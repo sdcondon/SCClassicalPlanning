@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <Authors>Simon Condon</Authors>
+    <Company />
+    <Product>SCClassicalPlanning</Product>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/sdcondon/SCClassicalPlanning.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/sdcondon/SCClassicalPlanning</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>2022 Simon Condon</Copyright>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <Version>0.0.0-localbuild+localbuild</Version>
+  </PropertyGroup>
+</Project>
