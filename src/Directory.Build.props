@@ -2,10 +2,10 @@
   <PropertyGroup>
     <Authors>Simon Condon</Authors>
     <Company />
-    <Product>SCClassicalPlanning</Product>
+    <Product>SCAutomatedPlanning</Product>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/sdcondon/SCClassicalPlanning.git</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/sdcondon/SCClassicalPlanning</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sdcondon/SCAutomatedPlanning.git</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/sdcondon/SCAutomatedPlanning</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>2022 Simon Condon</Copyright>
     <IncludeSymbols>true</IncludeSymbols>
