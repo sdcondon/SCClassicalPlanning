@@ -15,6 +15,10 @@
         /// <summary>
         /// Gets the set of atoms that comprise the state.
         /// </summary>
-        public Atom[] Atoms { get; }
+        public IReadOnlyCollection<Atom> Atoms { get; }
+
+        // TODO: public State Add(Atom atom)
+
+        // TODO: public State Remove(Atom atom)
     }
 }

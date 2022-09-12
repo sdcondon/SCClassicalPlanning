@@ -1,42 +1,65 @@
 ﻿using SCAutomatedPlanning.Classical;
-using static SCAutomatedPlanning.Classical.OperableStateFactory;
+using static SCAutomatedPlanning.Classical.StateCreation.OperableStateFactory;
 using Action = SCAutomatedPlanning.Classical.Action;
 
 namespace SCAutomatedPlanning.ExampleProblems.Classical
 {
+    /// <summary>
+    /// The "Blocks World" example from section 10.1.3 of "Artificial Intelligence: A Modern Approach".
+    /// </summary>
     public class BlocksWorld
     {
-        private static OperableAtom On(Variable above, Variable below) => new Atom(nameof(On), above, below);
+        /// <summary>
+        /// Gets the available actions.
+        /// </summary>
+        public static IEnumerable<Action> Actions { get; } = new Action[]
+        {
+            Move(B, X, Y),
+            MoveToTable(B, X),
+        };
 
-        private static OperableAtom Block(Variable block) => new Atom(nameof(Block), block);
+        public static Variable Table { get; } = new(nameof(Table));
+        public static Variable BlockA { get; } = new(nameof(BlockA));
+        public static Variable BlockB { get; } = new(nameof(BlockB));
+        public static Variable BlockC { get; } = new(nameof(BlockC));
 
-        private static OperableAtom Clear(Variable surface) => new Atom(nameof(Clear), surface);
+        /// <summary>
+        /// Gets the implicit state of the world, that will never change as the result of actions.
+        /// </summary>
+        public static OperableState ImplicitState => Block(BlockA) & Block(BlockB) & Block(BlockC);
 
-        private static OperableAtom Equal(Variable x, Variable y) => new Atom(nameof(Equal), x, y);
+        public static OperableAtom On(Variable above, Variable below) => new Atom(nameof(On), above, below);
+        public static OperableAtom Block(Variable block) => new Atom(nameof(Block), block);
+        public static OperableAtom Clear(Variable surface) => new Atom(nameof(Clear), surface);
+        public static OperableAtom Equal(Variable x, Variable y) => new Atom(nameof(Equal), x, y);
 
-        private static readonly Variable Table = new(nameof(Table));
-        private static readonly Variable A = new(nameof(A));
-        private static readonly Variable B = new(nameof(B));
-        private static readonly Variable C = new(nameof(C));
+        public static Action Move(Variable block, Variable from, Variable toBlock) => new(
+            symbol: nameof(Move),
+            precondition:
+                On(block, from)
+                & Clear(block)
+                & Clear(toBlock)
+                & Block(block)
+                & Block(toBlock)
+                & !Equal(block, from)
+                & !Equal(block, toBlock)
+                & !Equal(from, toBlock),
+            effect:
+                On(block, toBlock)
+                & Clear(from)
+                & !On(block, from)
+                & !Clear(toBlock));
 
-        private static readonly Variable b = new(nameof(b));
-        private static readonly Variable x = new(nameof(x));
-        private static readonly Variable y = new(nameof(y));
-
-        public static Problem Problem { get; } = new Problem(
-            initialState: On(A, Table) & On(B, Table) & On(C, A) & Block(A) & Block(B) & Block(C) & Clear(B) & Clear(C),
-            goalState: On(A, B) & On(B, C),
-            availableActions: new Action[]
-            {
-                new(
-                    symbol: "Move",
-                    precondition: On(b, x) & Clear(b) & Clear(y) & Block(b) & Block(y) & !Equal(b, x) & !Equal(b, y) & !Equal(x, y),
-                    effect: On(b, y) & Clear(x) & !On(b, x) & !Clear(y)),
-
-                new(
-                    symbol: "MoveToTable",
-                    precondition: On(b, x) & Clear(b) & Block(b) & !Equal(b, x),
-                    effect: On(b, Table) & Clear(x) & !On(b, x)),
-            });
+        public static Action MoveToTable(Variable block, Variable from) => new(
+            symbol: nameof(MoveToTable),
+            precondition:
+                On(block, from)
+                & Clear(block)
+                & Block(block)
+                & !Equal(block, from),
+            effect:
+                On(block, Table)
+                & Clear(from)
+                & !On(block, from));
     }
 }

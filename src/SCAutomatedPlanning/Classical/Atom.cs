@@ -35,5 +35,7 @@
         /// Gets the arguments of the underlying predicate.
         /// </summary>
         public Variable[] Variables { get; }
+
+        // TODO: public override bool Equals(Atom atom)
     }
 }

@@ -37,10 +37,12 @@
         /// Gets a value indicating whether the action is applicable in a givne state.
         /// </summary>
         /// <param name="state"></param>
-        /// <returns>A value indicating whether the action is applicable in a givne state.</returns>
-        public bool IsApplicableIn(State state)
+        /// <returns>A value indicating whether the action is applicable in a given state.</returns>
+        public bool IsApplicableTo(State state)
         {
             return false;
         }
+
+        // public State ApplyTo(State state)
     }
 }

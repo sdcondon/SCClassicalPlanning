@@ -1,44 +1,55 @@
 ﻿using SCAutomatedPlanning.Classical;
+using static SCAutomatedPlanning.Classical.StateCreation.OperableStateFactory;
 using Action = SCAutomatedPlanning.Classical.Action;
-using static SCAutomatedPlanning.Classical.OperableStateFactory;
 
 namespace SCAutomatedPlanning.ExampleProblems.Classical
 {
-    internal class SpareTire
+    /// <summary>
+    /// The "Spare Tire" example from section 10.1.2 of "Artificial Intelligence: A Modern Approach".
+    /// </summary>
+    public class SpareTire
     {
-        private static OperableAtom IsTire(Variable variable) => new Atom(nameof(IsTire), variable);
+        public static IEnumerable<Action> Actions => new Action[]
+        {
+            Remove(O, L),
+            PutOn(T),
+            LeaveOvernight(),
+        };
 
-        private static OperableAtom IsAt(Variable item, Variable location) => new Atom(nameof(IsAt), item, location);
+        public static Variable Spare { get; } = new(nameof(Spare));
+        public static Variable Flat { get; } = new(nameof(Spare));
+        public static Variable Axle { get; } = new(nameof(Axle));
+        public static Variable Trunk { get; } = new(nameof(Trunk));
+        public static Variable Ground { get; } = new(nameof(Ground));
 
-        private static readonly Variable Spare = new(nameof(Spare));
-        private static readonly Variable Flat = new(nameof(Spare));
-        private static readonly Variable Axle = new(nameof(Axle));
-        private static readonly Variable Trunk = new(nameof(Trunk));
-        private static readonly Variable Ground = new(nameof(Ground));
+        /// <summary>
+        /// Gets the implicit state of the world, that will never change as the result of actions.
+        /// </summary>
+        public static OperableState ImplicitState => IsTire(Spare) & IsTire(Flat);
 
-        private static readonly Variable obj = new(nameof(obj));
-        private static readonly Variable loc = new(nameof(loc));
-        private static readonly Variable t = new(nameof(t));
+        public static OperableAtom IsTire(Variable variable) => new Atom(nameof(IsTire), variable);
 
-        public static Problem Problem { get; } = new Problem(
-            initialState: IsTire(Spare) & IsTire(Flat) & IsAt(Flat, Axle) & IsAt(Spare, Trunk),
-            goalState: IsAt(Spare, Axle),
-            availableActions: new Action[]
-            {
-                new(
-                    symbol: "Remove",
-                    precondition: IsAt(obj, loc),
-                    effect: !IsAt(obj, loc) & IsAt(obj, Ground)),
+        public static OperableAtom IsAt(Variable item, Variable location) => new Atom(nameof(IsAt), item, location);
 
-                new(
-                    symbol: "PutOn",
-                    precondition: IsTire(t) & IsAt(t, Ground) & !IsAt(Flat, Axle),
-                    effect: !IsAt(t, Ground) & IsAt(t, Axle)),
+        public static Action Remove(Variable @object, Variable location) => new(
+            symbol: nameof(Remove),
+            precondition: IsAt(@object, location),
+            effect: !IsAt(@object, location) & IsAt(@object, Ground));
 
-                new(
-                    symbol: "LeaveOvernight",
-                    precondition: new(),
-                    effect: !IsAt(Spare, Ground) & !IsAt(Spare, Axle) & !IsAt(Spare, Trunk) & !IsAt(Flat, Ground) & !IsAt(Flat, Axle) & !IsAt(Flat, Trunk)),
-            });
+        public static Action PutOn(Variable tire) => new(
+            symbol: nameof(PutOn),
+            precondition: IsTire(tire) & IsAt(tire, Ground) & !IsAt(Flat, Axle),
+            effect: !IsAt(tire, Ground) & IsAt(tire, Axle));
+
+        public static Action LeaveOvernight() => new(
+            symbol: nameof(LeaveOvernight),
+            precondition: new(),
+            effect:
+                !IsAt(Spare, Ground)
+                & !IsAt(Spare, Axle)
+                & !IsAt(Spare, Trunk)
+                & !IsAt(Flat, Ground)
+                & !IsAt(Flat, Axle)
+                & !IsAt(Flat, Trunk));
     }
 }
