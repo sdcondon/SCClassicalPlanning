@@ -1,4 +1,6 @@
-﻿namespace SCAutomatedPlanning.Classical.StateCreation
+﻿using System.Collections.ObjectModel;
+
+namespace SCAutomatedPlanning.Classical.StateCreation
 {
     /// <summary>
     /// Shorthand factory methods for <see cref="State"/> instances.
@@ -30,21 +32,21 @@
         /// </summary>
         public class OperableAtom
         {
-            internal OperableAtom(bool isNegated, object symbol, Variable[] variables) => (IsNegated, Symbol, Variables) = (IsNegated, symbol, variables);
+            internal OperableAtom(bool isNegated, object symbol, IList<Variable> variables) => (IsNegated, Symbol, Arguments) = (IsNegated, symbol, new ReadOnlyCollection<Variable>(variables));
 
             public bool IsNegated { get; }
 
             public object Symbol { get; }
 
-            public Variable[] Variables { get; }
+            public ReadOnlyCollection<Variable> Arguments { get; }
 
-            public static OperableAtom operator !(OperableAtom atom) => new OperableAtom(!atom.IsNegated, atom.Symbol, atom.Variables);
+            public static OperableAtom operator !(OperableAtom atom) => new OperableAtom(!atom.IsNegated, atom.Symbol, atom.Arguments);
 
             public static OperableState operator &(OperableAtom left, OperableAtom right) => new OperableState(left, right);
 
-            public static implicit operator OperableAtom(Atom atom) => new OperableAtom(atom.IsNegated, atom.Symbol, atom.Variables);
+            public static implicit operator OperableAtom(Atom atom) => new OperableAtom(atom.IsNegated, atom.Symbol, atom.Arguments);
 
-            public static implicit operator Atom(OperableAtom atom) => new Atom(atom.IsNegated, atom.Symbol, atom.Variables);
+            public static implicit operator Atom(OperableAtom atom) => new Atom(atom.IsNegated, atom.Symbol, atom.Arguments);
 
             public static implicit operator State(OperableAtom atom) => new State(atom);
         }

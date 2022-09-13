@@ -2,20 +2,27 @@
 {
     /// <summary>
     /// Encapsulates some state of a problem.
-    /// Braodly analagous to a sentence of first order logic - consisting of a conjunction of literals.
     /// </summary>
     public class State
     {
+        private readonly HashSet<Atom> atoms;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="State"/> class.
         /// </summary>
-        /// <param name="atoms"></param>
-        public State(params Atom[] atoms) => Atoms = atoms;
+        /// <param name="atoms">The set of atoms that comprise the state.</param>
+        public State(IEnumerable<Atom> atoms) => this.atoms = new HashSet<Atom>(atoms);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="State"/> class.
+        /// </summary>
+        /// <param name="atoms">The set of atoms that comprise the state.</param>
+        public State(params Atom[] atoms) => this.atoms = new HashSet<Atom>(atoms);
 
         /// <summary>
         /// Gets the set of atoms that comprise the state.
         /// </summary>
-        public IReadOnlyCollection<Atom> Atoms { get; }
+        public IReadOnlySet<Atom> Atoms => atoms;
 
         // TODO: public State Add(Atom atom)
 
