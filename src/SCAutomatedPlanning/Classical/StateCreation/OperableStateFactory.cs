@@ -21,14 +21,14 @@ namespace SCAutomatedPlanning.Classical.StateCreation
 
             public static OperableState operator &(OperableAtom atom, OperableState state) => new OperableState(state.Atoms.Append(atom).ToArray());
 
-            public static implicit operator State(OperableState state) => new State(state.Atoms.Select(a => (Atom)a).ToArray());
+            public static implicit operator State(OperableState state) => new State(state.Atoms.Select(a => (Literal)a).ToArray());
 
             //public static implicit operator OperableState(OperableAtom atom) => new OperableState(atom);
         }
 
         /// <summary>
-        /// Surrogate class for <see cref="Atom"/> that defines ! and &amp; operators for negation and conjunction respectively. Implicitly convertible
-        /// from and to an <see cref="Atom"/>, and to a <see cref="State"/> (consisting of just this atom).
+        /// Surrogate class for <see cref="Literal"/> that defines ! and &amp; operators for negation and conjunction respectively. Implicitly convertible
+        /// from and to an <see cref="Literal"/>, and to a <see cref="State"/> (consisting of just this atom).
         /// </summary>
         public class OperableAtom
         {
@@ -44,9 +44,9 @@ namespace SCAutomatedPlanning.Classical.StateCreation
 
             public static OperableState operator &(OperableAtom left, OperableAtom right) => new OperableState(left, right);
 
-            public static implicit operator OperableAtom(Atom atom) => new OperableAtom(atom.IsNegated, atom.Symbol, atom.Arguments);
+            public static implicit operator OperableAtom(Literal atom) => new OperableAtom(atom.IsNegated, atom.Symbol, atom.Arguments);
 
-            public static implicit operator Atom(OperableAtom atom) => new Atom(atom.IsNegated, atom.Symbol, atom.Arguments);
+            public static implicit operator Literal(OperableAtom atom) => new Literal(atom.IsNegated, atom.Symbol, atom.Arguments);
 
             public static implicit operator State(OperableAtom atom) => new State(atom);
         }

@@ -28,10 +28,10 @@ namespace SCAutomatedPlanning.ExampleProblems.Classical
         /// </summary>
         public static OperableState ImplicitState => Block(BlockA) & Block(BlockB) & Block(BlockC);
 
-        public static OperableAtom On(Variable above, Variable below) => new Atom(nameof(On), above, below);
-        public static OperableAtom Block(Variable block) => new Atom(nameof(Block), block);
-        public static OperableAtom Clear(Variable surface) => new Atom(nameof(Clear), surface);
-        public static OperableAtom Equal(Variable x, Variable y) => new Atom(nameof(Equal), x, y);
+        public static OperableAtom On(Variable above, Variable below) => new Literal(nameof(On), above, below);
+        public static OperableAtom Block(Variable block) => new Literal(nameof(Block), block);
+        public static OperableAtom Clear(Variable surface) => new Literal(nameof(Clear), surface);
+        public static OperableAtom Equal(Variable x, Variable y) => new Literal(nameof(Equal), x, y);
 
         public static Action Move(Variable block, Variable from, Variable toBlock) => new(
             symbol: nameof(Move),

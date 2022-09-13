@@ -31,12 +31,12 @@ namespace SCAutomatedPlanning.ExampleProblems.Classical
         /// </summary>
         public static OperableState ImplicitState => Cargo(Cargo1) & Cargo(Cargo2) & Plane(Plane1) & Plane(Plane2) & Airport(JFK) & Airport(SFO);
 
-        public static OperableAtom At(Variable @object, Variable location) => new Atom(nameof(At), @object, location);
-        public static OperableAtom In(Variable @object, Variable container) => new Atom(nameof(In), @object, container);
-        public static OperableAtom Cargo(Variable cargo) => new Atom(nameof(Cargo), cargo);
-        public static OperableAtom Plane(Variable plane) => new Atom(nameof(Plane), plane);
+        public static OperableAtom At(Variable @object, Variable location) => new Literal(nameof(At), @object, location);
+        public static OperableAtom In(Variable @object, Variable container) => new Literal(nameof(In), @object, container);
+        public static OperableAtom Cargo(Variable cargo) => new Literal(nameof(Cargo), cargo);
+        public static OperableAtom Plane(Variable plane) => new Literal(nameof(Plane), plane);
 
-        public static OperableAtom Airport(Variable airport) => new Atom(nameof(Airport), airport);
+        public static OperableAtom Airport(Variable airport) => new Literal(nameof(Airport), airport);
 
         public static Action Load(Variable cargo, Variable plane, Variable airport) => new(
             symbol: nameof(Load),

@@ -27,9 +27,9 @@ namespace SCAutomatedPlanning.ExampleProblems.Classical
         /// </summary>
         public static OperableState ImplicitState => IsTire(Spare) & IsTire(Flat);
 
-        public static OperableAtom IsTire(Variable variable) => new Atom(nameof(IsTire), variable);
+        public static OperableAtom IsTire(Variable variable) => new Literal(nameof(IsTire), variable);
 
-        public static OperableAtom IsAt(Variable item, Variable location) => new Atom(nameof(IsAt), item, location);
+        public static OperableAtom IsAt(Variable item, Variable location) => new Literal(nameof(IsAt), item, location);
 
         public static Action Remove(Variable @object, Variable location) => new(
             symbol: nameof(Remove),

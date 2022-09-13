@@ -22,7 +22,8 @@ namespace SCAutomatedPlanning.Classical.Planners
         /// <summary>
         /// Gets the collection of available actions.
         /// <para/>
-        /// NB: Means planners are mutable. Perhaps worth revisiting - IPlanner and IMutablePlanner at some point..        /// </summary>
+        /// NB: This means planners are mutable. Perhaps worth revisiting - IPlanner and IMutablePlanner at some point..
+        /// /// </summary>
         ICollection<Action> Actions { get; }
     }
 }
