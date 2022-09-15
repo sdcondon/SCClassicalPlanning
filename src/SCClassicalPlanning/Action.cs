@@ -1,4 +1,4 @@
-﻿namespace SCAutomatedPlanning.Classical
+﻿namespace SCClassicalPlanning
 {
     /// <summary>
     /// Container for descriptive information about an action.

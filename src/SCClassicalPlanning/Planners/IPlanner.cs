@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SCClassicalPlanning;
 
-namespace SCAutomatedPlanning.Classical.Planners
+namespace SCClassicalPlanning.Planners
 {
     /// <summary>
     /// Interface for types that can create plans if given an initial state, goal state and set of possible actions.

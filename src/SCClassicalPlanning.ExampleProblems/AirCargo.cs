@@ -2,7 +2,7 @@
 using static SCAutomatedPlanning.Classical.StateCreation.OperableStateFactory;
 using Action = SCAutomatedPlanning.Classical.Action;
 
-namespace SCAutomatedPlanning.ExampleProblems.Classical
+namespace SCClassicalPlanning.ExampleProblems
 {
     /// <summary>
     /// The "Air Cargo" example from section 10.1.1 of "Artificial Intelligence: A Modern Approach".

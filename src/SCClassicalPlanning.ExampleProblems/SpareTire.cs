@@ -2,7 +2,7 @@
 using static SCAutomatedPlanning.Classical.StateCreation.OperableStateFactory;
 using Action = SCAutomatedPlanning.Classical.Action;
 
-namespace SCAutomatedPlanning.ExampleProblems.Classical
+namespace SCClassicalPlanning.ExampleProblems
 {
     /// <summary>
     /// The "Spare Tire" example from section 10.1.2 of "Artificial Intelligence: A Modern Approach".

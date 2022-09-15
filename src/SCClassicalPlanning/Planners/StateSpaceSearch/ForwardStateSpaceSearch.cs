@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SCClassicalPlanning;
 
-namespace SCAutomatedPlanning.Classical.Planners.StateSpaceSearch
+namespace SCClassicalPlanning.Planners.StateSpaceSearch
 {
     public class ForwardStateSpaceSearch : IPlanner
     {

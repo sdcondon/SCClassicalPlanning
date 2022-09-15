@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace SCAutomatedPlanning.Classical
+namespace SCClassicalPlanning
 {
     /// <summary>
     /// Encapsulates an atomic component of the state of a problem.

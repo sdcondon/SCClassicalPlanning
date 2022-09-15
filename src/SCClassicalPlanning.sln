@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCAutomatedPlanning", "SCAutomatedPlanning\SCAutomatedPlanning.csproj", "{F84D6B1A-801B-4C74-B214-231FE5B4B715}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanning", "SCClassicalPlanning\SCClassicalPlanning.csproj", "{F84D6B1A-801B-4C74-B214-231FE5B4B715}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCAutomatedPlanning.Tests", "SCAutomatedPlanning.Tests\SCAutomatedPlanning.Tests.csproj", "{C14C6CF7-2A5C-4975-84D7-D5B6DDFFFC7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanning.Tests", "SCClassicalPlanning.Tests\SCClassicalPlanning.Tests.csproj", "{C14C6CF7-2A5C-4975-84D7-D5B6DDFFFC7C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCAutomatedPlanning.ExampleProblems", "SCAutomatedPlanning.ExampleProblems\SCAutomatedPlanning.ExampleProblems.csproj", "{F933F571-54C0-4D4E-A04D-E2DDE3B49311}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanning.ExampleProblems", "SCClassicalPlanning.ExampleProblems\SCClassicalPlanning.ExampleProblems.csproj", "{F933F571-54C0-4D4E-A04D-E2DDE3B49311}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

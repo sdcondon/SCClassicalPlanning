@@ -8,7 +8,7 @@ using static SCAutomatedPlanning.ExampleProblems.Classical.AirCargo;
 using static SCAutomatedPlanning.ExampleProblems.Classical.BlocksWorld;
 using static SCAutomatedPlanning.ExampleProblems.Classical.SpareTire;
 
-namespace SCAutomatedPlanning.Tests.Classic.Planners.StateSpaceSearch
+namespace SCClassicalPlanning.Planners.StateSpaceSearch
 {
     internal class ForwardStateSpaceSearchTest
     {

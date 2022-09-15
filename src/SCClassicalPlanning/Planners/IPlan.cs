@@ -1,4 +1,6 @@
-﻿namespace SCAutomatedPlanning.Classical.Planners
+﻿using SCClassicalPlanning;
+
+namespace SCClassicalPlanning.Planners
 {
     /// <summary>
     /// Interface for types encapsulating a plan of action.

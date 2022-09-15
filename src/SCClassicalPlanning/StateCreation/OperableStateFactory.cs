@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace SCAutomatedPlanning.Classical.StateCreation
+namespace SCClassicalPlanning.StateCreation
 {
     /// <summary>
     /// Shorthand factory methods for <see cref="State"/> instances.

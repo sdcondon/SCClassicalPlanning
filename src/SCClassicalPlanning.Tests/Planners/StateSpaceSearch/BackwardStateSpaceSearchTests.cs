@@ -1,14 +1,14 @@
 ﻿using FluentAssertions;
 using FlUnit;
-using SCAutomatedPlanning.Classical;
-using SCAutomatedPlanning.Classical.Planners;
-using SCAutomatedPlanning.Classical.Planners.StateSpaceSearch;
-using SCAutomatedPlanning.ExampleProblems.Classical;
-using static SCAutomatedPlanning.ExampleProblems.Classical.AirCargo;
-using static SCAutomatedPlanning.ExampleProblems.Classical.BlocksWorld;
-using static SCAutomatedPlanning.ExampleProblems.Classical.SpareTire;
+using SCClassicalPlanning;
+using SCClassicalPlanning.Planners;
+using SCClassicalPlanning.Planners.StateSpaceSearch;
+using SCClassicalPlanning;
+using static SCClassicalPlanning.ExampleProblems.AirCargo;
+using static SCClassicalPlanning.ExampleProblems.BlocksWorld;
+using static SCClassicalPlanning.ExampleProblems.SpareTire;
 
-namespace SCAutomatedPlanning.Classic.Planners.StateSpaceSearch
+namespace SCClassicalPlanning.Planners.StateSpaceSearch
 {
     public static class BackwardStateSpaceSearchTests
     {

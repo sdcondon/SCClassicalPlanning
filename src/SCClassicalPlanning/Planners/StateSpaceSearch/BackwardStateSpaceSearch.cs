@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SCAutomatedPlanning.Classical.Planners.StateSpaceSearch
+﻿namespace SCClassicalPlanning.Planners.StateSpaceSearch
 {
     /// <summary>
     /// A simple implementation of <see cref="IPlanner"/> that carries out a backward search of

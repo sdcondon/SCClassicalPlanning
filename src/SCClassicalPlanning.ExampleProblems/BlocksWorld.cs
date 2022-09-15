@@ -2,7 +2,7 @@
 using static SCAutomatedPlanning.Classical.StateCreation.OperableStateFactory;
 using Action = SCAutomatedPlanning.Classical.Action;
 
-namespace SCAutomatedPlanning.ExampleProblems.Classical
+namespace SCClassicalPlanning.ExampleProblems
 {
     /// <summary>
     /// The "Blocks World" example from section 10.1.3 of "Artificial Intelligence: A Modern Approach".

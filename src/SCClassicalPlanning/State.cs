@@ -1,4 +1,4 @@
-﻿namespace SCAutomatedPlanning.Classical
+﻿namespace SCClassicalPlanning
 {
     /// <summary>
     /// Encapsulates some state of a problem. Braodly equivalent to a conjunction of its consituent literals.
