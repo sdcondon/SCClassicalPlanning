@@ -1,2 +1,2 @@
-# SCAutomatedPlanning User Guide
+# SCClassicalPlanning User Guide
 
