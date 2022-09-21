@@ -1,8 +1,6 @@
-﻿using SCAutomatedPlanning.Classical;
-using static SCAutomatedPlanning.Classical.StateCreation.OperableStateFactory;
-using Action = SCAutomatedPlanning.Classical.Action;
+﻿using static SCClassicalPlanning.ProblemCreation.CommonVariableDeclarations;
 
-namespace SCClassicalPlanning.ExampleProblems
+namespace SCClassicalPlanning.ExampleDomains
 {
     /// <summary>
     /// The "Blocks World" example from section 10.1.3 of "Artificial Intelligence: A Modern Approach".
@@ -10,31 +8,31 @@ namespace SCClassicalPlanning.ExampleProblems
     public class BlocksWorld
     {
         /// <summary>
-        /// Gets the available actions.
+        /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
         /// </summary>
-        public static IEnumerable<Action> Actions { get; } = new Action[]
-        {
-            Move(B, X, Y),
-            MoveToTable(B, X),
-        };
+        public static Domain Domain { get; } = new Domain(
+            predicates: new Predicate[]
+            {
+                Block(B),
+                On(B, S),
+                Clear(S),
+                Equal(X, Y),
+            },
+            actions: new Action[]
+            {
+                Move(B, X, Y),
+                MoveToTable(B, X),
+            });
 
         public static Variable Table { get; } = new(nameof(Table));
-        public static Variable BlockA { get; } = new(nameof(BlockA));
-        public static Variable BlockB { get; } = new(nameof(BlockB));
-        public static Variable BlockC { get; } = new(nameof(BlockC));
 
-        /// <summary>
-        /// Gets the implicit state of the world, that will never change as the result of actions.
-        /// </summary>
-        public static OperableState ImplicitState => Block(BlockA) & Block(BlockB) & Block(BlockC);
-
-        public static OperableAtom On(Variable above, Variable below) => new Literal(nameof(On), above, below);
-        public static OperableAtom Block(Variable block) => new Literal(nameof(Block), block);
-        public static OperableAtom Clear(Variable surface) => new Literal(nameof(Clear), surface);
-        public static OperableAtom Equal(Variable x, Variable y) => new Literal(nameof(Equal), x, y);
+        public static Predicate On(Variable above, Variable below) => new(nameof(On), above, below);
+        public static Predicate Block(Variable block) => new(nameof(Block), block);
+        public static Predicate Clear(Variable surface) => new(nameof(Clear), surface);
+        public static Predicate Equal(Variable x, Variable y) => new(nameof(Equal), x, y);
 
         public static Action Move(Variable block, Variable from, Variable toBlock) => new(
-            symbol: nameof(Move),
+            identifier: nameof(Move),
             precondition:
                 On(block, from)
                 & Clear(block)
@@ -51,7 +49,7 @@ namespace SCClassicalPlanning.ExampleProblems
                 & !Clear(toBlock));
 
         public static Action MoveToTable(Variable block, Variable from) => new(
-            symbol: nameof(MoveToTable),
+            identifier: nameof(MoveToTable),
             precondition:
                 On(block, from)
                 & Clear(block)

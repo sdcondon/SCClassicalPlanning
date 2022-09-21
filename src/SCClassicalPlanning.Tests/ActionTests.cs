@@ -1,11 +1,13 @@
 ﻿using FluentAssertions;
 using FlUnit;
-using static SCClassicalPlanning.ExampleProblems.Container;
+using static SCClassicalPlanning.ExampleDomains.Container;
 
 namespace SCClassicalPlanning
 {
     public static class ActionTests
     {
+        private static readonly Variable element1 = new Variable(nameof(element1));
+
         private record IsApplicableToTestCase(State initialState, Action action, bool expectedResult);
 
         public static Test IsApplicableToBehaviour => TestThat
@@ -13,38 +15,38 @@ namespace SCClassicalPlanning
             {
                 // Positive - positive precond
                 new(
-                    initialState: IsPresent(Element1),
-                    action: Remove(Element1),
+                    initialState: IsPresent(element1),
+                    action: Remove(element1),
                     expectedResult: true),
 
                 // Positive - explicit negative
                 new(
-                    initialState: !IsPresent(Element1),
-                    action: Add(Element1),
+                    initialState: !IsPresent(element1),
+                    action: Add(element1),
                     expectedResult: true),
 
                 // Positive - implicit negative
                 new(
                     initialState: State.Empty,
-                    action: Add(Element1),
+                    action: Add(element1),
                     expectedResult: true),
 
                 // Negative - Positive precond
                 new(
-                    initialState: IsPresent(Element1),
-                    action: Add(Element1),
+                    initialState: IsPresent(element1),
+                    action: Add(element1),
                     expectedResult: false),
 
                 // Negative - explicit negative
                 new(
-                    initialState: !IsPresent(Element1),
-                    action: Remove(Element1),
+                    initialState: !IsPresent(element1),
+                    action: Remove(element1),
                     expectedResult: false),
 
                 // Negative - implicit negative
                 new(
                     initialState: State.Empty,
-                    action: Remove(Element1),
+                    action: Remove(element1),
                     expectedResult: false),
             })
             .When(tc => tc.action.ApplyTo(tc.initialState))
@@ -59,25 +61,25 @@ namespace SCClassicalPlanning
                 // Adds atom
                 new(
                     initialState: State.Empty,
-                action: Add(Element1),
-                    expectedState: IsPresent(Element1)),
+                    action: Add(element1),
+                    expectedState: IsPresent(element1)),
 
                 // Removes atom
                 new(
-                initialState: IsPresent(Element1),
-                    action: Remove(Element1),
+                initialState: IsPresent(element1),
+                    action: Remove(element1),
                     expectedState: State.Empty),
 
                 // Doesn't add duplicate
                 new(
-                initialState: IsPresent(Element1),
-                action: Add(Element1),
-                    expectedState: IsPresent(Element1)),
+                    initialState: IsPresent(element1),
+                    action: Add(element1),
+                    expectedState: IsPresent(element1)),
 
                 // Doesn't complain about removing non-present element
                 new(
-                initialState: State.Empty,
-                    action: Remove(Element1),
+                    initialState: State.Empty,
+                    action: Remove(element1),
                     expectedState: State.Empty),
             })
             .When(tc => tc.action.ApplyTo(tc.initialState))

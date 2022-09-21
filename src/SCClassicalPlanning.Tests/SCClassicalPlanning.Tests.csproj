@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SCClassicalPlanning.ExampleProblems\SCClassicalPlanning.ExampleProblems.csproj" />
+    <ProjectReference Include="..\SCClassicalPlanning.ExampleProblems\SCClassicalPlanning.ExampleDomains.csproj" />
     <ProjectReference Include="..\SCClassicalPlanning\SCClassicalPlanning.csproj" />
   </ItemGroup>
 

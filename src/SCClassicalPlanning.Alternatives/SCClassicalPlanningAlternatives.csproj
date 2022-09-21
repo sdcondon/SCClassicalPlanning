@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="GrammarCentric\ExampleProblems\" />
+    <Folder Include="GrammarCentric\ProblemCreation\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SCFirstOrderLogic" Version="1.1.0" />
+  </ItemGroup>
+
+    <PropertyGroup>
+        <Antlr4UseCSharpGenerator>True</Antlr4UseCSharpGenerator>
+    </PropertyGroup>
+
+</Project>

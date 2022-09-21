@@ -1,10 +1,6 @@
-﻿using global::SCClassicalPlanning.Planners;
-using SCClassicalPlanning.Planners;
-using SCFirstOrderLogic.Planning.Planners;
-using SCFirstOrderLogic.SentenceFormatting;
-using System.Text;
+﻿using System.Text;
 
-namespace SCClassicalPlanning.Formatting
+namespace SCClassicalPlanning.Planning
 {
     /// <summary>
     /// Formatting logic for plans (and actions).
@@ -27,9 +23,12 @@ namespace SCClassicalPlanning.Formatting
             return builder.ToString();
         }
 
-        public string Format(Action action)
-        {
-            return $"{action.Symbol}: {string.Join(", ", action.Effect.Atoms.Select(a => sentenceFormatter.Format(a)))})";
-        }
+        public string Format(Action action) => $"{action.Identifier}: {string.Join(", ", action.Effect.Elements.Select(Format))})";
+
+        public string Format(Literal literal) => $"{(literal.IsNegated ? "¬" : "")}{Format(literal.Predicate)}";
+
+        public string Format(Predicate predicate) => $"{predicate.Identifier}({string.Join(", ", predicate.Arguments.Select(Format))})";
+
+        public string? Format(Variable variable) => variable.Identifier.ToString();
     }
 }

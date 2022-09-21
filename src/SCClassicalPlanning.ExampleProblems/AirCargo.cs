@@ -1,8 +1,6 @@
-﻿using SCAutomatedPlanning.Classical;
-using static SCAutomatedPlanning.Classical.StateCreation.OperableStateFactory;
-using Action = SCAutomatedPlanning.Classical.Action;
+﻿using static SCClassicalPlanning.ProblemCreation.CommonVariableDeclarations; // For A-Z variable declarations
 
-namespace SCClassicalPlanning.ExampleProblems
+namespace SCClassicalPlanning.ExampleDomains
 {
     /// <summary>
     /// The "Air Cargo" example from section 10.1.1 of "Artificial Intelligence: A Modern Approach".
@@ -10,36 +8,32 @@ namespace SCClassicalPlanning.ExampleProblems
     public class AirCargo
     {
         /// <summary>
-        /// Gets the available actions.
+        /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates Air Cargo domain.
         /// </summary>
-        public static IEnumerable<Action> Actions { get; } = new Action[]
-        {
-            Load(C, P, A),
-            Unload(C, P, A),
-            Fly(P, F, T),
-        };
+        public static Domain Domain { get; } = new Domain(
+            predicates: new Predicate[]
+            {
+                Cargo(C),
+                Plane(P),
+                Airport(A),
+                In(C, P),
+                At(C, A),
+            },
+            actions: new Action[]
+            {
+                Load(C, P, A),
+                Unload(C, P, A),
+                Fly(P, F, T),
+            });
 
-        public static Variable Cargo1 { get; } = new(nameof(Cargo1));
-        public static Variable Cargo2 { get; } = new(nameof(Cargo2));
-        public static Variable Plane1 { get; } = new(nameof(Plane1));
-        public static Variable Plane2 { get; } = new(nameof(Plane2));
-        public static Variable JFK { get; } = new(nameof(JFK));
-        public static Variable SFO { get; } = new(nameof(SFO));
-
-        /// <summary>
-        /// Gets the implicit state of the world, that will never change as the result of actions.
-        /// </summary>
-        public static OperableState ImplicitState => Cargo(Cargo1) & Cargo(Cargo2) & Plane(Plane1) & Plane(Plane2) & Airport(JFK) & Airport(SFO);
-
-        public static OperableAtom At(Variable @object, Variable location) => new Literal(nameof(At), @object, location);
-        public static OperableAtom In(Variable @object, Variable container) => new Literal(nameof(In), @object, container);
-        public static OperableAtom Cargo(Variable cargo) => new Literal(nameof(Cargo), cargo);
-        public static OperableAtom Plane(Variable plane) => new Literal(nameof(Plane), plane);
-
-        public static OperableAtom Airport(Variable airport) => new Literal(nameof(Airport), airport);
+        public static Predicate Cargo(Variable cargo) => new Predicate(nameof(Cargo), cargo);
+        public static Predicate Plane(Variable plane) => new Predicate(nameof(Plane), plane);
+        public static Predicate Airport(Variable airport) => new Predicate(nameof(Airport), airport);
+        public static Predicate At(Variable @object, Variable location) => new Predicate(nameof(At), @object, location);
+        public static Predicate In(Variable @object, Variable container) => new Predicate(nameof(In), @object, container);
 
         public static Action Load(Variable cargo, Variable plane, Variable airport) => new(
-            symbol: nameof(Load),
+            identifier: nameof(Load),
             precondition:
                 At(cargo, airport)
                 & At(plane, airport)
@@ -51,7 +45,7 @@ namespace SCClassicalPlanning.ExampleProblems
                 & In(cargo, plane));
 
         public static Action Unload(Variable cargo, Variable plane, Variable airport) => new(
-            symbol: nameof(Unload),
+            identifier: nameof(Unload),
             precondition:
                 In(cargo, plane)
                 & At(plane, airport)
@@ -63,7 +57,7 @@ namespace SCClassicalPlanning.ExampleProblems
                 & !In(cargo, plane));
 
         public static Action Fly(Variable plane, Variable from, Variable to) => new(
-            symbol: nameof(Fly),
+            identifier: nameof(Fly),
             precondition:
                 At(plane, from)
                 & Plane(plane)
