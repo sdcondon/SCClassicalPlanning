@@ -18,7 +18,7 @@
         public State Precondition { get; }
 
         /// <summary>
-        /// Gets the effect of the action. All unmentioneds predicates are assumed to be unchanged.
+        /// Gets the effect of the action. All unmentioned predicates are assumed to be unchanged.
         /// <para/>
         /// NB: In real PDDL, effects are their own type, not the same type as is used to represent goals and preconditions.
         /// The reason being that said types include more than just elements, and these extra members differ.
@@ -51,5 +51,21 @@
         /// <param name="state">The state to apply the action to.</param>
         /// <returns>The new state.</returns>
         public State ApplyTo(State state) => new State(state.Elements.Except(DeleteList).Union(AddList));
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public bool IsRegressableFrom(State state) => throw new NotImplementedException();
+
+        /// <summary>
+        /// Regresses from a given state over the action.
+        /// That is, gives the minimal state that would have existed prior to performing the action, if the given state was the result.
+        /// </summary>
+        /// <param name="state">The state to regress from.</param>
+        /// <returns>The minimal state that would have existed prior to performing the action, if the given state was the result.</returns>
+        public State Regress(State state) => new State(state.Elements.Except(AddList).Union(Precondition.Elements));
     }
 }
