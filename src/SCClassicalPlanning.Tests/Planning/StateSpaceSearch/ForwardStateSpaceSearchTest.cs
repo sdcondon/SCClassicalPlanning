@@ -95,7 +95,7 @@ namespace SCAutomatedPlanning.Planning.StateSpaceSearch
         {
             public IPlan Execute()
             {
-                var planner = new ForwardStateSpaceSearch();
+                var planner = new ForwardStateSpaceSearch((s, g) => 0);
                 var problem = new Problem(Domain, InitialState, GoalState);
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
             }

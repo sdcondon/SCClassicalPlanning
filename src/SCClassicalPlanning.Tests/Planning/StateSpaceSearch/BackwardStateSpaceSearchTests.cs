@@ -94,7 +94,7 @@ namespace SCClassicalPlanning.Planners.StateSpaceSearch
         {
             public IPlan Execute()
             {
-                var planner = new BackwardStateSpaceSearch();
+                var planner = new BackwardStateSpaceSearch((s, g) => 0);
                 var problem = new Problem(Domain, InitialState, GoalState);
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
             }
