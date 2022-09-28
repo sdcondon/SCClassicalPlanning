@@ -1,9 +1,8 @@
 ﻿using SCGraphTheory.Search.Classic;
 using SCGraphTheory;
 using System.Collections.ObjectModel;
-using SCClassicalPlanning;
 
-namespace SCClassicalPlanning.Planning.StateSpaceSearch
+namespace SCClassicalPlanningAlternatives.OwnFolModel.Planning.StateSpaceSearch
 {
     /// <summary>
     /// A simple implementation of <see cref="IPlanner"/> that carries out a backward search of
@@ -28,13 +27,14 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.GoalState),
                 isTarget: n => n.State.IsSuperstateOf(problem.InitialState),
-                getEdgeCost: e => 1,
+                getEdgeCost: e => 0,
                 getEstimatedCostToTarget: n => heuristic(n.State, problem.InitialState));
 
             await Task.Run(() => search.Complete());
 
             return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
         }
+
 
         // IsRelevantTo
 

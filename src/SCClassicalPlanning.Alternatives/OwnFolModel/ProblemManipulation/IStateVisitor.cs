@@ -1,4 +1,4 @@
-﻿namespace SCClassicalPlanning.ProblemManipulation
+﻿namespace SCClassicalPlanningAlternatives.OwnFolModel.ProblemManipulation
 {
     /// <summary>
     /// Interface for visitors of <see cref="State"/> instances.

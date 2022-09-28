@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SCClassicalPlanning.ProblemManipulation
+﻿namespace SCClassicalPlanningAlternatives.OwnFolModel.ProblemManipulation
 {
     /// <summary>
     /// Base class for recursive visitors of <see cref="Sentence"/> instances.

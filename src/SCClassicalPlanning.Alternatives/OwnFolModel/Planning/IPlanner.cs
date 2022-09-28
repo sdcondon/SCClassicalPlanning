@@ -1,6 +1,4 @@
-﻿using SCClassicalPlanning;
-
-namespace SCClassicalPlanning.Planning
+﻿namespace SCClassicalPlanningAlternatives.OwnFolModel.Planning
 {
     /// <summary>
     /// Interface for types that can create plans for given problems.

@@ -9,10 +9,12 @@
   <ItemGroup>
     <Folder Include="GrammarCentric\ExampleProblems\" />
     <Folder Include="GrammarCentric\ProblemCreation\" />
+    <Folder Include="OwnFolModel\Planning\GraphPlan\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="SCFirstOrderLogic" Version="1.1.0" />
+    <PackageReference Include="SCFirstOrderLogic" Version="2.1.0-pre.2" />
+    <PackageReference Include="SCGraphTheory.Search" Version="2.3.2" />
   </ItemGroup>
 
     <PropertyGroup>

@@ -1,8 +1,7 @@
-﻿using SCClassicalPlanningAlternatives.UsingSCFirstOrderLogic.ProblemManipulation;
-using SCFirstOrderLogic;
+﻿using SCClassicalPlanningAlternatives.OwnFolModel.ProblemManipulation;
 using System.Collections.ObjectModel;
 
-namespace SCClassicalPlanningAlternatives.UsingSCFirstOrderLogic
+namespace SCClassicalPlanningAlternatives.OwnFolModel
 {
     /// <summary>
     /// Encapsulates a planning problem.
@@ -16,10 +15,10 @@ namespace SCClassicalPlanningAlternatives.UsingSCFirstOrderLogic
         /// <param name="objects">The objects that exist in this problem.</param>
         /// <param name="initialState">The initial state of the problem.</param>
         /// <param name="goalState">the goal state of the problem.</param>
-        public Problem(Domain domain, IList<Constant> objects, State initialState, State goalState)
+        public Problem(Domain domain, IList<Variable> objects, State initialState, State goalState)
         {
             Domain = domain;
-            Objects = new ReadOnlyCollection<Constant>(objects);
+            Objects = new ReadOnlyCollection<Variable>(objects);
             InitialState = initialState;
             GoalState = goalState;
         }
@@ -27,20 +26,20 @@ namespace SCClassicalPlanningAlternatives.UsingSCFirstOrderLogic
         /// <summary>
         /// Initializes a new instance of the <see cref="Problem"/> class, in which the objects that exist are inferred from the variables that are present in the initial and goal states.
         /// </summary>
-        /// <param name="domain"></param>
-        /// <param name="initialState"></param>
-        /// <param name="goalState"></param>
+        /// <param name="domain">The domain in which this problem resides.</param>
+        /// <param name="initialState">The initial state of the problem.</param>
+        /// <param name="goalState">the goal state of the problem.</param>
         public Problem(Domain domain, State initialState, State goalState)
         {
             Domain = domain;
             InitialState = initialState;
             GoalState = goalState;
 
-            var variableFinder = new ConstantFinder();
-            var variables = new HashSet<Constant>();
+            var variableFinder = new VariableFinder();
+            var variables = new HashSet<Variable>();
             variableFinder.Visit(initialState, variables);
             variableFinder.Visit(goalState, variables);
-            Objects = new ReadOnlyCollection<Constant>(variables.ToArray());
+            Objects = new ReadOnlyCollection<Variable>(variables.ToArray());
         }
 
         /// <summary>
@@ -51,7 +50,7 @@ namespace SCClassicalPlanningAlternatives.UsingSCFirstOrderLogic
         /// <summary>
         /// Gets the objects that exist in the problem.
         /// </summary>
-        public IReadOnlyCollection<Constant> Objects { get; }
+        public IReadOnlyCollection<Variable> Objects { get; }
 
         /// <summary>
         /// Gets the initial state of the problem.
@@ -63,9 +62,9 @@ namespace SCClassicalPlanningAlternatives.UsingSCFirstOrderLogic
         /// </summary>
         public State GoalState { get; }
 
-        private class ConstantFinder : RecursiveStateVisitor<HashSet<Constant>>
+        private class VariableFinder : RecursiveStateVisitor<HashSet<Variable>>
         {
-            public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
+            public override void Visit(Variable variable, HashSet<Variable> variables) => variables.Add(variable);
         }
     }
 }

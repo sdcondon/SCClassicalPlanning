@@ -1,4 +1,6 @@
-﻿namespace SCClassicalPlanning.ProblemManipulation
+﻿using SCFirstOrderLogic;
+
+namespace SCClassicalPlanning.ProblemManipulation
 {
     /// <summary>
     /// Interface for visitors of <see cref="State"/> instances.
@@ -17,9 +19,9 @@
         void Visit(State state, TState visitationState);
 
         /// <summary>
-        /// Visits a <see cref="Literal"/> instance.
+        /// Visits a <see cref="CNFLiteral"/> instance.
         /// </summary>
-        /// <param name="literal">The <see cref="Literal"/> instance to visit.</param>
+        /// <param name="literal">The <see cref="CNFLiteral"/> instance to visit.</param>
         /// <param name="visitationState">A reference to the state of this visitation.</param>
         void Visit(Literal literal, TState visitationState);
 

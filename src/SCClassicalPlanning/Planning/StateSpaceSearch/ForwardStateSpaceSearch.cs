@@ -1,5 +1,7 @@
-﻿using SCGraphTheory;
+﻿using SCClassicalPlanning;
+using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
+using System.Collections;
 using System.Collections.ObjectModel;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch
@@ -49,14 +51,24 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public State State { get; }
 
             /// <inheritdoc />
-            public IReadOnlyCollection<StateSpaceEdge> Edges
+            public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(problem, State);
+        }
+
+        private struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
+        {
+            private readonly Problem problem;
+            private readonly State state;
+
+            public StateSpaceNodeEdges(Problem problem, State state) => (this.problem, this.state) = (problem, state);
+
+            public int Count => this.Count();
+
+            public IEnumerator<StateSpaceEdge> GetEnumerator()
             {
-                get
-                {
-                    // TODO: Find applicable actions, new state is action applied to this state.
-                    throw new NotImplementedException();
-                }
+                yield break; //TODO
             }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         private struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>

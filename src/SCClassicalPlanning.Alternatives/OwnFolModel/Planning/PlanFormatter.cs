@@ -1,7 +1,7 @@
-﻿using SCFirstOrderLogic.SentenceFormatting;
-using System.Text;
+﻿using System.Text;
+using SCClassicalPlanningAlternatives.OwnFolModel;
 
-namespace SCClassicalPlanning.Planning
+namespace SCClassicalPlanningAlternatives.OwnFolModel.Planning
 {
     /// <summary>
     /// Formatting logic for plans (and actions).
@@ -12,8 +12,6 @@ namespace SCClassicalPlanning.Planning
     /// </summary>
     public class PlanFormatter
     {
-        private readonly SentenceFormatter sentenceFormatter = new SentenceFormatter();
-
         public string Format(IPlan plan)
         {
             var builder = new StringBuilder();
@@ -26,9 +24,12 @@ namespace SCClassicalPlanning.Planning
             return builder.ToString();
         }
 
-        public string Format(Action action)
-        {
-            return $"{action.Identifier}: {string.Join(", ", action.Effect.Elements.Select(e => sentenceFormatter.Format(e)))})";
-        }
+        public string Format(Action action) => $"{action.Identifier}: {string.Join(", ", action.Effect.Elements.Select(Format))})";
+
+        public string Format(Literal literal) => $"{(literal.IsNegated ? "¬" : "")}{Format(literal.Predicate)}";
+
+        public string Format(Predicate predicate) => $"{predicate.Identifier}({string.Join(", ", predicate.Arguments.Select(Format))})";
+
+        public string? Format(Variable variable) => variable.Identifier.ToString();
     }
 }

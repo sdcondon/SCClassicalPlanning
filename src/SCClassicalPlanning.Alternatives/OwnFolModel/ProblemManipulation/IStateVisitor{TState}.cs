@@ -1,7 +1,6 @@
-﻿using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
+﻿using SCClassicalPlanningAlternatives.OwnFolModel;
 
-namespace SCClassicalPlanningAlternatives.UsingSCFirstOrderLogic.ProblemManipulation
+namespace SCClassicalPlanningAlternatives.OwnFolModel.ProblemManipulation
 {
     /// <summary>
     /// Interface for visitors of <see cref="State"/> instances.
@@ -20,11 +19,11 @@ namespace SCClassicalPlanningAlternatives.UsingSCFirstOrderLogic.ProblemManipula
         void Visit(State state, TState visitationState);
 
         /// <summary>
-        /// Visits a <see cref="CNFLiteral"/> instance.
+        /// Visits a <see cref="Literal"/> instance.
         /// </summary>
-        /// <param name="literal">The <see cref="CNFLiteral"/> instance to visit.</param>
+        /// <param name="literal">The <see cref="Literal"/> instance to visit.</param>
         /// <param name="visitationState">A reference to the state of this visitation.</param>
-        void Visit(CNFLiteral literal, TState visitationState);
+        void Visit(Literal literal, TState visitationState);
 
         /// <summary>
         /// Visits a <see cref="Predicate"/> instance. 

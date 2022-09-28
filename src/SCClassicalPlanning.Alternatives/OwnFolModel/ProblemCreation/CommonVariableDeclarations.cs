@@ -1,4 +1,4 @@
-﻿namespace SCClassicalPlanning.ProblemCreation
+﻿namespace SCClassicalPlanningAlternatives.OwnFolModel.ProblemCreation
 {
     /// <summary>
     /// Shorthand factory methods for <see cref="State"/> instances.

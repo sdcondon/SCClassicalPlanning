@@ -1,6 +1,6 @@
-﻿using SCClassicalPlanning;
+﻿using SCClassicalPlanningAlternatives.OwnFolModel;
 
-namespace SCClassicalPlanning.Planning
+namespace SCClassicalPlanningAlternatives.OwnFolModel.Planning
 {
     /// <summary>
     /// Interface for types encapsulating a plan of action.

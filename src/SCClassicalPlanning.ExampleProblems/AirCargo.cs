@@ -1,4 +1,5 @@
-﻿using static SCClassicalPlanning.ProblemCreation.CommonVariableDeclarations; // For A-Z variable declarations
+﻿using SCFirstOrderLogic;
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.ExampleDomains
 {
@@ -26,45 +27,45 @@ namespace SCClassicalPlanning.ExampleDomains
                 Fly(P, F, T),
             });
 
-        public static Predicate Cargo(Variable cargo) => new Predicate(nameof(Cargo), cargo);
-        public static Predicate Plane(Variable plane) => new Predicate(nameof(Plane), plane);
-        public static Predicate Airport(Variable airport) => new Predicate(nameof(Airport), airport);
-        public static Predicate At(Variable @object, Variable location) => new Predicate(nameof(At), @object, location);
-        public static Predicate In(Variable @object, Variable container) => new Predicate(nameof(In), @object, container);
+        public static OperablePredicate Cargo(Term cargo) => new Predicate(nameof(Cargo), cargo);
+        public static OperablePredicate Plane(Term plane) => new Predicate(nameof(Plane), plane);
+        public static OperablePredicate Airport(Term airport) => new Predicate(nameof(Airport), airport);
+        public static OperablePredicate At(Term @object, Term location) => new Predicate(nameof(At), @object, location);
+        public static OperablePredicate In(Term @object, Term container) => new Predicate(nameof(In), @object, container);
 
-        public static Action Load(Variable cargo, Variable plane, Variable airport) => new(
+        public static Action Load(Term cargo, Term plane, Term airport) => new(
             identifier: nameof(Load),
-            precondition:
+            precondition: new State(
                 At(cargo, airport)
                 & At(plane, airport)
                 & Cargo(cargo)
                 & Plane(plane)
-                & Airport(airport),
-            effect:
+                & Airport(airport)),
+            effect: new State(
                 !At(cargo, airport)
-                & In(cargo, plane));
+                & In(cargo, plane)));
 
-        public static Action Unload(Variable cargo, Variable plane, Variable airport) => new(
+        public static Action Unload(Term cargo, Term plane, Term airport) => new(
             identifier: nameof(Unload),
-            precondition:
+            precondition: new State(
                 In(cargo, plane)
                 & At(plane, airport)
                 & Cargo(cargo)
                 & Plane(plane)
-                & Airport(airport),
-            effect:
+                & Airport(airport)),
+            effect: new State(
                 At(cargo, airport)
-                & !In(cargo, plane));
+                & !In(cargo, plane)));
 
-        public static Action Fly(Variable plane, Variable from, Variable to) => new(
+        public static Action Fly(Term plane, Term from, Term to) => new(
             identifier: nameof(Fly),
-            precondition:
+            precondition: new State(
                 At(plane, from)
                 & Plane(plane)
                 & Airport(from)
-                & Airport(to),
-            effect:
+                & Airport(to)),
+            effect: new State(
                 !At(plane, from)
-                & At(plane, to));
+                & At(plane, to)));
     }
 }

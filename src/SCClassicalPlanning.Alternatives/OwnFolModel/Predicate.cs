@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace SCClassicalPlanning
+namespace SCClassicalPlanningAlternatives.OwnFolModel
 {
     /// <summary>
     /// Represents a predicate of first order logic. That is, some fact (taking zero or more terms as arguments) that either holds true or does not.

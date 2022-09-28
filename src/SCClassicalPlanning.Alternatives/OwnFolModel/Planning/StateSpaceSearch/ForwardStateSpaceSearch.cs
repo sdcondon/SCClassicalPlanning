@@ -1,16 +1,11 @@
-﻿using SCGraphTheory.Search.Classic;
+﻿using SCClassicalPlanningAlternatives.OwnFolModel;
 using SCGraphTheory;
+using SCGraphTheory.Search.Classic;
 using System.Collections.ObjectModel;
-using SCClassicalPlanning;
 
-namespace SCClassicalPlanning.Planning.StateSpaceSearch
+namespace SCClassicalPlanningAlternatives.OwnFolModel.Planning.StateSpaceSearch
 {
-    /// <summary>
-    /// A simple implementation of <see cref="IPlanner"/> that carries out a backward search of
-    /// the state space to create plans. See section 10.2.2 of "Artificial Intelligence: A Modern
-    /// Approach" for more on this.
-    /// </summary>
-    public class BackwardStateSpaceSearch : IPlanner
+    public class ForwardStateSpaceSearch : IPlanner
     {
         private readonly Func<State, State, float> heuristic;
 
@@ -18,7 +13,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class.
         /// </summary>
         /// <param name="heuristic">The heuristic to use.</param>
-        public BackwardStateSpaceSearch(Func<State, State, float> heuristic) => this.heuristic = heuristic;
+        public ForwardStateSpaceSearch(Func<State, State, float> heuristic) => this.heuristic = heuristic;
 
         /// <inheritdoc />
         async Task<IPlan> IPlanner.CreatePlanAsync(Problem problem) => await CreatePlanAsync(problem);
@@ -26,17 +21,15 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         public async Task<Plan> CreatePlanAsync(Problem problem)
         {
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
-                source: new StateSpaceNode(problem, problem.GoalState),
-                isTarget: n => n.State.IsSuperstateOf(problem.InitialState),
-                getEdgeCost: e => 1,
-                getEstimatedCostToTarget: n => heuristic(n.State, problem.InitialState));
+                source: new StateSpaceNode(problem, problem.InitialState),
+                isTarget: n => n.State.IsSuperstateOf(problem.GoalState),
+                getEdgeCost: e => 0,
+                getEstimatedCostToTarget: n => heuristic(n.State, problem.GoalState));
 
             await Task.Run(() => search.Complete());
 
             return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
         }
-
-        // IsRelevantTo
 
         public class Plan : IPlan
         {
@@ -61,7 +54,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 get
                 {
-                    // TODO: Find relevant actions, new state is state regressed over action.
+                    // TODO: Find applicable actions, new state is action applied to this state.
                     throw new NotImplementedException();
                 }
             }

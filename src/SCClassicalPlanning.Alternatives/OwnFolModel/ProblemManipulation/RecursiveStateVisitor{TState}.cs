@@ -1,7 +1,4 @@
-﻿using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
-
-namespace SCClassicalPlanningAlternatives.UsingSCFirstOrderLogic.ProblemManipulation
+﻿namespace SCClassicalPlanningAlternatives.OwnFolModel.ProblemManipulation
 {
     /// <summary>
     /// Base class for recursive visitors of <see cref="State"/> instances that reference external visitation state
@@ -23,11 +20,11 @@ namespace SCClassicalPlanningAlternatives.UsingSCFirstOrderLogic.ProblemManipula
         }
 
         /// <summary>
-        /// Visits a <see cref="CNFLiteral"/> instance. 
+        /// Visits a <see cref="Literal"/> instance. 
         /// The default implementation just visits the underlying predicate.
         /// </summary>
-        /// <param name="literal">The <see cref="CNFLiteral"/> instance to visit.</param>
-        public virtual void Visit(CNFLiteral literal, TState visitState)
+        /// <param name="literal">The <see cref="Literal"/> instance to visit.</param>
+        public virtual void Visit(Literal literal, TState visitState)
         {
             Visit(literal.Predicate, visitState);
         }
@@ -46,40 +43,11 @@ namespace SCClassicalPlanningAlternatives.UsingSCFirstOrderLogic.ProblemManipula
         }
 
         /// <summary>
-        /// Visits a <see cref="Term"/> instance.
-        /// The default implementation doesn't do anything.
-        /// </summary>
-        /// <param name="term">The term to visit.</param>
-        public virtual void Visit(Term term, TState visitState)
-        {
-            switch (term)
-            {
-                case Constant constant:
-                    Visit(constant, visitState);
-                    break;
-                case VariableReference variableReference:
-                    Visit(variableReference, visitState);
-                    break;
-                default:
-                    throw new ArgumentException("Unsupported term type", nameof(term));
-            };
-        }
-
-        /// <summary>
-        /// Visits a <see cref="Constant"/> instance.
-        /// The default implementation doesn't do anything.
-        /// </summary>
-        /// <param name="constant">The constant to visit.</param>
-        public virtual void Visit(Constant constant, TState visitState)
-        {
-        }
-
-        /// <summary>
-        /// Visits a <see cref="VariableReference"/> instance.
+        /// Visits a <see cref="Variable"/> instance.
         /// The default implementation doesn't do anything.
         /// </summary>
         /// <param name="variable">The variable reference to visit.</param>
-        public virtual void Visit(VariableReference variableReference, TState visitState)
+        public virtual void Visit(Variable variable, TState visitState)
         {
         }
     }

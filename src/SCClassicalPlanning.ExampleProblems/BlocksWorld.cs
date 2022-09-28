@@ -1,4 +1,5 @@
-﻿using static SCClassicalPlanning.ProblemCreation.CommonVariableDeclarations;
+﻿using SCFirstOrderLogic;
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.ExampleDomains
 {
@@ -8,7 +9,7 @@ namespace SCClassicalPlanning.ExampleDomains
     public class BlocksWorld
     {
         /// <summary>
-        /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
+        /// Gets a <see cref="OwnFolModel.Domain"/ instance that encapsulates the "Blocks World" domain.
         /// </summary>
         public static Domain Domain { get; } = new Domain(
             predicates: new Predicate[]
@@ -24,16 +25,16 @@ namespace SCClassicalPlanning.ExampleDomains
                 MoveToTable(B, X),
             });
 
-        public static Variable Table { get; } = new(nameof(Table));
+        public static Constant Table { get; } = new(nameof(Table));
 
-        public static Predicate On(Variable above, Variable below) => new(nameof(On), above, below);
-        public static Predicate Block(Variable block) => new(nameof(Block), block);
-        public static Predicate Clear(Variable surface) => new(nameof(Clear), surface);
-        public static Predicate Equal(Variable x, Variable y) => new(nameof(Equal), x, y);
+        public static OperablePredicate On(Term above, Term below) => new Predicate(nameof(On), above, below);
+        public static OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
+        public static OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
+        public static OperablePredicate Equal(Term x, Term y) => new Predicate(nameof(Equal), x, y);
 
-        public static Action Move(Variable block, Variable from, Variable toBlock) => new(
+        public static Action Move(Term block, Term from, Term toBlock) => new(
             identifier: nameof(Move),
-            precondition:
+            precondition: new State(
                 On(block, from)
                 & Clear(block)
                 & Clear(toBlock)
@@ -41,23 +42,23 @@ namespace SCClassicalPlanning.ExampleDomains
                 & Block(toBlock)
                 & !Equal(block, from)
                 & !Equal(block, toBlock)
-                & !Equal(from, toBlock),
-            effect:
+                & !Equal(from, toBlock)),
+            effect: new State(
                 On(block, toBlock)
                 & Clear(from)
                 & !On(block, from)
-                & !Clear(toBlock));
+                & !Clear(toBlock)));
 
-        public static Action MoveToTable(Variable block, Variable from) => new(
+        public static Action MoveToTable(Term block, Term from) => new(
             identifier: nameof(MoveToTable),
-            precondition:
+            precondition: new State(
                 On(block, from)
                 & Clear(block)
                 & Block(block)
-                & !Equal(block, from),
-            effect:
+                & !Equal(block, from)),
+            effect: new State(
                 On(block, Table)
                 & Clear(from)
-                & !On(block, from));
+                & !On(block, from)));
     }
 }

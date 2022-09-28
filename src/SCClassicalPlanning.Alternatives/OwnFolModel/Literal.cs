@@ -1,4 +1,4 @@
-﻿namespace SCClassicalPlanning
+﻿namespace SCClassicalPlanningAlternatives.OwnFolModel
 {
     /// <summary>
     /// Represents a literal of first-order logic. That is, a predicate or negated predicate.

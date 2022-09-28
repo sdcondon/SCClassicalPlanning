@@ -1,6 +1,4 @@
-﻿using SCFirstOrderLogic;
-
-namespace SCClassicalPlanning
+﻿namespace SCClassicalPlanningAlternatives.OwnFolModel
 {
     /// <summary>
     /// 
@@ -35,17 +33,15 @@ namespace SCClassicalPlanning
         /// </summary>
         public State Effect { get; }
 
-        /// TODI: variables - lazily, via visitor
-
         /// <summary>
         /// Gets the "add list" of the action - the non-negated atoms in the action's effect.
         /// </summary>
-        public IEnumerable<Predicate> AddList => Effect.Elements.Where(a => !a.IsNegated).Select(l => l.Predicate);
+        public IEnumerable<Literal> AddList => Effect.Elements.Where(a => !a.IsNegated);
 
         /// <summary>
         /// Gets the "delete list" of the action - the negated atoms in the action's effect.
         /// </summary>
-        public IEnumerable<Predicate> DeleteList => Effect.Elements.Where(a => a.IsNegated).Select(l => l.Predicate);
+        public IEnumerable<Literal> DeleteList => Effect.Elements.Where(a => a.IsNegated);
 
         /// <summary>
         /// Gets a value indicating whether the action is applicable in a given state.
@@ -57,7 +53,7 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Applies this action to a given state, producing a new state.
         /// <para/>
-        /// NB: Does not validate preconditions to be of use with particular heuristics.
+        /// NB: Does not validate preconditions to be of use with particular heuristics..
         /// </summary>
         /// <param name="state">The state to apply the action to.</param>
         /// <returns>The new state.</returns>

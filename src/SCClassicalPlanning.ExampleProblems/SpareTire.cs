@@ -1,4 +1,5 @@
-﻿using static SCClassicalPlanning.ProblemCreation.CommonVariableDeclarations;
+﻿using SCFirstOrderLogic;
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.ExampleDomains
 {
@@ -8,7 +9,7 @@ namespace SCClassicalPlanning.ExampleDomains
     public class SpareTire
     {
         /// <summary>
-        /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Spare Tire" domain.
+        /// Gets a <see cref="OwnFolModel.Domain"/ instance that encapsulates the "Spare Tire" domain.
         /// </summary>
         public static Domain Domain { get; } = new Domain(
             predicates: new Predicate[]
@@ -23,40 +24,40 @@ namespace SCClassicalPlanning.ExampleDomains
                 LeaveOvernight(),
             });
 
-        public static Variable Spare { get; } = new(nameof(Spare));
-        public static Variable Flat { get; } = new(nameof(Flat));
-        public static Variable Ground { get; } = new(nameof(Ground));
-        public static Variable Axle { get; } = new(nameof(Axle));
-        public static Variable Trunk { get; } = new(nameof(Trunk));
+        public static Constant Spare { get; } = new(nameof(Spare));
+        public static Constant Flat { get; } = new(nameof(Flat));
+        public static Constant Ground { get; } = new(nameof(Ground));
+        public static Constant Axle { get; } = new(nameof(Axle));
+        public static Constant Trunk { get; } = new(nameof(Trunk));
 
         /// <summary>
         /// Gets the implicit state of the world, that will never change as the result of actions.
         /// </summary>
-        public static State ImplicitState => IsTire(Spare) & IsTire(Flat);
+        public static State ImplicitState => new State(IsTire(Spare) & IsTire(Flat));
 
-        public static Predicate IsTire(Variable variable) => new(nameof(IsTire), variable);
+        public static OperablePredicate IsTire(OperableTerm tire) => new Predicate(nameof(IsTire), tire);
 
-        public static Predicate IsAt(Variable item, Variable location) => new(nameof(IsAt), item, location);
+        public static OperablePredicate IsAt(OperableTerm item, OperableTerm location) => new Predicate(nameof(IsAt), item, location);
 
-        public static Action Remove(Variable @object, Variable location) => new(
+        public static Action Remove(OperableTerm @object, OperableTerm location) => new(
             identifier: nameof(Remove),
-            precondition: IsAt(@object, location),
-            effect: !IsAt(@object, location) & IsAt(@object, Ground));
+            precondition: new State(IsAt(@object, location)),
+            effect: new State(!IsAt(@object, location) & IsAt(@object, Ground)));
 
-        public static Action PutOn(Variable tire) => new(
+        public static Action PutOn(Term tire) => new(
             identifier: nameof(PutOn),
-            precondition: IsTire(tire) & IsAt(tire, Ground) & !IsAt(Flat, Axle),
-            effect: !IsAt(tire, Ground) & IsAt(tire, Axle));
+            precondition: new State(IsTire(tire) & IsAt(tire, Ground) & !IsAt(Flat, Axle)),
+            effect: new State(!IsAt(tire, Ground) & IsAt(tire, Axle)));
 
         public static Action LeaveOvernight() => new(
             identifier: nameof(LeaveOvernight),
             precondition: State.Empty,
-            effect:
+            effect: new State(
                 !IsAt(Spare, Ground)
                 & !IsAt(Spare, Axle)
                 & !IsAt(Spare, Trunk)
                 & !IsAt(Flat, Ground)
                 & !IsAt(Flat, Axle)
-                & !IsAt(Flat, Trunk));
+                & !IsAt(Flat, Trunk)));
     }
 }
