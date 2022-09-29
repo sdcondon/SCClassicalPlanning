@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains;
-using SCClassicalPlanning.OwnFolModel;
 using SCClassicalPlanning.Planning;
 using SCClassicalPlanning.Planning.StateSpaceSearch;
+using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.BlocksWorld;
 using static SCClassicalPlanning.ExampleDomains.SpareTire;
@@ -16,16 +16,16 @@ namespace SCClassicalPlanning.Planners.StateSpaceSearch
             .GivenTestContext()
             .And(() =>
             {
-                Variable cargo1 = new(nameof(cargo1));
-                Variable cargo2 = new(nameof(cargo2));
-                Variable plane1 = new(nameof(plane1));
-                Variable plane2 = new(nameof(plane2));
-                Variable sfo = new(nameof(sfo));
-                Variable jfk = new(nameof(jfk));
+                VariableDeclaration cargo1 = new(nameof(cargo1));
+                VariableDeclaration cargo2 = new(nameof(cargo2));
+                VariableDeclaration plane1 = new(nameof(plane1));
+                VariableDeclaration plane2 = new(nameof(plane2));
+                VariableDeclaration sfo = new(nameof(sfo));
+                VariableDeclaration jfk = new(nameof(jfk));
 
                 return new TestCase(
                     Domain: AirCargo.Domain,
-                    InitialState:
+                    InitialState: new State(
                         Cargo(cargo1)
                         & Cargo(cargo2)
                         & Plane(plane1)
@@ -35,10 +35,10 @@ namespace SCClassicalPlanning.Planners.StateSpaceSearch
                         & At(cargo1, sfo)
                         & At(cargo2, jfk)
                         & At(plane1, sfo)
-                        & At(plane2, jfk),
-                    GoalState:
+                        & At(plane2, jfk)),
+                    GoalState: new State(
                         At(cargo1, jfk)
-                        & At(cargo2, sfo));
+                        & At(cargo2, sfo)));
             })
             .When((_, tc) => tc.Execute())
             .ThenReturns()
@@ -49,13 +49,13 @@ namespace SCClassicalPlanning.Planners.StateSpaceSearch
             .GivenTestContext()
             .And(() =>
             {
-                Variable blockA = new(nameof(blockA));
-                Variable blockB = new(nameof(blockB));
-                Variable blockC = new(nameof(blockC));
+                VariableReference blockA = new(nameof(blockA));
+                VariableReference blockB = new(nameof(blockB));
+                VariableReference blockC = new(nameof(blockC));
 
                 return new TestCase(
                     Domain: BlocksWorld.Domain,
-                    InitialState:
+                    InitialState: new(
                         Block(blockA)
                         & Block(blockB)
                         & Block(blockC)
@@ -63,10 +63,10 @@ namespace SCClassicalPlanning.Planners.StateSpaceSearch
                         & On(blockB, Table)
                         & On(blockC, blockA)
                         & Clear(blockB)
-                        & Clear(blockC),
-                    GoalState:
+                        & Clear(blockC)),
+                    GoalState: new(
                         On(blockA, blockB)
-                        & On(blockB, blockC));
+                        & On(blockB, blockC)));
             })
             .When((_, tc) => tc.Execute())
             .ThenReturns()
@@ -79,12 +79,12 @@ namespace SCClassicalPlanning.Planners.StateSpaceSearch
             {
                 return new TestCase(
                     Domain: SpareTire.Domain,
-                    InitialState:
+                    InitialState: new(
                         SpareTire.ImplicitState
                         & IsAt(Flat, Axle)
-                        & IsAt(Spare, Trunk),
-                    GoalState:
-                        IsAt(Spare, Axle));
+                        & IsAt(Spare, Trunk)),
+                    GoalState: new(
+                        IsAt(Spare, Axle)));
             })
             .When((_, tc) => tc.Execute())
             .ThenReturns()

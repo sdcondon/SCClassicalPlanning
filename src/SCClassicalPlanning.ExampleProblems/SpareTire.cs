@@ -33,7 +33,7 @@ namespace SCClassicalPlanning.ExampleDomains
         /// <summary>
         /// Gets the implicit state of the world, that will never change as the result of actions.
         /// </summary>
-        public static State ImplicitState => new State(IsTire(Spare) & IsTire(Flat));
+        public static OperableSentence ImplicitState => IsTire(Spare) & IsTire(Flat);
 
         public static OperablePredicate IsTire(OperableTerm tire) => new Predicate(nameof(IsTire), tire);
 
@@ -42,17 +42,17 @@ namespace SCClassicalPlanning.ExampleDomains
         public static Action Remove(OperableTerm @object, OperableTerm location) => new(
             identifier: nameof(Remove),
             precondition: new State(IsAt(@object, location)),
-            effect: new State(!IsAt(@object, location) & IsAt(@object, Ground)));
+            effect: new Effect(!IsAt(@object, location) & IsAt(@object, Ground)));
 
         public static Action PutOn(Term tire) => new(
             identifier: nameof(PutOn),
             precondition: new State(IsTire(tire) & IsAt(tire, Ground) & !IsAt(Flat, Axle)),
-            effect: new State(!IsAt(tire, Ground) & IsAt(tire, Axle)));
+            effect: new Effect(!IsAt(tire, Ground) & IsAt(tire, Axle)));
 
         public static Action LeaveOvernight() => new(
             identifier: nameof(LeaveOvernight),
             precondition: State.Empty,
-            effect: new State(
+            effect: new Effect(
                 !IsAt(Spare, Ground)
                 & !IsAt(Spare, Axle)
                 & !IsAt(Spare, Trunk)

@@ -1,13 +1,13 @@
 ﻿using FluentAssertions;
 using FlUnit;
-using SCClassicalPlanning.OwnFolModel;
+using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.Container;
 
 namespace SCClassicalPlanning
 {
     public static class ActionTests
     {
-        private static readonly Variable element1 = new Variable(nameof(element1));
+        private static readonly VariableDeclaration element1 = new(nameof(element1));
 
         private record IsApplicableToTestCase(State initialState, Action action, bool expectedResult);
 
@@ -16,13 +16,13 @@ namespace SCClassicalPlanning
             {
                 // Positive - positive precond
                 new(
-                    initialState: IsPresent(element1),
+                    initialState: new(IsPresent(element1)),
                     action: Remove(element1),
                     expectedResult: true),
 
                 // Positive - explicit negative
                 new(
-                    initialState: !IsPresent(element1),
+                    initialState: new(!IsPresent(element1)),
                     action: Add(element1),
                     expectedResult: true),
 
@@ -34,13 +34,13 @@ namespace SCClassicalPlanning
 
                 // Negative - Positive precond
                 new(
-                    initialState: IsPresent(element1),
+                    initialState: new(IsPresent(element1)),
                     action: Add(element1),
                     expectedResult: false),
 
                 // Negative - explicit negative
                 new(
-                    initialState: !IsPresent(element1),
+                    initialState: new(!IsPresent(element1)),
                     action: Remove(element1),
                     expectedResult: false),
 
@@ -63,19 +63,19 @@ namespace SCClassicalPlanning
                 new(
                     initialState: State.Empty,
                     action: Add(element1),
-                    expectedState: IsPresent(element1)),
+                    expectedState: new(IsPresent(element1))),
 
                 // Removes atom
                 new(
-                initialState: IsPresent(element1),
+                    initialState: new(IsPresent(element1)),
                     action: Remove(element1),
                     expectedState: State.Empty),
 
                 // Doesn't add duplicate
                 new(
-                    initialState: IsPresent(element1),
+                    initialState: new(IsPresent(element1)),
                     action: Add(element1),
-                    expectedState: IsPresent(element1)),
+                    expectedState: new(IsPresent(element1))),
 
                 // Doesn't complain about removing non-present element
                 new(

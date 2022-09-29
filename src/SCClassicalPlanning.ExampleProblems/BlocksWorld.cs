@@ -43,7 +43,7 @@ namespace SCClassicalPlanning.ExampleDomains
                 & !Equal(block, from)
                 & !Equal(block, toBlock)
                 & !Equal(from, toBlock)),
-            effect: new State(
+            effect: new Effect(
                 On(block, toBlock)
                 & Clear(from)
                 & !On(block, from)
@@ -56,7 +56,7 @@ namespace SCClassicalPlanning.ExampleDomains
                 & Clear(block)
                 & Block(block)
                 & !Equal(block, from)),
-            effect: new State(
+            effect: new Effect(
                 On(block, Table)
                 & Clear(from)
                 & !On(block, from)));

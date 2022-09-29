@@ -1,10 +1,10 @@
 ﻿using SCFirstOrderLogic;
+using System.Collections.Immutable;
 
 namespace SCClassicalPlanning
 {
     /// <summary>
-    /// Surrogate class for <see cref="State"/> that defines a &amp; operators for conjuncting additional atoms. Implicitly convertible
-    /// from and to <see cref="State"/> instances.
+    ///
     /// <para/>
     /// TODO: talk (briefly) about the differences and similarities between this and GD/Effect in PDDL.
     /// <para/>
@@ -13,27 +13,27 @@ namespace SCClassicalPlanning
     public sealed class State
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="State"/> class from an enumerable of the literals that comprise it.
+        /// Initializes a new instance of the <see cref="State"/> class from an enumerable of the predicates that comprise it.
         /// </summary>
-        /// <param name="elements">The literals that comprise the state.</param>
-        public State(IEnumerable<Literal> elements)
+        /// <param name="elements">The predicates that comprise the state.</param>
+        public State(IEnumerable<Predicate> elements)
         {
-            Elements = new HashSet<Literal>(elements);
+            Elements = elements.ToImmutableHashSet();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="State"/> class from a (params) array of the literals that comprise it.
+        /// Initializes a new instance of the <see cref="State"/> class from a (params) array of the predicates that comprise it.
         /// </summary>
-        /// <param name="elements">The literals that comprise the state.</param>
-        public State(params Literal[] elements) : this((IEnumerable<Literal>)elements) { }
+        /// <param name="elements">The predicates that comprise the state.</param>
+        public State(params Predicate[] elements) : this((IEnumerable<Predicate>)elements) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="State" /> class from a sentence of first order logic. The sentence must normalize to a conjunction of literals, or an exception will be thrown.
+        /// Initializes a new instance of the <see cref="State" /> class from a sentence of first order logic. The sentence must normalize to a conjunction of positive literals, or an exception will be thrown.
         /// </summary>
         /// <param name="sentence"></param>
         public State(Sentence sentence)
         {
-            var elements = new HashSet<Literal>();
+            var elements = new HashSet<Predicate>();
 
             foreach (var clause in new CNFSentence(sentence).Clauses)
             {
@@ -42,10 +42,17 @@ namespace SCClassicalPlanning
                     throw new ArgumentException();
                 }
 
-                elements.Add(clause.Literals.First());
+                var literal = clause.Literals.First();
+
+                if (literal.IsNegated)
+                {
+                    throw new ArgumentException();
+                }
+
+                elements.Add(literal.Predicate);
             }
 
-            Elements = elements;
+            Elements = elements.ToImmutableHashSet();
         }
 
         /// <summary>
@@ -54,9 +61,9 @@ namespace SCClassicalPlanning
         public static State Empty { get; } = new State();
 
         /// <summary>
-        /// Gets the set of literals that comprise this state.
+        /// Gets the set of predicates that comprise this state.
         /// </summary>
-        public IReadOnlySet<Literal> Elements { get; }
+        public IReadOnlySet<Predicate> Elements { get; }
 
         /// <summary>
         /// Gets a value indicating whether this state's elements are a subset of the given state's elements.

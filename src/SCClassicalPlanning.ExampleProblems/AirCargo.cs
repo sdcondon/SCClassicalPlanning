@@ -41,7 +41,7 @@ namespace SCClassicalPlanning.ExampleDomains
                 & Cargo(cargo)
                 & Plane(plane)
                 & Airport(airport)),
-            effect: new State(
+            effect: new Effect(
                 !At(cargo, airport)
                 & In(cargo, plane)));
 
@@ -53,7 +53,7 @@ namespace SCClassicalPlanning.ExampleDomains
                 & Cargo(cargo)
                 & Plane(plane)
                 & Airport(airport)),
-            effect: new State(
+            effect: new Effect(
                 At(cargo, airport)
                 & !In(cargo, plane)));
 
@@ -64,7 +64,7 @@ namespace SCClassicalPlanning.ExampleDomains
                 & Plane(plane)
                 & Airport(from)
                 & Airport(to)),
-            effect: new State(
+            effect: new Effect(
                 !At(plane, from)
                 & At(plane, to)));
     }
