@@ -11,9 +11,9 @@ namespace SCClassicalPlanning
         /// Initializes a new instance of the <see cref="Action"/> class. 
         /// </summary>
         /// <param name="identifier">The identifier for this action.</param>
-        /// <param name="precondition">The preconditional state for the action.</param>
+        /// <param name="precondition">The precondition for the action.</param>
         /// <param name="effect">The effect of the action.</param>
-        public Action(object identifier, State precondition, Effect effect) => (Identifier, Precondition, Effect) = (identifier, precondition, effect);
+        public Action(object identifier, GoalDescription precondition, Effect effect) => (Identifier, Precondition, Effect) = (identifier, precondition, effect);
 
         /// <summary>
         /// Gets the identifier for the action.
@@ -21,10 +21,10 @@ namespace SCClassicalPlanning
         public object Identifier { get; }
 
         /// <summary>
-        /// Gets the preconditional state for the action.
+        /// Gets the precondition for the action.
         /// This elements of this state must be a subset of the current state in order for the action to be applicable.
         /// </summary>
-        public State Precondition { get; }
+        public GoalDescription Precondition { get; }
 
         /// <summary>
         /// Gets the effect of the action. All unmentioned predicates are assumed to be unchanged.
@@ -38,12 +38,17 @@ namespace SCClassicalPlanning
         /// </summary>
         /// <param name="state">The state to examine.</param>
         /// <returns>A value indicating whether the action is applicable in a given state.</returns>
-        public bool IsApplicableTo(State state) => Precondition.Elements.IsSubsetOf(state.Elements); // unification - prob a different method..?
+        public bool IsApplicableTo(State state)
+        {
+            // unification - prob a different method..?
+            return state.Elements.IsSupersetOf(Precondition.Elements.Where(l => l.IsPositive).Select(l => l.Predicate))
+                && !state.Elements.Overlaps(Precondition.Elements.Where(l => l.IsNegated).Select(l => l.Predicate));
+        }
 
         /// <summary>
         /// Applies this action to a given state, producing a new state.
         /// <para/>
-        /// NB: Does not validate preconditions to be of use with particular heuristics.
+        /// NB: Does NOT validate preconditions - to be of use with particular heuristics.
         /// </summary>
         /// <param name="state">The state to apply the action to.</param>
         /// <returns>The new state.</returns>
@@ -62,6 +67,6 @@ namespace SCClassicalPlanning
         /// </summary>
         /// <param name="state">The state to regress from.</param>
         /// <returns>The minimal state that could have existed prior to performing the action, if the given state was the result.</returns>
-        public State Regress(State state) => new State(state.Elements.Except(Effect.AddList).Union(Precondition.Elements));
+        ////public State Regress(State state) => new State(state.Elements.Except(Effect.AddList).Union(Precondition.Elements));
     }
 }

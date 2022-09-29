@@ -35,7 +35,7 @@ namespace SCClassicalPlanning.ExampleDomains
 
         public static Action Load(Term cargo, Term plane, Term airport) => new(
             identifier: nameof(Load),
-            precondition: new State(
+            precondition: new GoalDescription(
                 At(cargo, airport)
                 & At(plane, airport)
                 & Cargo(cargo)
@@ -47,7 +47,7 @@ namespace SCClassicalPlanning.ExampleDomains
 
         public static Action Unload(Term cargo, Term plane, Term airport) => new(
             identifier: nameof(Unload),
-            precondition: new State(
+            precondition: new GoalDescription(
                 In(cargo, plane)
                 & At(plane, airport)
                 & Cargo(cargo)
@@ -59,7 +59,7 @@ namespace SCClassicalPlanning.ExampleDomains
 
         public static Action Fly(Term plane, Term from, Term to) => new(
             identifier: nameof(Fly),
-            precondition: new State(
+            precondition: new GoalDescription(
                 At(plane, from)
                 & Plane(plane)
                 & Airport(from)

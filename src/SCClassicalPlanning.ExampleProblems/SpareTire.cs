@@ -41,17 +41,17 @@ namespace SCClassicalPlanning.ExampleDomains
 
         public static Action Remove(OperableTerm @object, OperableTerm location) => new(
             identifier: nameof(Remove),
-            precondition: new State(IsAt(@object, location)),
+            precondition: new GoalDescription(IsAt(@object, location)),
             effect: new Effect(!IsAt(@object, location) & IsAt(@object, Ground)));
 
         public static Action PutOn(Term tire) => new(
             identifier: nameof(PutOn),
-            precondition: new State(IsTire(tire) & IsAt(tire, Ground) & !IsAt(Flat, Axle)),
+            precondition: new GoalDescription(IsTire(tire) & IsAt(tire, Ground) & !IsAt(Flat, Axle)),
             effect: new Effect(!IsAt(tire, Ground) & IsAt(tire, Axle)));
 
         public static Action LeaveOvernight() => new(
             identifier: nameof(LeaveOvernight),
-            precondition: State.Empty,
+            precondition: GoalDescription.Empty,
             effect: new Effect(
                 !IsAt(Spare, Ground)
                 & !IsAt(Spare, Axle)

@@ -7,6 +7,7 @@ using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.BlocksWorld;
 using static SCClassicalPlanning.ExampleDomains.SpareTire;
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.Planners.StateSpaceSearch
 {
@@ -16,12 +17,12 @@ namespace SCClassicalPlanning.Planners.StateSpaceSearch
             .GivenTestContext()
             .And(() =>
             {
-                VariableDeclaration cargo1 = new(nameof(cargo1));
-                VariableDeclaration cargo2 = new(nameof(cargo2));
-                VariableDeclaration plane1 = new(nameof(plane1));
-                VariableDeclaration plane2 = new(nameof(plane2));
-                VariableDeclaration sfo = new(nameof(sfo));
-                VariableDeclaration jfk = new(nameof(jfk));
+                VariableReference cargo1 = new(nameof(cargo1));
+                VariableReference cargo2 = new(nameof(cargo2));
+                VariableReference plane1 = new(nameof(plane1));
+                VariableReference plane2 = new(nameof(plane2));
+                VariableReference sfo = new(nameof(sfo));
+                VariableReference jfk = new(nameof(jfk));
 
                 return new TestCase(
                     Domain: AirCargo.Domain,

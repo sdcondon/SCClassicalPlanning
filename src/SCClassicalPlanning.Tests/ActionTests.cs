@@ -2,12 +2,13 @@
 using FlUnit;
 using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.Container;
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning
 {
     public static class ActionTests
     {
-        private static readonly VariableDeclaration element1 = new(nameof(element1));
+        private static readonly OperableVariableReference element1 = new VariableReference(nameof(element1));
 
         private record IsApplicableToTestCase(State initialState, Action action, bool expectedResult);
 
