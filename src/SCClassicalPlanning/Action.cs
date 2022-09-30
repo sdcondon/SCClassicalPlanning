@@ -1,6 +1,4 @@
-﻿using SCFirstOrderLogic;
-
-namespace SCClassicalPlanning
+﻿namespace SCClassicalPlanning
 {
     /// <summary>
     /// Container for information about an action that can be carried out within a domain.

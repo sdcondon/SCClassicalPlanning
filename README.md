@@ -1,3 +1,5 @@
+![SCClassicalPlanning Icon](src/SCClassicalPlanning.png)
+
 # SCClassicalPlanning
 
 Very simple classical planning implementations. These are implementations of some of the concepts introduced in chapter 10 of _Artificial Intelligence: A Modern Approach_ (3rd Edition - [ISBN 978-1292153964](https://www.google.com/search?q=isbn+978-1292153964)). Specifically:
