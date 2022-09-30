@@ -15,43 +15,31 @@ namespace SCClassicalPlanning
         public static Test IsApplicableToBehaviour => TestThat
             .GivenEachOf(() => new IsApplicableToTestCase[]
             {
-                // Positive - positive precond
+                // Positive - positive precondition
                 new(
                     initialState: new(IsPresent(element1)),
                     action: Remove(element1),
                     expectedResult: true),
 
-                // Positive - explicit negative
-                new(
-                    initialState: new(!IsPresent(element1)),
-                    action: Add(element1),
-                    expectedResult: true),
-
-                // Positive - implicit negative
+                // Positive - negative precondition
                 new(
                     initialState: State.Empty,
                     action: Add(element1),
                     expectedResult: true),
 
-                // Negative - Positive precond
+                // Negative - positive precondition
                 new(
                     initialState: new(IsPresent(element1)),
                     action: Add(element1),
                     expectedResult: false),
 
-                // Negative - explicit negative
-                new(
-                    initialState: new(!IsPresent(element1)),
-                    action: Remove(element1),
-                    expectedResult: false),
-
-                // Negative - implicit negative
+                // Negative - negative precondition
                 new(
                     initialState: State.Empty,
                     action: Remove(element1),
                     expectedResult: false),
             })
-            .When(tc => tc.action.ApplyTo(tc.initialState))
+            .When(tc => tc.action.IsApplicableTo(tc.initialState))
             .ThenReturns()
             .And((tc, r) => r.Should().Be(tc.expectedResult));
 

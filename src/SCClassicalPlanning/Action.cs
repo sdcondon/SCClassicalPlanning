@@ -3,7 +3,7 @@
 namespace SCClassicalPlanning
 {
     /// <summary>
-    /// 
+    /// Container for information about an action that can be carried out within a domain.
     /// </summary>
     public sealed class Action
     {
@@ -13,7 +13,7 @@ namespace SCClassicalPlanning
         /// <param name="identifier">The identifier for this action.</param>
         /// <param name="precondition">The precondition for the action.</param>
         /// <param name="effect">The effect of the action.</param>
-        public Action(object identifier, GoalDescription precondition, Effect effect) => (Identifier, Precondition, Effect) = (identifier, precondition, effect);
+        public Action(object identifier, Goal precondition, Effect effect) => (Identifier, Precondition, Effect) = (identifier, precondition, effect);
 
         /// <summary>
         /// Gets the identifier for the action.
@@ -24,7 +24,7 @@ namespace SCClassicalPlanning
         /// Gets the precondition for the action.
         /// This elements of this state must be a subset of the current state in order for the action to be applicable.
         /// </summary>
-        public GoalDescription Precondition { get; }
+        public Goal Precondition { get; }
 
         /// <summary>
         /// Gets the effect of the action. All unmentioned predicates are assumed to be unchanged.
@@ -38,12 +38,7 @@ namespace SCClassicalPlanning
         /// </summary>
         /// <param name="state">The state to examine.</param>
         /// <returns>A value indicating whether the action is applicable in a given state.</returns>
-        public bool IsApplicableTo(State state)
-        {
-            // unification - prob a different method..?
-            return state.Elements.IsSupersetOf(Precondition.Elements.Where(l => l.IsPositive).Select(l => l.Predicate))
-                && !state.Elements.Overlaps(Precondition.Elements.Where(l => l.IsNegated).Select(l => l.Predicate));
-        }
+        public bool IsApplicableTo(State state) => Precondition.IsSatisfiedBy(state);
 
         /// <summary>
         /// Applies this action to a given state, producing a new state.
@@ -54,19 +49,8 @@ namespace SCClassicalPlanning
         /// <returns>The new state.</returns>
         public State ApplyTo(State state) => Effect.ApplyTo(state);
 
-        /// <summary>
-        /// Gets a value indicate whether a given state could be the result of applying this action.
-        /// </summary>
-        /// <param name="state">The state to examine.</param>
-        /// <returns>A value indicate whether a given state could be the result of applying this action.</returns>
-        public bool IsRegressableFrom(State state) => throw new NotImplementedException();
+        ////public bool IsRegressableFrom(Goal goal) => throw new NotImplementedException();
 
-        /// <summary>
-        /// Regresses from a given state over the action.
-        /// That is, gives the minimal state that could have existed prior to performing the action, if the given state was the result.
-        /// </summary>
-        /// <param name="state">The state to regress from.</param>
-        /// <returns>The minimal state that could have existed prior to performing the action, if the given state was the result.</returns>
-        ////public State Regress(State state) => new State(state.Elements.Except(Effect.AddList).Union(Precondition.Elements));
+        ////public Goal Regress(Goal goal) => new State(goal.Elements.Except(Effect.AddList).Union(Precondition.Elements));
     }
 }

@@ -1,5 +1,4 @@
-﻿using SCClassicalPlanning;
-using SCGraphTheory;
+﻿using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -8,13 +7,13 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
     public class ForwardStateSpaceSearch : IPlanner
     {
-        private readonly Func<State, State, float> heuristic;
+        private readonly Func<State, Goal, float> heuristic;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class.
         /// </summary>
-        /// <param name="heuristic">The heuristic to use.</param>
-        public ForwardStateSpaceSearch(Func<State, State, float> heuristic) => this.heuristic = heuristic;
+        /// <param name="heuristic">The heuristic to use - should give an estimate of the number of actions required to get from the current state to a goal.</param>
+        public ForwardStateSpaceSearch(Func<State, Goal, float> heuristic) => this.heuristic = heuristic;
 
         /// <inheritdoc />
         async Task<IPlan> IPlanner.CreatePlanAsync(Problem problem) => await CreatePlanAsync(problem);
@@ -23,9 +22,9 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         {
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.InitialState),
-                isTarget: n => n.State.IsSuperstateOf(problem.GoalState),
-                getEdgeCost: e => 0,
-                getEstimatedCostToTarget: n => heuristic(n.State, problem.GoalState));
+                isTarget: n => problem.Goal.IsSatisfiedBy(n.State),
+                getEdgeCost: e => 1,
+                getEstimatedCostToTarget: n => heuristic(n.State, problem.Goal));
 
             await Task.Run(() => search.Complete());
 
@@ -65,7 +64,13 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             public IEnumerator<StateSpaceEdge> GetEnumerator()
             {
-                yield break; //TODO
+                foreach (var action in problem.GetAvailableActions(state))
+                {
+                    yield return new StateSpaceEdge(
+                        new StateSpaceNode(problem, state),
+                        new StateSpaceNode(problem, action.ApplyTo(state)),
+                        action);
+                }
             }
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

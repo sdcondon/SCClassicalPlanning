@@ -4,12 +4,14 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning
 {
     /// <summary>
-    ///
+    /// Container for information about an effect - some change of the state of a system. These occur as the result of <see cref="Action"/>s.
     /// <para/>
-    /// TODO: talk (briefly) about the differences and similarities between this and GD/Effect in PDDL.
+    /// <see cref="Effect"/>s are essentially a set of (functionless) <see cref="Literal"/>s. The positive ones indicates predicates that are added to the system's
+    /// state by the effect. The negative ones indicate predicates that are removed, and absent ones are ones that remain unchanged.
     /// <para/>
     /// TODO: probably should add some verification that all literals are functionless. TODO: Should also probably store add and delete lists separately,
-    /// for performance. Application and Regression are going to be far more common than wanting to get all elements of a state.
+    /// for performance. Application and Regression are going to be far more common than wanting to get all elements. Then again, if and this is expanded to richer
+    /// PDDL functionality (or if we want to allow extension.. - unlikely given the motivator for the project, but..)
     /// </summary>
     public sealed class Effect
     {

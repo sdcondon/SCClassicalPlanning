@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanning.Example
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanning.Benchmarks", "SCClassicalPlanning.Benchmarks\SCClassicalPlanning.Benchmarks.csproj", "{A839A7CD-BBC8-4454-A730-F033A0A2B860}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanningAlternatives", "SCClassicalPlanning.Alternatives\SCClassicalPlanningAlternatives.csproj", "{73A044E5-05F6-4877-98D6-A29240ADC4CC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanningAlternatives", "SCClassicalPlanningAlternatives\SCClassicalPlanningAlternatives.csproj", "{73A044E5-05F6-4877-98D6-A29240ADC4CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

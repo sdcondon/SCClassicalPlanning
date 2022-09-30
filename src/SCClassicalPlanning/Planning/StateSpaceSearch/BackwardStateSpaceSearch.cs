@@ -1,7 +1,6 @@
-﻿using SCGraphTheory.Search.Classic;
-using SCGraphTheory;
+﻿using SCGraphTheory;
+using SCGraphTheory.Search.Classic;
 using System.Collections.ObjectModel;
-using SCClassicalPlanning;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
@@ -12,13 +11,13 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     /// </summary>
     public class BackwardStateSpaceSearch : IPlanner
     {
-        private readonly Func<State, State, float> heuristic;
+        private readonly Func<State, Goal, float> heuristic;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class.
         /// </summary>
         /// <param name="heuristic">The heuristic to use.</param>
-        public BackwardStateSpaceSearch(Func<State, State, float> heuristic) => this.heuristic = heuristic;
+        public BackwardStateSpaceSearch(Func<State, Goal, float> heuristic) => this.heuristic = heuristic;
 
         /// <inheritdoc />
         async Task<IPlan> IPlanner.CreatePlanAsync(Problem problem) => await CreatePlanAsync(problem);
@@ -26,10 +25,10 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         public async Task<Plan> CreatePlanAsync(Problem problem)
         {
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
-                source: new StateSpaceNode(problem, problem.GoalState),
-                isTarget: n => n.State.IsSuperstateOf(problem.InitialState),
+                source: new StateSpaceNode(problem, problem.Goal),
+                isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
                 getEdgeCost: e => 1,
-                getEstimatedCostToTarget: n => heuristic(n.State, problem.InitialState));
+                getEstimatedCostToTarget: n => heuristic(problem.InitialState, n.Goal));
 
             await Task.Run(() => search.Complete());
 
@@ -49,12 +48,12 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         {
             private readonly Problem problem;
 
-            public StateSpaceNode(Problem problem, State state) => (this.problem, State) = (problem, state);
+            public StateSpaceNode(Problem problem, Goal goal) => (this.problem, Goal) = (problem, goal);
 
             /// <summary>
-            /// Gets the state represented by this node.
+            /// Gets the goal represented by this node.
             /// </summary>
-            public State State { get; }
+            public Goal Goal { get; }
 
             /// <inheritdoc />
             public IReadOnlyCollection<StateSpaceEdge> Edges
@@ -78,7 +77,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public StateSpaceNode To { get; }
 
             /// <summary>
-            /// Gets the action that is carried out to achieve this state transition.
+            /// Gets the action that is regressed over to achieve this state transition.
             /// <para/>
             /// TODO: Ref type. Given that, is there really much value in val types for nodes and edges. Test me.
             /// </summary>

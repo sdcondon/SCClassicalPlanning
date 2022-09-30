@@ -4,11 +4,12 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning
 {
     /// <summary>
-    ///
+    /// Container for a particular state of a domain. Instances occur as the initial state of <see cref="Problem"/> instances - and can
+    /// also be used by planning algorithms to track intermediate states while looking for a solution to a problem.
     /// <para/>
-    /// Is essentially just a set of ground predicates - that collectively describe the current state of the system
+    /// A state is essentially just a set of ground (i.e. variable-free), functionless predicates.
     /// <para/>
-    /// TODO: probably should add some verification that all literals are functionless. also i think needs to verify that its ground?
+    /// TODO: probably should add some verification in ctor that all elements are ground and functionless.
     /// </summary>
     public sealed class State
     {
@@ -35,7 +36,7 @@ namespace SCClassicalPlanning
         {
             var elements = new HashSet<Predicate>();
 
-            foreach (var clause in new CNFSentence(sentence).Clauses)
+            foreach (var clause in new CNFSentence(sentence).Clauses) // TODO: this'll standardise vars.. do we want that?
             {
                 if (!clause.IsUnitClause)
                 {
@@ -49,7 +50,8 @@ namespace SCClassicalPlanning
                     throw new ArgumentException();
                 }
 
-                //// TODO: Belongs in other ctor
+                //// TODO: Belongs in other ctor.. but slows stuff down. alot of state instantion will happen.
+                //// then again, this is premature optimisation..
                 ////if (literal.Predicate.Arguments.Any(a => !a.IsGroundTerm))
                 ////{
                 ////    throw new ArgumentException();

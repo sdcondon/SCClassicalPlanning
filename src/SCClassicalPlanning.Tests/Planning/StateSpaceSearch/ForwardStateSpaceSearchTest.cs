@@ -37,13 +37,13 @@ namespace SCAutomatedPlanning.Planning.StateSpaceSearch
                         & At(cargo2, jfk)
                         & At(plane1, sfo)
                         & At(plane2, jfk)),
-                    GoalState: new(
+                    Goal: new(
                         At(cargo1, jfk)
                         & At(cargo2, sfo)));
             })
             .When((_, tc) => tc.Execute())
             .ThenReturns()
-            .And((_, tc, p) => p.ApplyTo(tc.InitialState).Elements.IsSupersetOf(tc.GoalState.Elements).Should().BeTrue())
+            .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
             .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter().Format(p)));
 
         public static Test BlocksWorldScenario => TestThat
@@ -65,13 +65,13 @@ namespace SCAutomatedPlanning.Planning.StateSpaceSearch
                         & On(blockC, blockA)
                         & Clear(blockB)
                         & Clear(blockC)),
-                    GoalState: new(
+                    Goal: new(
                         On(blockA, blockB)
                         & On(blockB, blockC)));
             })
             .When((_, tc) => tc.Execute())
             .ThenReturns()
-            .And((_, tc, p) => p.ApplyTo(tc.InitialState).Elements.IsSupersetOf(tc.GoalState.Elements).Should().BeTrue())
+            .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
             .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter().Format(p)));
 
         public static Test SpareTireScenario => TestThat
@@ -84,20 +84,20 @@ namespace SCAutomatedPlanning.Planning.StateSpaceSearch
                         SpareTire.ImplicitState
                         & IsAt(Flat, Axle)
                         & IsAt(Spare, Trunk)),
-                    GoalState: new(
+                    Goal: new(
                         IsAt(Spare, Axle)));
             })
             .When((_, tc) => tc.Execute())
             .ThenReturns()
-            .And((_, tc, p) => p.ApplyTo(tc.InitialState).Elements.IsSupersetOf(tc.GoalState.Elements).Should().BeTrue())
+            .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
             .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter().Format(p)));
 
-        private record TestCase(Domain Domain, State InitialState, State GoalState)
+        private record TestCase(Domain Domain, State InitialState, Goal Goal)
         {
             public IPlan Execute()
             {
                 var planner = new ForwardStateSpaceSearch((s, g) => 0);
-                var problem = new Problem(Domain, InitialState, GoalState);
+                var problem = new Problem(Domain, InitialState, Goal);
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
             }
         }

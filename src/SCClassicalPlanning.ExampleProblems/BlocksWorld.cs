@@ -34,7 +34,7 @@ namespace SCClassicalPlanning.ExampleDomains
 
         public static Action Move(Term block, Term from, Term toBlock) => new(
             identifier: nameof(Move),
-            precondition: new GoalDescription(
+            precondition: new Goal(
                 On(block, from)
                 & Clear(block)
                 & Clear(toBlock)
@@ -51,7 +51,7 @@ namespace SCClassicalPlanning.ExampleDomains
 
         public static Action MoveToTable(Term block, Term from) => new(
             identifier: nameof(MoveToTable),
-            precondition: new GoalDescription(
+            precondition: new Goal(
                 On(block, from)
                 & Clear(block)
                 & Block(block)

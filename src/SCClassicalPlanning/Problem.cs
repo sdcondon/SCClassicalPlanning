@@ -15,13 +15,13 @@ namespace SCClassicalPlanning
         /// <param name="domain">The domain in which this problem resides.</param>
         /// <param name="objects">The objects that exist in this problem.</param>
         /// <param name="initialState">The initial state of the problem.</param>
-        /// <param name="goalState">the goal state of the problem.</param>
-        public Problem(Domain domain, IList<Constant> objects, State initialState, State goalState)
+        /// <param name="goal">The goal of the problem.</param>
+        public Problem(Domain domain, IList<Constant> objects, State initialState, Goal goal)
         {
             Domain = domain;
             Objects = new ReadOnlyCollection<Constant>(objects);
             InitialState = initialState;
-            GoalState = goalState;
+            Goal = goal;
         }
 
         /// <summary>
@@ -29,17 +29,16 @@ namespace SCClassicalPlanning
         /// </summary>
         /// <param name="domain">The domain in which this problem resides.</param>
         /// <param name="initialState">The initial state of the problem.</param>
-        /// <param name="goalState">the goal state of the problem.</param>
-        public Problem(Domain domain, State initialState, State goalState)
+        /// <param name="goal">The goal of the problem.</param>
+        public Problem(Domain domain, State initialState, Goal goal)
         {
             Domain = domain;
             InitialState = initialState;
-            GoalState = goalState;
+            Goal = goal;
 
-            var constantFinder = new ConstantFinder();
             var constants = new HashSet<Constant>();
-            constantFinder.Visit(initialState, constants);
-            constantFinder.Visit(goalState, constants);
+            StateConstantFinder.Instance.Visit(initialState, constants);
+            GoalConstantFinder.Instance.Visit(goal, constants);
             Objects = new ReadOnlyCollection<Constant>(constants.ToArray());
         }
 
@@ -59,12 +58,34 @@ namespace SCClassicalPlanning
         public State InitialState { get; }
 
         /// <summary>
-        /// Gets the initial state of the problem.
+        /// Gets the goal of the problem.
         /// </summary>
-        public State GoalState { get; }
+        public Goal Goal { get; }
 
-        private class ConstantFinder : RecursiveStateVisitor<HashSet<Constant>>
+        /// <summary>
+        /// Gets the available actions from a given state.
+        /// <para/>
+        /// Iterates all action templates, trying to unify (to a ground state - i.e. using known objects) the precondition of each with some subset of the current state.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        public IEnumerable<Action> GetAvailableActions(State state)
         {
+            // todo
+            yield break;
+        }
+
+        private class StateConstantFinder : RecursiveStateVisitor<HashSet<Constant>>
+        {
+            public static StateConstantFinder Instance { get; } = new();
+
+            public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
+        }
+
+        private class GoalConstantFinder : RecursiveGoalVisitor<HashSet<Constant>>
+        {
+            public static GoalConstantFinder Instance { get; } = new();
+
             public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
         }
     }

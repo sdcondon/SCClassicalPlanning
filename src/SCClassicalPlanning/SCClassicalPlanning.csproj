@@ -19,4 +19,8 @@
     <PackageReference Include="SCGraphTheory.Search" Version="2.3.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ProblemFormatting\" />
+  </ItemGroup>
+
 </Project>

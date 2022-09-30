@@ -27,17 +27,17 @@ namespace SCClassicalPlanning.ExampleDomains
 
         public static Action Add(Term @object) => new(
             identifier: nameof(Add),
-            precondition: new GoalDescription(!IsPresent(@object)),
+            precondition: new Goal(!IsPresent(@object)),
             effect: new Effect(IsPresent(@object)));
 
         public static Action Remove(Term @object) => new(
             identifier: nameof(Remove),
-            precondition: new GoalDescription(IsPresent(@object)),
+            precondition: new Goal(IsPresent(@object)),
             effect: new Effect(!IsPresent(@object)));
 
         public static Action Swap(Term remove, Term add) => new(
             identifier: nameof(Swap),
-            precondition: new GoalDescription(IsPresent(remove) & !IsPresent(add)),
+            precondition: new Goal(IsPresent(remove) & !IsPresent(add)),
             effect: new Effect(!IsPresent(remove) & IsPresent(add)));
     }
 }

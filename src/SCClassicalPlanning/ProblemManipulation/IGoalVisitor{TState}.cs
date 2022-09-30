@@ -3,20 +3,17 @@
 namespace SCClassicalPlanning.ProblemManipulation
 {
     /// <summary>
-    /// Interface for visitors of <see cref="State"/> instances.
-    /// <para/>
-    /// NB: This interface (in comparison to the non-generic <see cref="IStateVisitor"/>) is specifically for visitors that facilitate
-    /// state accumulation outside of the visitor instance itself.
+    /// Interface for visitors of <see cref="Goal"/> instances.
     /// </summary>
     /// <typeparam name="TState">The type of state that this visitor works with.</typeparam>
-    public interface IStateVisitor<TState>
+    public interface IGoalVisitor<TState>
     {
         /// <summary>
         /// Visits a <see cref="State"/> instance.
         /// </summary>
-        /// <param name="state">The <see cref="State"/> instance to visit.</param>
+        /// <param name="goal">The <see cref="Goal"/> instance to visit.</param>
         /// <param name="visitationState">A reference to the state of this visitation.</param>
-        void Visit(State state, TState visitationState);
+        void Visit(Goal goal, TState visitationState);
 
         /// <summary>
         /// Visits a <see cref="Literal"/> instance.
