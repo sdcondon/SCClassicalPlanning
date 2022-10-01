@@ -23,6 +23,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         /// <inheritdoc />
         async Task<IPlan> IPlanner.CreatePlanAsync(Problem problem) => await CreatePlanAsync(problem);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="problem"></param>
+        /// <returns></returns>
         public async Task<Plan> CreatePlanAsync(Problem problem)
         {
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(

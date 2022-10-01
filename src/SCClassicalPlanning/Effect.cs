@@ -9,7 +9,8 @@ namespace SCClassicalPlanning
     /// <see cref="Effect"/>s are essentially a set of (functionless) <see cref="Literal"/>s. The positive ones indicates predicates that are added to the system's
     /// state by the effect. The negative ones indicate predicates that are removed, and absent ones are ones that remain unchanged.
     /// <para/>
-    /// TODO: probably should add some verification that all literals are functionless. TODO: Should also probably store add and delete lists separately,
+    /// TODO: probably should add some verification that all literals are functionless.
+    /// <br/>TODO: Should also probably store add and delete lists separately,
     /// for performance. Application and Regression are going to be far more common than wanting to get all elements. Then again, if and this is expanded to richer
     /// PDDL functionality (or if we want to allow extension.. - unlikely given the motivator for the project, but..)
     /// </summary>

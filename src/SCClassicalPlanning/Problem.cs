@@ -63,18 +63,24 @@ namespace SCClassicalPlanning
         public Goal Goal { get; }
 
         /// <summary>
-        /// Gets the available actions from a given state.
+        /// Gets the applicable actions from a given state.
         /// <para/>
         /// Iterates all action templates, trying to unify (to a ground state - i.e. using known objects) the precondition of each with some subset of the current state.
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        public IEnumerable<Action> GetAvailableActions(State state)
+        public IEnumerable<Action> GetApplicableActions(State state)
         {
             // todo
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="goal"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
         public IEnumerable<Action> GetRelevantActions(Goal goal)
         {
             // todo

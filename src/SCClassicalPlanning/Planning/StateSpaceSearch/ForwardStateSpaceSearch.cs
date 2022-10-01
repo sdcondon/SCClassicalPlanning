@@ -68,7 +68,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             public IEnumerator<StateSpaceEdge> GetEnumerator()
             {
-                foreach (var action in problem.GetAvailableActions(state))
+                foreach (var action in problem.GetApplicableActions(state))
                 {
                     yield return new StateSpaceEdge(
                         new StateSpaceNode(problem, state),
