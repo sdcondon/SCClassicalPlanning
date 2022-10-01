@@ -72,7 +72,6 @@ namespace SCClassicalPlanning
         /// <returns></returns>
         public bool IsSatisfiedBy(State state)
         {
-            // unification - prob a different method..?
             return state.Elements.IsSupersetOf(Elements.Where(l => l.IsPositive).Select(l => l.Predicate))
                 && !state.Elements.Overlaps(Elements.Where(l => l.IsNegated).Select(l => l.Predicate));
         }

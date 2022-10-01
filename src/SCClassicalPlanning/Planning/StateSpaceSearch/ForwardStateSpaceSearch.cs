@@ -28,14 +28,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             await Task.Run(() => search.Complete()); // todo: worth adding all the Steppable stuff like in FoL?
 
-            if (search.Target != default)
-            {
-                return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
-            }
-            else
-            {
-
-            }
+            // TODO: will throw nullref if search fails. can do better.
+            return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
         }
 
         /// <summary>

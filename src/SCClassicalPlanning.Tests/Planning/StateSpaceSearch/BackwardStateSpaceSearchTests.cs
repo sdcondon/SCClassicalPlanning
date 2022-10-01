@@ -1,15 +1,12 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains;
-using SCClassicalPlanning.Planning;
-using SCClassicalPlanning.Planning.StateSpaceSearch;
 using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.BlocksWorld;
 using static SCClassicalPlanning.ExampleDomains.SpareTire;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
-namespace SCClassicalPlanning.Planners.StateSpaceSearch
+namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
     public static class BackwardStateSpaceSearchTests
     {
@@ -17,12 +14,12 @@ namespace SCClassicalPlanning.Planners.StateSpaceSearch
             .GivenTestContext()
             .And(() =>
             {
-                VariableReference cargo1 = new(nameof(cargo1));
-                VariableReference cargo2 = new(nameof(cargo2));
-                VariableReference plane1 = new(nameof(plane1));
-                VariableReference plane2 = new(nameof(plane2));
-                VariableReference sfo = new(nameof(sfo));
-                VariableReference jfk = new(nameof(jfk));
+                Constant cargo1 = new(nameof(cargo1));
+                Constant cargo2 = new(nameof(cargo2));
+                Constant plane1 = new(nameof(plane1));
+                Constant plane2 = new(nameof(plane2));
+                Constant sfo = new(nameof(sfo));
+                Constant jfk = new(nameof(jfk));
 
                 return new TestCase(
                     Domain: AirCargo.Domain,
@@ -50,9 +47,9 @@ namespace SCClassicalPlanning.Planners.StateSpaceSearch
             .GivenTestContext()
             .And(() =>
             {
-                VariableReference blockA = new(nameof(blockA));
-                VariableReference blockB = new(nameof(blockB));
-                VariableReference blockC = new(nameof(blockC));
+                Constant blockA = new(nameof(blockA));
+                Constant blockB = new(nameof(blockB));
+                Constant blockC = new(nameof(blockC));
 
                 return new TestCase(
                     Domain: BlocksWorld.Domain,

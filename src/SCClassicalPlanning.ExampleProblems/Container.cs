@@ -9,7 +9,7 @@ namespace SCClassicalPlanning.ExampleDomains
     public static class Container
     {
         /// <summary>
-        /// Gets a <see cref="OwnFolModel.Domain"/ instance that encapsulates the "Container" domain.
+        /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Container" domain.
         /// </summary>
         public static Domain Domain { get; } = new Domain(
             predicates: new Predicate[]

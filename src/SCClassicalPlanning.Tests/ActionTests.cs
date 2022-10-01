@@ -8,8 +8,8 @@ namespace SCClassicalPlanning
 {
     public static class ActionTests
     {
-        private static readonly OperableVariableReference element1 = new VariableReference(nameof(element1));
-        private static readonly OperableVariableReference element2 = new VariableReference(nameof(element2));
+        private static readonly Constant element1 = new(nameof(element1));
+        private static readonly Constant element2 = new(nameof(element2));
 
         private record IsApplicableToTestCase(State initialState, Action action, bool expectedResult);
 
@@ -76,6 +76,39 @@ namespace SCClassicalPlanning
             .When(tc => tc.action.ApplyTo(tc.initialState))
             .ThenReturns()
             .And((tc, s) => s.Should().BeEquivalentTo(tc.expectedState));
+
+        private record IsRelevantToTestCase(Goal goal, Action action, bool expectedResult);
+
+        public static Test IsRelevantToBehaviour => TestThat
+            .GivenEachOf(() => new IsRelevantToTestCase[]
+            {
+                // fulfills positive element
+                new(
+                    goal: new(IsPresent(element1)),
+                    action: Add(element1),
+                    expectedResult: true),
+
+                // fulfills negative element
+                new(
+                    goal: new(!IsPresent(element1)),
+                    action: Remove(element1),
+                    expectedResult: true),
+
+                // fulfills positive & negative element
+                new(
+                    goal: new(!IsPresent(element1) & IsPresent(element2)),
+                    action: Swap(element1, element2),
+                    expectedResult: true),
+
+                // fulfills positive element, undoes positive element
+                new(
+                    goal: new(IsPresent(element1) & IsPresent(element2)),
+                    action: Swap(element1, element2),
+                    expectedResult: false),
+            })
+            .When(tc => tc.action.IsRelevantTo(tc.goal))
+            .ThenReturns()
+            .And((tc, r) => r.Should().Be(tc.expectedResult));
 
         private record RegressTestCase(Goal goal, Action action, Goal expectedResult);
 

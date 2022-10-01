@@ -63,7 +63,7 @@
         /// <summary>
         /// Returns the goal that must be satisfied prior to performing this action, in order to satisfy a given goal after the action is performed. 
         /// <para/>
-        /// NB: AIMA gets regression a bit.. err.. wrong, because it gets a little confused between states (which, under the
+        /// NB: AIaMA gets regression a bit.. err.. wrong, because it gets a little confused between states (which, under the
         /// closed-world assumption, need include only positive fluents) and goals (which can include both positive and negative fluents).
         /// It makes a distinction between add lists and delete lists. The flaw in the argument about how delete lists can be ignored can be seen via a moments
         /// thought about how nothing *should* fundamentally change if you restate a problem so that every fluent is negated (e.g. instead of "IsThing", we use "IsNotThing") -

@@ -35,11 +35,11 @@ namespace SCClassicalPlanning.ExampleDomains
         /// </summary>
         public static OperableSentence ImplicitState => IsTire(Spare) & IsTire(Flat);
 
-        public static OperablePredicate IsTire(OperableTerm tire) => new Predicate(nameof(IsTire), tire);
+        public static OperablePredicate IsTire(Term tire) => new Predicate(nameof(IsTire), tire);
 
-        public static OperablePredicate IsAt(OperableTerm item, OperableTerm location) => new Predicate(nameof(IsAt), item, location);
+        public static OperablePredicate IsAt(Term item, Term location) => new Predicate(nameof(IsAt), item, location);
 
-        public static Action Remove(OperableTerm @object, OperableTerm location) => new(
+        public static Action Remove(Term @object, Term location) => new(
             identifier: nameof(Remove),
             precondition: new Goal(IsAt(@object, location)),
             effect: new Effect(!IsAt(@object, location) & IsAt(@object, Ground)));

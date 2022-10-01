@@ -19,6 +19,11 @@ namespace SCClassicalPlanning
         /// <param name="elements">The predicates that comprise the state.</param>
         public State(IEnumerable<Predicate> elements)
         {
+            if (elements.SelectMany(e => e.Arguments).Any(a => !a.IsGroundTerm))
+            {
+                throw new ArgumentException("States cannot include non-ground terms");
+            }
+
             Elements = elements.ToImmutableHashSet();
         }
 
@@ -50,13 +55,11 @@ namespace SCClassicalPlanning
                     throw new ArgumentException();
                 }
 
-                //// TODO: Belongs in other ctor.. but slows stuff down. alot of state instantion will happen.
-                //// then again, this is premature optimisation..
-                ////if (literal.Predicate.Arguments.Any(a => !a.IsGroundTerm))
-                ////{
-                ////    throw new ArgumentException();
-                ////}
-                
+                if (literal.Predicate.Arguments.Any(a => !a.IsGroundTerm))
+                {
+                    throw new ArgumentException("States cannot include non-ground terms");
+                }
+
                 elements.Add(literal.Predicate);
             }
 
