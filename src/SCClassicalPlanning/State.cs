@@ -72,19 +72,5 @@ namespace SCClassicalPlanning
         /// Gets the set of predicates that comprise this state.
         /// </summary>
         public IReadOnlySet<Predicate> Elements { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether this state's elements are a subset of the given state's elements.
-        /// </summary>
-        /// <param name="state">The state to compare this state to.</param>
-        /// <returns>True if and only if this state's elements are a subset of the given state's elements.</returns>
-        public bool IsSubstateOf(State state) => Elements.IsSubsetOf(state.Elements);
-
-        /// <summary>
-        /// Gets a value indicating whether this state's elements are a superset of the given state's elements.
-        /// </summary>
-        /// <param name="state">The state to compare this state to.</param>
-        /// <returns>True if and only if this state's elements are a superset of the given state's elements.</returns>
-        public bool IsSuperstateOf(State state) => Elements.IsSupersetOf(state.Elements);
     }
 }

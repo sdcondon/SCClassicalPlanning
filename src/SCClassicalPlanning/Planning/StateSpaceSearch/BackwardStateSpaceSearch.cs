@@ -1,5 +1,6 @@
 ﻿using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
+using System.Collections;
 using System.Collections.ObjectModel;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch
@@ -16,7 +17,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class.
         /// </summary>
-        /// <param name="heuristic">The heuristic to use.</param>
+        /// <param name="heuristic">The heuristic to use - should give an estimate of the number of actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
         public BackwardStateSpaceSearch(Func<State, Goal, float> heuristic) => this.heuristic = heuristic;
 
         /// <inheritdoc />
@@ -34,8 +35,6 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
         }
-
-        // IsRelevantTo
 
         public class Plan : IPlan
         {
@@ -56,14 +55,30 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public Goal Goal { get; }
 
             /// <inheritdoc />
-            public IReadOnlyCollection<StateSpaceEdge> Edges
+            public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(problem, Goal);
+        }
+
+        private struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
+        {
+            private readonly Problem problem;
+            private readonly Goal goal;
+
+            public StateSpaceNodeEdges(Problem problem, Goal goal) => (this.problem, this.goal) = (problem, goal);
+
+            public int Count => this.Count();
+
+            public IEnumerator<StateSpaceEdge> GetEnumerator()
             {
-                get
+                foreach (var action in problem.GetRelevantActions(goal))
                 {
-                    // TODO: Find relevant actions, new state is state regressed over action.
-                    throw new NotImplementedException();
+                    yield return new StateSpaceEdge(
+                        new StateSpaceNode(problem, goal),
+                        new StateSpaceNode(problem, action.Regress(goal)),
+                        action);
                 }
             }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
         private struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
@@ -77,9 +92,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public StateSpaceNode To { get; }
 
             /// <summary>
-            /// Gets the action that is regressed over to achieve this state transition.
-            /// <para/>
-            /// TODO: Ref type. Given that, is there really much value in val types for nodes and edges. Test me.
+            /// Gets the action that is regressed over to achieve this goal transition.
             /// </summary>
             public Action Action { get; }
         }

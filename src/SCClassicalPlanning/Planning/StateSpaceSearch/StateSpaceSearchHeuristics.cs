@@ -1,20 +1,15 @@
-﻿using SCGraphTheory;
-using SCGraphTheory.Search.Classic;
-using System.Collections;
-using System.Collections.ObjectModel;
-
-namespace SCClassicalPlanning.Planning.StateSpaceSearch
+﻿namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
     public static class StateSpaceSearchHeuristics
     {
-        public static float IgnorePreconditions(State initial, Goal goal)
+        public static float IgnorePreconditions(State initialState, Goal goal)
         {
-            return 0;
+            throw new NotImplementedException();
         }
 
-        public static float IgnoreDeleteLists(State initial, Goal goal)
+        public static float IgnoreDeleteLists(State initialState, Goal goal)
         {
-            return 0;
+            throw new NotImplementedException();
         }
     }
 }

@@ -47,8 +47,32 @@
         /// <returns>The new state.</returns>
         public State ApplyTo(State state) => Effect.ApplyTo(state);
 
-        ////public bool IsRegressableFrom(Goal goal) => throw new NotImplementedException();
+        /// <summary>
+        /// Returns a value indicating whether this action is conceivably a useful final step in achieving a given goal.
+        /// <para/>
+        /// An action is relevant if it accomplishes at least one element of the goal, and does not undo anything.
+        /// That is, the effect's elements overlap with the goals elements, and the negation of each of the effect's elements does not.
+        /// </summary>
+        /// <param name="goal"></param>
+        /// <returns></returns>
+        public bool IsRelevantTo(Goal goal)
+        {
+            return goal.Elements.Overlaps(Effect.Elements) && !goal.Elements.Overlaps(Effect.Elements.Select(l => l.Negate()));
+        }
 
-        ////public Goal Regress(Goal goal) => new State(goal.Elements.Except(Effect.AddList).Union(Precondition.Elements));
+        /// <summary>
+        /// Returns the goal that must be satisfied prior to performing this action, in order to satisfy a given goal after the action is performed. 
+        /// <para/>
+        /// NB: AIMA gets regression a bit.. err.. wrong, because it gets a little confused between states (which, under the
+        /// closed-world assumption, need include only positive fluents) and goals (which can include both positive and negative fluents).
+        /// It makes a distinction between add lists and delete lists. The flaw in the argument about how delete lists can be ignored can be seen via a moments
+        /// thought about how nothing *should* fundamentally change if you restate a problem so that every fluent is negated (e.g. instead of "IsThing", we use "IsNotThing") -
+        /// but would because doing so would swap add lists and delete lists.
+        /// A sound way to reason about regression is that any element of the given goal (positive OR negative) that is applied by the action doesn't have to hold 
+        /// in the regressed goal (because it'll be applied by the action) - so is removed. However, all preconditions do have to hold - so they are added.
+        /// </summary>
+        /// <param name="goal">The goal that must be satisfied after performing this action.</param>
+        /// <returns>The goal that must be satisfied prior to performing this action.</returns>
+        public Goal Regress(Goal goal) => new Goal(goal.Elements.Except(Effect.Elements).Union(Precondition.Elements));
     }
 }

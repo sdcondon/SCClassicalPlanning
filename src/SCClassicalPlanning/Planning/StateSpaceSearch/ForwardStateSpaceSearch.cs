@@ -12,7 +12,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class.
         /// </summary>
-        /// <param name="heuristic">The heuristic to use - should give an estimate of the number of actions required to get from the current state to a goal.</param>
+        /// <param name="heuristic">The heuristic to use - should give an estimate of the number of actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
         public ForwardStateSpaceSearch(Func<State, Goal, float> heuristic) => this.heuristic = heuristic;
 
         /// <inheritdoc />
@@ -26,11 +26,21 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 getEdgeCost: e => 1,
                 getEstimatedCostToTarget: n => heuristic(n.State, problem.Goal));
 
-            await Task.Run(() => search.Complete());
+            await Task.Run(() => search.Complete()); // todo: worth adding all the Steppable stuff like in FoL?
 
-            return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
+            if (search.Target != default)
+            {
+                return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
+            }
+            else
+            {
+
+            }
         }
 
+        /// <summary>
+        /// Plan implementation
+        /// </summary>
         public class Plan : IPlan
         {
             public Plan(IList<Action> steps) => Steps = new ReadOnlyCollection<Action>(steps);
@@ -89,7 +99,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             /// <summary>
             /// Gets the action that is carried out to achieve this state transition.
             /// <para/>
-            /// TODO: Ref type. Given that, is there really much value in val types for nodes and edges. Test me.
+            /// TODO: Ref type. Given that, is there really much value in val types for nodes and edges? Test me.
             /// </summary>
             public Action Action { get; }
         }

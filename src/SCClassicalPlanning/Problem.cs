@@ -72,7 +72,13 @@ namespace SCClassicalPlanning
         public IEnumerable<Action> GetAvailableActions(State state)
         {
             // todo
-            yield break;
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<Action> GetRelevantActions(Goal goal)
+        {
+            // todo
+            throw new NotImplementedException();
         }
 
         private class StateConstantFinder : RecursiveStateVisitor<HashSet<Constant>>
