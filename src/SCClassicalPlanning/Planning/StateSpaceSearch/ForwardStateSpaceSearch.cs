@@ -26,7 +26,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 getEdgeCost: e => 1,
                 getEstimatedCostToTarget: n => heuristic(n.State, problem.Goal));
 
-            await Task.Run(() => search.Complete()); // todo: worth adding all the Steppable stuff like in FoL?
+            await Task.Run(() => search.Complete()); // todo?: worth adding all the Steppable stuff like in FoL?
 
             // TODO: will throw nullref if search fails. can do better.
             return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
@@ -64,7 +64,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             public StateSpaceNodeEdges(Problem problem, State state) => (this.problem, this.state) = (problem, state);
 
-            public int Count => this.Count();
+            public int Count => problem.GetApplicableActions(state).Count();
 
             public IEnumerator<StateSpaceEdge> GetEnumerator()
             {
@@ -92,8 +92,6 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             /// <summary>
             /// Gets the action that is carried out to achieve this state transition.
-            /// <para/>
-            /// TODO: Ref type. Given that, is there really much value in val types for nodes and edges? Test me.
             /// </summary>
             public Action Action { get; }
         }

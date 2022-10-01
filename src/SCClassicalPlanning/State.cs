@@ -43,18 +43,19 @@ namespace SCClassicalPlanning
         {
             var elements = new HashSet<Predicate>();
 
-            foreach (var clause in new CNFSentence(sentence).Clauses) // TODO: this'll standardise vars.. do we want that?
+            foreach (var clause in new CNFSentence(sentence).Clauses)
             {
                 if (!clause.IsUnitClause)
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("States must be expressable as a conjunction of literals");
                 }
 
                 var literal = clause.Literals.First();
 
                 if (literal.IsNegated)
                 {
-                    throw new ArgumentException();
+                    // TODO?: Rather than throw, should we just ignore?
+                    throw new ArgumentException("States make the closed-world assumption (any unmentioned fluent is false) - so negated predicates should just be omitted instead");
                 }
 
                 if (literal.Predicate.Arguments.Any(a => !a.IsGroundTerm))

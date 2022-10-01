@@ -20,19 +20,22 @@
 
         /// <summary>
         /// Gets the precondition for the action.
-        /// This elements of this state must be a subset of the current state in order for the action to be applicable.
+        /// This must be satisfied by a <see cref="State"/> for an action to be applicable in that state.
         /// </summary>
         public Goal Precondition { get; }
 
         /// <summary>
-        /// Gets the effect of the action. All unmentioned predicates are assumed to be unchanged.
+        /// Gets the effect of the action.
+        /// This is what is applied to a state when the action is applied.
         /// </summary>
         public Effect Effect { get; }
 
-        /// TODO: variables - lazily, via visitor
+        /// TODO?: Variables - lazily, via visitor. Just 'cos PDDL has it..
 
         /// <summary>
         /// Gets a value indicating whether the action is applicable in a given state.
+        /// <para/>
+        /// An action is applicable in a state if its <see cref="Precondition"/> is satisfied by that state.
         /// </summary>
         /// <param name="state">The state to examine.</param>
         /// <returns>A value indicating whether the action is applicable in a given state.</returns>
@@ -41,7 +44,7 @@
         /// <summary>
         /// Applies this action to a given state, producing a new state.
         /// <para/>
-        /// NB: Does NOT validate preconditions - to be of use with particular heuristics.
+        /// NB: Does NOT validate preconditions - to be of use with particular planning heuristics.
         /// </summary>
         /// <param name="state">The state to apply the action to.</param>
         /// <returns>The new state.</returns>

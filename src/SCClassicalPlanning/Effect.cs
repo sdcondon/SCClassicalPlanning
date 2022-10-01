@@ -6,8 +6,8 @@ namespace SCClassicalPlanning
     /// <summary>
     /// Container for information about an effect - some change of the state of a system. These occur as the result of <see cref="Action"/>s.
     /// <para/>
-    /// <see cref="Effect"/>s are essentially a set of (functionless) <see cref="Literal"/>s. The positive ones indicates predicates that are added to the system's
-    /// state by the effect. The negative ones indicate predicates that are removed, and absent ones are ones that remain unchanged.
+    /// <see cref="Effect"/>s are essentially a set of (functionless) <see cref="Literal"/>s. The positive ones indicates predicates that are added to a
+    /// state by the effect's application. The negative ones indicate predicates that are removed, and absent ones remain unchanged.
     /// <para/>
     /// TODO: probably should add some verification that all literals are functionless.
     /// <br/>TODO: Should also probably store add and delete lists separately,

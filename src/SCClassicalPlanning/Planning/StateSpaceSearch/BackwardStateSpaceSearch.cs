@@ -70,7 +70,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             public StateSpaceNodeEdges(Problem problem, Goal goal) => (this.problem, this.goal) = (problem, goal);
 
-            public int Count => this.Count();
+            public int Count => problem.GetRelevantActions(goal).Count();
 
             public IEnumerator<StateSpaceEdge> GetEnumerator()
             {

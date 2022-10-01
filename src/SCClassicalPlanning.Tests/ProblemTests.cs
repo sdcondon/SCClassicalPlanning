@@ -10,7 +10,6 @@ namespace SCClassicalPlanning
     {
         private static readonly Constant element1 = new(nameof(element1));
         private static readonly Constant element2 = new(nameof(element2));
-
         private static readonly Problem containerProblem = new Problem(Container.Domain, new[] { element1, element2 }, State.Empty, Goal.Empty);
 
         private record GetApplicableActionsTestCase(Problem Problem, State State, Action[] ExpectedResult);

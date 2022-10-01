@@ -27,6 +27,6 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// </summary>
         /// <param name="predicate">The <see cref="Predicate"/> instance to visit.</param>
         /// <param name="visitationState">A reference to the state of this visitation.</param>
-        void Visit(Predicate predicate, TState vistationState);
+        void Visit(Predicate predicate, TState visitationState);
     }
 }

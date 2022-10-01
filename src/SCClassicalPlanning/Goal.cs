@@ -59,14 +59,16 @@ namespace SCClassicalPlanning
         public static Goal Empty { get; } = new Goal();
 
         /// <summary>
-        /// Gets the set of literals that comprise this effect.
-        /// The positive ones indicate predicates that must exist in the domain's state in order for the goal to be satisfied.
-        /// The negative ones indicate predicates that must NOT exist in the domain's state.
+        /// Gets the set of literals that comprise this goal.
+        /// The positive ones indicate predicates that must exist in a <see cref="State"/> in order for the goal to be satisfied.
+        /// The negative ones indicate predicates that must NOT exist in a <see cref="State"/> in order for the goal to be satisfied.
         /// </summary>
         public IReadOnlySet<Literal> Elements { get; }
 
         /// <summary>
         /// Gets a value indicating whether this goal is satisfied by a particular state.
+        /// <para/>
+        /// A goal is satisfied by a state if all of its positive elements and none of its negative elements are present in the state.
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
