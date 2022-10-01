@@ -2,7 +2,6 @@
 using FlUnit;
 using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.Container;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning
 {

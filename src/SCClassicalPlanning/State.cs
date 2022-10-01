@@ -19,6 +19,8 @@ namespace SCClassicalPlanning
         /// <param name="elements">The predicates that comprise the state.</param>
         public State(IEnumerable<Predicate> elements)
         {
+            // TODO-PERFORMANCE: this will be invariant under Effect application (as long as the effect isn't a badly created one..) - don't need to keep checking it.
+            // Don't prematurely optimise though.. Will come back to this.
             if (elements.SelectMany(e => e.Arguments).Any(a => !a.IsGroundTerm))
             {
                 throw new ArgumentException("States cannot include non-ground terms");

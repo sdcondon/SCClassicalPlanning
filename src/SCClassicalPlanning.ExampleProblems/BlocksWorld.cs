@@ -9,9 +9,9 @@ namespace SCClassicalPlanning.ExampleDomains
     public class BlocksWorld
     {
         /// <summary>
-        /// Gets a <see cref="OwnFolModel.Domain"/ instance that encapsulates the "Blocks World" domain.
+        /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
         /// </summary>
-        public static Domain Domain { get; } = new Domain(
+        public static Domain Domain => new Domain(
             predicates: new Predicate[]
             {
                 Block(B),
