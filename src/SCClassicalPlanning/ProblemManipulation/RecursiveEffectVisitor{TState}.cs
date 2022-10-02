@@ -1,21 +1,22 @@
 ﻿using SCFirstOrderLogic;
+using SCFirstOrderLogic.SentenceManipulation;
 
 namespace SCClassicalPlanning.ProblemManipulation
 {
     /// <summary>
-    /// Base class for recursive visitors of <see cref="Goal"/> instances that reference external visitation state
+    /// Base class for recursive visitors of <see cref="Effect"/> instances that reference external visitation state
     /// (as opposed to maintaining state as fields of the visitor).
     /// </summary>
-    public abstract class RecursiveGoalVisitor<TState> : IGoalVisitor<TState>
+    public abstract class RecursiveEffectVisitor<TState> : IEffectVisitor<TState>, ILiteralVisitor<TState>, ITermVisitor<TState>
     {
         /// <summary>
-        /// Visits a <see cref="Goal"/> instance.
-        /// The default implementation just visits all of the goal's elements.
+        /// Visits a <see cref="Effect"/> instance.
+        /// The default implementation just visits all of the effect's elements.
         /// </summary>
-        /// <param name="goal">The <see cref="Goal"/> instance to visit.</param>
-        public virtual void Visit(Goal goal, TState visitState)
+        /// <param name="effect">The <see cref="Effect"/> instance to visit.</param>
+        public virtual void Visit(Effect effect, TState visitState)
         {
-            foreach (var literal in goal.Elements)
+            foreach (var literal in effect.Elements)
             {
                 Visit(literal, visitState);
             }
@@ -40,24 +41,24 @@ namespace SCClassicalPlanning.ProblemManipulation
         {
             foreach (var argument in predicate.Arguments)
             {
-                Visit(argument, visitState);
+                Visit(argument, ref visitState);
             }
         }
 
         /// <summary>
         /// Visits a <see cref="Term"/> instance.
-        /// The default implementation doesn't do anything.
+        /// The default implementation invokes the Visit method appropriate to the runtime type of the term.
         /// </summary>
         /// <param name="term">The term to visit.</param>
-        public virtual void Visit(Term term, TState visitState)
+        public virtual void Visit(Term term, ref TState visitState)
         {
             switch (term)
             {
                 case Constant constant:
-                    Visit(constant, visitState);
+                    Visit(constant, ref visitState);
                     break;
                 case VariableReference variableReference:
-                    Visit(variableReference, visitState);
+                    Visit(variableReference, ref visitState);
                     break;
                 default:
                     // NB: FUNCTIONS UNSUPPORTED
@@ -70,18 +71,28 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation doesn't do anything.
         /// </summary>
         /// <param name="constant">The constant to visit.</param>
-        public virtual void Visit(Constant constant, TState visitState)
+        public virtual void Visit(Constant constant, ref TState visitState)
         {
+        }
+
+        /// <summary>
+        /// Visits a <see cref="Function"/> instance.
+        /// Since all terms in classical planning should be functionless, the default implementation throws an exception.
+        /// </summary>
+        /// <param name="function">The function to visit.</param>
+        public virtual void Visit(Function function, ref TState visitState)
+        {
+            throw new NotSupportedException();
         }
 
         /// <summary>
         /// Visits a <see cref="VariableReference"/> instance.
         /// The default implementation just visits the variable's declaration
         /// </summary>
-        /// <param name="variable">The variable reference to visit.</param>
-        public virtual void Visit(VariableReference variableReference, TState visitState)
+        /// <param name="variableReference">The variable reference to visit.</param>
+        public virtual void Visit(VariableReference variableReference, ref TState visitState)
         {
-            Visit(variableReference.Declaration, visitState);
+            Visit(variableReference.Declaration, ref visitState);
         }
 
         /// <summary>
@@ -89,7 +100,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation doesn't do anything.
         /// </summary>
         /// <param name="variableDeclaration">The variable declaration to visit.</param>
-        public virtual void Visit(VariableDeclaration variableDeclaration, TState visitState)
+        public virtual void Visit(VariableDeclaration variableDeclaration, ref TState visitState)
         {
         }
     }

@@ -1,9 +1,7 @@
-﻿using SCClassicalPlanning;
-
-namespace SCClassicalPlanning.Planning
+﻿namespace SCClassicalPlanning.Planning
 {
     /// <summary>
-    /// Interface for types that can create plans for given problems.
+    /// Interface for types that can create <see cref="Plan"/>s for given <see cref="Problem"/>s.
     /// </summary>
     public interface IPlanner
     {
@@ -12,6 +10,6 @@ namespace SCClassicalPlanning.Planning
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
         /// <returns>A <see cref="Task"/> representing the process of creating a plan that solves the problem.</returns>
-        Task<IPlan> CreatePlanAsync(Problem problem);
+        Task<Plan> CreatePlanAsync(Problem problem);
     }
 }

@@ -76,10 +76,20 @@ namespace SCClassicalPlanning.ProblemManipulation
 
         /// <summary>
         /// Visits a <see cref="VariableReference"/> instance.
-        /// The default implementation doesn't do anything.
+        /// The default implementation just visits the variable's declaration
         /// </summary>
         /// <param name="variable">The variable reference to visit.</param>
         public virtual void Visit(VariableReference variableReference, TState visitState)
+        {
+            Visit(variableReference.Declaration, visitState);
+        }
+
+        /// <summary>
+        /// Visits a <see cref="VariableDeclaration"/> instance.
+        /// The default implementation doesn't do anything.
+        /// </summary>
+        /// <param name="variableDeclaration">The variable declaration to visit.</param>
+        public virtual void Visit(VariableDeclaration variableDeclaration, TState visitState)
         {
         }
     }

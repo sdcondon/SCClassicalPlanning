@@ -17,19 +17,5 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// <param name="state">The <see cref="State"/> instance to visit.</param>
         /// <param name="visitationState">A reference to the state of this visitation.</param>
         void Visit(State state, TState visitationState);
-
-        /// <summary>
-        /// Visits a <see cref="Literal"/> instance.
-        /// </summary>
-        /// <param name="literal">The <see cref="Literal"/> instance to visit.</param>
-        /// <param name="visitationState">A reference to the state of this visitation.</param>
-        void Visit(Literal literal, TState visitationState);
-
-        /// <summary>
-        /// Visits a <see cref="Predicate"/> instance. 
-        /// </summary>
-        /// <param name="predicate">The <see cref="Predicate"/> instance to visit.</param>
-        /// <param name="visitationState">A reference to the state of this visitation.</param>
-        void Visit(Predicate predicate, TState visitationState);
     }
 }

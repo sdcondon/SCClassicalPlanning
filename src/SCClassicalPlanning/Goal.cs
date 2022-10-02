@@ -4,11 +4,11 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning
 {
     /// <summary>
-    /// Container for a description of a goal - used to describe goals of <see cref="Problem"/> instances, as well as the precondition of <see cref="Action"/> instances.
+    /// Container for information about a goal.
     /// <para/>
-    /// <see cref="Goal"/>s are essentially a set of (functionless) literals. The positive ones indicate predicates that must exist in the domain's state in order 
-    /// for the goal to be satisfied. The negative ones indicate predicates that must NOT exist in the domain's state, and absent ones are ones that have no effect on whether
-    /// the goal is satisfied or not.
+    /// A <see cref="Goal"/> is essentially just a set of (functionless) <see cref="Literal"/>s. The positive ones indicate predicates that must exist in a <see cref="State"/> for it 
+    /// to satisfy the goal. The negative ones indicate predicates that must NOT exist in a state for it to satisfy the goal. Goals are used to describe the end goal of <see cref="Problem"/>
+    /// instances, as well as the precondition of <see cref="Action"/> instances.
     /// <para/>
     /// TODO: probably should add some verification that all literals are functionless. TODO: Should also probably store add and delete lists separately,
     /// for performance. Application and Regression are going to be far more common than wanting to get all elements of a state.
@@ -64,6 +64,16 @@ namespace SCClassicalPlanning
         /// The negative ones indicate predicates that must NOT exist in a <see cref="State"/> in order for the goal to be satisfied.
         /// </summary>
         public IReadOnlySet<Literal> Elements { get; }
+
+        /// <summary>
+        /// Gets the predicates that must exist in a <see cref="State"/> in order for this goal to be satisfied.
+        /// </summary>
+        public IEnumerable<Predicate> PositiveElements => Elements.Where(l => l.IsPositive).Select(l => l.Predicate);
+
+        /// <summary>
+        /// Gets the predicates that must NOT exist in a <see cref="State"/> in order for this goal to be satisfied.
+        /// </summary>
+        public IEnumerable<Predicate> NegativeElements => Elements.Where(l => l.IsNegated).Select(l => l.Predicate);
 
         /// <summary>
         /// Gets a value indicating whether this goal is satisfied by a particular state.

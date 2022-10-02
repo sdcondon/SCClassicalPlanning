@@ -3,16 +3,16 @@
 namespace SCClassicalPlanning.ProblemManipulation
 {
     /// <summary>
-    /// Interface for visitors of <see cref="Goal"/> instances.
+    /// Interface for visitors of <see cref="Effect"/> instances.
     /// </summary>
     /// <typeparam name="TState">The type of state that this visitor works with.</typeparam>
-    public interface IGoalVisitor<TState>
+    public interface IEffectVisitor<TState>
     {
         /// <summary>
-        /// Visits a <see cref="Goal"/> instance.
+        /// Visits a <see cref="Effect"/> instance.
         /// </summary>
-        /// <param name="goal">The <see cref="Goal"/> instance to visit.</param>
+        /// <param name="effect">The <see cref="Effect"/> instance to visit.</param>
         /// <param name="visitationState">A reference to the state of this visitation.</param>
-        void Visit(Goal goal, TState visitationState);
+        void Visit(Effect effect, TState visitationState);
     }
 }

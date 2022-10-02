@@ -14,7 +14,7 @@ namespace SCClassicalPlanning.Planning
     {
         private readonly SentenceFormatter sentenceFormatter = new SentenceFormatter();
 
-        public string Format(IPlan plan)
+        public string Format(Plan plan)
         {
             var builder = new StringBuilder();
 

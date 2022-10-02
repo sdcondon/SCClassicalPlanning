@@ -1,5 +1,6 @@
 ﻿using SCFirstOrderLogic;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
+using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 
 namespace SCClassicalPlanning.ExampleDomains
 {
@@ -33,39 +34,39 @@ namespace SCClassicalPlanning.ExampleDomains
         public static OperablePredicate At(Term @object, Term location) => new Predicate(nameof(At), @object, location);
         public static OperablePredicate In(Term @object, Term container) => new Predicate(nameof(In), @object, container);
 
-        public static Action Load(Term cargo, Term plane, Term airport) => new(
+        public static OperableAction Load(Term cargo, Term plane, Term airport) => new(
             identifier: nameof(Load),
-            precondition: new Goal(
+            precondition:
                 At(cargo, airport)
                 & At(plane, airport)
                 & Cargo(cargo)
                 & Plane(plane)
-                & Airport(airport)),
-            effect: new Effect(
+                & Airport(airport),
+            effect:
                 !At(cargo, airport)
-                & In(cargo, plane)));
+                & In(cargo, plane));
 
-        public static Action Unload(Term cargo, Term plane, Term airport) => new(
+        public static OperableAction Unload(Term cargo, Term plane, Term airport) => new(
             identifier: nameof(Unload),
-            precondition: new Goal(
+            precondition:
                 In(cargo, plane)
                 & At(plane, airport)
                 & Cargo(cargo)
                 & Plane(plane)
-                & Airport(airport)),
-            effect: new Effect(
+                & Airport(airport),
+            effect:
                 At(cargo, airport)
-                & !In(cargo, plane)));
+                & !In(cargo, plane));
 
-        public static Action Fly(Term plane, Term from, Term to) => new(
+        public static OperableAction Fly(Term plane, Term from, Term to) => new(
             identifier: nameof(Fly),
-            precondition: new Goal(
+            precondition:
                 At(plane, from)
                 & Plane(plane)
                 & Airport(from)
-                & Airport(to)),
-            effect: new Effect(
+                & Airport(to),
+            effect:
                 !At(plane, from)
-                & At(plane, to)));
+                & At(plane, to));
     }
 }

@@ -24,11 +24,11 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Gets the set of predicates that exist within the domain.
         /// </summary>
-        public IReadOnlyCollection<Predicate> Predicates { get; }
+        public ReadOnlyCollection<Predicate> Predicates { get; }
 
         /// <summary>
         /// Gets the set of actions that exist within the domain.
         /// </summary>
-        public IReadOnlyCollection<Action> Actions { get; }
+        public ReadOnlyCollection<Action> Actions { get; }
     }
 }

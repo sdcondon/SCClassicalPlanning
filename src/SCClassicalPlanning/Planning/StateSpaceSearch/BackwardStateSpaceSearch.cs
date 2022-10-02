@@ -1,14 +1,14 @@
 ﻿using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
 using System.Collections;
-using System.Collections.ObjectModel;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
     /// <summary>
-    /// A simple implementation of <see cref="IPlanner"/> that carries out a backward search of
-    /// the state space to create plans. See section 10.2.2 of "Artificial Intelligence: A Modern
-    /// Approach" for more on this.
+    /// A simple implementation of <see cref="IPlanner"/> that carries out a backward (A-star) search of
+    /// the state space to create plans.
+    /// <para/>
+    /// See section 10.2.2 of "Artificial Intelligence: A Modern Approach" for more on this.
     /// </summary>
     public class BackwardStateSpaceSearch : IPlanner
     {
@@ -21,13 +21,6 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         public BackwardStateSpaceSearch(Func<State, Goal, float> heuristic) => this.heuristic = heuristic;
 
         /// <inheritdoc />
-        async Task<IPlan> IPlanner.CreatePlanAsync(Problem problem) => await CreatePlanAsync(problem);
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="problem"></param>
-        /// <returns></returns>
         public async Task<Plan> CreatePlanAsync(Problem problem)
         {
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
@@ -38,14 +31,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             await Task.Run(() => search.Complete());
 
+            // TODO: handle failure gracefully..
             return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
-        }
-
-        public class Plan : IPlan
-        {
-            public Plan(IList<Action> steps) => Steps = new ReadOnlyCollection<Action>(steps);
-
-            public IReadOnlyCollection<Action> Steps { get; }
         }
 
         private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>
@@ -70,8 +57,10 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             public StateSpaceNodeEdges(Problem problem, Goal goal) => (this.problem, this.goal) = (problem, goal);
 
+            /// <inheritdoc />
             public int Count => problem.GetRelevantActions(goal).Count();
 
+            /// <inheritdoc />
             public IEnumerator<StateSpaceEdge> GetEnumerator()
             {
                 foreach (var action in problem.GetRelevantActions(goal))
@@ -83,6 +72,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 }
             }
 
+            /// <inheritdoc />
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 

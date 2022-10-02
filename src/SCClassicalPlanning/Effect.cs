@@ -4,10 +4,10 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning
 {
     /// <summary>
-    /// Container for information about an effect - some change of the state of a system. These occur as the result of <see cref="Action"/>s.
+    /// Container for information about an effect - some change in the state of a system.
     /// <para/>
     /// <see cref="Effect"/>s are essentially a set of (functionless) <see cref="Literal"/>s. The positive ones indicates predicates that are added to a
-    /// state by the effect's application. The negative ones indicate predicates that are removed, and absent ones remain unchanged.
+    /// state by the effect's application. The negative ones indicate predicates that are removed. Effects are applied as the result of <see cref="Action"/>s.
     /// <para/>
     /// TODO: probably should add some verification that all literals are functionless.
     /// <br/>TODO: Should also probably store add and delete lists separately,
@@ -30,8 +30,6 @@ namespace SCClassicalPlanning
         /// </summary>
         /// <param name="elements">The literals that comprise the state.</param>
         public Effect(params Literal[] elements) : this((IEnumerable<Literal>)elements) { }
-
-        // TODO?: public Effect(IEnumerable<Predicate> addList, IEnumerable<Predicate> deleteList)
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Effect" /> class from a sentence of first order logic. The sentence must normalize to a conjunction of literals, or an exception will be thrown.

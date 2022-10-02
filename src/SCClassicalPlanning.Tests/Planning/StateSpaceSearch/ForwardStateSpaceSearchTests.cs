@@ -91,7 +91,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
         private record TestCase(Domain Domain, State InitialState, Goal Goal)
         {
-            public IPlan Execute()
+            public Plan Execute()
             {
                 var planner = new ForwardStateSpaceSearch((s, g) => 0);
                 var problem = new Problem(Domain, InitialState, Goal);

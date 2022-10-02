@@ -1,7 +1,11 @@
 ﻿namespace SCClassicalPlanning
 {
     /// <summary>
-    /// Container for information about an action that can be carried out within a domain.
+    /// Container for information about an action.
+    /// <para/>
+    /// <see cref="Action"/>s can be applied to <see cref="State"/>s to create new states (via the action's Effect),
+    /// provided that the action's Precondition is met. <see cref="Domain"/>s include a description of all
+    /// actions that are valid in the domain.
     /// </summary>
     public sealed class Action
     {
@@ -30,8 +34,6 @@
         /// </summary>
         public Effect Effect { get; }
 
-        /// TODO?: Variables - lazily, via visitor. Just 'cos PDDL has it..
-
         /// <summary>
         /// Gets a value indicating whether the action is applicable in a given state.
         /// <para/>
@@ -44,7 +46,7 @@
         /// <summary>
         /// Applies this action to a given state, producing a new state.
         /// <para/>
-        /// NB: Does NOT validate preconditions - to be of use with particular planning heuristics.
+        /// TODO-NEEDED?: NB: Does NOT validate preconditions - to be of use with particular planning heuristics.
         /// </summary>
         /// <param name="state">The state to apply the action to.</param>
         /// <returns>The new state.</returns>
@@ -68,14 +70,17 @@
         /// <para/>
         /// NB: AIaMA gets regression a bit.. err.. wrong, because it gets a little confused between states (which, under the
         /// closed-world assumption, need include only positive fluents) and goals (which can include both positive and negative fluents).
-        /// It makes a distinction between add lists and delete lists. The flaw in the argument about how delete lists can be ignored can be seen via a moments
-        /// thought about how nothing *should* fundamentally change if you restate a problem so that every fluent is negated (e.g. instead of "IsThing", we use "IsNotThing") -
-        /// but would because doing so would swap add lists and delete lists.
-        /// A sound way to reason about regression is that any element of the given goal (positive OR negative) that is applied by the action doesn't have to hold 
-        /// in the regressed goal (because it'll be applied by the action) - so is removed. However, all preconditions do have to hold - so they are added.
+        /// It treats add lists and delete lists fundamentally differently, but shouldn't.
+        /// <para/>
+        /// A sound way to reason about regression is to first note that it operates on a goal to give a goal - that is, both positive and negative fluents appear can
+        /// occur in both the argument and the result. Then note that any element of the given goal (positive or negative) that is applied by the action doesn't
+        /// have to hold in the returned goal (because it'll be applied by the action) - so is removed. However, all preconditions do have to hold - so they are added.
         /// </summary>
         /// <param name="goal">The goal that must be satisfied after performing this action.</param>
         /// <returns>The goal that must be satisfied prior to performing this action.</returns>
-        public Goal Regress(Goal goal) => new Goal(goal.Elements.Except(Effect.Elements).Union(Precondition.Elements));
+        public Goal Regress(Goal goal)
+        {
+            return new Goal(goal.Elements.Except(Effect.Elements).Union(Precondition.Elements));
+        }
     }
 }
