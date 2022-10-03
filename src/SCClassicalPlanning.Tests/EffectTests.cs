@@ -42,5 +42,44 @@ namespace SCClassicalPlanning
             .When(tc => tc.effect.ApplyTo(tc.initialState))
             .ThenReturns()
             .And((tc, s) => s.Should().BeEquivalentTo(tc.expectedState));
+
+        private record IsRelevantToTestCase(Goal goal, Effect effect, bool expectedResult);
+
+        public static Test IsRelevantToBehaviour => TestThat
+            .GivenEachOf(() => new IsRelevantToTestCase[]
+            {
+                // fulfills positive element
+                new(
+                    goal: new(IsPresent(element1)),
+                    effect: new(IsPresent(element1)),
+                    expectedResult: true),
+
+                // fulfills negative element
+                new(
+                    goal: new(!IsPresent(element1)),
+                    effect: new(!IsPresent(element1)),
+                    expectedResult: true),
+
+                // fulfills positive & negative element
+                new(
+                    goal: new(!IsPresent(element1) & IsPresent(element2)),
+                    effect: new(!IsPresent(element1) & IsPresent(element2)),
+                    expectedResult: true),
+
+                // doesn't fulfill any elements
+                new(
+                    goal: new(!IsPresent(element1) & IsPresent(element2)),
+                    effect: new(IsPresent(element1) & !IsPresent(element2)),
+                    expectedResult: false),
+
+                // fulfills positive element, undoes positive element
+                new(
+                    goal: new(IsPresent(element1) & IsPresent(element2)),
+                    effect: new(!IsPresent(element1) & IsPresent(element2)),
+                    expectedResult: false),
+            })
+            .When(tc => tc.effect.IsRelevantTo(tc.goal))
+            .ThenReturns()
+            .And((tc, r) => r.Should().Be(tc.expectedResult));
     }
 }

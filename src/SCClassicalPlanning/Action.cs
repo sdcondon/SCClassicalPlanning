@@ -55,15 +55,11 @@
         /// <summary>
         /// Returns a value indicating whether this action is conceivably a useful final step in achieving a given goal.
         /// <para/>
-        /// An action is relevant if it accomplishes at least one element of the goal, and does not undo anything.
-        /// That is, the effect's elements overlap with the goals elements, and the negation of each of the effect's elements does not.
+        /// An action is relevant to a goal if its effect is relevant to the goal.
         /// </summary>
         /// <param name="goal"></param>
         /// <returns></returns>
-        public bool IsRelevantTo(Goal goal)
-        {
-            return goal.Elements.Overlaps(Effect.Elements) && !goal.Elements.Overlaps(Effect.Elements.Select(l => l.Negate()));
-        }
+        public bool IsRelevantTo(Goal goal) => Effect.IsRelevantTo(goal);
 
         /// <summary>
         /// Returns the goal that must be satisfied prior to performing this action, in order to satisfy a given goal after the action is performed. 
