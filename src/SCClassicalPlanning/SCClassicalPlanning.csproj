@@ -16,7 +16,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SCFirstOrderLogic" Version="2.1.0-pre.4" />
+    <PackageReference Include="SCFirstOrderLogic" Version="2.1.0-pre.5" />
     <PackageReference Include="SCGraphTheory.Search" Version="2.3.2" />
   </ItemGroup>
 
@@ -26,8 +26,8 @@
   </ItemGroup>
     
   <ItemGroup>
-    <Folder Include="StateStorage\" />
     <Folder Include="ProblemFormatting\" />
+    <Folder Include="StateStorage\" />
   </ItemGroup>
 
 </Project>

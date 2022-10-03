@@ -1,4 +1,5 @@
 ﻿using SCFirstOrderLogic;
+using SCFirstOrderLogic.SentenceManipulation;
 using System.Collections.Immutable;
 
 namespace SCClassicalPlanning
@@ -38,18 +39,10 @@ namespace SCClassicalPlanning
         /// <param name="sentence"></param>
         public Goal(Sentence sentence)
         {
+            // NB: it is important NOT to standardise variables at this point, because we will generally
+            // definitions that are common across e.g. the precondition and goal of an action.
             var elements = new HashSet<Literal>();
-
-            foreach (var clause in new CNFSentence(sentence).Clauses)
-            {
-                if (!clause.IsUnitClause)
-                {
-                    throw new ArgumentException();
-                }
-
-                elements.Add(clause.Literals.First());
-            }
-
+            GoalConstructor.Instance.Visit(sentence, ref elements);
             Elements = elements.ToImmutableHashSet();
         }
 
@@ -86,6 +79,27 @@ namespace SCClassicalPlanning
         {
             return state.Elements.IsSupersetOf(Elements.Where(l => l.IsPositive).Select(l => l.Predicate))
                 && !state.Elements.Overlaps(Elements.Where(l => l.IsNegated).Select(l => l.Predicate));
+        }
+
+        private class GoalConstructor : RecursiveSentenceVisitor<HashSet<Literal>>
+        {
+            public static GoalConstructor Instance { get; } = new GoalConstructor();
+
+            public override void Visit(Sentence sentence, ref HashSet<Literal> literals)
+            {
+                if (sentence is Conjunction conjunction)
+                {
+                    // The sentence is assumed to be a conjunction of literals - so just skip past all the conjunctions at the root.
+                    base.Visit(conjunction, ref literals);
+                }
+                else
+                {
+                    // Assume we've hit a literal. NB will throw if its not actually a literal.
+                    // Afterwards, we don't need to look any further down the tree for the purposes of this class (though the Literal ctor that
+                    // we invoke here does so to figure out the details of the literal). So we can just return rather than invoking base.Visit.
+                    literals.Add(new Literal(sentence));
+                }
+            }
         }
     }
 }

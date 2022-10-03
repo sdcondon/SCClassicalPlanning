@@ -3,32 +3,32 @@
 namespace SCClassicalPlanning.ProblemManipulation
 {
     /// <summary>
-    /// Base class for recursive transformations of <see cref="Sentence"/> instances to other <see cref="Sentence"/> instances.
+    /// Base class for recursive transformations of <see cref="Effect"/> instances to other <see cref="Effect"/> instances.
     /// </summary>
-    public abstract class RecursiveGoalTransformation : IGoalTransformation<Goal>
+    public abstract class RecursiveEffectTransformation
     {
         /// <summary>
-        /// Applies this transformation to a <see cref="Goal"/> instance.
+        /// Applies this transformation to a <see cref="Effect"/> instance.
         /// <para/>
-        /// The default implementation returns a <see cref="Goal"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
+        /// The default implementation returns a <see cref="Effect"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
         /// </summary>
-        /// <param name="goal">The sentence to visit.</param>
-        /// <returns>The transformed <see cref="Goal"/>.</returns>
-        public virtual Goal ApplyTo(Goal goal)
+        /// <param name="effect">The effect to transform.</param>
+        /// <returns>The transformed effect.</returns>
+        public virtual Effect ApplyTo(Effect effect)
         {
-            var elements = goal.Elements.Select(a => ApplyTo(a)).ToList();
+            var elements = effect.Elements.Select(a => ApplyTo(a)).ToList();
 
-            if (elements.Zip(goal.Elements, (x, y) => (x, y)).Any(t => t.x != t.y))
+            if (elements.Zip(effect.Elements, (x, y) => (x, y)).Any(t => t.x != t.y))
             {
-                return new Goal(elements);
+                return new Effect(elements);
             }
 
-            return goal;
+            return effect;
         }
 
         /// <summary>
         /// Applies this transformation to a <see cref="Literal"/> instance. 
-        /// The default implementation returns a <see cref="Literal"/> with the same positivity as the existing literal and a predicate that it the result of calling <see cref="ApplyTo(Predicate)"/> on the existing predicate.
+        /// The default implementation returns a <see cref="Literal"/> with the same positivity as te existing literal and a predicate that it the result of calling <see cref="ApplyTo(Predicate)"/> on the existing predicate.
         /// </summary>
         /// <param name="literal">The <see cref="Literal"/> instance to visit.</param>
         /// <returns>The transformed predicate.</returns>
@@ -48,7 +48,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation returns a <see cref="Predicate"/> with the same Symbol and with an argument list that is the result of calling <see cref="ApplyTo(Term)"/> on all of the existing arguments.
         /// </summary>
         /// <param name="predicate">The <see cref="Predicate"/> instance to visit.</param>
-        /// <returns>The transformed predicate.</returns>
+        /// <returns>The transformed literal.</returns>
         public virtual Predicate ApplyTo(Predicate predicate)
         {
             var arguments = predicate.Arguments.Select(a => ApplyTo(a)).ToList();
