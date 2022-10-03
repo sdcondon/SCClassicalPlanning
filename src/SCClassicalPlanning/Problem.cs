@@ -95,10 +95,10 @@ namespace SCClassicalPlanning
 
                     if (firstGoalElement.IsPositive)
                     {
-                        // This first of the remaining goal elements is positive.
-                        // Here we iterate through ALL elements of the state, trying to find unifications with that element.
-                        // Using some kind of index here would of course speed things up.
-                        // For each unification found , we then recurse for the rest of the elements of the goal.
+                        // The first of the remaining goal elements is positive.
+                        // Here we iterate through ALL elements of the state, trying to find unifications with the element.
+                        // Using some kind of index here would of course speed things up (support for this is a TODO).
+                        // For each unification found, we then recurse for the rest of the elements of the goal.
                         foreach (var stateElement in state.Elements)
                         {
                             var firstGoalElementUnifier = new VariableSubstitution(unifier);
@@ -116,8 +116,8 @@ namespace SCClassicalPlanning
                     }
                     else
                     {
-                        // This first of the remaining goal elements is negative.
-                        // At this point we should have a unifier that includes a valid binding for all the variables that occur in earlier
+                        // The first of the remaining goal elements is negative.
+                        // At this point we have a unifier that includes a valid binding for all the variables that occur in earlier
                         // elements of the goal. If this covers all the variables that occur in this goal element, all we need to do is check
                         // that the goal element transformed by the existing unifier does not occur in the state. However, if there are any that
                         // do not occur, we need to check for the existence of the predicate formed by substituting EVERY combination of objects

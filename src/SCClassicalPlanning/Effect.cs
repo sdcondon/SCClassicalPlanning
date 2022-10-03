@@ -33,15 +33,15 @@ namespace SCClassicalPlanning
         public Effect(params Literal[] elements) : this((IEnumerable<Literal>)elements) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Effect" /> class from a sentence of first order logic. The sentence must normalize to a conjunction of literals, or an exception will be thrown.
+        /// Initializes a new instance of the <see cref="Effect" /> class from a sentence of first order logic. The sentence must be a conjunction of literals, or an exception will be thrown.
         /// </summary>
         /// <param name="sentence"></param>
         public Effect(Sentence sentence)
         {
             // NB: it is important NOT to standardise variables at this point, because we will generally
-            // definitions that are common across e.g. the precondition and goal of an action.
+            // want variable definitions that are common across e.g. the precondition and goal of an action.
             var elements = new HashSet<Literal>();
-            EffectConstructor.Instance.Visit(sentence, ref elements);
+            EffectConstructionVisitor.Instance.Visit(sentence, ref elements);
             Elements = elements.ToImmutableHashSet();
         }
 
@@ -80,10 +80,14 @@ namespace SCClassicalPlanning
         /// <returns>The new state.</returns>
         public State ApplyTo(State state) => new State(state.Elements.Except(DeleteList).Union(AddList));
 
-        private class EffectConstructor : RecursiveSentenceVisitor<HashSet<Literal>>
+        private class EffectConstructionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
         {
-            public static EffectConstructor Instance { get; } = new EffectConstructor();
+            /// <summary>
+            /// Gets a singleton instance of this class.
+            /// </summary>
+            public static EffectConstructionVisitor Instance { get; } = new EffectConstructionVisitor();
 
+            /// <inheritdoc/>
             public override void Visit(Sentence sentence, ref HashSet<Literal> literals)
             {
                 if (sentence is Conjunction conjunction)

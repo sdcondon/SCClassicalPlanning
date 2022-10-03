@@ -34,15 +34,15 @@ namespace SCClassicalPlanning
         public Goal(params Literal[] elements) : this((IEnumerable<Literal>)elements) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Effect" /> class from a sentence of first order logic. The sentence must normalize to a conjunction of literals, or an exception will be thrown.
+        /// Initializes a new instance of the <see cref="Effect" /> class from a sentence of first order logic. The sentence must be a conjunction of literals, or an exception will be thrown.
         /// </summary>
         /// <param name="sentence"></param>
         public Goal(Sentence sentence)
         {
             // NB: it is important NOT to standardise variables at this point, because we will generally
-            // definitions that are common across e.g. the precondition and goal of an action.
+            // want variable definitions that are common across e.g. the precondition and goal of an action.
             var elements = new HashSet<Literal>();
-            GoalConstructor.Instance.Visit(sentence, ref elements);
+            GoalConstructionVisitor.Instance.Visit(sentence, ref elements);
             Elements = elements.ToImmutableHashSet();
         }
 
@@ -81,10 +81,14 @@ namespace SCClassicalPlanning
                 && !state.Elements.Overlaps(Elements.Where(l => l.IsNegated).Select(l => l.Predicate));
         }
 
-        private class GoalConstructor : RecursiveSentenceVisitor<HashSet<Literal>>
+        private class GoalConstructionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
         {
-            public static GoalConstructor Instance { get; } = new GoalConstructor();
+            /// <summary>
+            /// Gets a singleton instance of this class.
+            /// </summary>
+            public static GoalConstructionVisitor Instance { get; } = new GoalConstructionVisitor();
 
+            /// <inheritdoc/>
             public override void Visit(Sentence sentence, ref HashSet<Literal> literals)
             {
                 if (sentence is Conjunction conjunction)
