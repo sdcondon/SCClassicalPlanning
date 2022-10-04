@@ -5,6 +5,7 @@ using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.BlocksWorld;
 using static SCClassicalPlanning.ExampleDomains.SpareTire;
+using static SCClassicalPlanning.Planning.StateSpaceSearch.StateSpaceSearchHeuristics;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
@@ -93,7 +94,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         {
             public Plan Execute()
             {
-                var planner = new ForwardStateSpaceSearch((s, g) => 0);
+                var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOfActionsToGoal);
                 var problem = new Problem(Domain, InitialState, Goal);
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
             }

@@ -1,4 +1,5 @@
 ﻿using SCFirstOrderLogic;
+using SCFirstOrderLogic.SentenceManipulation;
 using System.Collections.Immutable;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
@@ -36,7 +37,12 @@ namespace SCClassicalPlanning.ProblemCreation
 
             public static implicit operator Goal(OperableGoal goal) => new(goal.Elements);
 
-            public static implicit operator OperableGoal(OperableSentence sentence) => null; //TODO
+            public static implicit operator OperableGoal(OperableSentence sentence)
+            {
+                var literals = new HashSet<Literal>();
+                LiteralConjunctionVisitor.Instance.Visit(sentence, ref literals);
+                return new(literals);
+            }
         }
 
         public class OperableState
@@ -49,7 +55,12 @@ namespace SCClassicalPlanning.ProblemCreation
 
             public static implicit operator State(OperableState state) => new(state.Elements);
 
-            public static implicit operator OperableState(OperableSentence sentence) => null; //TODO
+            public static implicit operator OperableState(OperableSentence sentence)
+            {
+                var predicates = new HashSet<Predicate>();
+                PredicateConjunctionVisitor.Instance.Visit(sentence, ref predicates);
+                return new(predicates);
+            }
         } 
 
         public class OperableEffect
@@ -62,7 +73,75 @@ namespace SCClassicalPlanning.ProblemCreation
 
             public static implicit operator Effect(OperableEffect effect) => new(effect.Elements);
 
-            public static implicit operator OperableEffect(OperableSentence sentence) => null; //TODO
+            public static implicit operator OperableEffect(OperableSentence sentence)
+            {
+                var literals = new HashSet<Literal>();
+                LiteralConjunctionVisitor.Instance.Visit(sentence, ref literals);
+                return new(literals);
+            }
+        }
+
+        /// <summary>
+        /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.
+        /// </summary>
+        private class LiteralConjunctionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
+        {
+            /// <summary>
+            /// Gets a singleton instance of this class.
+            /// </summary>
+            public static LiteralConjunctionVisitor Instance { get; } = new LiteralConjunctionVisitor();
+
+            /// <inheritdoc/>
+            public override void Visit(Sentence sentence, ref HashSet<Literal> literals)
+            {
+                if (sentence is Conjunction conjunction)
+                {
+                    // The sentence is assumed to be a conjunction of literals - so just skip past all the conjunctions at the root.
+                    base.Visit(conjunction, ref literals);
+                }
+                else
+                {
+                    // Assume we've hit a literal. NB: ctor will throw if its not actually a literal.
+                    // Afterwards, we don't need to look any further down the tree for the purposes of this class (though the Literal ctor that
+                    // we invoke here does so to figure out the details of the literal). So we can just return rather than invoking base.Visit.
+                    literals.Add(new Literal(sentence));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sentence visitor class that extracts <see cref="Predicate"/>s from a <see cref="Sentence"/> that is a conjunction of them.
+        /// </summary>
+        private class PredicateConjunctionVisitor : RecursiveSentenceVisitor<HashSet<Predicate>>
+        {
+            /// <summary>
+            /// Gets a singleton instance of this class.
+            /// </summary>
+            public static PredicateConjunctionVisitor Instance { get; } = new PredicateConjunctionVisitor();
+
+            /// <inheritdoc/>
+            public override void Visit(Sentence sentence, ref HashSet<Predicate> predicates)
+            {
+                if (sentence is Conjunction conjunction)
+                {
+                    base.Visit(conjunction, ref predicates);
+                }
+                else if (sentence is Predicate predicate)
+                {
+                    // TODO: check for functions and throw..?
+
+                    if (predicate.Arguments.Any(a => !a.IsGroundTerm))
+                    {
+                        throw new ArgumentException("States cannot include non-ground terms");
+                    }
+
+                    predicates.Add(predicate);
+                }
+                else
+                {
+                    throw new ArgumentException("States must be a conjunction of predicates");
+                }
+            }
         }
     }
 }
