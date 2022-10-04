@@ -51,12 +51,12 @@ namespace SCClassicalPlanning
         public ImmutableHashSet<Literal> Elements { get; }
 
         /// <summary>
-        /// Gets the "add list" of the action - the non-negated atoms in the action's effect.
+        /// Gets the "add list" of the action - the non-negated predicates in the action's effect.
         /// </summary>
         public IEnumerable<Predicate> AddList => Elements.Where(a => !a.IsNegated).Select(l => l.Predicate);
 
         /// <summary>
-        /// Gets the "delete list" of the action - the negated atoms in the action's effect.
+        /// Gets the "delete list" of the action - the negated predicates in the action's effect.
         /// </summary>
         public IEnumerable<Predicate> DeleteList => Elements.Where(a => a.IsNegated).Select(l => l.Predicate);
 

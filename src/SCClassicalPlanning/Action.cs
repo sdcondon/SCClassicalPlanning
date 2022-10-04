@@ -69,7 +69,7 @@
         /// It treats add lists and delete lists fundamentally differently, but shouldn't.
         /// <para/>
         /// A sound way to reason about regression is to first note that it operates on a goal to give a goal - that is, both positive and negative fluents appear can
-        /// occur in both the argument and the result. Then note that any element of the given goal (positive or negative) that is applied by the action doesn't
+        /// occur in both the argument and the return value. Then note that any element of the given goal (positive or negative) that is applied by the action doesn't
         /// have to hold in the returned goal (because it'll be applied by the action) - so is removed. However, all preconditions do have to hold - so they are added.
         /// </summary>
         /// <param name="goal">The goal that must be satisfied after performing this action.</param>
