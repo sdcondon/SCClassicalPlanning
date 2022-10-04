@@ -46,6 +46,11 @@ namespace SCClassicalPlanning
         }
 
         /// <summary>
+        /// Gets a singleton <see cref="Effect"/> instance that is empty.
+        /// </summary>
+        public static Effect Empty { get; } = new Effect();
+
+        /// <summary>
         /// Gets the set of literals that comprise this effect.
         /// </summary>
         public ImmutableHashSet<Literal> Elements { get; }
@@ -79,6 +84,30 @@ namespace SCClassicalPlanning
         /// <param name="state">The state to apply the effect to.</param>
         /// <returns>The new state.</returns>
         public State ApplyTo(State state) => state.Apply(this);
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            // Effects should be small-ish, so I'm not too worried by the inefficiency here.
+            // Otherwise could think about sorting the set of elements (e.g. using ImmutableSortedSet sorted by hash code), maybe?
+            // Would need testing whether benefit is outweighed by constructed set in first place..
+            return obj is Effect effect && effect.Elements.IsSubsetOf(Elements) && Elements.IsSubsetOf(effect.Elements);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+
+            // As with Equals, asserting that this is okay given that effects should be small-ish.
+            // Though worth noting we'd avoid it if using e.g. ImmutableSortedSet for the elements.
+            foreach (var element in Elements.OrderBy(e => e.GetHashCode()))
+            {
+                hashCode.Add(element);
+            }
+
+            return hashCode.ToHashCode();
+        }
 
         /// <summary>
         /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.

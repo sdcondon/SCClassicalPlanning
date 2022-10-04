@@ -75,5 +75,17 @@
         /// <param name="goal">The goal that must be satisfied after performing this action.</param>
         /// <returns>The goal that must be satisfied prior to performing this action.</returns>
         public Goal Regress(Goal goal) => new Goal(goal.Elements.Except(Effect.Elements).Union(Precondition.Elements));
+
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            return obj is Action action && action.Identifier.Equals(Identifier) && action.Precondition.Equals(Precondition) && action.Effect.Equals(Effect);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Identifier, Precondition, Effect);
+        }
     }
 }

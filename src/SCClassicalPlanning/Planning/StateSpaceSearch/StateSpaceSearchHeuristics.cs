@@ -8,7 +8,7 @@
 
             public IgnorePreconditions(Problem problem) => this.problem = problem;
 
-            public static float EstimateCountOfActionsToGoal(State state, Goal goal)
+            public float EstimateCountOfActionsToGoal(State state, Goal goal)
             {
                 throw new NotImplementedException();
             }
@@ -20,7 +20,7 @@
 
             public IgnoreDeleteLists(Problem problem) => this.problem = problem;
 
-            public static float EstimateCountOfActionsToGoal(State state, Goal goal)
+            public float EstimateCountOfActionsToGoal(State state, Goal goal)
             {
                 throw new NotImplementedException();
             }

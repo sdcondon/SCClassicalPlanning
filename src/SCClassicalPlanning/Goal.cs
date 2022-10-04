@@ -87,6 +87,30 @@ namespace SCClassicalPlanning
         /// <returns></returns>
         public bool IsSatisfiedBy(State state) => state.Satisfies(this);
 
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            // Goals should be small-ish, so I'm not too worried by the inefficiency here.
+            // Otherwise could think about sorting the set of elements (e.g. using ImmutableSortedSet sorted by hash code), maybe?
+            // Would need testing whether benefit is outweighed by constructed set in first place..
+            return obj is Goal goal && goal.Elements.IsSubsetOf(Elements) && Elements.IsSubsetOf(goal.Elements);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+
+            // As with Equals, asserting that this is okay given that goals should be small-ish.
+            // Though worth noting we'd avoid it if using e.g. ImmutableSortedSet for the elements.
+            foreach (var element in Elements.OrderBy(e => e.GetHashCode()))
+            {
+                hashCode.Add(element);
+            }
+
+            return hashCode.ToHashCode();
+        }
+
         /// <summary>
         /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.
         /// Used by the <see cref="Goal(Sentence)"/> constructor.

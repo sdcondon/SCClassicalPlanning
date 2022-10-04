@@ -89,5 +89,35 @@ namespace SCClassicalPlanning
             .When(tc => tc.effect.IsRelevantTo(tc.goal))
             .ThenReturns()
             .And((tc, r) => r.Should().Be(tc.expectedResult));
+
+        private record EqualityTestCase(Effect X, Effect Y, bool ExpectedEquality);
+
+        public static Test EqualityBehaviour => TestThat
+            .GivenEachOf(() => new EqualityTestCase[]
+            {
+                new(
+                    X: Effect.Empty,
+                    Y: new Effect(),
+                    ExpectedEquality: true),
+
+                new(
+                    X: new Effect(new Predicate("A"), new Predicate("B")),
+                    Y: new Effect(new Predicate("A"), new Predicate("B")),
+                    ExpectedEquality: true),
+
+                new(
+                    X: new Effect(new Predicate("A"), new Predicate("B")),
+                    Y: new Effect(new Predicate("B"), new Predicate("A")),
+                    ExpectedEquality: true),
+
+                new(
+                    X: new Effect(new Predicate("A"), new Predicate("B")),
+                    Y: new Effect((Sentence)new Predicate("A")),
+                    ExpectedEquality: false),
+            })
+            .When(tc => (Equality: tc.X.Equals(tc.Y), HashCodeEquality: tc.X.GetHashCode() == tc.Y.GetHashCode()))
+            .ThenReturns()
+            .And((tc, rv) => rv.Equality.Should().Be(tc.ExpectedEquality))
+            .And((tc, rv) => rv.HashCodeEquality.Should().Be(tc.ExpectedEquality));
     }
 }

@@ -68,6 +68,29 @@ namespace SCClassicalPlanning
         // Depends on what we do with Problem.GetRelevantActions
         public bool Satisfies(Goal goal) => Elements.IsSupersetOf(goal.PositivePredicates) && !Elements.Overlaps(goal.NegativePredicates);
 
+        /// <inheritdoc />
+        public override bool Equals(object? obj)
+        {
+            // Obviously unworkable if the state is large. However, if the state is large then this isn't
+            // the only problematic thing. So let's revisit this when we look at abstracting state to allow 
+            // for secondary storage and indexing. It may be thatfor the "in-mem version", this is fine..
+            return obj is State state && state.Elements.IsSubsetOf(Elements) && Elements.IsSubsetOf(state.Elements);
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+            
+            // Again, terrible for large states.
+            foreach (var element in Elements.OrderBy(e => e.GetHashCode()))
+            {
+                hashCode.Add(element);
+            }
+
+            return hashCode.ToHashCode();
+        }
+
         /// <summary>
         /// Sentence visitor class that extracts <see cref="Predicate"/>s from a <see cref="Sentence"/> that is a conjunction of them.
         /// Used by the <see cref="State(Sentence)"/> constructor.

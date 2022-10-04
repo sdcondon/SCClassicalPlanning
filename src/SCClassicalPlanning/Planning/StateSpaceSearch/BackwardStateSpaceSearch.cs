@@ -35,7 +35,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             return new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
         }
 
-        private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>
+        private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
         {
             private readonly Problem problem;
 
@@ -48,6 +48,13 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             /// <inheritdoc />
             public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(problem, Goal);
+
+            /// <inheritdoc />
+            // NB: this struct is private - so we don't need to look at the problem, since it'll always match
+            public bool Equals(StateSpaceNode node) => node.Goal.Equals(Goal);
+
+            /// <inheritdoc />
+            public override int GetHashCode() => HashCode.Combine(Goal);
         }
 
         private struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
