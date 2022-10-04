@@ -57,7 +57,7 @@ namespace SCClassicalPlanning
         /// <para/>
         /// TODO-SIGNIFICANT: Problematic design-wise.. Large? IO? Fairly big deal because could have significant impact.
         /// Should Objects and InitialState be replaced with something like an 'IStateStore'? Which would perhaps mean that State should be IState?
-        /// And everything that entails - Effect.ApplyTo(Effect) probably becomes IState.Apply(Effect) and so on. Explore this. Later.
+        /// Explore this. Later.
         /// </summary>
         public ReadOnlyCollection<Constant> Objects { get; }
 
@@ -66,7 +66,7 @@ namespace SCClassicalPlanning
         /// <para/>
         /// TODO-SIGNIFICANT: Problematic design-wise.. Large? IO? Fairly big deal because could have significant impact.
         /// Should Objects and InitialState be replaced with something like an 'IStateStore'? Which would perhaps mean that State should be IState?
-        /// And everything that entails - Effect.ApplyTo(Effect) probably becomes IState.Apply(Effect) and so on. Explore this. Later.
+        /// Explore this. Later.
         /// </summary>
         public State InitialState { get; }
 
@@ -108,7 +108,7 @@ namespace SCClassicalPlanning
 
                             // TODO: using LiteralUnifier is perhaps overkill given that we know we're functionless, but will do for now.
                             // (doesn't really cost much more..)
-                            if (LiteralUnifier.TryUpdateUnsafe(stateElement, goalElements.First(), firstGoalElementUnifier))
+                            if (LiteralUnifier.TryUpdateUnsafe(stateElement, firstGoalElement, firstGoalElementUnifier))
                             {
                                 foreach (var restOfGoalElementsUnifier in MatchWithState(goalElements.Skip(1), firstGoalElementUnifier))
                                 {
@@ -172,7 +172,7 @@ namespace SCClassicalPlanning
                 var orderedElements = actionTemplate.Precondition.PositiveElements.Concat(actionTemplate.Precondition.NegativeElements);
 
                 // Now we can try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
-                foreach (var substitution in MatchWithState(actionTemplate.Precondition.Elements, new VariableSubstitution()))
+                foreach (var substitution in MatchWithState(orderedElements, new VariableSubstitution()))
                 {
                     yield return new Action(
                         actionTemplate.Identifier,
@@ -180,6 +180,17 @@ namespace SCClassicalPlanning
                         new VariableSubstitutionEffectTransformation(substitution).ApplyTo(actionTemplate.Effect));
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the (ground) actions that are relevant to a given goal.
+        /// </summary>
+        /// <param name="state">The goal to retrieve the relevant actions for.</param>
+        /// <returns>The actions that are relevant to the given state.</returns>
+        public IEnumerable<Action> GetRelevantActions(Goal goal)
+        {
+            // todo
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -197,7 +208,7 @@ namespace SCClassicalPlanning
         }
 
         /// <summary>
-        /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="Goal"/>, and add them to a given <see cref="HashSet{T}"/>.
+        /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="SCClassicalPlanning.Goal"/>, and add them to a given <see cref="HashSet{T}"/>.
         /// </summary>
         private class GoalConstantFinder : RecursiveGoalVisitor<HashSet<Constant>>
         {

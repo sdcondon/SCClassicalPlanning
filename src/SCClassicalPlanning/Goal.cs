@@ -59,14 +59,24 @@ namespace SCClassicalPlanning
         public ImmutableHashSet<Literal> Elements { get; }
 
         /// <summary>
-        /// Gets the predicates that must exist in a <see cref="State"/> in order for this goal to be satisfied.
+        /// Gets the positive elements of the goal - those whose predicates must exist in a <see cref="State"/> in order for this goal to be satisfied.
         /// </summary>
-        public IEnumerable<Predicate> PositiveElements => Elements.Where(l => l.IsPositive).Select(l => l.Predicate);
+        public IEnumerable<Literal> PositiveElements => Elements.Where(l => l.IsPositive);
 
         /// <summary>
-        /// Gets the predicates that must NOT exist in a <see cref="State"/> in order for this goal to be satisfied.
+        /// Gets the negative elements of the goal - those whose predicates must NOT exist in a <see cref="State"/> in order for this goal to be satisfied.
         /// </summary>
-        public IEnumerable<Predicate> NegativeElements => Elements.Where(l => l.IsNegated).Select(l => l.Predicate);
+        public IEnumerable<Literal> NegativeElements => Elements.Where(l => l.IsNegated);
+
+        /// <summary>
+        /// Gets the positive predicates of the goal - those that must exist in a <see cref="State"/> in order for this goal to be satisfied.
+        /// </summary>
+        public IEnumerable<Predicate> PositivePredicates => PositiveElements.Select(l => l.Predicate);
+
+        /// <summary>
+        /// Gets the negative predicates of the goal - those that must NOT exist in a <see cref="State"/> in order for this goal to be satisfied.
+        /// </summary>
+        public IEnumerable<Predicate> NegativePredicates => NegativeElements.Select(l => l.Predicate);
 
         /// <summary>
         /// Gets a value indicating whether this goal is satisfied by a particular state.

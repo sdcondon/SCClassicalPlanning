@@ -66,7 +66,7 @@ namespace SCClassicalPlanning
         /// <returns>A value indicating whether this state satisfies a given goal.</returns>
         // TODO: unify...? or at least throw if either the goal or the state is not ground?
         // Depends on what we do with Problem.GetRelevantActions
-        public bool Satisfies(Goal goal) => Elements.IsSupersetOf(goal.PositiveElements) && !Elements.Overlaps(goal.NegativeElements);
+        public bool Satisfies(Goal goal) => Elements.IsSupersetOf(goal.PositivePredicates) && !Elements.Overlaps(goal.NegativePredicates);
 
         /// <summary>
         /// Sentence visitor class that extracts <see cref="Predicate"/>s from a <see cref="Sentence"/> that is a conjunction of them.
