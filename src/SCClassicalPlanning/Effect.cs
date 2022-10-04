@@ -15,7 +15,7 @@ namespace SCClassicalPlanning
     /// for performance. Application and Regression are going to be far more common than wanting to get all elements. Then again, if and this is expanded to richer
     /// PDDL functionality (or if we want to allow extension.. - unlikely given the motivator for the project, but..)
     /// </summary>
-    public sealed class Effect
+    public class Effect
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Effect"/> class from an enumerable of the literals that comprise it.
@@ -80,6 +80,10 @@ namespace SCClassicalPlanning
         /// <returns>The new state.</returns>
         public State ApplyTo(State state) => new State(state.Elements.Except(DeleteList).Union(AddList));
 
+        /// <summary>
+        /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.
+        /// Used by the <see cref="Effect(Sentence)"/> constructor.
+        /// </summary>
         private class EffectConstructionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
         {
             /// <summary>

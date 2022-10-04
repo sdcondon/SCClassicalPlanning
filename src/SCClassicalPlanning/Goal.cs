@@ -14,7 +14,7 @@ namespace SCClassicalPlanning
     /// TODO: probably should add some verification that all literals are functionless. TODO: Should also probably store add and delete lists separately,
     /// for performance. Application and Regression are going to be far more common than wanting to get all elements of a state.
     /// </summary>
-    public sealed class Goal
+    public class Goal
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Effect"/> class from an enumerable of the literals that comprise it.
@@ -77,10 +77,16 @@ namespace SCClassicalPlanning
         /// <returns></returns>
         public bool IsSatisfiedBy(State state)
         {
+            // TODO: unify...? or at least throw if either the goal or the state is not ground?
+            // Depends on what we do with Problem.GetRelevantActions
             return state.Elements.IsSupersetOf(Elements.Where(l => l.IsPositive).Select(l => l.Predicate))
                 && !state.Elements.Overlaps(Elements.Where(l => l.IsNegated).Select(l => l.Predicate));
         }
 
+        /// <summary>
+        /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.
+        /// Used by the <see cref="Goal(Sentence)"/> constructor.
+        /// </summary>
         private class GoalConstructionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
         {
             /// <summary>

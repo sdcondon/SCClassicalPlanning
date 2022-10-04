@@ -2,7 +2,9 @@
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains;
 using SCFirstOrderLogic;
+using static SCClassicalPlanning.ExampleDomains.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.Container;
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning
 {
@@ -45,16 +47,30 @@ namespace SCClassicalPlanning
                     Problem: containerProblem,
                     Goal: new(IsPresent(element1)),
                     ExpectedResult: new[] { Add(element1), Swap(element2, element1) }),
+                    // In general (domain): Add(element1), Swap(R, element1)
 
                 new(
                     Problem: containerProblem,
                     Goal: new(IsPresent(element1) & IsPresent(element2)),
                     ExpectedResult: new[] { Add(element1), Add(element2) }),
+                    // In general (domain): Add(element1), Add(element2), Swap(R, element1) where R != element2, Swap(R, element2) where R != element1
 
                 new(
                     Problem: containerProblem,
                     Goal: new(IsPresent(element1) & !IsPresent(element2)),
                     ExpectedResult: new[] { Add(element1), Remove(element2), Swap(element2, element1) }),
+                    // In general (domain): Add(element1), Remove(element2), Swap(R, element1), Swap(element2, A)
+
+                new(
+                    Problem: containerProblem,
+                    Goal: new(!IsPresent(element1) & !IsPresent(element2)),
+                    ExpectedResult: new[] { Remove(element1), Remove(element2) }),
+                    // In general (domain): Remove(element1), Remove(element2), Swap(element1, A) where A != element2, Swap(element2, A) where A != element1
+
+                ////new(
+                ////    Problem: AirCargo.CanonicalProblem,
+                ////    Goal: new(At(new Constant("cargo2"), new Constant("sfo"))),
+                ////    ExpectedResult: new Action[] { Unload(new Constant("cargo2"), P, new Constant("sfo")) }),
             })
             .When(tc => tc.Problem.GetRelevantActions(tc.Goal))
             .ThenReturns()

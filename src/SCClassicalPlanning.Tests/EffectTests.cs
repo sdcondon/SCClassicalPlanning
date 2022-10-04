@@ -1,7 +1,9 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCFirstOrderLogic;
+using static SCClassicalPlanning.ExampleDomains.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.Container;
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning
 {
@@ -77,6 +79,12 @@ namespace SCClassicalPlanning
                     goal: new(IsPresent(element1) & IsPresent(element2)),
                     effect: new(!IsPresent(element1) & IsPresent(element2)),
                     expectedResult: false),
+
+                // Variable doesn't confuse matters..
+                new(
+                    goal: new(At(new Constant("C2"), new Constant("JFK"))),
+                    effect: new(At(new Constant("C2"), new Constant("JFK")) & !In(new Constant("C2"), P)),
+                    expectedResult: true),
             })
             .When(tc => tc.effect.IsRelevantTo(tc.goal))
             .ThenReturns()

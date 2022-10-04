@@ -1,4 +1,5 @@
 ﻿using SCFirstOrderLogic;
+using SCFirstOrderLogic.SentenceManipulation;
 using System.Collections.Immutable;
 
 namespace SCClassicalPlanning
@@ -6,13 +7,13 @@ namespace SCClassicalPlanning
     /// <summary>
     /// Container for information about a state.
     /// <para/>
-    /// A state is essentially just a set of ground (i.e. variable-free), functionless predicates. State instances occur as the initial state of <see cref="Problem"/>
+    /// A state is essentially just a set of ground (i.e. variable-free), functionless <see cref="Predicate"/>s. State instances occur as the initial state of <see cref="Problem"/>
     /// instances - and are also used by some planning algorithms to track intermediate states while looking for a solution to a problem.
     /// <para/>
     /// TODO: probably should add some verification in ctor that all elements are ground and functionless. Or.. not - don't want to sap performane by validating on
     /// every step in plan creation.. Best of both worlds would be nice.
     /// </summary>
-    public sealed class State
+    public class State
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="State"/> class from an enumerable of the predicates that comprise it.
@@ -34,31 +35,8 @@ namespace SCClassicalPlanning
         public State(Sentence sentence)
         {
             var elements = new HashSet<Predicate>();
-
-            foreach (var clause in new CNFSentence(sentence).Clauses)
-            {
-                if (!clause.IsUnitClause)
-                {
-                    throw new ArgumentException("States must be expressable as a conjunction of literals");
-                }
-
-                var literal = clause.Literals.First();
-
-                if (literal.IsNegated)
-                {
-                    // TODO?: Rather than throw, should we just ignore?
-                    throw new ArgumentException("States make the closed-world assumption (any unmentioned fluent is false) - so negated predicates should just be omitted instead");
-                }
-
-                if (literal.Predicate.Arguments.Any(a => !a.IsGroundTerm))
-                {
-                    throw new ArgumentException("States cannot include non-ground terms");
-                }
-
-                elements.Add(literal.Predicate);
-            }
-
-            Elements = elements;
+            StateConstructionVisitor.Instance.Visit(sentence, ref elements);
+            Elements = elements.ToImmutableHashSet();
         }
 
         /// <summary>
@@ -70,5 +48,39 @@ namespace SCClassicalPlanning
         /// Gets the set of predicates that comprise this state.
         /// </summary>
         public IReadOnlySet<Predicate> Elements { get; }
+
+        /// <summary>
+        /// Sentence visitor class that extracts <see cref="Predicate"/>s from a <see cref="Sentence"/> that is a conjunction of them.
+        /// Used by the <see cref="State(Sentence)"/> constructor.
+        /// </summary>
+        private class StateConstructionVisitor : RecursiveSentenceVisitor<HashSet<Predicate>>
+        {
+            /// <summary>
+            /// Gets a singleton instance of this class.
+            /// </summary>
+            public static StateConstructionVisitor Instance { get; } = new StateConstructionVisitor();
+
+            /// <inheritdoc/>
+            public override void Visit(Sentence sentence, ref HashSet<Predicate> predicates)
+            {
+                if (sentence is Conjunction conjunction)
+                {
+                    base.Visit(conjunction, ref predicates);
+                }
+                else if (sentence is Predicate predicate)
+                {
+                    if (predicate.Arguments.Any(a => !a.IsGroundTerm))
+                    {
+                        throw new ArgumentException("States cannot include non-ground terms");
+                    }
+
+                    predicates.Add(predicate);
+                }
+                else
+                {
+                    throw new ArgumentException("States must be a conjunction of predicates");
+                }
+            }
+        }
     }
 }

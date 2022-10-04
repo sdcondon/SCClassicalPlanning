@@ -8,7 +8,7 @@ namespace SCClassicalPlanning
     /// <para/>
     /// A domain defines the aspects that are common to of all problems that occur within it. Specifically, the predicates relevant to it and the actions available within it.
     /// </summary>
-    public sealed class Domain
+    public class Domain
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Domain"/> class.
