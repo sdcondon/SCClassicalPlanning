@@ -8,17 +8,20 @@ namespace SCClassicalPlanning
 {
     /// <summary>
     /// Encapsulates a planning problem.
+    /// <para/>
+    /// Problems exist within a <see cref="SCClassicalPlanning.Domain"/>, and consist of an initial <see cref="State"/>, an end <see cref="SCClassicalPlanning.Goal"/>,
+    /// and a set of objects (represented here by <see cref="Constant"/>s from the SCFirstOrderLogic library) that exist within the scope of the problem.
     /// </summary>
-    public sealed class Problem
+    public class Problem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Problem"/> class.
         /// </summary>
         /// <param name="domain">The domain in which this problem resides.</param>
-        /// <param name="objects">The objects that exist in this problem.</param>
         /// <param name="initialState">The initial state of the problem.</param>
         /// <param name="goal">The goal of the problem.</param>
-        public Problem(Domain domain, IList<Constant> objects, State initialState, Goal goal)
+        /// <param name="objects">The objects that exist in this problem.</param>
+        public Problem(Domain domain, State initialState, Goal goal, IList<Constant> objects)
         {
             Domain = domain;
             Objects = new ReadOnlyCollection<Constant>(objects);
@@ -27,7 +30,7 @@ namespace SCClassicalPlanning
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Problem"/> class, in which the objects that exist are inferred from the constants that are present in the initial and goal states.
+        /// Initializes a new instance of the <see cref="Problem"/> class, in which the objects that exist are inferred from the constants that are present in the initial state and the goal.
         /// </summary>
         /// <param name="domain">The domain in which this problem resides.</param>
         /// <param name="initialState">The initial state of the problem.</param>
@@ -81,8 +84,8 @@ namespace SCClassicalPlanning
         {
             // Local method to (recursively) match a set of (remaining) goal elements to the given state.
             // goalElements: The remaining elements of the goal to be matched
-            // unifier: The variable subsitution established so far (by matching earlier goal elements)
-            // returns: An enumerable of VariableSubsitutions that can be applied to the goal elements to make them match the given state
+            // unifier: The VariableSubstitution established so far (by matching earlier goal elements)
+            // returns: An enumerable of VariableSubstitutions that can be applied to the goal elements to make them satisfied by the given state
             IEnumerable<VariableSubstitution> MatchWithState(IEnumerable<Literal> goalElements, VariableSubstitution unifier)
             {
                 if (!goalElements.Any())
@@ -96,7 +99,7 @@ namespace SCClassicalPlanning
                     if (firstGoalElement.IsPositive)
                     {
                         // The first of the remaining goal elements is positive.
-                        // Here we iterate through ALL elements of the state, trying to find unifications with the element.
+                        // Here we iterate through ALL elements of the state, trying to find unifications with the goal element.
                         // Using some kind of index here would of course speed things up (support for this is a TODO).
                         // For each unification found, we then recurse for the rest of the elements of the goal.
                         foreach (var stateElement in state.Elements)
@@ -104,7 +107,7 @@ namespace SCClassicalPlanning
                             var firstGoalElementUnifier = new VariableSubstitution(unifier);
 
                             // TODO: using LiteralUnifier is perhaps overkill given that we know we're functionless, but will do for now.
-                            // (doesn't necessarily cost more..)
+                            // (doesn't really cost much more..)
                             if (LiteralUnifier.TryUpdateUnsafe(stateElement, goalElements.First(), firstGoalElementUnifier))
                             {
                                 foreach (var restOfGoalElementsUnifier in MatchWithState(goalElements.Skip(1), firstGoalElementUnifier))
@@ -155,6 +158,9 @@ namespace SCClassicalPlanning
                 }
             }
 
+            // The overall task to be accomplished here is to find (action, variable substituion) pairings such that
+            // the state's elements satisfy the action precondition (after the variable substitution is applied to it).
+            // First. iterate the available actions:
             foreach (var actionTemplate in Domain.Actions)
             {
                 // Note than when trying to match elements of the precondition to elements of the state, we consider positive
@@ -165,6 +171,7 @@ namespace SCClassicalPlanning
                 // some analysis of the problem, and is something we'd likely want to abstract to allow for different approaches (this is a TODO).
                 var orderedElements = actionTemplate.Precondition.PositiveElements.Concat(actionTemplate.Precondition.NegativeElements);
 
+                // Now we can try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
                 foreach (var substitution in MatchWithState(actionTemplate.Precondition.Elements, new VariableSubstitution()))
                 {
                     yield return new Action(
@@ -173,17 +180,6 @@ namespace SCClassicalPlanning
                         new VariableSubstitutionEffectTransformation(substitution).ApplyTo(actionTemplate.Effect));
                 }
             }
-        }
-
-        /// <summary>
-        /// Gets the (ground) actions that are relevant to a given goal.
-        /// </summary>
-        /// <param name="state">The goal to retrieve the relevant actions for.</param>
-        /// <returns>The actions that are relevant to the given state.</returns>
-        public IEnumerable<Action> GetRelevantActions(Goal goal)
-        {
-            // todo
-            throw new NotImplementedException();
         }
 
         /// <summary>

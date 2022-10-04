@@ -12,7 +12,7 @@ namespace SCClassicalPlanning
     {
         private static readonly Constant element1 = new(nameof(element1));
         private static readonly Constant element2 = new(nameof(element2));
-        private static readonly Problem containerProblem = new Problem(Container.Domain, new[] { element1, element2 }, State.Empty, Goal.Empty);
+        private static readonly Problem containerProblem = new Problem(Container.Domain, State.Empty, Goal.Empty, new[] { element1, element2 });
 
         private record GetApplicableActionsTestCase(Problem Problem, State State, Action[] ExpectedResult);
 
@@ -38,42 +38,5 @@ namespace SCClassicalPlanning
             .ThenReturns()
             .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult));
 
-        private record GetRelevantActionsTestCase(Problem Problem, Goal Goal, Action[] ExpectedResult);
-
-        public static Test GetRelevantActionsBehaviour => TestThat
-            .GivenEachOf(() => new GetRelevantActionsTestCase[]
-            {
-                new(
-                    Problem: containerProblem,
-                    Goal: new(IsPresent(element1)),
-                    ExpectedResult: new[] { Add(element1), Swap(element2, element1) }),
-                    // In general (domain): Add(element1), Swap(R, element1)
-
-                new(
-                    Problem: containerProblem,
-                    Goal: new(IsPresent(element1) & IsPresent(element2)),
-                    ExpectedResult: new[] { Add(element1), Add(element2) }),
-                    // In general (domain): Add(element1), Add(element2), Swap(R, element1) where R != element2, Swap(R, element2) where R != element1
-
-                new(
-                    Problem: containerProblem,
-                    Goal: new(IsPresent(element1) & !IsPresent(element2)),
-                    ExpectedResult: new[] { Add(element1), Remove(element2), Swap(element2, element1) }),
-                    // In general (domain): Add(element1), Remove(element2), Swap(R, element1), Swap(element2, A)
-
-                new(
-                    Problem: containerProblem,
-                    Goal: new(!IsPresent(element1) & !IsPresent(element2)),
-                    ExpectedResult: new[] { Remove(element1), Remove(element2) }),
-                    // In general (domain): Remove(element1), Remove(element2), Swap(element1, A) where A != element2, Swap(element2, A) where A != element1
-
-                ////new(
-                ////    Problem: AirCargo.CanonicalProblem,
-                ////    Goal: new(At(new Constant("cargo2"), new Constant("sfo"))),
-                ////    ExpectedResult: new Action[] { Unload(new Constant("cargo2"), P, new Constant("sfo")) }),
-            })
-            .When(tc => tc.Problem.GetRelevantActions(tc.Goal))
-            .ThenReturns()
-            .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult));
     }
 }
