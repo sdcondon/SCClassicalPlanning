@@ -28,7 +28,7 @@ namespace SCClassicalPlanning.Planning
 
         public string Format(Action action)
         {
-            return $"{action.Identifier}: {string.Join(", ", action.Effect.Elements.Select(e => sentenceFormatter.Format(e)))})";
+            return $"[{action.Identifier}] Effect: {string.Join(" & ", action.Effect.Elements.Select(e => sentenceFormatter.Format(e)))}";
         }
     }
 }

@@ -32,7 +32,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             await Task.Run(() => search.Complete());
 
             // TODO: handle failure gracefully..
-            return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
+            return new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
         }
 
         private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>
