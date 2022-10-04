@@ -3,7 +3,7 @@
     /// <summary>
     /// Container for information about an action.
     /// <para/>
-    /// <see cref="Action"/>s can be applied to <see cref="State"/>s to create new states (via the action's Effect),
+    /// Actions can be applied to <see cref="State"/>s to create new states (via the action's Effect),
     /// provided that the action's Precondition (which is a <see cref="Goal"/>) is met. <see cref="Domain"/>s include a description of all
     /// actions that are valid in the domain.
     /// </summary>
@@ -41,7 +41,7 @@
         /// </summary>
         /// <param name="state">The state to examine.</param>
         /// <returns>A value indicating whether the action is applicable in a given state.</returns>
-        public bool IsApplicableTo(State state) => Precondition.IsSatisfiedBy(state);
+        public bool IsApplicableTo(State state) => state.Satisfies(Precondition);
 
         /// <summary>
         /// Applies this action to a given state, producing a new state.
@@ -50,7 +50,7 @@
         /// </summary>
         /// <param name="state">The state to apply the action to.</param>
         /// <returns>The new state.</returns>
-        public State ApplyTo(State state) => Effect.ApplyTo(state);
+        public State ApplyTo(State state) => state.Apply(Effect);
 
         /// <summary>
         /// Returns a value indicating whether this action is conceivably a useful final step in achieving a given goal.
@@ -74,9 +74,6 @@
         /// </summary>
         /// <param name="goal">The goal that must be satisfied after performing this action.</param>
         /// <returns>The goal that must be satisfied prior to performing this action.</returns>
-        public Goal Regress(Goal goal)
-        {
-            return new Goal(goal.Elements.Except(Effect.Elements).Union(Precondition.Elements));
-        }
+        public Goal Regress(Goal goal) => new Goal(goal.Elements.Except(Effect.Elements).Union(Precondition.Elements));
     }
 }

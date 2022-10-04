@@ -29,9 +29,9 @@ namespace SCClassicalPlanning
 
         /// <summary>
         /// Initializes a new instance of the <see cref="State"/> class from a sentence of first order logic.
-        /// The sentence must normalize to a conjunction of positive literals, or an exception will be thrown.
+        /// The sentence must be a conjunction of predicates, or an exception will be thrown.
         /// </summary>
-        /// <param name="sentence"></param>
+        /// <param name="sentence">The sentence that expresses the state.</param>
         public State(Sentence sentence)
         {
             var elements = new HashSet<Predicate>();
@@ -47,7 +47,26 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Gets the set of predicates that comprise this state.
         /// </summary>
-        public IReadOnlySet<Predicate> Elements { get; }
+        public ImmutableHashSet<Predicate> Elements { get; }
+
+        /// <summary>
+        /// Applies a given <see cref="Effect"/> to the state, producing a new state.
+        /// </summary>
+        /// <param name="effect">The effect to apply.</param>
+        /// <returns>The new state.</returns>
+        // TODO: at some point look at (test) efficiency here. ImmutableHashSet builder stuff might be of use?
+        public State Apply(Effect effect) => new State(Elements.Except(effect.DeleteList).Union(effect.AddList));
+
+        /// <summary>
+        /// Gets a value indicating whether this state satisfies a given goal.
+        /// <para/>
+        /// A goal is satisfied by a state if all of its positive elements and none of its negative elements are present in the state.
+        /// </summary>
+        /// <param name="goal">The goal to check.</param>
+        /// <returns>A value indicating whether this state satisfies a given goal.</returns>
+        // TODO: unify...? or at least throw if either the goal or the state is not ground?
+        // Depends on what we do with Problem.GetRelevantActions
+        public bool Satisfies(Goal goal) => Elements.IsSupersetOf(goal.PositiveElements) && !Elements.Overlaps(goal.NegativeElements);
 
         /// <summary>
         /// Sentence visitor class that extracts <see cref="Predicate"/>s from a <see cref="Sentence"/> that is a conjunction of them.
@@ -69,6 +88,8 @@ namespace SCClassicalPlanning
                 }
                 else if (sentence is Predicate predicate)
                 {
+                    // TODO: check for functions and throw..?
+
                     if (predicate.Arguments.Any(a => !a.IsGroundTerm))
                     {
                         throw new ArgumentException("States cannot include non-ground terms");

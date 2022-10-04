@@ -56,7 +56,7 @@ namespace SCClassicalPlanning
         /// The positive ones indicate predicates that must exist in a <see cref="State"/> in order for the goal to be satisfied.
         /// The negative ones indicate predicates that must NOT exist in a <see cref="State"/> in order for the goal to be satisfied.
         /// </summary>
-        public IReadOnlySet<Literal> Elements { get; }
+        public ImmutableHashSet<Literal> Elements { get; }
 
         /// <summary>
         /// Gets the predicates that must exist in a <see cref="State"/> in order for this goal to be satisfied.
@@ -75,13 +75,7 @@ namespace SCClassicalPlanning
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        public bool IsSatisfiedBy(State state)
-        {
-            // TODO: unify...? or at least throw if either the goal or the state is not ground?
-            // Depends on what we do with Problem.GetRelevantActions
-            return state.Elements.IsSupersetOf(Elements.Where(l => l.IsPositive).Select(l => l.Predicate))
-                && !state.Elements.Overlaps(Elements.Where(l => l.IsNegated).Select(l => l.Predicate));
-        }
+        public bool IsSatisfiedBy(State state) => state.Satisfies(this);
 
         /// <summary>
         /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.

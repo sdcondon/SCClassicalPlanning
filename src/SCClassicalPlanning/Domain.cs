@@ -4,9 +4,10 @@ using System.Collections.ObjectModel;
 namespace SCClassicalPlanning
 {
     /// <summary>
-    /// Container of information about a planning domain.
+    /// Container for information about a domain.
     /// <para/>
-    /// A domain defines the aspects that are common to of all problems that occur within it. Specifically, the predicates relevant to it and the actions available within it.
+    /// A domain defines the aspects that are common to of all problems that occur within it.
+    /// Specifically, the <see cref="Predicate"/>s relevant to it and the <see cref="Action"/>s available within it.
     /// </summary>
     public class Domain
     {

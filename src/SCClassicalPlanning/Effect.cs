@@ -48,7 +48,7 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Gets the set of literals that comprise this effect.
         /// </summary>
-        public IReadOnlySet<Literal> Elements { get; }
+        public ImmutableHashSet<Literal> Elements { get; }
 
         /// <summary>
         /// Gets the "add list" of the action - the non-negated atoms in the action's effect.
@@ -76,9 +76,9 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Applies this action to a given state, producing a new state.
         /// </summary>
-        /// <param name="state">The state to apply the action to.</param>
+        /// <param name="state">The state to apply the effect to.</param>
         /// <returns>The new state.</returns>
-        public State ApplyTo(State state) => new State(state.Elements.Except(DeleteList).Union(AddList));
+        public State ApplyTo(State state) => state.Apply(this);
 
         /// <summary>
         /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.
@@ -101,7 +101,7 @@ namespace SCClassicalPlanning
                 }
                 else
                 {
-                    // Assume we've hit a literal. NB will throw if its not actually a literal.
+                    // Assume we've hit a literal. NB: ctor will throw if its not actually a literal.
                     // Afterwards, we don't need to look any further down the tree for the purposes of this class (though the Literal ctor that
                     // we invoke here does so to figure out the details of the literal). So we can just return rather than invoking base.Visit.
                     literals.Add(new Literal(sentence));
