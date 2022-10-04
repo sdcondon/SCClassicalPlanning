@@ -106,8 +106,8 @@ namespace SCClassicalPlanning
                         {
                             var firstGoalElementUnifier = new VariableSubstitution(unifier);
 
-                            // TODO: using LiteralUnifier is perhaps overkill given that we know we're functionless, but will do for now.
-                            // (doesn't really cost much more..)
+                            // TODO: using LiteralUnifier is perhaps overkill given that we know we're functionless,
+                            // but will do for now. (doesn't really cost much more, so perhaps fine long-term).
                             if (LiteralUnifier.TryUpdateUnsafe(stateElement, firstGoalElement, firstGoalElementUnifier))
                             {
                                 foreach (var restOfGoalElementsUnifier in MatchWithState(goalElements.Skip(1), firstGoalElementUnifier))
@@ -184,13 +184,96 @@ namespace SCClassicalPlanning
 
         /// <summary>
         /// Gets the (ground) actions that are relevant to a given goal.
+        /// <para/>
+        /// NB: All the result here are ground results - which is rather (potentially extremely) inefficient if the problem is large.
+        /// It'd be nice to be able to have an equivalent nethod in <see cref="Domain"/> that can return <see cref="Actions"/> that have
+        /// some (potentially constrained) variable references in them. That's a TODO..
         /// </summary>
         /// <param name="state">The goal to retrieve the relevant actions for.</param>
         /// <returns>The actions that are relevant to the given state.</returns>
         public IEnumerable<Action> GetRelevantActions(Goal goal)
         {
-            // todo
-            throw new NotImplementedException();
+            IEnumerable<VariableSubstitution> UnmatchWithGoalNegation(IEnumerable<Literal> effectElements, VariableSubstitution unifier)
+            {
+                if (!effectElements.Any())
+                {
+                    yield return unifier;
+                }
+                else
+                {
+                    var firstEffectElement = effectElements.First();
+
+                    // At this point we have a unifier that includes a valid binding to match at least one of the elements of the goal.
+                    // If this covers all the variables that occur in *this* effect element, all we need to do is check that the effect element
+                    // transformed by the existing unifier does not occur in the goal. However, if there are any that
+                    // do not occur, we need to check for the existence of the negation of the literal formed by substituting EVERY combination of
+                    // objects in the problem for the as yet unbound variables. This is obviously VERY expensive for large problems with lots of objects -
+                    // though I guess clever indexing could help (support for indexing is TODO). Would be nive to do this at the domain level, if constrained
+                    // variables aren't a problem..
+                    IEnumerable<VariableSubstitution> allPossibleUnifiers = new List<VariableSubstitution>() { unifier };
+                    var unboundVariables = firstEffectElement.Predicate.Arguments.OfType<VariableReference>().Except(unifier.Bindings.Keys);
+                    foreach (var unboundVariable in unboundVariables)
+                    {
+                        allPossibleUnifiers = allPossibleUnifiers.SelectMany(u => Objects.Select(o =>
+                        {
+                            var newBindings = new Dictionary<VariableReference, Term>(u.Bindings);
+                            newBindings[unboundVariable] = o;
+                            return new VariableSubstitution(newBindings);
+                        }));
+                    }
+
+                    foreach (var firstEffectElementUnifier in allPossibleUnifiers)
+                    {
+                        var possibleLiteral = firstEffectElementUnifier.ApplyTo(firstEffectElement);
+
+                        // TODO: perhaps even slower than needed - exhaustively iterating state n times..
+                        // Can we check for them all at once - e.g. above foreach - allPossibleUnifiers.Select(ApplyTo(firstGoalElement)).Except(state.Elements) kinda thing?
+                        if (!goal.Elements.Contains(possibleLiteral.Negate()))
+                        {
+                            foreach (var restOfGoalElementsUnifier in UnmatchWithGoalNegation(effectElements.Skip(1), firstEffectElementUnifier))
+                            {
+                                yield return restOfGoalElementsUnifier;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Local method to match a set of effect elements to the given goal.
+            // effectElements: The elements of the effect to be matched.
+            // returns: An enumerable of VariableSubstitutions that can be applied to the effect elements to make at least one of the match a goal element
+            IEnumerable<VariableSubstitution> MatchWithGoal(IEnumerable<Literal> effectElements)
+            {
+                foreach (var effectElement in effectElements)
+                {
+                    // Here we iterate through ALL elements of the goal, trying to find unifications with the effect element.
+                    // Using some kind of index here would of course speed things up (support for this is a TODO).
+                    // We return each unification we find immediately - for an effect to be relevant it only needs to match at least one element of the goal.
+                    foreach (var goalElement in goal.Elements)
+                    {
+                        // TODO: using LiteralUnifier is perhaps overkill given that we know we're functionless,
+                        // but will do for now. (doesn't necessarily cost more..)
+                        if (LiteralUnifier.TryCreate(goalElement, effectElement, out var unifier))
+                        {
+                            yield return unifier;
+                        }
+                    }
+                }
+            }
+
+            foreach (var actionTemplate in Domain.Actions)
+            {
+                foreach (var potentialSubsitution in MatchWithGoal(actionTemplate.Effect.Elements))
+                {
+                    foreach (var substitution in UnmatchWithGoalNegation(actionTemplate.Effect.Elements, potentialSubsitution))
+                    {
+                        yield return new Action(
+                            actionTemplate.Identifier,
+                            new VariableSubstitutionGoalTransformation(substitution).ApplyTo(actionTemplate.Precondition),
+                            new VariableSubstitutionEffectTransformation(substitution).ApplyTo(actionTemplate.Effect));
+                    }
+                }
+            }
         }
 
         /// <summary>

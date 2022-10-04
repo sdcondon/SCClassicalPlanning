@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿#if false
+using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains;
 using SCFirstOrderLogic;
@@ -8,77 +9,56 @@ using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning
 {
-    public static class ProblemTests
+    public static class DomainTests
     {
         private static readonly Constant element1 = new(nameof(element1));
         private static readonly Constant element2 = new(nameof(element2));
-        private static readonly Problem containerProblem = new Problem(Container.Domain, State.Empty, Goal.Empty, new[] { element1, element2 });
 
-        private record GetApplicableActionsTestCase(Problem Problem, State State, Action[] ExpectedResult);
-
-        public static Test GetApplicableActionsBehaviour => TestThat
-            .GivenEachOf(() => new GetApplicableActionsTestCase[]
-            {
-                new(
-                    Problem: containerProblem,
-                    State: State.Empty,
-                    ExpectedResult: new[] { Add(element1), Add(element2) }),
-
-                new(
-                    Problem: containerProblem,
-                    State: new(IsPresent(element1)),
-                    ExpectedResult: new[] { Remove(element1), Add(element2), Swap(element1, element2) }),
-
-                new(
-                    Problem: containerProblem,
-                    State: new(IsPresent(element1) & IsPresent(element2)),
-                    ExpectedResult: new[] { Remove(element1), Remove(element2) }),
-            })
-            .When(tc => tc.Problem.GetApplicableActions(tc.State))
-            .ThenReturns()
-            .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult));
-
-        private record GetRelevantActionsTestCase(Problem Problem, Goal Goal, Action[] ExpectedResult);
+        private record GetRelevantActionsTestCase(Domain Domain, Goal Goal, Action[] ExpectedResult);
 
         public static Test GetRelevantActionsBehaviour => TestThat
             .GivenEachOf(() => new GetRelevantActionsTestCase[]
             {
                 new(
-                    Problem: containerProblem,
+                    Domain: Container.Domain,
                     Goal: new(IsPresent(element1)),
                     ExpectedResult: new[]
                     {
                         Add(element1),
-                        Swap(element2, element1),
+                        Swap(R, element1),
                     }),
 
                 new(
-                    Problem: containerProblem,
+                    Domain: Container.Domain,
                     Goal: new(IsPresent(element1) & IsPresent(element2)),
                     ExpectedResult: new[]
                     {
                         Add(element1),
                         Add(element2),
+                        //Swap(R, element1) where R != element2,
+                        //Swap(R, element2) where R != element1,
                     }),
 
                 new(
-                    Problem: containerProblem,
+                    Domain: Container.Domain,
                     Goal: new(IsPresent(element1) & !IsPresent(element2)),
                     ExpectedResult: new[]
                     {
                         Add(element1),
                         Remove(element2),
-                        Swap(element2, element1),
-                        Swap(element2, element1), // TODO-BUG: yeah, hits twice - for the element1 presence and for the element2 non-presence)
+                        Swap(R, element1),
+                        Swap(element2, A),
                     }),
 
                 new(
-                    Problem: containerProblem,
+                    Domain: Container.Domain,
                     Goal: new(!IsPresent(element1) & !IsPresent(element2)),
                     ExpectedResult: new[]
                     {
                         Remove(element1),
                         Remove(element2),
+                        //Swap(element1, A) where A != element2,
+                        //Swap(element2, A) where A != element1,
                     }),
 
                 ////new(
@@ -89,9 +69,24 @@ namespace SCClassicalPlanning
                 ///         Unload(new Constant("cargo2"), P, new Constant("sfo")),
                 ///     }),
             })
-            .When(tc => tc.Problem.GetRelevantActions(tc.Goal))
+            .When(tc => tc.Domain.GetRelevantActions(tc.Goal))
             .ThenReturns()
             .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult));
 
+        // Model for a variable symbol that is precluded from taking particular values...
+        // #1 Is this approach justifiable?
+        // #2 Or would it need to be separate? i.e. ConstrainedGoal(Elements, Constraints..). Better than new Term type.
+        // #3 Or would it need to be a different Term type (which'd obv cause problems for SCFirstOrderLogic - REALLY want to avoid this approach)
+        // On first glance, I think I actually prefer #2..
+        // Experiment with me.. Later. Sticking point will obviously be if/how constraints can propogate backwards..
+        public class ConstrainedVariableSymbol
+        {
+            public ConstrainedVariableSymbol(object originalSymbol, IEnumerable<Constant> precludedValues) => (OriginalSymbol, PrecludedValues) = (originalSymbol, precludedValues);
+
+            public object OriginalSymbol { get; }
+
+            public IEnumerable<Constant> PrecludedValues { get; }
+        }
     }
 }
+#endif
