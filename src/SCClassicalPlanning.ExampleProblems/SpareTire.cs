@@ -6,7 +6,7 @@ namespace SCClassicalPlanning.ExampleDomains
     /// <summary>
     /// The "Spare Tire" example from section 10.1.2 of "Artificial Intelligence: A Modern Approach".
     /// </summary>
-    public class SpareTire
+    public static class SpareTire
     {
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Spare Tire" domain.

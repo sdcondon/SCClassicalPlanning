@@ -203,12 +203,13 @@ namespace SCClassicalPlanning
                 {
                     var firstEffectElement = effectElements.First();
 
-                    // At this point we have a unifier that includes a valid binding to match at least one of the elements of the goal.
+                    // At this point we have a unifier that includes a valid binding to match at least one of the effects elements to an
+                    // element of the goal, and none of the preceding effect elements to an effect of the goal.
                     // If this covers all the variables that occur in *this* effect element, all we need to do is check that the effect element
                     // transformed by the existing unifier does not occur in the goal. However, if there are any that
                     // do not occur, we need to check for the existence of the negation of the literal formed by substituting EVERY combination of
                     // objects in the problem for the as yet unbound variables. This is obviously VERY expensive for large problems with lots of objects -
-                    // though I guess clever indexing could help (support for indexing is TODO). Would be nive to do this at the domain level, if constrained
+                    // though I guess clever indexing could help (support for indexing is TODO). Would be nice to do this at the domain level, if constrained
                     // variables aren't a problem..
                     IEnumerable<VariableSubstitution> allPossibleUnifiers = new List<VariableSubstitution>() { unifier };
                     var unboundVariables = firstEffectElement.Predicate.Arguments.OfType<VariableReference>().Except(unifier.Bindings.Keys);

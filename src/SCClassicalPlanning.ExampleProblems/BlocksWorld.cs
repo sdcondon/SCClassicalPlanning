@@ -1,4 +1,5 @@
 ﻿using SCFirstOrderLogic;
+using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.ExampleDomains
@@ -6,7 +7,7 @@ namespace SCClassicalPlanning.ExampleDomains
     /// <summary>
     /// The "Blocks World" example from section 10.1.3 of "Artificial Intelligence: A Modern Approach".
     /// </summary>
-    public class BlocksWorld
+    public static class BlocksWorld
     {
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
@@ -32,9 +33,9 @@ namespace SCClassicalPlanning.ExampleDomains
         public static OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
         public static OperablePredicate Equal(Term x, Term y) => new Predicate(nameof(Equal), x, y);
 
-        public static Action Move(Term block, Term from, Term toBlock) => new(
+        public static OperableAction Move(Term block, Term from, Term toBlock) => new(
             identifier: nameof(Move),
-            precondition: new Goal(
+            precondition:
                 On(block, from)
                 & Clear(block)
                 & Clear(toBlock)
@@ -42,23 +43,23 @@ namespace SCClassicalPlanning.ExampleDomains
                 & Block(toBlock)
                 & !Equal(block, from)
                 & !Equal(block, toBlock)
-                & !Equal(from, toBlock)),
-            effect: new Effect(
+                & !Equal(from, toBlock),
+            effect:
                 On(block, toBlock)
                 & Clear(from)
                 & !On(block, from)
-                & !Clear(toBlock)));
+                & !Clear(toBlock));
 
-        public static Action MoveToTable(Term block, Term from) => new(
+        public static OperableAction MoveToTable(Term block, Term from) => new(
             identifier: nameof(MoveToTable),
-            precondition: new Goal(
+            precondition:
                 On(block, from)
                 & Clear(block)
                 & Block(block)
-                & !Equal(block, from)),
-            effect: new Effect(
+                & !Equal(block, from),
+            effect:
                 On(block, Table)
                 & Clear(from)
-                & !On(block, from)));
+                & !On(block, from));
     }
 }

@@ -57,8 +57,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                     Domain: BlocksWorld.Domain,
                     InitialState: new(
                         Block(blockA)
+                        & Equal(blockA, blockA)
                         & Block(blockB)
+                        & Equal(blockB, blockB)
                         & Block(blockC)
+                        & Equal(blockC, blockC)
                         & On(blockA, Table)
                         & On(blockB, Table)
                         & On(blockC, blockA)

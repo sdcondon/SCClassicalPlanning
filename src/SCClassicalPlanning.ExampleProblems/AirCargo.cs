@@ -7,7 +7,7 @@ namespace SCClassicalPlanning.ExampleDomains
     /// <summary>
     /// The "Air Cargo" example from section 10.1.1 of "Artificial Intelligence: A Modern Approach".
     /// </summary>
-    public class AirCargo
+    public static class AirCargo
     {
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates Air Cargo domain.
