@@ -85,7 +85,13 @@ namespace SCClassicalPlanning
         /// <returns>The new state.</returns>
         public State ApplyTo(State state) => state.Apply(this);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// <para/>
+        /// Effects implement value semantics for equality - two Effects are equal if they share the same Elements.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
         public override bool Equals(object? obj)
         {
             // Effects should be small-ish, so I'm not too worried by the inefficiency here.

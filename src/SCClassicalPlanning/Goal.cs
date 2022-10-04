@@ -87,7 +87,13 @@ namespace SCClassicalPlanning
         /// <returns></returns>
         public bool IsSatisfiedBy(State state) => state.Satisfies(this);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// <para/>
+        /// Goals implement value semantics for equality - two Goals are equal if they share the same Elements.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
         public override bool Equals(object? obj)
         {
             // Goals should be small-ish, so I'm not too worried by the inefficiency here.

@@ -76,7 +76,13 @@
         /// <returns>The goal that must be satisfied prior to performing this action.</returns>
         public Goal Regress(Goal goal) => new Goal(goal.Elements.Except(Effect.Elements).Union(Precondition.Elements));
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// <para/>
+        /// Actions implement value semantics for equality - two Actions are equal if they their Identifiers, Preconditions and Effects are.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
         public override bool Equals(object? obj)
         {
             return obj is Action action && action.Identifier.Equals(Identifier) && action.Precondition.Equals(Precondition) && action.Effect.Equals(Effect);
