@@ -12,22 +12,22 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     /// </summary>
     public class ForwardStateSpaceSearch : IPlanner
     {
-        private readonly Func<State, Goal, float> heuristic;
+        private readonly Func<State, Goal, float> estimateCountOfActionsToGoal;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class.
         /// </summary>
-        /// <param name="heuristic">The heuristic to use - should give an estimate of the number of actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
-        public ForwardStateSpaceSearch(Func<State, Goal, float> heuristic) => this.heuristic = heuristic;
+        /// <param name="estimateCountOfActionsToGoal">The heuristic to use - should give an estimate of the number of actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
+        public ForwardStateSpaceSearch(Func<State, Goal, float> estimateCountOfActionsToGoal) => this.estimateCountOfActionsToGoal = estimateCountOfActionsToGoal;
 
         /// <inheritdoc />
         public async Task<Plan> CreatePlanAsync(Problem problem)
         {
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.InitialState),
-                isTarget: n => problem.Goal.IsSatisfiedBy(n.State),
+                isTarget: n => n.State.Satisfies(problem.Goal),
                 getEdgeCost: e => 1,
-                getEstimatedCostToTarget: n => heuristic(n.State, problem.Goal));
+                getEstimatedCostToTarget: n => estimateCountOfActionsToGoal(n.State, problem.Goal));
 
             await Task.Run(() => search.Complete()); // todo?: worth adding all the Steppable stuff like in FoL?
 

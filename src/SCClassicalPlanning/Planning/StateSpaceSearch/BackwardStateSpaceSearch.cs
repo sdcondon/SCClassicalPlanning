@@ -12,13 +12,13 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     /// </summary>
     public class BackwardStateSpaceSearch : IPlanner
     {
-        private readonly Func<State, Goal, float> heuristic;
+        private readonly Func<State, Goal, float> estimateCountOfActionsToGoal;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class.
         /// </summary>
-        /// <param name="heuristic">The heuristic to use - should give an estimate of the number of actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
-        public BackwardStateSpaceSearch(Func<State, Goal, float> heuristic) => this.heuristic = heuristic;
+        /// <param name="estimateCountOfActionsToGoal">The heuristic to use - should give an estimate of the number of actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
+        public BackwardStateSpaceSearch(Func<State, Goal, float> estimateCountOfActionsToGoal) => this.estimateCountOfActionsToGoal = estimateCountOfActionsToGoal;
 
         /// <inheritdoc />
         public async Task<Plan> CreatePlanAsync(Problem problem)
@@ -27,7 +27,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 source: new StateSpaceNode(problem, problem.Goal),
                 isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
                 getEdgeCost: e => 1,
-                getEstimatedCostToTarget: n => heuristic(problem.InitialState, n.Goal));
+                getEstimatedCostToTarget: n => estimateCountOfActionsToGoal(problem.InitialState, n.Goal));
 
             await Task.Run(() => search.Complete());
 
