@@ -32,12 +32,7 @@ namespace SCClassicalPlanning
         /// The sentence must be a conjunction of predicates, or an exception will be thrown.
         /// </summary>
         /// <param name="sentence">The sentence that expresses the state.</param>
-        public State(Sentence sentence)
-        {
-            var elements = new HashSet<Predicate>();
-            StateConstructionVisitor.Instance.Visit(sentence, ref elements);
-            Elements = elements.ToImmutableHashSet();
-        }
+        public State(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
 
         /// <summary>
         /// Gets a singleton <see cref="State"/> instance that is empty.
@@ -73,7 +68,7 @@ namespace SCClassicalPlanning
         {
             // Obviously unworkable if the state is large. However, if the state is large then this isn't
             // the only problematic thing. So let's revisit this when we look at abstracting state to allow 
-            // for secondary storage and indexing. It may be thatfor the "in-mem version", this is fine..
+            // for secondary storage and indexing. It may be that for the "in-mem" version, this is fine..
             return obj is State state && state.Elements.IsSubsetOf(Elements) && Elements.IsSubsetOf(state.Elements);
         }
 
@@ -95,12 +90,16 @@ namespace SCClassicalPlanning
         /// Sentence visitor class that extracts <see cref="Predicate"/>s from a <see cref="Sentence"/> that is a conjunction of them.
         /// Used by the <see cref="State(Sentence)"/> constructor.
         /// </summary>
-        private class StateConstructionVisitor : RecursiveSentenceVisitor<HashSet<Predicate>>
+        private class ConstructionVisitor : RecursiveSentenceVisitor<HashSet<Predicate>>
         {
-            /// <summary>
-            /// Gets a singleton instance of this class.
-            /// </summary>
-            public static StateConstructionVisitor Instance { get; } = new StateConstructionVisitor();
+            private static readonly ConstructionVisitor Instance = new ConstructionVisitor();
+
+            public static HashSet<Predicate> Visit(Sentence sentence)
+            {
+                var elements = new HashSet<Predicate>();
+                Instance.Visit(sentence, ref elements);
+                return elements;
+            }
 
             /// <inheritdoc/>
             public override void Visit(Sentence sentence, ref HashSet<Predicate> predicates)

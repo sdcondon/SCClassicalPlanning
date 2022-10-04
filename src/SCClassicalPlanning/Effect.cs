@@ -36,14 +36,7 @@ namespace SCClassicalPlanning
         /// Initializes a new instance of the <see cref="Effect" /> class from a sentence of first order logic. The sentence must be a conjunction of literals, or an exception will be thrown.
         /// </summary>
         /// <param name="sentence"></param>
-        public Effect(Sentence sentence)
-        {
-            // NB: it is important NOT to standardise variables at this point, because we will generally
-            // want variable definitions that are common across e.g. the precondition and goal of an action.
-            var elements = new HashSet<Literal>();
-            EffectConstructionVisitor.Instance.Visit(sentence, ref elements);
-            Elements = elements.ToImmutableHashSet();
-        }
+        public Effect(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
 
         /// <summary>
         /// Gets a singleton <see cref="Effect"/> instance that is empty.
@@ -119,12 +112,16 @@ namespace SCClassicalPlanning
         /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.
         /// Used by the <see cref="Effect(Sentence)"/> constructor.
         /// </summary>
-        private class EffectConstructionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
+        private class ConstructionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
         {
-            /// <summary>
-            /// Gets a singleton instance of this class.
-            /// </summary>
-            public static EffectConstructionVisitor Instance { get; } = new EffectConstructionVisitor();
+            private static readonly ConstructionVisitor Instance = new ConstructionVisitor();
+
+            public static HashSet<Literal> Visit(Sentence sentence)
+            {
+                var elements = new HashSet<Literal>();
+                Instance.Visit(sentence, ref elements);
+                return elements;
+            }
 
             /// <inheritdoc/>
             public override void Visit(Sentence sentence, ref HashSet<Literal> literals)
