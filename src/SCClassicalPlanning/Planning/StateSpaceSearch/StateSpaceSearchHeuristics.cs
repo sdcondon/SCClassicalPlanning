@@ -35,8 +35,8 @@
         {
             public static float EstimateCountOfActionsToGoal(State state, Goal goal)
             {
-                return goal.Elements.Where(e => e.IsPositive).Select(e => e.Predicate).Except(state.Elements).Count()
-                    + goal.Elements.Where(e => e.IsNegated).Select(e => e.Predicate).Intersect(state.Elements).Count();
+                return goal.PositivePredicates.Except(state.Elements).Count()
+                    + goal.NegativePredicates.Intersect(state.Elements).Count();
             }
         }
     }

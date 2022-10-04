@@ -1,4 +1,5 @@
 ﻿using SCFirstOrderLogic;
+using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.ExampleDomains
@@ -39,25 +40,25 @@ namespace SCClassicalPlanning.ExampleDomains
 
         public static OperablePredicate IsAt(Term item, Term location) => new Predicate(nameof(IsAt), item, location);
 
-        public static Action Remove(Term @object, Term location) => new(
+        public static Action Remove(Term @object, Term location) => new OperableAction(
             identifier: nameof(Remove),
-            precondition: new Goal(IsAt(@object, location)),
-            effect: new Effect(!IsAt(@object, location) & IsAt(@object, Ground)));
+            precondition: IsAt(@object, location),
+            effect: !IsAt(@object, location) & IsAt(@object, Ground));
 
-        public static Action PutOn(Term tire) => new(
+        public static Action PutOn(Term tire) => new OperableAction(
             identifier: nameof(PutOn),
-            precondition: new Goal(IsTire(tire) & IsAt(tire, Ground) & !IsAt(Flat, Axle)),
-            effect: new Effect(!IsAt(tire, Ground) & IsAt(tire, Axle)));
+            precondition: IsTire(tire) & IsAt(tire, Ground) & !IsAt(Flat, Axle),
+            effect: !IsAt(tire, Ground) & IsAt(tire, Axle));
 
-        public static Action LeaveOvernight() => new(
+        public static Action LeaveOvernight() => new OperableAction(
             identifier: nameof(LeaveOvernight),
             precondition: Goal.Empty,
-            effect: new Effect(
+            effect:
                 !IsAt(Spare, Ground)
                 & !IsAt(Spare, Axle)
                 & !IsAt(Spare, Trunk)
                 & !IsAt(Flat, Ground)
                 & !IsAt(Flat, Axle)
-                & !IsAt(Flat, Trunk)));
+                & !IsAt(Flat, Trunk));
     }
 }

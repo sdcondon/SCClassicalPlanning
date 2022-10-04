@@ -1,4 +1,5 @@
 ﻿using SCFirstOrderLogic;
+using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.ExampleDomains
@@ -25,19 +26,19 @@ namespace SCClassicalPlanning.ExampleDomains
 
         public static OperablePredicate IsPresent(Term @object) => new Predicate(nameof(IsPresent), @object);
 
-        public static Action Add(Term @object) => new(
+        public static Action Add(Term @object) => new OperableAction(
             identifier: nameof(Add),
-            precondition: new Goal(!IsPresent(@object)),
-            effect: new Effect(IsPresent(@object)));
+            precondition: !IsPresent(@object),
+            effect: IsPresent(@object));
 
-        public static Action Remove(Term @object) => new(
+        public static Action Remove(Term @object) => new OperableAction(
             identifier: nameof(Remove),
-            precondition: new Goal(IsPresent(@object)),
-            effect: new Effect(!IsPresent(@object)));
+            precondition: IsPresent(@object),
+            effect: !IsPresent(@object));
 
-        public static Action Swap(Term remove, Term add) => new(
+        public static Action Swap(Term remove, Term add) => new OperableAction(
             identifier: nameof(Swap),
-            precondition: new Goal(IsPresent(remove) & !IsPresent(add)),
-            effect: new Effect(!IsPresent(remove) & IsPresent(add)));
+            precondition: IsPresent(remove) & !IsPresent(add),
+            effect: !IsPresent(remove) & IsPresent(add));
     }
 }

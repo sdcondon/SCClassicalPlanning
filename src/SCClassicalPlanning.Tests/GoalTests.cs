@@ -10,44 +10,44 @@ namespace SCClassicalPlanning
         private static readonly Constant element1 = new(nameof(element1));
         private static readonly Constant element2 = new(nameof(element2));
 
-        private record IsSatisfiedByTestCase(Goal goal, State state, bool expectedResult);
+        private record IsSatisfiedByTestCase(Goal Goal, State State, bool ExpectedResult);
 
         public static Test IsSatisfiedByBehaviour => TestThat
             .GivenEachOf(() => new IsSatisfiedByTestCase[]
             {
                 // satisfied positive element
                 new(
-                    goal: new(IsPresent(element1)),
-                    state: new(IsPresent(element1)),
-                    expectedResult: true),
+                    Goal: new(IsPresent(element1)),
+                    State: new(IsPresent(element1)),
+                    ExpectedResult: true),
 
                 // satisfied negative element, present irrelevant element
                 new(
-                    goal: new(!IsPresent(element1)),
-                    state: new(IsPresent(element2)),
-                    expectedResult: true),
+                    Goal: new(!IsPresent(element1)),
+                    State: new(IsPresent(element2)),
+                    ExpectedResult: true),
 
                 // satisfied positive & negative element
                 new(
-                    goal: new(!IsPresent(element1) & IsPresent(element2)),
-                    state: new(IsPresent(element2)),
-                    expectedResult: true),
+                    Goal: new(!IsPresent(element1) & IsPresent(element2)),
+                    State: new(IsPresent(element2)),
+                    ExpectedResult: true),
 
                 // satisfied positive element, unsatisfied negative element
                 new(
-                    goal: new(IsPresent(element1) & !IsPresent(element2)),
-                    state: new(IsPresent(element1) & IsPresent(element2)),
-                    expectedResult: false),
+                    Goal: new(IsPresent(element1) & !IsPresent(element2)),
+                    State: new(IsPresent(element1) & IsPresent(element2)),
+                    ExpectedResult: false),
 
                 // satisfied negative element, unsatisfied positive element
                 new(
-                    goal: new(IsPresent(element1) & !IsPresent(element2)),
-                    state: State.Empty,
-                    expectedResult: false),
+                    Goal: new(IsPresent(element1) & !IsPresent(element2)),
+                    State: State.Empty,
+                    ExpectedResult: false),
             })
-            .When(tc => tc.goal.IsSatisfiedBy(tc.state))
+            .When(tc => tc.Goal.IsSatisfiedBy(tc.State))
             .ThenReturns()
-            .And((tc, r) => r.Should().Be(tc.expectedResult));
+            .And((tc, r) => r.Should().Be(tc.ExpectedResult));
 
         private record EqualityTestCase(Goal X, Goal Y, bool ExpectedEquality);
 

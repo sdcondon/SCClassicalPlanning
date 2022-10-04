@@ -10,142 +10,142 @@ namespace SCClassicalPlanning
         private static readonly Constant element1 = new(nameof(element1));
         private static readonly Constant element2 = new(nameof(element2));
 
-        private record IsApplicableToTestCase(State initialState, Action action, bool expectedResult);
+        private record IsApplicableToTestCase(State State, Action Action, bool ExpectedResult);
 
         public static Test IsApplicableToBehaviour => TestThat
-            .GivenEachOf(() => new IsApplicableToTestCase[]
+            .GivenEachOf<IsApplicableToTestCase>(() => (new IsApplicableToTestCase[]
             {
                 // Positive - positive precondition
                 new(
-                    initialState: new(IsPresent(element1)),
-                    action: Remove(element1),
-                    expectedResult: true),
+                    State: new(IsPresent(element1)),
+                    Action: Remove(element1),
+                    ExpectedResult: true),
 
                 // Positive - negative precondition
                 new(
-                    initialState: State.Empty,
-                    action: Add(element1),
-                    expectedResult: true),
+                    State: State.Empty,
+                    Action: Add(element1),
+                    ExpectedResult: true),
 
                 // Negative - positive precondition
                 new(
-                    initialState: new(IsPresent(element1)),
-                    action: Add(element1),
-                    expectedResult: false),
+                    State: new(IsPresent(element1)),
+                    Action: Add(element1),
+                    ExpectedResult: false),
 
                 // Negative - negative precondition
                 new(
-                    initialState: State.Empty,
-                    action: Remove(element1),
-                    expectedResult: false),
-            })
-            .When(tc => tc.action.IsApplicableTo(tc.initialState))
+                    State: State.Empty,
+                    Action: Remove(element1),
+                    ExpectedResult: false),
+            }))
+            .When(tc => tc.Action.IsApplicableTo(tc.State))
             .ThenReturns()
-            .And((tc, r) => r.Should().Be(tc.expectedResult));
+            .And((tc, r) => r.Should().Be(tc.ExpectedResult));
 
-        private record ApplyToTestCase(State initialState, Action action, State expectedState);
+        private record ApplyToTestCase(State State, Action Action, State ExpectedState);
 
         public static Test ApplyToBehaviour => TestThat
-            .GivenEachOf(() => new ApplyToTestCase[]
+            .GivenEachOf<ApplyToTestCase>(() => (new ApplyToTestCase[]
             {
                 // Adds atom
                 new(
-                    initialState: State.Empty,
-                    action: Add(element1),
-                    expectedState: new(IsPresent(element1))),
+                    State: State.Empty,
+                    Action: Add(element1),
+                    ExpectedState: new(IsPresent(element1))),
 
                 // Removes atom
                 new(
-                    initialState: new(IsPresent(element1)),
-                    action: Remove(element1),
-                    expectedState: State.Empty),
+                    State: new(IsPresent(element1)),
+                    Action: Remove(element1),
+                    ExpectedState: State.Empty),
 
                 // Doesn't add duplicate
                 new(
-                    initialState: new(IsPresent(element1)),
-                    action: Add(element1),
-                    expectedState: new(IsPresent(element1))),
+                    State: new(IsPresent(element1)),
+                    Action: Add(element1),
+                    ExpectedState: new(IsPresent(element1))),
 
                 // Doesn't complain about removing non-present element
                 new(
-                    initialState: State.Empty,
-                    action: Remove(element1),
-                    expectedState: State.Empty),
-            })
-            .When(tc => tc.action.ApplyTo(tc.initialState))
+                    State: State.Empty,
+                    Action: Remove(element1),
+                    ExpectedState: State.Empty),
+            }))
+            .When(tc => tc.Action.ApplyTo(tc.State))
             .ThenReturns()
-            .And((tc, s) => s.Should().BeEquivalentTo(tc.expectedState));
+            .And((tc, s) => s.Should().BeEquivalentTo(tc.ExpectedState));
 
-        private record IsRelevantToTestCase(Goal goal, Action action, bool expectedResult);
+        private record IsRelevantToTestCase(Goal Goal, Action Action, bool ExpectedResult);
 
         public static Test IsRelevantToBehaviour => TestThat
             .GivenEachOf(() => new IsRelevantToTestCase[]
             {
                 // fulfills positive element
                 new(
-                    goal: new(IsPresent(element1)),
-                    action: Add(element1),
-                    expectedResult: true),
+                    Goal: new(IsPresent(element1)),
+                    Action: Add(element1),
+                    ExpectedResult: true),
 
                 // fulfills negative element
                 new(
-                    goal: new(!IsPresent(element1)),
-                    action: Remove(element1),
-                    expectedResult: true),
+                    Goal: new(!IsPresent(element1)),
+                    Action: Remove(element1),
+                    ExpectedResult: true),
 
                 // fulfills positive & negative element
                 new(
-                    goal: new(!IsPresent(element1) & IsPresent(element2)),
-                    action: Swap(element1, element2),
-                    expectedResult: true),
+                    Goal: new(!IsPresent(element1) & IsPresent(element2)),
+                    Action: Swap(element1, element2),
+                    ExpectedResult: true),
 
                 // fulfills positive element, undoes positive element
                 new(
-                    goal: new(IsPresent(element1) & IsPresent(element2)),
-                    action: Swap(element1, element2),
-                    expectedResult: false),
+                    Goal: new(IsPresent(element1) & IsPresent(element2)),
+                    Action: Swap(element1, element2),
+                    ExpectedResult: false),
             })
-            .When(tc => tc.action.IsRelevantTo(tc.goal))
+            .When(tc => tc.Action.IsRelevantTo(tc.Goal))
             .ThenReturns()
-            .And((tc, r) => r.Should().Be(tc.expectedResult));
+            .And((tc, r) => r.Should().Be(tc.ExpectedResult));
 
-        private record RegressTestCase(Goal goal, Action action, Goal expectedResult);
+        private record RegressTestCase(Goal Goal, Action Action, Goal ExpectedResult);
 
         public static Test RegressBehaviour => TestThat
             .GivenEachOf(() => new RegressTestCase[]
             {
                 // Adds atom
                 new(
-                    goal: new(IsPresent(element1)),
-                    action: Add(element1),
-                    expectedResult: new(!IsPresent(element1))),
+                    Goal: new(IsPresent(element1)),
+                    Action: Add(element1),
+                    ExpectedResult: new(!IsPresent(element1))),
 
                 // Removes atom
                 new(
-                    goal: new(!IsPresent(element1)),
-                    action: Remove(element1),
-                    expectedResult: new(IsPresent(element1))),
+                    Goal: new(!IsPresent(element1)),
+                    Action: Remove(element1),
+                    ExpectedResult: new(IsPresent(element1))),
 
                 // Swap
                 new(
-                    goal: new(!IsPresent(element1) & IsPresent(element2)),
-                    action: Swap(element1, element2),
-                    expectedResult: new(IsPresent(element1) & !IsPresent(element2))),
+                    Goal: new(!IsPresent(element1) & IsPresent(element2)),
+                    Action: Swap(element1, element2),
+                    ExpectedResult: new(IsPresent(element1) & !IsPresent(element2))),
 
                 // Swap - partial 1
                 new(
-                    goal: new(!IsPresent(element1)),
-                    action: Swap(element1, element2),
-                    expectedResult: new(IsPresent(element1) & !IsPresent(element2))),
+                    Goal: new(!IsPresent(element1)),
+                    Action: Swap(element1, element2),
+                    ExpectedResult: new(IsPresent(element1) & !IsPresent(element2))),
 
                 // Swap - partial 2
                 new(
-                    goal: new(IsPresent(element2)),
-                    action: Swap(element1, element2),
-                    expectedResult: new(IsPresent(element1) & !IsPresent(element2)))
+                    Goal: new(IsPresent(element2)),
+                    Action: Swap(element1, element2),
+                    ExpectedResult: new(IsPresent(element1) & !IsPresent(element2)))
             })
-            .When(tc => tc.action.Regress(tc.goal))
+            .When(tc => tc.Action.Regress(tc.Goal))
             .ThenReturns()
-            .And((tc, s) => s.Should().BeEquivalentTo(tc.expectedResult));
+            .And((tc, s) => s.Should().BeEquivalentTo(tc.ExpectedResult));
     }
 }

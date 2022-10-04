@@ -62,7 +62,7 @@
         public bool IsRelevantTo(Goal goal) => Effect.IsRelevantTo(goal);
 
         /// <summary>
-        /// Returns the goal that must be satisfied prior to performing this action, in order to satisfy a given goal after the action is performed. 
+        /// Returns the goal that must be satisfied prior to performing this action, in order to ensure that a given goal is satisfied after the action is performed. 
         /// <para/>
         /// NB: AIaMA gets regression a bit.. err.. wrong, because it gets a little confused between states (which, under the
         /// closed-world assumption, need include only positive fluents) and goals (which can include both positive and negative fluents).

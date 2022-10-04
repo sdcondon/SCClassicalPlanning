@@ -34,7 +34,7 @@ namespace SCClassicalPlanning.ExampleDomains
         public static OperablePredicate At(Term @object, Term location) => new Predicate(nameof(At), @object, location);
         public static OperablePredicate In(Term @object, Term container) => new Predicate(nameof(In), @object, container);
 
-        public static OperableAction Load(Term cargo, Term plane, Term airport) => new(
+        public static Action Load(Term cargo, Term plane, Term airport) => new OperableAction(
             identifier: nameof(Load),
             precondition:
                 At(cargo, airport)
@@ -46,7 +46,7 @@ namespace SCClassicalPlanning.ExampleDomains
                 !At(cargo, airport)
                 & In(cargo, plane));
 
-        public static OperableAction Unload(Term cargo, Term plane, Term airport) => new(
+        public static Action Unload(Term cargo, Term plane, Term airport) => new OperableAction(
             identifier: nameof(Unload),
             precondition:
                 In(cargo, plane)
@@ -58,7 +58,7 @@ namespace SCClassicalPlanning.ExampleDomains
                 At(cargo, airport)
                 & !In(cargo, plane));
 
-        public static OperableAction Fly(Term plane, Term from, Term to) => new(
+        public static Action Fly(Term plane, Term from, Term to) => new OperableAction(
             identifier: nameof(Fly),
             precondition:
                 At(plane, from)

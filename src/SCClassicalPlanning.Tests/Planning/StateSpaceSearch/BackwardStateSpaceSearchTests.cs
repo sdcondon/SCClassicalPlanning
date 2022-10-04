@@ -75,6 +75,48 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
             .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter().Format(p)));
 
+        public static Test BigBlocksWorldScenario => TestThat
+            .GivenTestContext()
+            .And(() =>
+            {
+                Constant blockA = new(nameof(blockA));
+                Constant blockB = new(nameof(blockB));
+                Constant blockC = new(nameof(blockC));
+                Constant blockD = new(nameof(blockD));
+                Constant blockE = new(nameof(blockE));
+
+                return new TestCase(
+                    Domain: BlocksWorld.Domain,
+                    InitialState: new(
+                        Block(blockA)
+                        & Equal(blockA, blockA)
+                        & Block(blockB)
+                        & Equal(blockB, blockB)
+                        & Block(blockC)
+                        & Equal(blockC, blockC)
+                        & Block(blockD)
+                        & Equal(blockD, blockD)
+                        & Block(blockE)
+                        & Equal(blockE, blockE)
+                        & On(blockA, Table)
+                        & On(blockB, Table)
+                        & On(blockC, blockA)
+                        & On(blockD, blockB)
+                        & On(blockE, Table)
+                        & Clear(blockD)
+                        & Clear(blockE)
+                        & Clear(blockC)),
+                    Goal: new(
+                        On(blockA, blockB)
+                        & On(blockB, blockC)
+                        & On(blockC, blockD)
+                        & On(blockD, blockE)));
+            })
+            .When((_, tc) => tc.Execute())
+            .ThenReturns()
+            .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
+            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter().Format(p)));
+
         public static Test SpareTireScenario => TestThat
             .GivenTestContext()
             .And(() =>

@@ -33,7 +33,7 @@ namespace SCClassicalPlanning.ExampleDomains
         public static OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
         public static OperablePredicate Equal(Term x, Term y) => new Predicate(nameof(Equal), x, y);
 
-        public static OperableAction Move(Term block, Term from, Term toBlock) => new(
+        public static Action Move(Term block, Term from, Term toBlock) => new OperableAction(
             identifier: nameof(Move),
             precondition:
                 On(block, from)
@@ -50,7 +50,7 @@ namespace SCClassicalPlanning.ExampleDomains
                 & !On(block, from)
                 & !Clear(toBlock));
 
-        public static OperableAction MoveToTable(Term block, Term from) => new(
+        public static Action MoveToTable(Term block, Term from) => new OperableAction(
             identifier: nameof(MoveToTable),
             precondition:
                 On(block, from)

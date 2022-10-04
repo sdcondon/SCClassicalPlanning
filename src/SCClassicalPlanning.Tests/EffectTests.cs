@@ -12,83 +12,83 @@ namespace SCClassicalPlanning
         private static readonly Constant element1 = new(nameof(element1));
         private static readonly Constant element2 = new(nameof(element2));
 
-        private record ApplyToTestCase(State initialState, Effect effect, State expectedState);
+        private record ApplyToTestCase(State State, Effect Effect, State ExpectedResult);
 
         public static Test ApplyToBehaviour => TestThat
             .GivenEachOf(() => new ApplyToTestCase[]
             {
                 // Adds atom
                 new(
-                    initialState: State.Empty,
-                    effect: new(IsPresent(element1)),
-                    expectedState: new(IsPresent(element1))),
+                    State: State.Empty,
+                    Effect: new(IsPresent(element1)),
+                    ExpectedResult: new(IsPresent(element1))),
 
                 // Removes atom
                 new(
-                    initialState: new(IsPresent(element1)),
-                    effect: new(!IsPresent(element1)),
-                    expectedState: State.Empty),
+                    State: new(IsPresent(element1)),
+                    Effect: new(!IsPresent(element1)),
+                    ExpectedResult: State.Empty),
 
                 // Doesn't add duplicate
                 new(
-                    initialState: new(IsPresent(element1)),
-                    effect: new(IsPresent(element1)),
-                    expectedState: new(IsPresent(element1))),
+                    State: new(IsPresent(element1)),
+                    Effect: new(IsPresent(element1)),
+                    ExpectedResult: new(IsPresent(element1))),
 
                 // Doesn't complain about removing non-present element
                 new(
-                    initialState: State.Empty,
-                    effect: new(!IsPresent(element1)),
-                    expectedState: State.Empty),
+                    State: State.Empty,
+                    Effect: new(!IsPresent(element1)),
+                    ExpectedResult: State.Empty),
             })
-            .When(tc => tc.effect.ApplyTo(tc.initialState))
+            .When(tc => tc.Effect.ApplyTo(tc.State))
             .ThenReturns()
-            .And((tc, s) => s.Should().BeEquivalentTo(tc.expectedState));
+            .And((tc, s) => s.Should().BeEquivalentTo(tc.ExpectedResult));
 
-        private record IsRelevantToTestCase(Goal goal, Effect effect, bool expectedResult);
+        private record IsRelevantToTestCase(Goal Goal, Effect Effect, bool ExpectedResult);
 
         public static Test IsRelevantToBehaviour => TestThat
             .GivenEachOf(() => new IsRelevantToTestCase[]
             {
                 // fulfills positive element
                 new(
-                    goal: new(IsPresent(element1)),
-                    effect: new(IsPresent(element1)),
-                    expectedResult: true),
+                    Goal: new(IsPresent(element1)),
+                    Effect: new(IsPresent(element1)),
+                    ExpectedResult: true),
 
                 // fulfills negative element
                 new(
-                    goal: new(!IsPresent(element1)),
-                    effect: new(!IsPresent(element1)),
-                    expectedResult: true),
+                    Goal: new(!IsPresent(element1)),
+                    Effect: new(!IsPresent(element1)),
+                    ExpectedResult: true),
 
                 // fulfills positive & negative element
                 new(
-                    goal: new(!IsPresent(element1) & IsPresent(element2)),
-                    effect: new(!IsPresent(element1) & IsPresent(element2)),
-                    expectedResult: true),
+                    Goal: new(!IsPresent(element1) & IsPresent(element2)),
+                    Effect: new(!IsPresent(element1) & IsPresent(element2)),
+                    ExpectedResult: true),
 
                 // doesn't fulfill any elements
                 new(
-                    goal: new(!IsPresent(element1) & IsPresent(element2)),
-                    effect: new(IsPresent(element1) & !IsPresent(element2)),
-                    expectedResult: false),
+                    Goal: new(!IsPresent(element1) & IsPresent(element2)),
+                    Effect: new(IsPresent(element1) & !IsPresent(element2)),
+                    ExpectedResult: false),
 
                 // fulfills positive element, undoes positive element
                 new(
-                    goal: new(IsPresent(element1) & IsPresent(element2)),
-                    effect: new(!IsPresent(element1) & IsPresent(element2)),
-                    expectedResult: false),
+                    Goal: new(IsPresent(element1) & IsPresent(element2)),
+                    Effect: new(!IsPresent(element1) & IsPresent(element2)),
+                    ExpectedResult: false),
 
                 // Variable doesn't confuse matters..
                 new(
-                    goal: new(At(new Constant("C2"), new Constant("JFK"))),
-                    effect: new(At(new Constant("C2"), new Constant("JFK")) & !In(new Constant("C2"), P)),
-                    expectedResult: true),
+                    Goal: new(At(new Constant("C2"), new Constant("JFK"))),
+                    Effect: new(At(new Constant("C2"), new Constant("JFK")) & !In(new Constant("C2"), P)),
+                    ExpectedResult: true),
             })
-            .When(tc => tc.effect.IsRelevantTo(tc.goal))
+            .When(tc => tc.Effect.IsRelevantTo(tc.Goal))
             .ThenReturns()
-            .And((tc, r) => r.Should().Be(tc.expectedResult));
+            .And((tc, r) => r.Should().Be(tc.ExpectedResult));
 
         private record EqualityTestCase(Effect X, Effect Y, bool ExpectedEquality);
 
