@@ -21,10 +21,7 @@ namespace SCClassicalPlanning
         /// Initializes a new instance of the <see cref="Effect"/> class from an enumerable of the literals that comprise it.
         /// </summary>
         /// <param name="elements">The literals that comprise the state.</param>
-        public Effect(IEnumerable<Literal> elements)
-        {
-            Elements = elements.ToImmutableHashSet();
-        }
+        public Effect(IEnumerable<Literal> elements) => Elements = elements.ToImmutableHashSet();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Effect"/> class from a (params) array of the literals that comprise it.
@@ -35,7 +32,7 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Initializes a new instance of the <see cref="Effect" /> class from a sentence of first order logic. The sentence must be a conjunction of literals, or an exception will be thrown.
         /// </summary>
-        /// <param name="sentence"></param>
+        /// <param name="sentence">The sentence that expresses the effect.</param>
         public Effect(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
 
         /// <summary>
@@ -50,11 +47,13 @@ namespace SCClassicalPlanning
 
         /// <summary>
         /// Gets the "add list" of the action - the non-negated predicates in the action's effect.
+        /// These are removed from a <see cref="State"/> when this effect is applied.
         /// </summary>
         public IEnumerable<Predicate> AddList => Elements.Where(a => !a.IsNegated).Select(l => l.Predicate);
 
         /// <summary>
         /// Gets the "delete list" of the action - the negated predicates in the action's effect.
+        /// These are removed from a <see cref="State"/> when this effect is applied.
         /// </summary>
         public IEnumerable<Predicate> DeleteList => Elements.Where(a => a.IsNegated).Select(l => l.Predicate);
 
@@ -89,7 +88,7 @@ namespace SCClassicalPlanning
         {
             // Effects should be small-ish, so I'm not too worried by the inefficiency here.
             // Otherwise could think about sorting the set of elements (e.g. using ImmutableSortedSet sorted by hash code), maybe?
-            // Would need testing whether benefit is outweighed by constructed set in first place..
+            // Would need testing whether benefit is outweighed by constructing the ordered set in first place..
             return obj is Effect effect && effect.Elements.IsSubsetOf(Elements) && Elements.IsSubsetOf(effect.Elements);
         }
 

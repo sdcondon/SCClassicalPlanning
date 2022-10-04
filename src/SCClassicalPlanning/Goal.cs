@@ -18,14 +18,9 @@ namespace SCClassicalPlanning
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Effect"/> class from an enumerable of the literals that comprise it.
-        /// <para/>
-        /// TODO: explain that in general (i.e. in PDDL) doesn't have to be a conjunction of literals - in general can have disjunctions, implications etc - but *does* have to be functionless.
         /// </summary>
         /// <param name="elements">The literals that comprise the state.</param>
-        public Goal(IEnumerable<Literal> elements)
-        {
-            Elements = elements.ToImmutableHashSet();
-        }
+        public Goal(IEnumerable<Literal> elements) => Elements = elements.ToImmutableHashSet();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Effect"/> class from a (params) array of the literals that comprise it.
@@ -36,7 +31,7 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Initializes a new instance of the <see cref="Effect" /> class from a sentence of first order logic. The sentence must be a conjunction of literals, or an exception will be thrown.
         /// </summary>
-        /// <param name="sentence"></param>
+        /// <param name="sentence">The sentence that expresses the goal.</param>
         public Goal(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
 
         /// <summary>
@@ -91,7 +86,7 @@ namespace SCClassicalPlanning
         {
             // Goals should be small-ish, so I'm not too worried by the inefficiency here.
             // Otherwise could think about sorting the set of elements (e.g. using ImmutableSortedSet sorted by hash code), maybe?
-            // Would need testing whether benefit is outweighed by constructed set in first place..
+            // Would need testing whether benefit is outweighed by constructing the ordered set in first place..
             return obj is Goal goal && goal.Elements.IsSubsetOf(Elements) && Elements.IsSubsetOf(goal.Elements);
         }
 
