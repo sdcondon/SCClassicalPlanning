@@ -20,22 +20,26 @@ using SCFirstOrderLogic; // ..for Constant and Term
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // ..for OperablePredicate and single-letter VariableDeclarations
 using Action = SCClassicalPlanning.Action; // Unfortunate clash with System.Action. I'd rather not rename, but.. we'll see
 
-// The library uses SCFirstOrderLogic for its first-order logic model.
-// It is recommended to create vars/fields/properties for your Constants, and helper methods
-// for your Predicates. Note that we're using OperablePredicate here. Its not required, but
-// makes everything nice and succinct because it means we can use & and !. See SCFirstOrderLogic
-// docs for more on this.
+// First, we need to create all the elements of the domain
+
+// Our domain refers to a single constant term - the table on which our blocks are placed:
 Constant Table = new(nameof(Table));
+
+// Our domain defines four predicates (facts about zero or more objects that can either hold true or not):
+// As mentioned in the user guide for SCFirstOrderLogic, creating helper methods for your predicates is highly recommended.
+// Note that we're using OperablePredicate here. Its not required, but makes everything nice and succinct because it
+// means we can use & and ! to combine them. See SCFirstOrderLogic docs for details.
 OperablePredicate On(Term above, Term below) => new Predicate(nameof(On), above, below);
 OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
 OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
 OperablePredicate Equal(Term x, Term y) => new Predicate(nameof(Equal), x, y);
 
-// Helper methods for your Actions is a matter of taste. Instantiating them directly once to pass to the domain object ctor
-// (see below) would work just as well (that's the only place this method is likely to be called). I find that this approach 
-// gives a decent level of clarity on the terms included in the action, without being overly verbose.
-Action Move(Term block, Term from, Term toBlock) => new Action(
-    identifier: nameof(Move),
+// Now our first action. The MoveToBlock action moves a block from its current location to on top of a block.
+// Note that we only invoke this method in one place - in the domain ctor call below, meaning you might be
+// inclined just to instantiate an action object directly here instead. I find that this approach makes things
+// nice and readable though - feel free to experiment if you disagree.
+Action MoveToBlock(Term block, Term from, Term toBlock) => new Action(
+    identifier: nameof(MoveToBlock),
     precondition: new(
         On(block, from)
         & Clear(block)
@@ -51,6 +55,8 @@ Action Move(Term block, Term from, Term toBlock) => new Action(
         & !On(block, from)
         & !Clear(toBlock)));
 
+// The other ation of our domain - MoveToTable.
+// Separate from MoveToBlock because of the different behaviour of table and block w.r.t being Clear or not.
 Action MoveToTable(Term block, Term from) => new Action(
     identifier: nameof(MoveToTable),
     precondition: new(
@@ -63,6 +69,7 @@ Action MoveToTable(Term block, Term from) => new Action(
         & Clear(from)
         & !On(block, from)));
 
+// Now we are ready to declare our domain.
 // A domain defines the common aspects of all problems that occur within it.
 // Specifically, what predicates exist and what actions are available:
 var domain = new Domain(
@@ -75,17 +82,19 @@ var domain = new Domain(
     },
     actions: new Action[]
     {
-        Move(B, X, Y),
+        MoveToBlock(B, X, Y),
         MoveToTable(B, X),
     });
 
-// Problems exist in a given domain, and consist of an initial state, an end goal, and a collection of objects that exist.
-// Note that here we have used a constructor overload without explicitly specifying what objects exist. This overload will
-// assume the existing objects are precisely the Constants that are referred to by the initial state and goal.
+// Now we declare a few more constants - specific to the problem we want to solve:
 Constant blockA = new(nameof(blockA));
 Constant blockB = new(nameof(blockB));
 Constant blockC = new(nameof(blockC));
 
+// Finally, we can declare our problem.
+// Problems exist in a given domain, and consist of an initial state, an end goal, and a collection of objects that exist.
+// Note that here we have used a constructor overload without explicitly specifying what objects exist. This overload will
+// assume the existing objects are precisely the Constants that are referred to by the initial state and goal.
 var problem = new Problem(
     domain: domain,
     initialState: new(
