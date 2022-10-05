@@ -17,19 +17,19 @@ namespace SCClassicalPlanning
     public class Goal
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Effect"/> class from an enumerable of the literals that comprise it.
+        /// Initializes a new instance of the <see cref="Goal"/> class from an enumerable of the literals that comprise it.
         /// </summary>
-        /// <param name="elements">The literals that comprise the state.</param>
+        /// <param name="elements">The literals that comprise the goal.</param>
         public Goal(IEnumerable<Literal> elements) => Elements = elements.ToImmutableHashSet();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Effect"/> class from a (params) array of the literals that comprise it.
+        /// Initializes a new instance of the <see cref="Goal"/> class from a (params) array of the literals that comprise it.
         /// </summary>
-        /// <param name="elements">The literals that comprise the state.</param>
+        /// <param name="elements">The literals that comprise the goal.</param>
         public Goal(params Literal[] elements) : this((IEnumerable<Literal>)elements) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Effect" /> class from a sentence of first order logic. The sentence must be a conjunction of literals, or an exception will be thrown.
+        /// Initializes a new instance of the <see cref="Goal" /> class from a sentence of first order logic. The sentence must be a conjunction of literals, or an exception will be thrown.
         /// </summary>
         /// <param name="sentence">The sentence that expresses the goal.</param>
         public Goal(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
