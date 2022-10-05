@@ -30,5 +30,10 @@ namespace SCClassicalPlanning.Planning
         {
             return $"[{action.Identifier}] Effect: {string.Join(" & ", action.Effect.Elements.Select(e => sentenceFormatter.Format(e)))}";
         }
+
+        public string Format(State state)
+        {
+            return $"{string.Join(" & ", state.Elements.Select(e => sentenceFormatter.Format(e)))}";
+        }
     }
 }

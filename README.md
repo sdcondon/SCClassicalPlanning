@@ -39,3 +39,4 @@ Like this? If so, it might also be worth taking a look at:
 * [SCFirstOrderLogic](https://github.com/sdcondon/SCFirstOrderLogic): Basic first-order logic implementations. Based on chapters 8 and 9 of "Artificial Intelligence: A Modern Approach". Depended on by this package (for its first-order logic model).
 * [SCGraphTheory.Search](https://github.com/sdcondon/SCGraphTheory.Search): Graph theory search algorithms. Depended on by this package (for state space search).
 * [AIMA Code - C#](https://github.com/aimacode/aima-csharp): I mention this only because I feel like I should. This is the "official" C# repository for "Artificial Intelligence: A Modern Approach" - and it is utterly, irretrievably useless.
+* [My GitHub Profile!](https://github.com/sdcondon): My profile README lists a whole bunch of stuff that I've made.
