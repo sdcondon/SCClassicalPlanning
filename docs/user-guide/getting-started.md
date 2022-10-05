@@ -30,9 +30,9 @@ OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
 OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
 OperablePredicate Equal(Term x, Term y) => new Predicate(nameof(Equal), x, y);
 
-// Helper methods for your Actions is a matter of taste. Instantiating them directly in the domain object ctor (see below) would
-// work just as well (that's the only place this method is likely to be called). I find its nice and readable this way, though.
-// The important thing is that the Action instances passed to the Domain ctor refer to variables and constants as appropriate.
+// Helper methods for your Actions is a matter of taste. Instantiating them directly once to pass to the domain object ctor
+// (see below) would work just as well (that's the only place this method is likely to be called). I find that this approach 
+// gives a decent level of clarity on the terms included in the action, without being overly verbose.
 Action Move(Term block, Term from, Term toBlock) => new Action(
     identifier: nameof(Move),
     precondition: new(
@@ -130,7 +130,7 @@ var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOf
 var plan = planner.CreatePlanAsync(problem).GetAwaiter().GetResult(); // or obviously just await.. if we're in an async method
 
 // Verify that applying the plan results in a state that satisfies the goal,
-// Printing out the actions included in the plan and the intermediate state in the process.
+// printing out the actions included in the plan and the intermediate state in the process.
 // NB: output is obviously something that could be improved upon. In particular, I'm
 // aware that it'd be nice to explictly state what the variables used in the action schema
 // are mapped to at each stage. That's a TODO.
