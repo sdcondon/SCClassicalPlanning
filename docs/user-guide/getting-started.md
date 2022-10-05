@@ -75,6 +75,8 @@ Action moveToTable = new Action(
 // Now we are ready to declare our domain.
 // A domain defines the common aspects of all problems that occur within it.
 // Specifically, what predicates exist and what actions are available:
+// (NB: I will almost certainly add a ctor overload at some point that allows
+// the predicates to be inferred from the actions).
 var domain = new Domain(
     predicates: new Predicate[]
     {
@@ -89,7 +91,8 @@ var domain = new Domain(
         moveToTable
     });
 
-// Now we declare a few more constants - specific to the problem we want to solve:
+// Now we declare a few more constants.
+// These ones are specific to the problem we want to solve:
 Constant blockA = new(nameof(blockA));
 Constant blockB = new(nameof(blockB));
 Constant blockC = new(nameof(blockC));
