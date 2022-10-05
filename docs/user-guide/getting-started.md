@@ -1,10 +1,12 @@
 # Getting Started
 
+Before we get started, two important notes:
+
 * **NB #1:** This guide makes no attempt to explain classical planning; it just explains how to use this library to invoke some classical planning algorithms.
-It is however worth noting that particular care has been taken with the type and member documentation - you may be able to intuit quite a lot just by combining this guide with those docs.
-* **NB #2:** Classical planning is built on top of first-order logic - classical planning elements (goals, effect etc) include expressions of first order logic.
+It is however worth noting that particular care has been taken with the type and member documentation - you *might* be able to intuit quite a lot just by combining this guide with those docs.
+* **NB #2:** Classical planning is built on top of first-order logic - classical planning elements (goals, effects etc) include elements of first order logic (notably, literals and predicates).
 This library uses SCFirstOrderLogic as its model for this rather than creating its own.
-As such, it might be useful to be passingly familiar with [SCFirstOrderLogic](https://github.com/sdcondon/SCFirstOrderLogic) before tackling this.
+As such, it *might* be useful to be passingly familiar with [SCFirstOrderLogic](https://github.com/sdcondon/SCFirstOrderLogic) before tackling this.
 
 ## Defining Problems
 
@@ -15,11 +17,12 @@ The first challenge is to define the planning problem to be solved. In this sect
 ```csharp
 using SCClassicalPlanning; // ..for Action, Domain etc
 using SCFirstOrderLogic; // ..for Constant and Term
-using SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory // ..for OperablePredicate
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory // ..for OperablePredicate and single-letter VariableDeclarations
 
 // The library uses SCFirstOrderLogic for its first-order logic model.
-// It is recommended to create fields/properties for your constants, and helper methods for your predicates.
-// Note that we're using OperablePredicate here. Not required, but makes everything nice and succinct via those operators.
+// It is recommended to create fields/properties for your Constants, and helper methods
+// for your Predicates.  Note that we're using OperablePredicate here. Its not required, but
+// makes everything nice and succinct because it means we can use & and !.
 Constant Table = new(nameof(Table));
 OperablePredicate On(Term above, Term below) => new Predicate(nameof(On), above, below);
 OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
@@ -28,7 +31,7 @@ OperablePredicate Equal(Term x, Term y) => new Predicate(nameof(Equal), x, y);
 
 // Helper methods for your Actions is a matter of taste. Instantiating them directly in the domain object ctor (see below) would
 // work just as well (that's the only place this method is likely to be called). I find its nice and readable this way, though.
-// The important thing is the instances passed to the Domain ctor refer to variables and constants as appropriate.
+// The important thing is that the Action instances passed to the Domain ctor refer to variables and constants as appropriate.
 Action Move(Term block, Term from, Term toBlock) => new Action(
     identifier: nameof(Move),
     precondition: new(
@@ -60,7 +63,7 @@ Action MoveToTable(Term block, Term from) => new Action(
 
 // A domain defines the common aspects of all problems that occur within it.
 // Specifically, what predicates exist and what actions are available:
-Domain = new Domain(
+var domain = new Domain(
     predicates: new Predicate[]
     {
         Block(B),
@@ -81,8 +84,8 @@ Constant blockA = new(nameof(blockA));
 Constant blockB = new(nameof(blockB));
 Constant blockC = new(nameof(blockC));
 
-Problem problem = new Problem(
-    domain: Domain,
+var problem = new Problem(
+    domain: domain,
     initialState: new(
         Block(blockA)
         & Equal(blockA, blockA)
@@ -107,16 +110,17 @@ I haven't gotten around to that just yet, though..
 
 ## Solving Problems
 
-Once you have a problem, the types in the `SCClassicalPlanning.Planning` domain, can be used to solve it.
+Once you have a problem, the types in the `SCClassicalPlanning.Planning` namespace can be used to try to create a plan to solve it.
 
 ### Using Forward State Space Search
 
-```
-using SCClassicalPlanning.Planning;
-using SCClassicalPlanning.Planning.StateSpaceSearch;
+```csharp
+using SCClassicalPlanning.Planning; // For PlanFormatter
+using SCClassicalPlanning.Planning.StateSpaceSearch; // For the planner
+using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // For ElementDifferenceCount
 
 // First instantiate a planner:
-// NB: the only heuristic implemented so far is a super-simple one that just count the differences
+// NB: the only heuristic implemented so far is a super-simple one that just counts the differences
 // between the current state and the goal. That's obviously not going to cut it in the real world,
 // but suffices for the very simple problems found in the ExampleDomains project:
 var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOfActionsToGoal);
