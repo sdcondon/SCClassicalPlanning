@@ -136,10 +136,11 @@ using SCClassicalPlanning.Planning; // For PlanFormatter
 using SCClassicalPlanning.Planning.StateSpaceSearch; // For the planner
 using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // For ElementDifferenceCount
 
-// First instantiate a planner:
+// First instantiate a planner, specifying a heuristic to use (an delegate that estimates of
+// the number of actions it will take to get from a given state to a state that satisfies a given goal).
 // NB: the only heuristic implemented so far is a super-simple one that just counts the differences
 // between the current state and the goal. That's obviously not going to cut it in the real world,
-// but suffices for the very simple problems found in the ExampleDomains project:
+// but suffices for the very simple problems we are trying to solve here:
 var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOfActionsToGoal);
 
 // Tell the planner to create a plan for our problem:
