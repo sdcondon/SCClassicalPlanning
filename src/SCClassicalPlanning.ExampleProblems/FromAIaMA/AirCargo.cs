@@ -2,7 +2,7 @@
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 
-namespace SCClassicalPlanning.ExampleDomains
+namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
 {
     /// <summary>
     /// The "Air Cargo" example from section 10.1.1 of "Artificial Intelligence: A Modern Approach".
@@ -65,7 +65,7 @@ namespace SCClassicalPlanning.ExampleDomains
                 & Plane(plane)
                 & Airport(from)
                 & Airport(to),
-                // & !Equal(from, to),
+            // & !Equal(from, to),
             effect:
                 !At(plane, from)
                 & At(plane, to));

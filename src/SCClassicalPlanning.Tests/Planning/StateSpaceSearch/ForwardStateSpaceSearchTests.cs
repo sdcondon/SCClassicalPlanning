@@ -1,11 +1,11 @@
 ﻿using FluentAssertions;
 using FlUnit;
-using SCClassicalPlanning.ExampleDomains;
 using SCFirstOrderLogic;
-using static SCClassicalPlanning.ExampleDomains.AirCargo;
-using static SCClassicalPlanning.ExampleDomains.BlocksWorld;
-using static SCClassicalPlanning.ExampleDomains.SpareTire;
+using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
+using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
+using static SCClassicalPlanning.ExampleDomains.FromAIaMA.SpareTire;
 using static SCClassicalPlanning.Planning.StateSpaceSearch.StateSpaceSearchHeuristics;
+using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {

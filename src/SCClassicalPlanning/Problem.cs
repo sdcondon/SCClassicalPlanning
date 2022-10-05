@@ -10,7 +10,7 @@ namespace SCClassicalPlanning
     /// Encapsulates a planning problem.
     /// <para/>
     /// Problems exist within a <see cref="SCClassicalPlanning.Domain"/>, and consist of an initial <see cref="State"/>, an end <see cref="SCClassicalPlanning.Goal"/>,
-    /// and a set of objects (represented here by <see cref="Constant"/>s from the SCFirstOrderLogic library) that exist within the scope of the problem.
+    /// and a set of objects (represented by <see cref="Constant"/>s from the SCFirstOrderLogic library) that exist within the scope of the problem.
     /// </summary>
     public class Problem
     {
@@ -186,13 +186,16 @@ namespace SCClassicalPlanning
         /// Gets the (ground) actions that are relevant to a given goal.
         /// <para/>
         /// TODO/NB: All the results here are ground results - which is rather (potentially extremely) inefficient if the problem is large.
-        /// It'd be nice to be able to have an equivalent nethod in <see cref="Domain"/> that can return <see cref="Actions"/> that have
+        /// It'd be nice to be able to have an equivalent nethod (in <see cref="Domain"/>) that can return <see cref="Action"/>s that have
         /// some (potentially constrained) variable references in them. That's a TODO..
         /// </summary>
-        /// <param name="state">The goal to retrieve the relevant actions for.</param>
+        /// <param name="goal">The goal to retrieve the relevant actions for.</param>
         /// <returns>The actions that are relevant to the given state.</returns>
         public IEnumerable<Action> GetRelevantActions(Goal goal)
         {
+            // Local method to create variable subsitutions such that the negation of the effects elements transformed by the substitution do not match any of the goal's elements.
+            // effectElements: The (remaining) elements of the effect to be matched.
+            // returns: An enumerable of VariableSubstitutions that can be applied to the effect elements to make none of them match the negation of a goal element
             IEnumerable<VariableSubstitution> UnmatchWithGoalNegation(IEnumerable<Literal> effectElements, VariableSubstitution unifier)
             {
                 if (!effectElements.Any())
@@ -240,7 +243,7 @@ namespace SCClassicalPlanning
                 }
             }
 
-            // Local method to match a set of effect elements to the given goal.
+            // Local method to create variable subsitutions such that the effects elements transformed by the substitution contain at least one match to the goal's elements.
             // effectElements: The elements of the effect to be matched.
             // returns: An enumerable of VariableSubstitutions that can be applied to the effect elements to make at least one of the match a goal element
             IEnumerable<VariableSubstitution> MatchWithGoal(IEnumerable<Literal> effectElements)

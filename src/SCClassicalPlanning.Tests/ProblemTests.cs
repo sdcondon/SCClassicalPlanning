@@ -2,7 +2,7 @@
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains;
 using SCFirstOrderLogic;
-using static SCClassicalPlanning.ExampleDomains.AirCargo;
+using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.Container;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 

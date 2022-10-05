@@ -4,8 +4,22 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Description>Basic but fully functional and documented classical planning implementations. Heavily influenced by "Artificial Intelligence: A Modern Approach" (Russell &amp; Norvig). Includes forward and backward state space search for now, GraphPlan will probably be added prior to v1.</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>classical planning ai state space search</PackageTags>
+    <Product>SCClassicalPlanning</Product>
+    <PackageId>SCClassicalPlanning</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>SCClassicalPlanning.png</PackageIcon>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
+    
+  <ItemGroup>
+    <None Include="SCClassicalPlanning.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\SCClassicalPlanning.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
@@ -16,13 +30,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SCFirstOrderLogic" Version="2.1.0-pre.5" />
+    <PackageReference Include="SCFirstOrderLogic" Version="2.1.0" />
     <PackageReference Include="SCGraphTheory.Search" Version="2.3.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="SCClassicalPlanning.md" Pack="true" PackagePath="README.md" />
-    <None Include="..\SCClassicalPlanning.png" Pack="true" PackagePath="\" />
   </ItemGroup>
     
   <ItemGroup>

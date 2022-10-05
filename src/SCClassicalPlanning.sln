@@ -11,6 +11,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanning.Example
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanning.Benchmarks", "SCClassicalPlanning.Benchmarks\SCClassicalPlanning.Benchmarks.csproj", "{A839A7CD-BBC8-4454-A730-F033A0A2B860}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B5ACFEC3-2BED-4BA8-809D-35D2AF01F917}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		SCClassicalPlanning.pdn = SCClassicalPlanning.pdn
+		SCClassicalPlanning.png = SCClassicalPlanning.png
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

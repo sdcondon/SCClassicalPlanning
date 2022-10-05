@@ -2,7 +2,7 @@
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
-namespace SCClassicalPlanning.ExampleDomains
+namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
 {
     /// <summary>
     /// The "Spare Tire" example from section 10.1.2 of "Artificial Intelligence: A Modern Approach".

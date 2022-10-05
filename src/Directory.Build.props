@@ -5,11 +5,14 @@
     <Product>SCClassicalPlanning</Product>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/sdcondon/SCClassicalPlanning.git</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageProjectUrl>https://github.com/sdcondon/SCClassicalPlanning</PackageProjectUrl>
+    <PackageReleaseNotes>See https://github.com/sdcondon/SCClassicalPlanning/releases.</PackageReleaseNotes>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>2022 Simon Condon</Copyright>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
 
     <Version>0.0.0-localbuild+localbuild</Version>
   </PropertyGroup>
