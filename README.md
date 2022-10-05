@@ -23,7 +23,9 @@ As such, care has been taken to include good type and member documentation, as w
 
 For the moment at least, documentation can be found in the docs folder of this repo. Specifically, we have:
 
-* *Nothing, just yet!*
+* **[User Guide](./docs/user-guide/):** User guide home page. Not much here just yet..
+  * **[Getting Started](./docs/user-guide/getting-started.md):** Instructions for getting started.
+* **[Roadmap](./docs/roadmap.md):** Proper project planning would obviously be a huge waste of effort at this point, so here's just a bullet list to organise my thoughts
 
 ## Issues and Contributions
 

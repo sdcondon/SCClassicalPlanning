@@ -20,9 +20,10 @@ using SCFirstOrderLogic; // ..for Constant and Term
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory // ..for OperablePredicate and single-letter VariableDeclarations
 
 // The library uses SCFirstOrderLogic for its first-order logic model.
-// It is recommended to create fields/properties for your Constants, and helper methods
-// for your Predicates.  Note that we're using OperablePredicate here. Its not required, but
-// makes everything nice and succinct because it means we can use & and !.
+// It is recommended to create vars/fields/properties for your Constants, and helper methods
+// for your Predicates. Note that we're using OperablePredicate here. Its not required, but
+// makes everything nice and succinct because it means we can use & and !. See SCFirstOrderLogic
+// docs for more on this.
 Constant Table = new(nameof(Table));
 OperablePredicate On(Term above, Term below) => new Predicate(nameof(On), above, below);
 OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
@@ -147,7 +148,7 @@ foreach (var action in plan.Steps)
 
     state = action.ApplyTo(state);
 
-    Console.WriteLine("Current state: {planFormatter.Format(action)}");
+    Console.WriteLine($"Current state: {planFormatter.Format(action)}");
     Console.WriteLine();
 }
 
