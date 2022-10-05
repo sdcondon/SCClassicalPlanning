@@ -2,6 +2,8 @@
 
 # SCClassicalPlanning
 
+[![NuGet version (SCClassicalPlanning)](https://img.shields.io/nuget/v/SCClassicalPlanning.svg?style=flat-square)](https://www.nuget.org/packages/SCClassicalPlanning/) [![NuGet downloads (SCClassicalPlanning)](https://img.shields.io/nuget/dt/SCClassicalPlanning.svg?style=flat-square)](https://www.nuget.org/packages/SCClassicalPlanning/)
+
 This repository contains the source code for the SCClassicalPlanning NuGet package.
 
 ## Package Overview
