@@ -17,7 +17,8 @@ The first challenge is to define the planning problem to be solved. In this sect
 ```csharp
 using SCClassicalPlanning; // ..for Action, Domain etc
 using SCFirstOrderLogic; // ..for Constant and Term
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory // ..for OperablePredicate and single-letter VariableDeclarations
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // ..for OperablePredicate and single-letter VariableDeclarations
+using Action = SCClassicalPlanning.Action; // Unfortunate clash with System.Action. I'd rather not rename, but.. we'll see
 
 // The library uses SCFirstOrderLogic for its first-order logic model.
 // It is recommended to create vars/fields/properties for your Constants, and helper methods
@@ -148,14 +149,11 @@ foreach (var action in plan.Steps)
 
     state = action.ApplyTo(state);
 
-    Console.WriteLine($"Current state: {planFormatter.Format(action)}");
+    Console.WriteLine($"Current state: {planFormatter.Format(state)}");
     Console.WriteLine();
 }
 
-if (!state.Satisfies(problem.Goal))
-{
-    Console.WriteLine("Goal not satisfied!");
-}
+Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.Goal)}!");
 ```
 
 ### Using Backward State Space Search
