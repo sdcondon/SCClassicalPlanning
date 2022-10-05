@@ -34,12 +34,15 @@ OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
 OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
 OperablePredicate Equal(Term x, Term y) => new Predicate(nameof(Equal), x, y);
 
-// Now our first action. The MoveToBlock action moves a block from its current location to on top of a block.
-// Note that we only invoke this method in one place - in the domain ctor call below, meaning you might be
-// inclined just to instantiate an action object directly here instead. I find that this approach makes things
-// nice and readable though - feel free to experiment if you disagree.
-Action MoveToBlock(Term block, Term from, Term toBlock) => new Action(
-    identifier: nameof(MoveToBlock),
+// Now declare some variable terms for use in our action schemas:
+VariableDeclaration block = new(nameof(block));
+VariableDeclaration from = new(nameof(from));
+VariableDeclaration toBlock = new(nameof(toBlock));
+
+// Our first action schema.
+// The 'moveToBlock' action moves a block from its current location to on top of a block:
+Action moveToBlock = new Action(
+    identifier: nameof(moveToBlock),
     precondition: new(
         On(block, from)
         & Clear(block)
@@ -55,10 +58,10 @@ Action MoveToBlock(Term block, Term from, Term toBlock) => new Action(
         & !On(block, from)
         & !Clear(toBlock)));
 
-// The other ation of our domain - MoveToTable.
-// Separate from MoveToBlock because of the different behaviour of table and block w.r.t being Clear or not.
-Action MoveToTable(Term block, Term from) => new Action(
-    identifier: nameof(MoveToTable),
+// The other ation of our domain - 'moveToTable'.
+// Separate from 'moveToBlock' because of the different behaviour of table and block w.r.t being Clear or not.
+Action moveToTable = new Action(
+    identifier: nameof(moveToTable),
     precondition: new(
         On(block, from)
         & Clear(block)
@@ -82,8 +85,8 @@ var domain = new Domain(
     },
     actions: new Action[]
     {
-        MoveToBlock(B, X, Y),
-        MoveToTable(B, X),
+        moveToBlock,
+        moveToTable
     });
 
 // Now we declare a few more constants - specific to the problem we want to solve:
