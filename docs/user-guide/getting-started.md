@@ -137,7 +137,7 @@ var plan = planner.CreatePlanAsync(problem).GetAwaiter().GetResult(); // or obvi
 // NB: output is obviously something that could be improved upon. In particular, I'm
 // aware that it'd be nice to explictly state what the variables used in the action schema
 // are mapped to at each stage. That's a TODO.
-var planFormatter = new PlanFormatter();
+var planFormatter = new PlanFormatter(problem.Domain);
 var state = problem.InitialState;
 foreach (var action in plan.Steps)
 {
@@ -150,9 +150,6 @@ foreach (var action in plan.Steps)
     }
 
     state = action.ApplyTo(state);
-
-    Console.WriteLine($"Current state: {planFormatter.Format(state)}");
-    Console.WriteLine();
 }
 
 Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.Goal)}!");
