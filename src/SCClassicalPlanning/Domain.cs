@@ -1,7 +1,6 @@
 ﻿using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace SCClassicalPlanning
@@ -10,7 +9,7 @@ namespace SCClassicalPlanning
     /// Container for information about a domain.
     /// <para/>
     /// A domain defines the aspects that are common to of all problems that occur within it.
-    /// Specifically, the <see cref="Predicate"/>s relevant to it and the <see cref="Action"/>s available within it.
+    /// Specifically, the <see cref="Action"/>s available within it.
     /// </summary>
     public class Domain
     {
@@ -18,24 +17,24 @@ namespace SCClassicalPlanning
         /// Initializes a new instance of the <see cref="Domain"/> class.
         /// </summary>
         /// <param name="actions">The set of actions that exist within the domain.</param>
-        /// <param name="predicates">The set of predicates that exist within the domain.</param>
-        public Domain(IList<Action> actions, IList<Predicate> predicates)
+        public Domain(IList<Action> actions)
         {
             Actions = new ReadOnlyCollection<Action>(actions);
-            Predicates = new ReadOnlyCollection<Predicate>(predicates);
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Domain"/> class.
+        /// </summary>
+        /// <param name="actions">The set of actions that exist within the domain.</param>
+        public Domain(params Action[] actions) : this((IList<Action>)actions) { }
 
         /// <summary>
         /// Gets the set of actions that exist within the domain.
         /// </summary>
         public ReadOnlyCollection<Action> Actions { get; }
 
-        /// <summary>
-        /// Gets the set of predicates that exist within the domain.
-        /// </summary>
-        public ReadOnlyCollection<Predicate> Predicates { get; }
-
 #if false
+TODO: more useful than predicates..
         /// <summary>
         /// Gets the set of constants that exist within the domain
         /// </summary>
