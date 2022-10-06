@@ -85,20 +85,22 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         private struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
         {
             private readonly Problem problem;
-            private readonly Goal goal;
+            private readonly Goal fromGoal;
+            private readonly Goal toGoal;
 
-            public StateSpaceEdge(Problem problem, Goal goal, Action action)
+            public StateSpaceEdge(Problem problem, Goal fromGoal, Action action)
             {
                 this.problem = problem;
-                this.goal = goal;
+                this.fromGoal = fromGoal;
+                this.toGoal = action.Regress(fromGoal);
                 this.Action = action;
             }
 
             /// <inheritdoc />
-            public StateSpaceNode From => new StateSpaceNode(problem, goal);
+            public StateSpaceNode From => new StateSpaceNode(problem, fromGoal);
 
             /// <inheritdoc />
-            public StateSpaceNode To => new StateSpaceNode(problem, Action.Regress(goal));
+            public StateSpaceNode To => new StateSpaceNode(problem, toGoal);
 
             /// <summary>
             /// Gets the action that is regressed over to achieve this goal transition.
