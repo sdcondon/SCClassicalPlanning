@@ -177,7 +177,7 @@ Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.Goal)}!");
 As above, but using `var planner = new BackwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOfActionsToGoal)`.
 
 NB: While this problem is simple enough that its not an issue, this heuristic is **terrible** for backward searches
-(feel free to take a look it a long/much memory it takes when used in some of the backward search tests).
+(feel free to take a look at how long/much memory it takes when used in some of the backward search tests).
 
 For a clue as to why, notice that by not taking into account the available actions in the problem, the search will
 happily explore goals that require e.g. the table to somehow turn into a block..
