@@ -1,5 +1,4 @@
 ﻿using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceFormatting;
 using SCFirstOrderLogic.SentenceManipulation;
 using System.Collections.Immutable;
 
@@ -107,11 +106,7 @@ namespace SCClassicalPlanning
         }
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            var formatter = new SentenceFormatter(); // TODO: overkill! don't need any of the support for normalisation terms etc
-            return string.Join(" ∧ ", Elements.Select(e => formatter.Format(e)));
-        }
+        public override string ToString() => string.Join(" ∧ ", Elements.Select(a => a.ToString()));
 
         /// <summary>
         /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.
