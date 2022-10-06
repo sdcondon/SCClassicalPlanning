@@ -1,4 +1,5 @@
 ﻿using SCFirstOrderLogic.SentenceFormatting;
+using SCFirstOrderLogic.SentenceManipulation;
 using System.Text;
 
 namespace SCClassicalPlanning.Planning
@@ -12,7 +13,9 @@ namespace SCClassicalPlanning.Planning
     /// </summary>
     public class PlanFormatter
     {
-        private readonly SentenceFormatter sentenceFormatter = new SentenceFormatter();
+        private readonly Domain domain;
+
+        public PlanFormatter(Domain domain) => this.domain = domain;
 
         public string Format(Plan plan)
         {
@@ -28,12 +31,8 @@ namespace SCClassicalPlanning.Planning
 
         public string Format(Action action)
         {
-            return $"[{action.Identifier}] Effect: {string.Join(" & ", action.Effect.Elements.Select(e => sentenceFormatter.Format(e)))}";
-        }
-
-        public string Format(State state)
-        {
-            return $"{string.Join(" & ", state.Elements.Select(e => sentenceFormatter.Format(e)))}";
+            VariableSubstitution substitution = domain.GetMappingFromSchema(action);
+            return $"{action.Identifier}({string.Join(", ", substitution.Bindings.Select(b => b.Key.ToString() + ": " + b.Value.ToString()))})";
         }
     }
 }

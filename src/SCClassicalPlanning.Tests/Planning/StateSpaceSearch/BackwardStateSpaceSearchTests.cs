@@ -42,7 +42,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .When((_, tc) => tc.Execute())
             .ThenReturns()
             .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
-            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter().Format(p)));
+            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter(AirCargo.Domain).Format(p)));
 
         public static Test BlocksWorldScenario => TestThat
             .GivenTestContext()
@@ -73,7 +73,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .When((_, tc) => tc.Execute())
             .ThenReturns()
             .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
-            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter().Format(p)));
+            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter(BlocksWorld.Domain).Format(p)));
 
         public static Test BigBlocksWorldScenario => TestThat
             .GivenTestContext()
@@ -115,7 +115,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .When((_, tc) => tc.Execute())
             .ThenReturns()
             .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
-            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter().Format(p)));
+            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter(BlocksWorld.Domain).Format(p)));
 
         public static Test SpareTireScenario => TestThat
             .GivenTestContext()
@@ -133,14 +133,16 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .When((_, tc) => tc.Execute())
             .ThenReturns()
             .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
-            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter().Format(p)));
+            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter(SpareTire.Domain).Format(p)));
 
         private record TestCase(Domain Domain, State InitialState, Goal Goal)
         {
             public Plan Execute()
             {
-                var planner = new BackwardStateSpaceSearch(ElementDifferenceCount.CountDifferences);
                 var problem = new Problem(Domain, InitialState, Goal);
+                var heuristic = new IgnorePreconditions_GreedySetCover(problem);
+                //var planner = new BackwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
+                var planner = new BackwardStateSpaceSearch(heuristic.EstimateCost);   
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
             }
         }
