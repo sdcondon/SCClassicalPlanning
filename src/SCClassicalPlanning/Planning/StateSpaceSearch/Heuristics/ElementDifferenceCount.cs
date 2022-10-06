@@ -7,7 +7,7 @@
     /// </summary>
     public static class ElementDifferenceCount
     {
-        public static float EstimateCountOfActionsToGoal(State state, Goal goal)
+        public static float CountDifferences(State state, Goal goal)
         {
             return goal.PositivePredicates.Except(state.Elements).Count()
                 + goal.NegativePredicates.Intersect(state.Elements).Count();

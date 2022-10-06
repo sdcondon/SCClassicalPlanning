@@ -144,8 +144,6 @@ namespace SCClassicalPlanning
                         {
                             var possiblePredicate = firstGoalElementUnifier.ApplyTo(firstGoalElement.Predicate).Predicate;
 
-                            // TODO: perhaps even slower than needed - exhaustively iterating state n times..
-                            // Can we check for them all at once - e.g. above foreach - allPossibleUnifiers.Select(ApplyTo(firstGoalElement)).Except(state.Elements) kinda thing?
                             if (!state.Elements.Contains(possiblePredicate))
                             {
                                 foreach (var restOfGoalElementsUnifier in MatchWithState(goalElements.Skip(1), firstGoalElementUnifier))
@@ -165,7 +163,7 @@ namespace SCClassicalPlanning
             {
                 // Note than when trying to match elements of the precondition to elements of the state, we consider positive
                 // elements of the goal first - on the assumption that these will narrow down the search far more than negative elements
-                // (i.e. there'll be far less objects for which a given predicate DOES hold than for which a given predicate DOESN'T hold).
+                // (i.e. there'll be far fewer objects for which a given predicate DOES hold than for which a given predicate DOESN'T hold).
                 // Beyond that, there's no specific element ordering - we just look at them in the order they happen to fall.
                 // Ideally, we'd do more to order the elements in a way that minimises the amount of work we have to do - but it would require
                 // some analysis of the problem, and is something we'd likely want to abstract to allow for different approaches (this is a TODO).
@@ -230,8 +228,6 @@ namespace SCClassicalPlanning
                     {
                         var possibleLiteral = firstEffectElementUnifier.ApplyTo(firstEffectElement);
 
-                        // TODO: perhaps even slower than needed - exhaustively iterating state n times..
-                        // Can we check for them all at once - e.g. above foreach - allPossibleUnifiers.Select(ApplyTo(firstGoalElement)).Except(state.Elements) kinda thing?
                         if (!goal.Elements.Contains(possibleLiteral.Negate()))
                         {
                             foreach (var restOfGoalElementsUnifier in UnmatchWithGoalNegation(effectElements.Skip(1), firstEffectElementUnifier))

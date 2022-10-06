@@ -58,7 +58,7 @@ Action moveToBlock = new Action(
         & !On(block, from)
         & !Clear(toBlock)));
 
-// The other ation of our domain - 'moveToTable'.
+// The other action of our domain - 'moveToTable'.
 // Separate from 'moveToBlock' because of the different behaviour of table and block w.r.t being Clear or not.
 Action moveToTable = new Action(
     identifier: nameof(moveToTable),
@@ -139,7 +139,7 @@ using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // For ElementDi
 // First instantiate a planner, specifying a heuristic to use (a delegate that estimates the
 // number of actions it will take to get from a given state to a state that satisfies a given goal).
 // NB: the only heuristic implemented so far is a super-simple one that just counts the differences
-// between the current state and the goal. That's obviously not going to cut it in the real world,
+// between the current state and the goal. That's obviously not going to cut it for most problems,
 // but suffices for the very simple problem we are trying to solve here:
 var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOfActionsToGoal);
 
@@ -147,7 +147,7 @@ var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOf
 var plan = planner.CreatePlanAsync(problem).GetAwaiter().GetResult(); // or obviously just await.. if we're in an async method
 
 // Verify that applying the plan results in a state that satisfies the goal,
-// printing out the actions included in the plan and the intermediate state in the process.
+// printing out the actions included in the plan and the intermediate state in the process:
 // NB: output is obviously something that could be improved upon. In particular, I'm
 // aware that it'd be nice to explictly state what the variables used in the action schema
 // are mapped to at each stage. That's a TODO.
@@ -175,6 +175,12 @@ Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.Goal)}!");
 ### Using Backward State Space Search
 
 As above, but using `var planner = new BackwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOfActionsToGoal)`.
+
+NB: While this problem is simple enough that its not an issue, this heuristic is **terrible** for backward searches
+(feel free to take a look it a long/much memory it takes when used in some of the backward search tests).
+
+For a clue as to why, notice that by not taking into account the available actions in the problem, the search will
+happily explore goals that require e.g. the table to somehow turn into a block..
 
 ### Using Graphplan
 

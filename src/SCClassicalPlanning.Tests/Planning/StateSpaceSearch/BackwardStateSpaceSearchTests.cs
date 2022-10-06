@@ -139,7 +139,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         {
             public Plan Execute()
             {
-                var planner = new BackwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOfActionsToGoal);
+                var planner = new BackwardStateSpaceSearch(ElementDifferenceCount.CountDifferences);
                 var problem = new Problem(Domain, InitialState, Goal);
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
             }
