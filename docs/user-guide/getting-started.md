@@ -127,7 +127,7 @@ using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // For ElementDi
 // NB: the only heuristic implemented so far is a super-simple one that just counts the differences
 // between the current state and the goal. That's obviously not going to cut it for most problems,
 // but suffices for the very simple problem we are trying to solve here:
-var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOfActionsToGoal);
+var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
 
 // Tell the planner to create a plan for our problem:
 var plan = planner.CreatePlanAsync(problem).GetAwaiter().GetResult(); // or obviously just await.. if we're in an async method
