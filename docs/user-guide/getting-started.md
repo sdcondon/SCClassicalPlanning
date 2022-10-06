@@ -89,7 +89,7 @@ Constant blockC = new(nameof(blockC));
 // assume the existing objects are precisely the Constants that are referred to by the initial state and goal.
 var problem = new Problem(
     domain: domain,
-    initialState: new(
+    initialState: new State(
         Block(blockA)
         & Equal(blockA, blockA)
         & Block(blockB)
@@ -101,7 +101,7 @@ var problem = new Problem(
         & On(blockC, blockA)
         & Clear(blockB)
         & Clear(blockC)),
-    goal: new(
+    goal: new Goal(
         On(blockA, blockB)
         & On(blockB, blockC)));
 ```
