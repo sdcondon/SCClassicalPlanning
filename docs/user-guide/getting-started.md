@@ -15,10 +15,10 @@ The first challenge is to define the planning problem to be solved. In this sect
 ### Defining Problems as Code
 
 ```csharp
-using SCClassicalPlanning; // ..for Action, Domain etc
-using SCFirstOrderLogic; // ..for Constant and Term
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // ..for OperablePredicate and single-letter VariableDeclarations
-using Action = SCClassicalPlanning.Action; // Unfortunate clash with System.Action. I'd rather not rename, but.. we'll see
+using SCClassicalPlanning; // ..for Goal, Effect, Action, Domain etc
+using SCFirstOrderLogic; // ..for Constant, Term, VariableDeclaration etc
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // ..for OperablePredicate
+using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.Action. I'd rather not rename it..
 
 // First, we need to create everything that our domain definition will refer to.
 
