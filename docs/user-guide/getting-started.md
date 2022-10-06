@@ -43,7 +43,7 @@ VariableDeclaration toBlock = new(nameof(toBlock));
 // The 'moveToBlock' action moves a block from its current location to on top of a block:
 Action moveToBlock = new Action(
     identifier: nameof(moveToBlock),
-    precondition: new(
+    precondition: new Goal(
         On(block, from)
         & Clear(block)
         & Clear(toBlock)
@@ -52,7 +52,7 @@ Action moveToBlock = new Action(
         & !Equal(block, from)
         & !Equal(block, toBlock)
         & !Equal(from, toBlock)),
-    effect: new(
+    effect: new Effect(
         On(block, toBlock)
         & Clear(from)
         & !On(block, from)
@@ -62,12 +62,12 @@ Action moveToBlock = new Action(
 // Separate from 'moveToBlock' because of the different behaviour of table and block w.r.t being Clear or not.
 Action moveToTable = new Action(
     identifier: nameof(moveToTable),
-    precondition: new(
+    precondition: new Goal(
         On(block, from)
         & Clear(block)
         & Block(block)
         & !Equal(block, from)),
-    effect: new(
+    effect: new Effect(
         On(block, Table)
         & Clear(from)
         & !On(block, from)));
