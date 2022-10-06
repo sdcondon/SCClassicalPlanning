@@ -10,7 +10,7 @@ As such, it *might* be useful to be passingly familiar with [SCFirstOrderLogic](
 
 ## Defining Problems
 
-The first challenge is to define the planning problem to be solved. In this section, we use the "blocks world" domain that is apparently fairly common in planning circles..
+The first challenge is to define the planning problem to be solved. In this section, we use the ["blocks world"](https://en.wikipedia.org/wiki/Blocks_world) domain that is a commonly used example.
 
 ### Defining Problems as Code
 
