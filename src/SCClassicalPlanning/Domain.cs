@@ -104,6 +104,7 @@ namespace SCClassicalPlanning
                 Actions.SingleOrDefault(a => a.Identifier.Equals(action.Identifier))
                 ?? throw new ArgumentException("Action not found! There is no action in the domain with a matching identifier");
 
+            // I suspect its possible for this to return more than one result.. investigate, write tests
             return MatchWithSchema(action, schema, new VariableSubstitution()).Single();
         }
     }

@@ -30,6 +30,21 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 getEstimatedCostToTarget: n => estimateCountOfActionsToGoal(problem.InitialState, n.Goal));
 
             await Task.Run(() => search.Complete());
+            ////var exploredEdges = new HashSet<StateSpaceEdge>();
+            ////while (!search.IsConcluded)
+            ////{
+            ////    search.NextStep();
+
+            ////    var newEdges = search.Visited.Values/*.Where(i => !i.IsOnFrontier)*/.Select(i => i.Edge);
+            ////    foreach (var edge in newEdges)
+            ////    {
+            ////        if (!object.Equals(edge, default(StateSpaceEdge)) && !exploredEdges.Contains(edge))
+            ////        {
+            ////            var heuristic = estimateCountOfActionsToGoal(problem.InitialState, edge.To.Goal);
+            ////            exploredEdges.Add(edge);
+            ////        }
+            ////    }
+            ////}
 
             // TODO: handle failure gracefully..
             return new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());

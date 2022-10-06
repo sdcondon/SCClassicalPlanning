@@ -7,6 +7,10 @@ namespace SCClassicalPlanning.Planning
     /// </summary>
     public class Plan
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Plan"/> class.
+        /// </summary>
+        /// <param name="steps">The actions that comprise the plan.</param>
         public Plan(IList<Action> steps) => Steps = new ReadOnlyCollection<Action>(steps);
 
         /// <summary>

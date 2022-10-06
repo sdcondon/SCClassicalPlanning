@@ -1,5 +1,4 @@
-﻿using SCFirstOrderLogic.SentenceFormatting;
-using SCFirstOrderLogic.SentenceManipulation;
+﻿using SCFirstOrderLogic.SentenceManipulation;
 using System.Text;
 
 namespace SCClassicalPlanning.Planning
@@ -32,7 +31,8 @@ namespace SCClassicalPlanning.Planning
         public string Format(Action action)
         {
             VariableSubstitution substitution = domain.GetMappingFromSchema(action);
-            return $"{action.Identifier}({string.Join(", ", substitution.Bindings.Select(b => b.Key.ToString() + ": " + b.Value.ToString()))})";
+            var orderedBindings = substitution.Bindings.OrderBy(b => b.Key.Symbol.ToString());
+            return $"{action.Identifier}({string.Join(", ", orderedBindings.Select(b => b.Key.ToString() + ": " + b.Value.ToString()))})";
         }
     }
 }
