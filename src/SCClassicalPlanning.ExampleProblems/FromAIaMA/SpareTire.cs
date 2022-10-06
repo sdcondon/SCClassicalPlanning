@@ -13,16 +13,16 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Spare Tire" domain.
         /// </summary>
         public static Domain Domain => new Domain(
-            predicates: new Predicate[]
-            {
-                IsTire(T),
-                IsAt(O, L),
-            },
             actions: new Action[]
             {
                 Remove(O, L),
                 PutOn(T),
                 LeaveOvernight(),
+            },
+            predicates: new Predicate[]
+            {
+                IsTire(T),
+                IsAt(O, L),
             });
 
         public static Constant Spare { get; } = new(nameof(Spare));

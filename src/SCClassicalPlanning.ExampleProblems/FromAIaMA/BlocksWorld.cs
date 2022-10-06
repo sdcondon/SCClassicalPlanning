@@ -13,17 +13,17 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
         /// </summary>
         public static Domain Domain => new Domain(
+            actions: new Action[]
+            {
+                Move(B, X, Y),
+                MoveToTable(B, X),
+            },
             predicates: new Predicate[]
             {
                 Block(B),
                 On(B, S),
                 Clear(S),
                 Equal(X, Y),
-            },
-            actions: new Action[]
-            {
-                Move(B, X, Y),
-                MoveToTable(B, X),
             });
 
         public static Constant Table { get; } = new(nameof(Table));

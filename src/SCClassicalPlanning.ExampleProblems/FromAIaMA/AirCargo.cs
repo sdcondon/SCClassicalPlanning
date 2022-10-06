@@ -13,6 +13,12 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates Air Cargo domain.
         /// </summary>
         public static Domain Domain { get; } = new Domain(
+            actions: new Action[]
+            {
+                Load(C, P, A),
+                Unload(C, P, A),
+                Fly(P, F, T),
+            },
             predicates: new Predicate[]
             {
                 Cargo(C),
@@ -20,12 +26,6 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                 Airport(A),
                 In(C, P),
                 At(C, A),
-            },
-            actions: new Action[]
-            {
-                Load(C, P, A),
-                Unload(C, P, A),
-                Fly(P, F, T),
             });
 
         public static OperablePredicate Cargo(Term cargo) => new Predicate(nameof(Cargo), cargo);
