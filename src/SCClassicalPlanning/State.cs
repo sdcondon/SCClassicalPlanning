@@ -1,4 +1,5 @@
 ﻿using SCFirstOrderLogic;
+using SCFirstOrderLogic.SentenceFormatting;
 using SCFirstOrderLogic.SentenceManipulation;
 using System.Collections.Immutable;
 
@@ -84,6 +85,14 @@ namespace SCClassicalPlanning
             }
 
             return hashCode.ToHashCode();
+        }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            // TODO: overkill! don't need any of the support for normalisation terms etc provided by SentenceFormatter
+            var formatter = new SentenceFormatter();
+            return string.Join(" ∧ ", Elements.Select(e => formatter.Format(e)));
         }
 
         /// <summary>
