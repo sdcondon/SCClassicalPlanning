@@ -132,11 +132,8 @@ var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOf
 // Tell the planner to create a plan for our problem:
 var plan = planner.CreatePlanAsync(problem).GetAwaiter().GetResult(); // or obviously just await.. if we're in an async method
 
-// Verify that applying the plan results in a state that satisfies the goal,
-// printing out the actions included in the plan and the intermediate state in the process:
-// NB: output is obviously something that could be improved upon. In particular, I'm
-// aware that it'd be nice to explictly state what the variables used in the action schema
-// are mapped to at each stage. That's a TODO.
+// Now let's verify that applying the plan results in a state that satisfies the goal,
+// printing out the actions included in the plan in the process:
 var planFormatter = new PlanFormatter(problem.Domain);
 var state = problem.InitialState;
 foreach (var action in plan.Steps)
