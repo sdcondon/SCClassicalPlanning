@@ -55,6 +55,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             /// <inheritdoc />
             public override int GetHashCode() => HashCode.Combine(Goal);
+
+            public override string ToString() => Goal.ToString();
         }
 
         private struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
@@ -72,10 +74,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 foreach (var action in problem.GetRelevantActions(goal))
                 {
-                    yield return new StateSpaceEdge(
-                        new StateSpaceNode(problem, goal),
-                        new StateSpaceNode(problem, action.Regress(goal)),
-                        action);
+                    yield return new StateSpaceEdge(problem, goal, action);
                 }
             }
 
@@ -85,18 +84,29 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
         private struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
         {
-            public StateSpaceEdge(StateSpaceNode from, StateSpaceNode to, Action action) => (From, To, Action) = (from, to, action);
+            private readonly Problem problem;
+            private readonly Goal goal;
+
+            public StateSpaceEdge(Problem problem, Goal goal, Action action)
+            {
+                this.problem = problem;
+                this.goal = goal;
+                this.Action = action;
+            }
 
             /// <inheritdoc />
-            public StateSpaceNode From { get; }
+            public StateSpaceNode From => new StateSpaceNode(problem, goal);
 
             /// <inheritdoc />
-            public StateSpaceNode To { get; }
+            public StateSpaceNode To => new StateSpaceNode(problem, Action.Regress(goal));
 
             /// <summary>
             /// Gets the action that is regressed over to achieve this goal transition.
             /// </summary>
             public Action Action { get; }
+
+            /// <inheritdoc />
+            public override string ToString() => new PlanFormatter(problem.Domain).Format(Action);
         }
     }
 }

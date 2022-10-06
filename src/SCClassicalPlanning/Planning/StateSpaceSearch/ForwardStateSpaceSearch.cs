@@ -72,10 +72,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 foreach (var action in problem.GetApplicableActions(state))
                 {
-                    yield return new StateSpaceEdge(
-                        new StateSpaceNode(problem, state),
-                        new StateSpaceNode(problem, action.ApplyTo(state)),
-                        action);
+                    yield return new StateSpaceEdge(problem, state, action);
                 }
             }
 
@@ -85,18 +82,29 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
         private struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
         {
-            public StateSpaceEdge(StateSpaceNode from, StateSpaceNode to, Action action) => (From, To, Action) = (from, to, action);
+            private readonly Problem problem;
+            private readonly State state;
+
+            public StateSpaceEdge(Problem problem, State state, Action action)
+            {
+                this.problem = problem;
+                this.state = state;
+                this.Action = action;
+            }
 
             /// <inheritdoc />
-            public StateSpaceNode From { get; }
+            public StateSpaceNode From => new StateSpaceNode(problem, state);
 
             /// <inheritdoc />
-            public StateSpaceNode To { get; }
+            public StateSpaceNode To => new StateSpaceNode(problem, Action.ApplyTo(state));
 
             /// <summary>
-            /// Gets the action that is carried out to achieve this state transition.
+            /// Gets the action that is regressed over to achieve this goal transition.
             /// </summary>
             public Action Action { get; }
+
+            /// <inheritdoc />
+            public override string ToString() => new PlanFormatter(problem.Domain).Format(Action);
         }
     }
 }
