@@ -33,6 +33,7 @@ namespace SCClassicalPlanning
         /// </summary>
         public ReadOnlyCollection<Predicate> Predicates { get; }
 
+#if false
         /// <summary>
         /// Gets the set of constants that exist within the domain
         /// </summary>
@@ -53,5 +54,6 @@ namespace SCClassicalPlanning
         {
             throw new NotImplementedException();
         }
+#endif
     }
 }

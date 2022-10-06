@@ -4,7 +4,7 @@ Before we get started, two important notes:
 
 * **NB #1:** This guide makes no attempt to explain classical planning; it just explains how to use this library to invoke some classical planning algorithms.
 It is however worth noting that particular care has been taken with the type and member documentation - you *might* be able to intuit quite a lot just by combining this guide with those docs.
-* **NB #2:** Classical planning (as we define it here, at least) is built on top of first-order logic - classical planning elements (goals, effects etc) include elements of first order logic (notably, literals and predicates).
+* **NB #2:** Classical planning (as we define it here, at least) is built on top of (functionless) first-order logic - classical planning elements (goals, effects etc) include elements of first order logic (notably, literals and predicates).
 This library uses SCFirstOrderLogic as its model for this rather than creating its own.
 As such, it *might* be useful to be passingly familiar with [SCFirstOrderLogic](https://github.com/sdcondon/SCFirstOrderLogic) before tackling this.
 
@@ -20,15 +20,15 @@ using SCFirstOrderLogic; // ..for Constant and Term
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // ..for OperablePredicate and single-letter VariableDeclarations
 using Action = SCClassicalPlanning.Action; // Unfortunate clash with System.Action. I'd rather not rename, but.. we'll see
 
-// First, we need to create all the elements of the domain
+// First, we need to create everything that our domain definition will refer to.
 
 // Our domain refers to a single constant term - the table on which our blocks are placed:
 Constant Table = new(nameof(Table));
 
-// Our domain defines four predicates (facts about zero or more objects that can either hold true or not):
+// Our domain defines four predicates (essentially, facts about zero or more objects that can either hold true or not):
 // As mentioned in the user guide for SCFirstOrderLogic, creating helper methods for your predicates is highly recommended.
 // Note that we're using OperablePredicate here. Its not required, but makes everything nice and succinct because it
-// means we can use & and ! to combine them. See SCFirstOrderLogic docs for details.
+// means we can use & and ! to combine them. See the SCFirstOrderLogic docs for details.
 OperablePredicate On(Term above, Term below) => new Predicate(nameof(On), above, below);
 OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
 OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);

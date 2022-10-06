@@ -13,15 +13,15 @@ namespace SCClassicalPlanning.ExampleDomains
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Container" domain.
         /// </summary>
         public static Domain Domain { get; } = new Domain(
-            predicates: new Predicate[]
-            {
-                IsPresent(X),
-            },
             actions: new Action[]
             {
                 Add(A),
                 Remove(R),
                 Swap(R, A),
+            },
+            predicates: new Predicate[]
+            {
+                IsPresent(X),
             });
 
         public static OperablePredicate IsPresent(Term @object) => new Predicate(nameof(IsPresent), @object);
