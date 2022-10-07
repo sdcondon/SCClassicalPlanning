@@ -42,8 +42,6 @@ namespace SCClassicalPlanning.Planning
                         {
                             var firstGoalElementUnifier = new VariableSubstitution(unifier);
 
-                            // TODO: using LiteralUnifier is perhaps overkill given that we know we're functionless,
-                            // but will do for now. (doesn't really cost much more, so perhaps fine long-term).
                             if (LiteralUnifier.TryUpdateUnsafe(stateElement, firstGoalElement, firstGoalElementUnifier))
                             {
                                 foreach (var restOfGoalElementsUnifier in MatchWithState(goalElements.Skip(1), firstGoalElementUnifier))
@@ -233,7 +231,7 @@ namespace SCClassicalPlanning.Planning
         /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
         /// It'd be nice to be able to have an equivalent nethod (in <see cref="Domain"/>) that can return <see cref="Action"/>s that have
         /// some variable references in them, with constraints on the substitutions that can be made if necessary. Having played with this idea a little
-        /// though, there are.. some subtleties - which go some some to explaining why even the earliest versions of PDDL have things like axioms and types..
+        /// though, there are.. some subtleties - which provide some insight into explaining why even the earliest versions of PDDL have things like axioms and types..
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>
