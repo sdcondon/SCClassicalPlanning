@@ -11,12 +11,12 @@ namespace SCClassicalPlanning.Planning
     public static class ProblemInspector
     {
         /// <summary>
-        /// Gets the (ground) actions that are applicable from a given state in a given problem.
+        /// Gets the (action schema, ground variable substitution) pairings that represent actions that are applicable from a given state in a given problem.
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="state">The state to retrieve the applicable actions for.</param>
         /// <returns>The actions that are applicable from the given state.</returns>
-        public static IEnumerable<Action> GetApplicableActions(Problem problem, State state)
+        public static IEnumerable<(Action schema, VariableSubstitution substitution)> GetApplicableActionSchemaSubstitutions(Problem problem, State state)
         {
             // Local method to (recursively) match a set of (remaining) goal elements to the given state.
             // goalElements: The remaining elements of the goal to be matched
@@ -108,17 +108,32 @@ namespace SCClassicalPlanning.Planning
                 // Now we can try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
                 foreach (var substitution in MatchWithState(orderedElements, new VariableSubstitution()))
                 {
-                    // For each substitution, apply it to the action schema and return it:
-                    yield return new Action(
-                        actionSchema.Identifier,
-                        new VariableSubstitutionGoalTransformation(substitution).ApplyTo(actionSchema.Precondition),
-                        new VariableSubstitutionEffectTransformation(substitution).ApplyTo(actionSchema.Effect));
+                    yield return (actionSchema, substitution);
                 }
             }
         }
 
         /// <summary>
-        /// Gets the (ground) actions that are relevant to a given goal in a givne problem.
+        /// Gets the (ground) actions that are applicable from a given state in a given problem.
+        /// </summary>
+        /// <param name="problem">The problem being solved.</param>
+        /// <param name="state">The state to retrieve the applicable actions for.</param>
+        /// <returns>The actions that are applicable from the given state.</returns>
+        public static IEnumerable<Action> GetApplicableActions(Problem problem, State state)
+        {
+            // Now we can try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
+            foreach (var (Schema, Substitution) in GetApplicableActionSchemaSubstitutions(problem, state))
+            {
+                // For each substitution, apply it to the action schema and return it:
+                yield return new Action(
+                    Schema.Identifier,
+                    new VariableSubstitutionGoalTransformation(Substitution).ApplyTo(Schema.Precondition),
+                    new VariableSubstitutionEffectTransformation(Substitution).ApplyTo(Schema.Effect));
+            }
+        }
+
+        /// <summary>
+        /// Gets the (action schema, ground variable substitution) pairings that represent actions that are relevant to a given goal in a given problem.
         /// <para/>
         /// TODO/NB: All the results here are ground results - which is rather (potentially extremely) inefficient if the problem is large.
         /// It'd be nice to be able to have an equivalent nethod (in <see cref="Domain"/>) that can return <see cref="Action"/>s that have
@@ -127,7 +142,7 @@ namespace SCClassicalPlanning.Planning
         /// <param name="problem">The problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>
         /// <returns>The actions that are relevant to the given state.</returns>
-        public static IEnumerable<Action> GetRelevantActions(Problem problem, Goal goal)
+        public static IEnumerable<(Action schema, VariableSubstitution substitution)> GetRelevantActionSchemaSubstitutions(Problem problem, Goal goal)
         {
             // Local method to create variable subsitutions such that the negation of the effects elements transformed by the substitution do not match any of the goal's elements.
             // effectElements: The (remaining) elements of the effect to be matched.
@@ -199,18 +214,36 @@ namespace SCClassicalPlanning.Planning
                 }
             }
 
-            foreach (var actionTemplate in problem.Domain.Actions)
+            foreach (var schema in problem.Domain.Actions)
             {
-                foreach (var potentialSubsitution in MatchWithGoal(actionTemplate.Effect.Elements))
+                foreach (var potentialSubsitution in MatchWithGoal(schema.Effect.Elements))
                 {
-                    foreach (var substitution in UnmatchWithGoalNegation(actionTemplate.Effect.Elements, potentialSubsitution))
+                    foreach (var substitution in UnmatchWithGoalNegation(schema.Effect.Elements, potentialSubsitution))
                     {
-                        yield return new Action(
-                            actionTemplate.Identifier,
-                            new VariableSubstitutionGoalTransformation(substitution).ApplyTo(actionTemplate.Precondition),
-                            new VariableSubstitutionEffectTransformation(substitution).ApplyTo(actionTemplate.Effect));
+                        yield return (schema, substitution);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the (ground) actions that are relevant to a given goal in a givne problem.
+        /// <para/>
+        /// TODO/NB: All the results here are ground results - which is rather (potentially extremely) inefficient if the problem is large.
+        /// It'd be nice to be able to have an equivalent nethod (in <see cref="Domain"/>) that can return <see cref="Action"/>s that have
+        /// some (potentially constrained) variable references in them. That's a TODO..
+        /// </summary>
+        /// <param name="problem">The problem being solved.</param>
+        /// <param name="goal">The goal to retrieve the relevant actions for.</param>
+        /// <returns>The actions that are relevant to the given state.</returns>
+        public static IEnumerable<Action> GetRelevantActions(Problem problem, Goal goal)
+        {
+            foreach (var (Schema, Substitution) in GetRelevantActionSchemaSubstitutions(problem, goal))
+            {
+                yield return new Action(
+                    Schema.Identifier,
+                    new VariableSubstitutionGoalTransformation(Substitution).ApplyTo(Schema.Precondition),
+                    new VariableSubstitutionEffectTransformation(Substitution).ApplyTo(Schema.Effect));
             }
         }
 
