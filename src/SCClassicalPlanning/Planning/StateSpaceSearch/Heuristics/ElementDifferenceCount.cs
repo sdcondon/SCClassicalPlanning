@@ -5,7 +5,8 @@
     /// to the number of negative elements that do (that is, it assumes that we need to carry out one action per element of
     /// the goal that isn't currently satisfied).
     /// <para/>
-    /// Is generally a pretty terrible heurtic - as are all heursitics that don't take into account the problem being solved.
+    /// This is generally a pretty terrible heuristic - as are all heuristics that don't take into account the details of the
+    /// problem being solved. Consider using something else..
     /// </summary>
     public static class ElementDifferenceCount
     {

@@ -227,7 +227,7 @@ namespace SCClassicalPlanning.Planning
         }
 
         /// <summary>
-        /// Gets the (ground) actions that are relevant to a given goal in a givne problem.
+        /// Gets the (ground) actions that are relevant to a given goal in a given problem.
         /// <para/>
         /// TODO/NB: All the results here are ground results - which is rather (potentially extremely) inefficient if the problem is large.
         /// It'd be nice to be able to have an equivalent nethod (in <see cref="Domain"/>) that can return <see cref="Action"/>s that have
