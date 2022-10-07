@@ -49,7 +49,7 @@ namespace SCClassicalPlanning
         /// </summary>
         /// <param name="effect">The effect to apply.</param>
         /// <returns>The new state.</returns>
-        // TODO: at some point look at (test) efficiency here. ImmutableHashSet builder stuff might be of use?
+        // TODO: at some point look at (test me!) efficiency here. ImmutableHashSet builder stuff might be of use?
         public State Apply(Effect effect) => new State(Elements.Except(effect.DeleteList).Union(effect.AddList));
 
         /// <summary>
@@ -59,8 +59,6 @@ namespace SCClassicalPlanning
         /// </summary>
         /// <param name="goal">The goal to check.</param>
         /// <returns>A value indicating whether this state satisfies a given goal.</returns>
-        // TODO: unify...? or at least throw if either the goal or the state is not ground?
-        // Depends on what we do with Problem.GetRelevantActions
         public bool Satisfies(Goal goal) => Elements.IsSupersetOf(goal.PositivePredicates) && !Elements.Overlaps(goal.NegativePredicates);
 
         /// <inheritdoc />
