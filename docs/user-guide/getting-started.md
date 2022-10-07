@@ -23,10 +23,10 @@ using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.A
 
 // First, we need to create everything that our domain definition will refer to.
 
-// Our domain refers to a single constant term - the table on which our blocks are placed:
+// Our domain refers to a single constant - the table on which our blocks are placed:
 Constant Table = new(nameof(Table));
 
-// Our domain defines four predicates (essentially, facts about zero or more objects that can either hold true or not):
+// Our domain defines four predicates (essentially, facts about zero or more elements of the domain that can either hold true or not):
 // As mentioned in the user guide for SCFirstOrderLogic, creating helper methods for your predicates is highly recommended.
 // Note that we're using OperablePredicate here. Its not required, but makes everything nice and succinct because it
 // means we can use & and ! to combine them. See the SCFirstOrderLogic docs for details.
@@ -35,7 +35,7 @@ OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
 OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
 OperablePredicate Equal(Term x, Term y) => new Predicate(nameof(Equal), x, y);
 
-// Now declare some variable terms for use in our action schemas:
+// Now declare some variables for use in our action schemas:
 VariableDeclaration block = new(nameof(block));
 VariableDeclaration from = new(nameof(from));
 VariableDeclaration toBlock = new(nameof(toBlock));
