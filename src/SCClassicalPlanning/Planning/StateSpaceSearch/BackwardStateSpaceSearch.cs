@@ -12,13 +12,28 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     /// </summary>
     public class BackwardStateSpaceSearch : IPlanner
     {
-        private readonly Func<State, Goal, float> estimateCountOfActionsToGoal;
+        private readonly Func<Action, float> getActionCost;
+        private readonly Func<State, Goal, float> estimateCostToGoal;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class.
+        /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the number of actions in the resulting plan.
         /// </summary>
         /// <param name="estimateCountOfActionsToGoal">The heuristic to use - should give an estimate of the number of actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
-        public BackwardStateSpaceSearch(Func<State, Goal, float> estimateCountOfActionsToGoal) => this.estimateCountOfActionsToGoal = estimateCountOfActionsToGoal;
+        public BackwardStateSpaceSearch(Func<State, Goal, float> estimateCountOfActionsToGoal)
+            : this(a => 1f, estimateCountOfActionsToGoal)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the total "cost" of actions in the resulting plan.
+        /// </summary>
+        /// <param name="getActionCost">A delegate to retrieve the cost of an action.</param>
+        /// <param name="estimateCostToGoal">The heuristic to use - should give an estimate of the total cost of the actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
+        public BackwardStateSpaceSearch(Func<Action, float> getActionCost, Func<State, Goal, float> estimateCostToGoal)
+        {
+            this.getActionCost = getActionCost;
+            this.estimateCostToGoal = estimateCostToGoal;
+        }
 
         /// <inheritdoc />
         public async Task<Plan> CreatePlanAsync(Problem problem)
@@ -26,8 +41,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.Goal),
                 isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
-                getEdgeCost: e => 1,
-                getEstimatedCostToTarget: n => estimateCountOfActionsToGoal(problem.InitialState, n.Goal));
+                getEdgeCost: e => getActionCost(e.Action),
+                getEstimatedCostToTarget: n => estimateCostToGoal(problem.InitialState, n.Goal));
 
             await Task.Run(() => search.Complete());
             ////var exploredEdges = new HashSet<StateSpaceEdge>();

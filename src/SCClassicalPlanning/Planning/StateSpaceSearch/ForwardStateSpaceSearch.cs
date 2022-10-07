@@ -12,13 +12,28 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     /// </summary>
     public class ForwardStateSpaceSearch : IPlanner
     {
-        private readonly Func<State, Goal, float> estimateCountOfActionsToGoal;
+        private readonly Func<Action, float> getActionCost;
+        private readonly Func<State, Goal, float> estimateCostToGoal;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class.
+        /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the number of actions in the resulting plan.
         /// </summary>
         /// <param name="estimateCountOfActionsToGoal">The heuristic to use - should give an estimate of the number of actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
-        public ForwardStateSpaceSearch(Func<State, Goal, float> estimateCountOfActionsToGoal) => this.estimateCountOfActionsToGoal = estimateCountOfActionsToGoal;
+        public ForwardStateSpaceSearch(Func<State, Goal, float> estimateCountOfActionsToGoal)
+            : this(a => 1f, estimateCountOfActionsToGoal)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the total "cost" of actions in the resulting plan.
+        /// </summary>
+        /// <param name="getActionCost">A delegate to retrieve the cost of an action.</param>
+        /// <param name="estimateCostToGoal">The heuristic to use - should give an estimate of the total cost of the actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
+        public ForwardStateSpaceSearch(Func<Action, float> getActionCost, Func<State, Goal, float> estimateCostToGoal)
+        {
+            this.getActionCost = getActionCost;
+            this.estimateCostToGoal = estimateCostToGoal;
+        }
 
         /// <inheritdoc />
         public async Task<Plan> CreatePlanAsync(Problem problem)
