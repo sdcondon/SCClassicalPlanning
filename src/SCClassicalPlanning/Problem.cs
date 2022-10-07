@@ -156,10 +156,10 @@ namespace SCClassicalPlanning
                 }
             }
 
-            // The overall task to be accomplished here is to find (action, variable substituion) pairings such that
+            // The overall task to be accomplished here is to find (action schema, variable substitution) pairings such that
             // the state's elements satisfy the action precondition (after the variable substitution is applied to it).
-            // First. iterate the available actions:
-            foreach (var actionTemplate in Domain.Actions)
+            // First, we iterate the action schemas:
+            foreach (var actionSchema in Domain.Actions)
             {
                 // Note than when trying to match elements of the precondition to elements of the state, we consider positive
                 // elements of the goal first - on the assumption that these will narrow down the search far more than negative elements
@@ -167,15 +167,16 @@ namespace SCClassicalPlanning
                 // Beyond that, there's no specific element ordering - we just look at them in the order they happen to fall.
                 // Ideally, we'd do more to order the elements in a way that minimises the amount of work we have to do - but it would require
                 // some analysis of the problem, and is something we'd likely want to abstract to allow for different approaches (this is a TODO).
-                var orderedElements = actionTemplate.Precondition.PositiveElements.Concat(actionTemplate.Precondition.NegativeElements);
+                var orderedElements = actionSchema.Precondition.PositiveElements.Concat(actionSchema.Precondition.NegativeElements);
 
                 // Now we can try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
                 foreach (var substitution in MatchWithState(orderedElements, new VariableSubstitution()))
                 {
+                    // For each substitution, apply it to the action schema and return it:
                     yield return new Action(
-                        actionTemplate.Identifier,
-                        new VariableSubstitutionGoalTransformation(substitution).ApplyTo(actionTemplate.Precondition),
-                        new VariableSubstitutionEffectTransformation(substitution).ApplyTo(actionTemplate.Effect));
+                        actionSchema.Identifier,
+                        new VariableSubstitutionGoalTransformation(substitution).ApplyTo(actionSchema.Precondition),
+                        new VariableSubstitutionEffectTransformation(substitution).ApplyTo(actionSchema.Effect));
                 }
             }
         }

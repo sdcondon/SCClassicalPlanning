@@ -79,7 +79,7 @@
         /// <summary>
         /// Determines whether the specified object is equal to the current object.
         /// <para/>
-        /// Actions implement value semantics for equality - two Actions are equal if they their Identifiers, Preconditions and Effects are.
+        /// Actions implement value semantics for equality - two Actions are equal if their Identifiers, Preconditions and Effects are.
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>

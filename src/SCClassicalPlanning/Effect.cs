@@ -46,13 +46,13 @@ namespace SCClassicalPlanning
         public ImmutableHashSet<Literal> Elements { get; }
 
         /// <summary>
-        /// Gets the "add list" of the action - the non-negated predicates in the action's effect.
+        /// Gets the "add list" of the effect - the non-negated predicates within the <see cref="Elements"/> set.
         /// These are removed from a <see cref="State"/> when this effect is applied.
         /// </summary>
         public IEnumerable<Predicate> AddList => Elements.Where(a => !a.IsNegated).Select(l => l.Predicate);
 
         /// <summary>
-        /// Gets the "delete list" of the action - the negated predicates in the action's effect.
+        /// Gets the "delete list" of the effect - the non-negated predicates within the <see cref="Elements"/> set.
         /// These are removed from a <see cref="State"/> when this effect is applied.
         /// </summary>
         public IEnumerable<Predicate> DeleteList => Elements.Where(a => a.IsNegated).Select(l => l.Predicate);
@@ -61,7 +61,7 @@ namespace SCClassicalPlanning
         /// Gets a value indicating whether this effect is relevant to a given goal.
         /// <para/>
         /// An effect is relevant to a goal if it accomplishes at least one element of the goal, and does not undo anything.
-        /// That is, the effect's elements overlap with the goals elements, and the negation of each of the effect's elements does not.
+        /// That is, the effect's elements overlap with the goals elements, and the set comprised of the negation of each of the effect's elements does not.
         /// </summary>
         /// <param name="goal">The goal to determine relevancy to.</param>
         /// <returns>A value indicating whether this effect is relevant to a given goal.</returns>

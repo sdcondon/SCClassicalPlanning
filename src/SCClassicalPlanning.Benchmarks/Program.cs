@@ -62,12 +62,8 @@ Action moveToTable = new Action(
 
 // Now we are ready to declare our domain.
 // A domain defines the common aspects of all problems that occur within it.
-// Specifically, what predicates exist and what actions are available:
-var domain = new Domain(new Action[]
-{
-    moveToBlock,
-    moveToTable
-});
+// Specifically, what actions are available:
+var domain = new Domain(moveToBlock, moveToTable);
 
 Constant blockA = new(nameof(blockA));
 Constant blockB = new(nameof(blockB));
@@ -102,23 +98,19 @@ var problem = new Problem(
         & On(blockC, blockD)
         & On(blockD, blockE)));
 
-// First instantiate a planner:
+// First instantiate a planner, specifying a heuristic to use (a delegate that estimates the
+// number of actions it will take to get from a given state to a state that satisfies a given goal).
 // NB: the only heuristic implemented so far is a super-simple one that just counts the differences
-// between the current state and the goal. That's obviously not going to cut it in the real world,
-// but suffices for the very simple problems found in the ExampleDomains project:
-var heuristic = new IgnorePreconditions_GreedySetCover(problem);
-//var planner = new BackwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
-var planner = new BackwardStateSpaceSearch(heuristic.EstimateCost);
+// between the current state and the goal. That's obviously not going to cut it for most problems,
+// but suffices for the very simple problem we are trying to solve here:
+var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
 
 // Tell the planner to create a plan for our problem:
 var plan = planner.CreatePlanAsync(problem).GetAwaiter().GetResult(); // or obviously just await.. if we're in an async method
 
-// Verify that applying the plan results in a state that satisfies the goal,
-// printing out the actions included in the plan and the intermediate state in the process.
-// NB: output is obviously something that could be improved upon. In particular, I'm
-// aware that it'd be nice to explictly state what the variables used in the action schema
-// are mapped to at each stage. That's a TODO.
-var planFormatter = new PlanFormatter(domain);
+// Now let's verify that applying the plan results in a state that satisfies the goal,
+// printing out the actions included in the plan in the process:
+var planFormatter = new PlanFormatter(problem.Domain);
 var state = problem.InitialState;
 foreach (var action in plan.Steps)
 {
@@ -131,10 +123,6 @@ foreach (var action in plan.Steps)
     }
 
     state = action.ApplyTo(state);
-
-    Console.WriteLine($"Effect: {action.Effect}");
-    Console.WriteLine($"Newate: {state}");
-    Console.WriteLine();
 }
 
 Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.Goal)}!");

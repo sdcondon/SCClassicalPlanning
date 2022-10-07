@@ -8,7 +8,9 @@ namespace SCClassicalPlanning.ProblemCreation
     /// <summary>
     /// Utility logic for the declaration of <see cref="Problem"/> instances, prioritising succinct C# above all else.
     /// <para/>
-    /// Allows for declaring actions that have preconditions and effects stated as <see cref="OperableSentenceFactory.OperableSentence"/> instances.
+    /// Allows for declaring actions that have preconditions and effects stated directly as <see cref="OperableSentenceFactory.OperableSentence"/> instances.
+    /// Which, err, really doesn't make much of a different, to be honest - there's not nearly as much value in this as there is in the equivalent functionality in SCFirstOrderLogic.
+    /// That's why it's not mentioned in the user guide.
     /// </summary>
     public static class OperableProblemFactory
     {

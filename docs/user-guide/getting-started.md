@@ -4,6 +4,7 @@ Before we get started, two important notes:
 
 * **NB #1:** This guide makes no attempt to explain classical planning; it just explains how to use this library to invoke some classical planning algorithms.
 It is however worth noting that particular care has been taken with the type and member documentation - you *might* be able to intuit quite a lot just by combining this guide with those docs.
+When all is said and done, classical planning isn't particularly complicated - conceptually at least.
 * **NB #2:** Classical planning (as we define it here, at least) is built on top of (functionless) first-order logic - classical planning elements (goals, effects etc) include elements of first order logic (notably, literals and predicates).
 This library uses SCFirstOrderLogic as its model for this rather than creating its own.
 As such, it *might* be useful to be passingly familiar with [SCFirstOrderLogic](https://github.com/sdcondon/SCFirstOrderLogic) before tackling this.
@@ -15,9 +16,9 @@ The first challenge is to define the planning problem to be solved. In this sect
 ### Defining Problems as Code
 
 ```csharp
-using SCClassicalPlanning; // ..for Goal, Effect, Action, Domain etc
-using SCFirstOrderLogic; // ..for Constant, Term, VariableDeclaration etc
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // ..for OperablePredicate
+using SCClassicalPlanning; // for Goal, Effect, Action, Domain, Problem, State
+using SCFirstOrderLogic; // for Constant, Term, Predicate, VariableDeclaration
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // for OperablePredicate
 using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.Action. I'd rather not rename it..
 
 // First, we need to create everything that our domain definition will refer to.
@@ -118,9 +119,9 @@ Once you have a problem, the types in the `SCClassicalPlanning.Planning` namespa
 ### Using Forward State Space Search
 
 ```csharp
-using SCClassicalPlanning.Planning; // For PlanFormatter
-using SCClassicalPlanning.Planning.StateSpaceSearch; // For the planner
-using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // For ElementDifferenceCount
+using SCClassicalPlanning.Planning; // for PlanFormatter
+using SCClassicalPlanning.Planning.StateSpaceSearch; // for ForwardStateSpaceSearch
+using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // for ElementDifferenceCount
 
 // First instantiate a planner, specifying a heuristic to use (a delegate that estimates the
 // number of actions it will take to get from a given state to a state that satisfies a given goal).
