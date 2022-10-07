@@ -41,8 +41,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.InitialState),
                 isTarget: n => n.State.Satisfies(problem.Goal),
-                getEdgeCost: e => 1,
-                getEstimatedCostToTarget: n => estimateCountOfActionsToGoal(n.State, problem.Goal));
+                getEdgeCost: e => getActionCost(e.Action),
+                getEstimatedCostToTarget: n => estimateCostToGoal(n.State, problem.Goal));
 
             await Task.Run(() => search.Complete()); // todo?: worth adding all the Steppable stuff like in FoL?
 
