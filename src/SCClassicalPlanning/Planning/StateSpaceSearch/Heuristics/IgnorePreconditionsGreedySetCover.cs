@@ -1,23 +1,21 @@
-﻿using SCClassicalPlanning.ProblemManipulation;
-using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation.Unification;
-using SCFirstOrderLogic.SentenceManipulation;
+﻿using SCFirstOrderLogic;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
 {
     /// <summary>
     /// State space search heuristic that ignores preconditions and uses a greedy set cover algorithm
-    /// to provide its estimate. Not admissable, but 
+    /// to provide its estimate. Not admissable (mostly because greedy set cover can overestimate),
+    /// but better than heuristics that don't examine the available actions at all..
     /// </summary>
-    public class IgnorePreconditions_GreedySetCover
+    public class IgnorePreconditionsGreedySetCover
     {
         private readonly Problem problem;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="IgnorePreconditions_GreedySetCover"/> class.
+        /// Initializes a new instance of the <see cref="IgnorePreconditionsGreedySetCover"/> class.
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
-        public IgnorePreconditions_GreedySetCover(Problem problem) => this.problem = problem;
+        public IgnorePreconditionsGreedySetCover(Problem problem) => this.problem = problem;
 
         public float EstimateCost(State state, Goal goal)
         {
@@ -62,7 +60,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
 
         private static HashSet<Literal> GetUnsatisfiedLiterals(State state, Goal goal)
         {
-            // sloooow..
+            // TODO: sloooow..
             var uncovered = new HashSet<Literal>();
             foreach (var goalElement in goal.Elements)
             {

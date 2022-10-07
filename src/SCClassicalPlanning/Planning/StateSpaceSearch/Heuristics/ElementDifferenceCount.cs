@@ -3,7 +3,9 @@
     /// <summary>
     /// Very simplistic heuristic that just adds the number of positive elements of the goal that do not occur in the state
     /// to the number of negative elements that do (that is, it assumes that we need to carry out one action per element of
-    /// the goal that isn't currently satisfied). 
+    /// the goal that isn't currently satisfied).
+    /// <para/>
+    /// Is generally a pretty terrible heurtic - as are all heursitics that don't take into account the problem being solved.
     /// </summary>
     public static class ElementDifferenceCount
     {

@@ -140,7 +140,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public Plan Execute()
             {
                 var problem = new Problem(Domain, InitialState, Goal);
-                var heuristic = new IgnorePreconditions_GreedySetCover(problem);
+                var heuristic = new IgnorePreconditionsGreedySetCover(problem);
                 //var planner = new BackwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
                 var planner = new BackwardStateSpaceSearch(heuristic.EstimateCost);   
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
