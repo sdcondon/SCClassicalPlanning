@@ -114,7 +114,7 @@ namespace SCClassicalPlanning.Planning
         }
 
         /// <summary>
-        /// Gets the (ground) actions that are applicable from a given state in a given problem.
+        /// Gets the ground actions that are applicable from a given state in a given problem.
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="state">The state to retrieve the applicable actions for.</param>
@@ -133,11 +133,12 @@ namespace SCClassicalPlanning.Planning
         }
 
         /// <summary>
-        /// Gets the (action schema, ground variable substitution) pairings that represent actions that are relevant to a given goal in a given problem.
+        /// Gets the (action schema, *ground* variable substitution) pairings that represent actions that are relevant to a given goal in a given problem.
         /// <para/>
-        /// TODO/NB: All the results here are ground results - which is rather (potentially extremely) inefficient if the problem is large.
+        /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
         /// It'd be nice to be able to have an equivalent nethod (in <see cref="Domain"/>) that can return <see cref="Action"/>s that have
-        /// some (potentially constrained) variable references in them. That's a TODO..
+        /// some variable references in them, with constraints on the substitutions that can be made if necessary. Having played with this idea a little
+        /// though, there are.. some subtleties - which go some some to explaining why even the earliest versions of PDDL have things like axioms and types..
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>
@@ -216,9 +217,9 @@ namespace SCClassicalPlanning.Planning
 
             foreach (var schema in problem.Domain.Actions)
             {
-                foreach (var potentialSubsitution in MatchWithGoal(schema.Effect.Elements))
+                foreach (var potentialSubstitution in MatchWithGoal(schema.Effect.Elements))
                 {
-                    foreach (var substitution in UnmatchWithGoalNegation(schema.Effect.Elements, potentialSubsitution))
+                    foreach (var substitution in UnmatchWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
                     {
                         yield return (schema, substitution);
                     }
@@ -227,11 +228,12 @@ namespace SCClassicalPlanning.Planning
         }
 
         /// <summary>
-        /// Gets the (ground) actions that are relevant to a given goal in a given problem.
+        /// Gets the *ground* actions that are relevant to a given goal in a given problem.
         /// <para/>
-        /// TODO/NB: All the results here are ground results - which is rather (potentially extremely) inefficient if the problem is large.
+        /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
         /// It'd be nice to be able to have an equivalent nethod (in <see cref="Domain"/>) that can return <see cref="Action"/>s that have
-        /// some (potentially constrained) variable references in them. That's a TODO..
+        /// some variable references in them, with constraints on the substitutions that can be made if necessary. Having played with this idea a little
+        /// though, there are.. some subtleties - which go some some to explaining why even the earliest versions of PDDL have things like axioms and types..
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>

@@ -15,7 +15,7 @@
     <PackageIcon>SCClassicalPlanning.png</PackageIcon>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
-    
+   
   <ItemGroup>
     <None Include="SCClassicalPlanning.md" Pack="true" PackagePath="README.md" />
     <None Include="..\SCClassicalPlanning.png" Pack="true" PackagePath="\" />
@@ -32,11 +32,6 @@
     </PackageReference>
     <PackageReference Include="SCFirstOrderLogic" Version="2.1.0" />
     <PackageReference Include="SCGraphTheory.Search" Version="2.3.2" />
-  </ItemGroup>
-    
-  <ItemGroup>
-    <Folder Include="ProblemFormatting\" />
-    <Folder Include="StateStorage\" />
   </ItemGroup>
 
 </Project>
