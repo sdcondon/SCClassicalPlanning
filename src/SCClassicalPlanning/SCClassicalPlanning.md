@@ -1,6 +1,6 @@
 # SCClassicalPlanning
 
-Basic but fully functional and documented classical planning implementations.
+Basic but fully functional and documented [classical planning](https://www.google.com/search?q=classical+planning) implementations.
 Somewhat influenced by chapter 10 of _Artificial Intelligence: A Modern Approach_ (3rd Edition - [ISBN 978-1292153964](https://www.google.com/search?q=isbn+978-1292153964)).
 Intended first and foremost to assist with learning and experimentation, but will (by the time v1 arrives) include extension points (and async support) so that it is at least conceivable that it could be (extended to be) useful in a production scenario.
 Includes:

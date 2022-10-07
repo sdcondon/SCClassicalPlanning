@@ -21,8 +21,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
 
         public float EstimateCost(State state, Goal goal)
         {
-            // hmm. *almost* what we want, I think.. note 
-            var relevantActions = problem.GetRelevantActions(goal); 
+            // hmm. *almost* what we want, I think..
+            var relevantActions = ProblemInspector.GetRelevantActions(problem, goal); 
             var coveringActionCount = GetCoveringActionCount(GetUnsatisfiedLiterals(state, goal), relevantActions);
 
             if (coveringActionCount == -1)

@@ -65,12 +65,12 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public StateSpaceNodeEdges(Problem problem, State state) => (this.problem, this.state) = (problem, state);
 
             /// <inheritdoc />
-            public int Count => problem.GetApplicableActions(state).Count();
+            public int Count => ProblemInspector.GetApplicableActions(problem, state).Count();
 
             /// <inheritdoc />
             public IEnumerator<StateSpaceEdge> GetEnumerator()
             {
-                foreach (var action in problem.GetApplicableActions(state))
+                foreach (var action in ProblemInspector.GetApplicableActions(problem, state))
                 {
                     yield return new StateSpaceEdge(problem, state, action);
                 }

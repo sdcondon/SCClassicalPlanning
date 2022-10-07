@@ -10,10 +10,10 @@ using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 
 // First, we need to create all the elements of the domain
 
-// Our domain refers to a single constant term - the table on which our blocks are placed:
+// Our domain refers to a single constant - the table on which our blocks are placed:
 Constant Table = new(nameof(Table));
 
-// Our domain defines four predicates (facts about zero or more objects that can either hold true or not):
+// Our domain defines four predicates (facts about zero or more elements of the domain that can either hold true or not):
 // As mentioned in the user guide for SCFirstOrderLogic, creating helper methods for your predicates is highly recommended.
 // Note that we're using OperablePredicate here. Its not required, but makes everything nice and succinct because it
 // means we can use & and ! to combine them. See SCFirstOrderLogic docs for details.
@@ -22,7 +22,7 @@ OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
 OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
 OperablePredicate Equal(Term x, Term y) => new Predicate(nameof(Equal), x, y);
 
-// Now declare some variable terms for use in our action schemas:
+// Now declare some variables for use in our action schemas:
 VariableDeclaration block = new(nameof(block));
 VariableDeclaration from = new(nameof(from));
 VariableDeclaration toBlock = new(nameof(toBlock));
@@ -46,8 +46,8 @@ Action moveToBlock = new Action(
         & !On(block, from)
         & !Clear(toBlock)));
 
-// The other ation of our domain - 'moveToTable'.
-// Separate from 'moveToBlock' because of the different behaviour of table and block w.r.t being Clear or not.
+// The other action of our domain.
+// 'moveToTable' is separate from 'moveToBlock' because of the different behaviour of table and block w.r.t being Clear or not.
 Action moveToTable = new Action(
     identifier: nameof(moveToTable),
     precondition: new(
