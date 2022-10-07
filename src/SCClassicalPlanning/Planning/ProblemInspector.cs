@@ -1,13 +1,7 @@
-﻿using SCFirstOrderLogic.SentenceManipulation.Unification;
-using SCFirstOrderLogic.SentenceManipulation;
+﻿using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using SCClassicalPlanning.ProblemManipulation;
+using SCFirstOrderLogic.SentenceManipulation;
+using SCFirstOrderLogic.SentenceManipulation.Unification;
 
 namespace SCClassicalPlanning.Planning
 {
@@ -17,8 +11,9 @@ namespace SCClassicalPlanning.Planning
     public static class ProblemInspector
     {
         /// <summary>
-        /// Gets the (ground) actions that are applicable from a given state.
+        /// Gets the (ground) actions that are applicable from a given state in a given problem.
         /// </summary>
+        /// <param name="problem">The problem being solved.</param>
         /// <param name="state">The state to retrieve the applicable actions for.</param>
         /// <returns>The actions that are applicable from the given state.</returns>
         public static IEnumerable<Action> GetApplicableActions(Problem problem, State state)
@@ -123,12 +118,13 @@ namespace SCClassicalPlanning.Planning
         }
 
         /// <summary>
-        /// Gets the (ground) actions that are relevant to a given goal.
+        /// Gets the (ground) actions that are relevant to a given goal in a givne problem.
         /// <para/>
         /// TODO/NB: All the results here are ground results - which is rather (potentially extremely) inefficient if the problem is large.
         /// It'd be nice to be able to have an equivalent nethod (in <see cref="Domain"/>) that can return <see cref="Action"/>s that have
         /// some (potentially constrained) variable references in them. That's a TODO..
         /// </summary>
+        /// <param name="problem">The problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>
         /// <returns>The actions that are relevant to the given state.</returns>
         public static IEnumerable<Action> GetRelevantActions(Problem problem, Goal goal)

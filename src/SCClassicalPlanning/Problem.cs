@@ -1,7 +1,5 @@
 ﻿using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
-using SCFirstOrderLogic.SentenceManipulation.Unification;
 using System.Collections.ObjectModel;
 
 namespace SCClassicalPlanning

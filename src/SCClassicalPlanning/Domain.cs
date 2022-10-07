@@ -1,4 +1,5 @@
-﻿using SCFirstOrderLogic;
+﻿using SCClassicalPlanning.Planning;
+using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
 using System.Collections.ObjectModel;
@@ -49,11 +50,10 @@ TODO: more useful than predicates..
         /// information (planners won't and shouldn't care what the original variable name was), but it is useful when
         /// producing human-readable information.
         /// <para/>
-        /// Note that we are effectively recreating the substitutions built by <see cref="Problem.GetApplicableActions(State)"/>
-        /// and <see cref="Problem.GetRelevantActions(Goal)"/> here. An alternative approach would of course be for those methods to
-        /// return both the schema and the substitution (rather than just the transformed action), so that the algorithm can keep
-        /// track itself if it wants to. For now at least though, I'm prioritising keep the actual planning as lean and mean as
-        /// possible over making the action formatting super snappy.
+        /// Note that we are effectively recreating the substitutions built by the relevant <see cref="ProblemInspector"/> methods, here.
+        /// An alternative approach would of course be for those methods to return both the schema and the substitution (rather than just the
+        /// transformed action), so that the algorithm can keep track itself if it wants to. For now at least though, I'm prioritising keep the
+        /// actual planning as lean and mean as possible over making the action formatting super snappy.
         /// </summary>
         /// <returns>A <see cref="VariableSubstitution"/> that maps the variables as defined in the schema to the terms referred to in the provided action.</returns>
         public VariableSubstitution GetMappingFromSchema(Action action)
@@ -103,7 +103,7 @@ TODO: more useful than predicates..
                 Actions.SingleOrDefault(a => a.Identifier.Equals(action.Identifier))
                 ?? throw new ArgumentException("Action not found! There is no action in the domain with a matching identifier");
 
-            // I suspect its possible for this to return more than one result.. investigate, write tests
+            // TODO: I suspect its possible for this to return more than one result.. investigate, write tests
             return MatchWithSchema(action, schema, new VariableSubstitution()).Single();
         }
     }

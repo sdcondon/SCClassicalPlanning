@@ -2,13 +2,11 @@
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains;
 using SCFirstOrderLogic;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.Container;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
-namespace SCClassicalPlanning
+namespace SCClassicalPlanning.Planning
 {
-    public static class ProblemTests
+    public static class ProblemInspectorTests
     {
         private static readonly Constant element1 = new(nameof(element1));
         private static readonly Constant element2 = new(nameof(element2));
@@ -34,7 +32,7 @@ namespace SCClassicalPlanning
                     State: new(IsPresent(element1) & IsPresent(element2)),
                     ExpectedResult: new[] { Remove(element1), Remove(element2) }),
             })
-            .When(tc => tc.Problem.GetApplicableActions(tc.State))
+            .When(tc => ProblemInspector.GetApplicableActions(tc.Problem, tc.State))
             .ThenReturns()
             .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult));
 
@@ -89,9 +87,8 @@ namespace SCClassicalPlanning
                 ///         Unload(new Constant("cargo2"), P, new Constant("sfo")),
                 ///     }),
             })
-            .When(tc => tc.Problem.GetRelevantActions(tc.Goal))
+            .When(tc => ProblemInspector.GetRelevantActions(tc.Problem, tc.Goal))
             .ThenReturns()
             .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult));
-
     }
 }
