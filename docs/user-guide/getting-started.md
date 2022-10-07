@@ -11,7 +11,8 @@ As such, it *might* be useful to be passingly familiar with [SCFirstOrderLogic](
 
 ## Defining Problems
 
-The first challenge is to define the planning problem to be solved. In this section, we use the ["blocks world"](https://en.wikipedia.org/wiki/Blocks_world) domain that is a commonly used example.
+The first challenge is to define the planning problem to be solved.
+In this section, we use the ["blocks world"](https://en.wikipedia.org/wiki/Blocks_world) domain that is a commonly used example (and indeed inspires the icon for this package!).
 
 ### Defining Problems as Code
 
