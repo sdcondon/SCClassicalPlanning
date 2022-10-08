@@ -125,18 +125,18 @@ using SCClassicalPlanning.Planning; // for PlanFormatter
 using SCClassicalPlanning.Planning.StateSpaceSearch; // for ForwardStateSpaceSearch
 using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // for ElementDifferenceCount
 
-// First instantiate a planner, specifying a heuristic to use (a delegate that estimates the
-// number of actions it will take to get from a given state to a state that satisfies a given goal).
-// You can create a heuristic specific to the problem domain, or you can use a generic one
-// provided by the library.
+// First instantiate a ForwardStateSpaceSearch, specifying a heuristic to use (a delegate that
+// estimates the number of actions it will take to get from a given state to a state that satisfies
+// a given goal). In general, you can create a heuristic specific to the domain, or you can use a
+// generic one provided by the library. Here we use one provided by the library.
 // NB #1: both the forward and backward state space search classes have constructor overloads
 // that also include a parameter for a delegate to compute the "cost" of an action. Potentially useful if 
 // it makes sense for a custom heuristic to consider some actions more costly than others.
 // NB #2: the only generic heuristic implemented so far is a very simple one that just counts the differences
 // between the current state and the goal. It's totally useless for backward searches (because
 // it can't rule out unsatisfiable goals) and isn't that great for most forward searches either
-// (note it's not admissable, so can give non-optimal plans). But suffices for the very simple problem
-// we are trying to solve here:
+// (note it's not admissable, so can give non-optimal plans). However, it suffices for the very simple
+// problem we are trying to solve here:
 var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
 
 // Tell the planner to create a plan for our problem:
