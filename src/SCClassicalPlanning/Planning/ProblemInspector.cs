@@ -218,8 +218,7 @@ namespace SCClassicalPlanning.Planning
             {
                 foreach (var effectElement in effectElements)
                 {
-                    // Here we iterate through ALL elements of the goal, trying to find unifications with the effect element.
-                    // Using some kind of index here would of course speed things up (support for this is a TODO).
+                    // Here we iterate through all elements of the goal, trying to find unifications with the effect element.
                     // We return each unification we find immediately - for an effect to be relevant it only needs to match at least one element of the goal.
                     foreach (var goalElement in goal.Elements)
                     {
