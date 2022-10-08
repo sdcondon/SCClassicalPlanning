@@ -9,6 +9,7 @@ using static SCClassicalPlanning.ExampleDomains.FromAIaMA.SpareTire;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
+#if false
     public static class BackwardStateSpaceSearchTests
     {
         public static Test AirCargoScenario => TestThat
@@ -140,11 +141,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public Plan Execute()
             {
                 var problem = new Problem(Domain, InitialState, Goal);
-                //var heuristic = new IgnorePreconditionsGreedySetCover(problem);
-                //var planner = new BackwardStateSpaceSearch(heuristic.EstimateCost);
-                var planner = new BackwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
+                var heuristic = new IgnorePreconditionsGreedySetCover(problem);
+                var planner = new BackwardStateSpaceSearch(heuristic.EstimateCost);
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
             }
         }
     }
+#endif
 }
