@@ -21,12 +21,18 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// <param name="problem">The problem being solved.</param>
         public IgnorePreconditionsGreedySetCover(Problem problem) => this.problem = problem;
 
+        /// <summary>
+        /// Estimates the cost of getting from the given state to a state that satisfies the given goal.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        /// <param name="goal">The goal.</param>
+        /// <returns>An estimate of the cost of getting from the given state to a state that satisfies the given goal.</returns>
         public float EstimateCost(State state, Goal goal)
         {
             // hmm. *almost* what we want, I think..
-            var relevantActions = ProblemInspector.GetRelevantActions(problem, goal); 
-            //var relevantActions = GetRelevantActions(goal); 
-            var coveringActionCount = GetCoveringActionCount(GetUnsatisfiedLiterals(state, goal), relevantActions);
+            //var relevantEffects = ProblemInspector.GetRelevantActions(problem, goal).Select(a => a.Effect); 
+            var relevantEffects = GetRelevantEffects(goal); 
+            var coveringActionCount = GetCoveringActionCount(GetUnsatisfiedLiterals(state, goal), relevantEffects);
 
             if (coveringActionCount == -1)
             {
@@ -39,34 +45,26 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         }
 
         /// So very very slow.
-        ////public IEnumerable<Action> GetRelevantActions(Goal goal)
-        ////{
-        ////    foreach (var actionSchema in problem.Domain.Actions)
-        ////    {
-        ////        foreach (var effectElement in actionSchema.Effect.Elements)
-        ////        {
-        ////            // Here we iterate through ALL elements of the goal, trying to find unifications with the effect element.
-        ////            // Using some kind of index here would of course speed things up (support for this is a TODO).
-        ////            // We return each unification we find immediately - for an effect to be relevant it only needs to match at least one element of the goal.
-        ////            foreach (var goalElement in goal.Elements)
-        ////            {
-        ////                // TODO: using LiteralUnifier is perhaps overkill given that we know we're functionless,
-        ////                // but will do for now. (doesn't necessarily cost more..)
-        ////                if (LiteralUnifier.TryCreate(goalElement, effectElement, out var unifier))
-        ////                {
-        ////                    yield return new Action(
-        ////                        actionSchema.Identifier,
-        ////                        new VariableSubstitutionGoalTransformation(unifier).ApplyTo(actionSchema.Precondition),
-        ////                        new VariableSubstitutionEffectTransformation(unifier).ApplyTo(actionSchema.Effect));
-        ////                }
-        ////            }
-        ////        }
-        ////    }
-        ////}
+        public IEnumerable<Effect> GetRelevantEffects(Goal goal)
+        {
+            foreach (var actionSchema in problem.Domain.Actions)
+            {
+                foreach (var effectElement in actionSchema.Effect.Elements)
+                {
+                    foreach (var goalElement in goal.Elements)
+                    {
+                        if (LiteralUnifier.TryCreate(goalElement, effectElement, out var unifier))
+                        {
+                            yield return new VariableSubstitutionEffectTransformation(unifier).ApplyTo(actionSchema.Effect);
+                        }
+                    }
+                }
+            }
+        }
 
         private static HashSet<Literal> GetUnsatisfiedLiterals(State state, Goal goal)
         {
-            // TODO: sloooow..
+            // At some point might want to test whether the cost of keeping elements ordered outweighs the cost of having to do stuff like this the long way..
             var uncovered = new HashSet<Literal>();
             foreach (var goalElement in goal.Elements)
             {
@@ -87,7 +85,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// <param name="target"></param>
         /// <param name="relevantActions"></param>
         /// <returns></returns>
-        private static int GetCoveringActionCount(IEnumerable<Literal> target, IEnumerable<Action> relevantActions)
+        private static int GetCoveringActionCount(IEnumerable<Literal> target, IEnumerable<Effect> relevantEffects)
         {
             var uncovered = new HashSet<Literal>(target);
             var coveringActionCount = 0;
@@ -95,14 +93,14 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
             while (uncovered.Count > 0)
             {
                 // The best match is the one that intersects the most with the remaining uncovered literals:
-                var bestMatch = relevantActions.MaxBy(a => a.Effect.Elements.Intersect(uncovered).Count());
+                var bestMatch = relevantEffects.MaxBy(e => e.Elements.Intersect(uncovered).Count());
 
                 // Yeah, a repeat calculation. Succinct code (LINQ-y goodness..) over actual efficiency is fine
                 // given that the purpose of this lib is learning and experimentation, not production-ready code.
-                if (bestMatch.Effect.Elements.Intersect(uncovered).Count() > 0) 
+                if (bestMatch.Elements.Intersect(uncovered).Count() > 0) 
                 {
                     coveringActionCount++;
-                    uncovered.ExceptWith(bestMatch.Effect.Elements);
+                    uncovered.ExceptWith(bestMatch.Elements);
                 }
                 else
                 {
