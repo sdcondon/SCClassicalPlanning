@@ -46,8 +46,14 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             await Task.Run(() => search.Complete()); // todo?: worth adding all the Steppable stuff like in FoL?
 
-            // TODO: handle failure gracefully..
-            return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
+            if (!object.Equals(search.Target, default(StateSpaceNode)))
+            {
+                return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
+            }
+            else
+            {
+                throw new ArgumentException("Problem is unsolvable", nameof(problem));
+            }
         }
 
         private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>

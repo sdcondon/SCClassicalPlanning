@@ -55,15 +55,21 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             ////    {
             ////        if (!object.Equals(edge, default(StateSpaceEdge)) && !exploredEdges.Contains(edge))
             ////        {
-            ////            var heuristic = estimateCountOfActionsToGoal(problem.InitialState, edge.To.Goal);
+            ////            var heuristic = estimateCostToGoal(problem.InitialState, edge.To.Goal);
             ////            exploredEdges.Add(edge);
             ////        }
             ////    }
             ////}
 
-            // TODO: handle failure gracefully..
-            return new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
-        }
+            if (!object.Equals(search.Target, default(StateSpaceNode)))
+            {
+                return new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
+            }
+            else
+            {
+                throw new ArgumentException("Problem is unsolvable", nameof(problem));
+            }
+}
 
         private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
         {
@@ -86,7 +92,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             /// <inheritdoc />
             public override int GetHashCode() => HashCode.Combine(Goal);
 
-            public override string ToString() => Goal.ToString();
+            public override string ToString() => Goal?.ToString() ?? "NULL NODE";
         }
 
         private struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
