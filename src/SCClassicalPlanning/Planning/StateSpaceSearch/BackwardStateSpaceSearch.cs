@@ -92,7 +92,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             /// <inheritdoc />
             public override int GetHashCode() => HashCode.Combine(Goal);
 
-            public override string ToString() => Goal?.ToString() ?? "NULL NODE";
+            public override string ToString() => Goal.ToString();
         }
 
         private struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
