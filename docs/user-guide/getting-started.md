@@ -44,7 +44,7 @@ VariableDeclaration toBlock = new(nameof(toBlock));
 
 // Our first action schema.
 // The 'moveToBlock' action moves a block from its current location to on top of a block:
-Action moveToBlock = new Action(
+Action moveToBlock = new(
     identifier: nameof(moveToBlock),
     precondition: new Goal(
         On(block, from)
@@ -63,7 +63,7 @@ Action moveToBlock = new Action(
 
 // The other action of our domain - 'moveToTable'.
 // Separate from 'moveToBlock' because of the different behaviour of table and block w.r.t being Clear or not.
-Action moveToTable = new Action(
+Action moveToTable = new(
     identifier: nameof(moveToTable),
     precondition: new Goal(
         On(block, from)
@@ -75,7 +75,7 @@ Action moveToTable = new Action(
         & Clear(from)
         & !On(block, from)));
 
-// Now we are ready to declare our domain.
+// Now we are finally ready to declare our domain.
 // A domain defines the common aspects of all problems that occur within it.
 // Specifically, what actions are available:
 var domain = new Domain(moveToBlock, moveToTable);
@@ -134,8 +134,8 @@ using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // for ElementDi
 // it makes sense for a custom heuristic to consider some actions more costly than others.
 // NB #2: the only generic heuristic implemented so far is a very simple one that just counts the differences
 // between the current state and the goal. It's totally useless for backward searches (because
-// it can't rule out unsatisifiable goals) and isn't that great for most forward searches either
-// (note it's not admissable, so can give non-optimal plans) - but suffices for the very simple problem
+// it can't rule out unsatisfiable goals) and isn't that great for most forward searches either
+// (note it's not admissable, so can give non-optimal plans). But suffices for the very simple problem
 // we are trying to solve here:
 var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
 
