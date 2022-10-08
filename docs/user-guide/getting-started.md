@@ -42,8 +42,8 @@ VariableDeclaration block = new(nameof(block));
 VariableDeclaration from = new(nameof(from));
 VariableDeclaration toBlock = new(nameof(toBlock));
 
-// Our first action schema.
-// The 'moveToBlock' action moves a block from its current location to on top of a block:
+// Our first action schema - 'moveToBlock'.
+// This action moves a block from its current location to on top of a block:
 Action moveToBlock = new(
     identifier: nameof(moveToBlock),
     precondition: new Goal(
@@ -130,7 +130,7 @@ using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // for ElementDi
 // You can create a heuristic specific to the problem domain, or you can use a generic one
 // provided by the library.
 // NB #1: both the forward and backward state space search classes have constructor overloads
-// that include a parameter for a delegate to compute the "cost" of an action. Potentially useful if 
+// that also include a parameter for a delegate to compute the "cost" of an action. Potentially useful if 
 // it makes sense for a custom heuristic to consider some actions more costly than others.
 // NB #2: the only generic heuristic implemented so far is a very simple one that just counts the differences
 // between the current state and the goal. It's totally useless for backward searches (because
