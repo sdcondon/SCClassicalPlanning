@@ -140,7 +140,7 @@ using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // for ElementDi
 var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
 
 // Tell the planner to create a plan for our problem:
-var plan = planner.CreatePlanAsync(problem).GetAwaiter().GetResult(); // or obviously just await.. if we're in an async method
+var plan = planner.CreatePlanAsync(problem).GetAwaiter().GetResult(); // obviously just use await if in an async method
 
 // Now let's verify that applying the plan results in a state that satisfies the goal,
 // printing out the actions included in the plan in the process:
