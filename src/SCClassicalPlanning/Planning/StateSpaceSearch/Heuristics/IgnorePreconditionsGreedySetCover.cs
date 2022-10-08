@@ -130,11 +130,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
             while (uncovered.Count > 0)
             {
                 // The best match is the one that intersects the most with the remaining uncovered literals:
-                var bestMatch = relevantEffects.MaxBy(e => e.Elements.Intersect(uncovered).Count());
+                var bestMatch = relevantEffects.MaxBy(e => e.Elements.Intersect(uncovered).Count);
 
                 // Yeah, a repeat calculation. Succinct code (LINQ-y goodness..) over actual efficiency is fine
                 // given that the purpose of this lib is learning and experimentation, not production-ready code.
-                if (bestMatch.Elements.Intersect(uncovered).Count() > 0) 
+                if (bestMatch.Elements.Intersect(uncovered).Count > 0) 
                 {
                     coveringActionCount++;
                     uncovered.ExceptWith(bestMatch.Elements);
