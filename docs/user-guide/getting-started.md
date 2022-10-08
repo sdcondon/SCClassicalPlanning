@@ -127,8 +127,14 @@ using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // for ElementDi
 
 // First instantiate a planner, specifying a heuristic to use (a delegate that estimates the
 // number of actions it will take to get from a given state to a state that satisfies a given goal).
-// NB: the only heuristic implemented so far is a super-simple one that just counts the differences
-// between the current state and the goal. That's obviously not going to cut it for most problems,
+// You can create a heuristic specific to the problem domain, or you can use a generic one
+// provided by the library.
+// NB #1: both the forward and backward state space search classes have constructor overloads
+// that include a parameter for a delegate to compute the "cost" of an action. Potentially useful if 
+// it makes sense for a custom heuristic to consider some actions more costly than others.
+// NB #2: the only generic heuristic implemented so far is a very simple one that just counts the differences
+// between the current state and the goal. It's totally useless for backward searches (because
+// it can't rule out unsatisifiable goals) and isn't that great for most forward searches either -
 // but suffices for the very simple problem we are trying to solve here:
 var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
 
@@ -157,13 +163,10 @@ Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.Goal)}!");
 
 ### Using Backward State Space Search
 
-As above, but using `var planner = new BackwardStateSpaceSearch(ElementDifferenceCount.EstimateCountOfActionsToGoal)`.
-
-NB: While this problem is simple enough that its not an issue, this heuristic is **terrible** for backward searches
-(feel free to take a look at how long/much memory it takes when used in some of the backward search tests).
-
-For a clue as to why, notice that by not taking into account the available actions in the problem, the search will
-happily explore goals that require e.g. the table to somehow turn into a block..
+As above, but using `var planner = new BackwardStateSpaceSearch(heuristic)`, where heuristic is a `Func<State, Goal, float>`.
+As mentioned above, ElementDifferenceCount.EstimateCost is useless for this. Either create one specifically for your
+domain, or wait until I implement some more generic ones (working on a precondition-ignoring greedy set cover at the time
+of writing).
 
 ### Using Graphplan
 
