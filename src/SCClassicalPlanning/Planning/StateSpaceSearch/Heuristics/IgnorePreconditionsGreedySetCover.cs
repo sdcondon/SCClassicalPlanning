@@ -33,7 +33,16 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         public float EstimateCost(State state, Goal goal)
         {
             var unsatisfiedGoalElements = GetUnsatisfiedGoalElements(state, goal);
+            if (unsatisfiedGoalElements.Count() == 0)
+            {
+                return 0;
+            }
+
             var relevantEffects = GetRelevantEffects(unsatisfiedGoalElements, state.Elements);
+            if (relevantEffects.Count() == 0)
+            {
+                return -1;
+            }
 
             var coveringActionCount = GetCoveringActionCount(unsatisfiedGoalElements, relevantEffects);
             if (coveringActionCount == -1)
@@ -48,33 +57,33 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
 
         private static HashSet<Literal> GetUnsatisfiedGoalElements(State state, Goal goal)
         {
-            // At some point might want to test whether the cost of keeping elements ordered outweighs the cost of having to do stuff like this the long way..
-            var uncovered = new HashSet<Literal>();
-            foreach (var goalElement in goal.Elements)
-            {
-                if (goalElement.IsPositive && !state.Elements.Contains(goalElement.Predicate)
-                    || goalElement.IsNegated && state.Elements.Contains(goalElement.Predicate))
-                {
-                    uncovered.Add(goalElement);
-                }
-            }
-            return uncovered;
-
-
-            ////var uncovered = new HashSet<Literal>(goal.Elements);
+            ////// At some point might want to test whether the cost of keeping elements ordered outweighs the cost of having to do stuff like this the long way..
+            ////var uncovered = new HashSet<Literal>();
             ////foreach (var goalElement in goal.Elements)
             ////{
-            ////    // Unifying here because positive elements of the goal can include variables..
-            ////    if (goalElement.IsPositive && state.Elements.Any(e => LiteralUnifier.TryCreate(goalElement, e, out var _)))
+            ////    if (goalElement.IsPositive && !state.Elements.Contains(goalElement.Predicate)
+            ////        || goalElement.IsNegated && state.Elements.Contains(goalElement.Predicate))
             ////    {
-            ////        uncovered.Remove(goalElement);
-            ////    }
-            ////    else if (goalElement.IsNegated && !state.Elements.Contains(goalElement.Predicate))
-            ////    {
-            ////        uncovered.Remove(goalElement);
+            ////        uncovered.Add(goalElement);
             ////    }
             ////}
             ////return uncovered;
+
+
+            var uncovered = new HashSet<Literal>(goal.Elements);
+            foreach (var goalElement in goal.Elements)
+            {
+                // Unifying here because positive elements of the goal can include variables..
+                if (goalElement.IsPositive && state.Elements.Any(e => LiteralUnifier.TryCreate(goalElement, e, out var _)))
+                {
+                    uncovered.Remove(goalElement);
+                }
+                else if (goalElement.IsNegated && !state.Elements.Contains(goalElement.Predicate))
+                {
+                    uncovered.Remove(goalElement);
+                }
+            }
+            return uncovered;
         }
 
         /// <summary>
@@ -83,7 +92,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// </summary>
         /// <param name="goal"></param>
         /// <returns></returns>
-        public IEnumerable<Effect> GetRelevantEffects(IEnumerable<Literal> goalElements, IEnumerable<Predicate> stateElements)
+        private IEnumerable<Effect> GetRelevantEffects(IEnumerable<Literal> goalElements, IEnumerable<Predicate> stateElements)
         {
             foreach (var goalElement in goalElements)
             {
@@ -103,15 +112,15 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
                     }
                 }
 
-                // could of course do this in getunsatisfied goal elements - but having experimented with it a bit,
-                // it really feels like they should count against the cost.. todo: alternative and benchmarking..
-                foreach (var stateElement in stateElements)
-                {
-                    if (LiteralUnifier.TryCreate(stateElement, goalElement, out var unifier))
-                    {
-                        yield return new Effect(goalElement);
-                    }
-                }
+                ////// could of course do this in getunsatisfied goal elements - but having experimented with it a bit,
+                ////// it really feels like they should count against the cost.. todo: alternative and benchmarking..
+                ////foreach (var stateElement in stateElements)
+                ////{
+                ////    if (LiteralUnifier.TryCreate(stateElement, goalElement, out var unifier))
+                ////    {
+                ////        yield return new Effect(goalElement);
+                ////    }
+                ////}
             }
         }
 
@@ -147,18 +156,6 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
             }
 
             return coveringActionCount;
-        }
-
-        /// <summary>
-        /// Utility class to transform <see cref="Goal"/> instances using a given <see cref="VariableSubstitution"/>.
-        /// </summary>
-        private class VariableSubstitutionGoalTransformation : RecursiveGoalTransformation
-        {
-            private readonly VariableSubstitution substitution;
-
-            public VariableSubstitutionGoalTransformation(VariableSubstitution substitution) => this.substitution = substitution;
-
-            public override Literal ApplyTo(Literal literal) => substitution.ApplyTo(literal);
         }
 
         /// <summary>

@@ -20,8 +20,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 Constant cargo2 = new(nameof(cargo2));
                 Constant plane1 = new(nameof(plane1));
                 Constant plane2 = new(nameof(plane2));
-                Constant sfo = new(nameof(sfo));
-                Constant jfk = new(nameof(jfk));
+                Constant airport1 = new(nameof(airport1));
+                Constant airport2 = new(nameof(airport2));
 
                 return new TestCase(
                     Domain: AirCargo.Domain,
@@ -30,15 +30,15 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                         & Cargo(cargo2)
                         & Plane(plane1)
                         & Plane(plane2)
-                        & Airport(jfk)
-                        & Airport(sfo)
-                        & At(cargo1, sfo)
-                        & At(cargo2, jfk)
-                        & At(plane1, sfo)
-                        & At(plane2, jfk)),
+                        & Airport(airport1)
+                        & Airport(airport2)
+                        & At(cargo1, airport2)
+                        & At(cargo2, airport1)
+                        & At(plane1, airport1)
+                        & At(plane2, airport2)),
                     Goal: new(
-                        At(cargo1, jfk)
-                        & At(cargo2, sfo)));
+                        At(cargo1, airport1)
+                        & At(cargo2, airport2)));
             })
             .When((_, tc) => tc.Execute())
             .ThenReturns()
@@ -104,9 +104,9 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                         & On(blockC, blockA)
                         & On(blockD, blockB)
                         & On(blockE, Table)
+                        & Clear(blockC)
                         & Clear(blockD)
-                        & Clear(blockE)
-                        & Clear(blockC)),
+                        & Clear(blockE)),
                     Goal: new(
                         On(blockA, blockB)
                         & On(blockB, blockC)

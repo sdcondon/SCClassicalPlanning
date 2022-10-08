@@ -17,8 +17,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         private static readonly Constant cargo2 = new(nameof(cargo2));
         private static readonly Constant plane1 = new(nameof(plane1));
         private static readonly Constant plane2 = new(nameof(plane2));
-        private static readonly Constant sfo = new(nameof(sfo));
-        private static readonly Constant jfk = new(nameof(jfk));
+        private static readonly Constant airport1 = new(nameof(airport1));
+        private static readonly Constant airport2 = new(nameof(airport2));
 
         private static readonly VariableDeclaration somePlane = new(nameof(somePlane));
 
@@ -27,12 +27,12 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             & Cargo(cargo2)
             & Plane(plane1)
             & Plane(plane2)
-            & Airport(jfk)
-            & Airport(sfo)
-            & At(cargo1, sfo)
-            & At(cargo2, jfk)
-            & At(plane1, sfo)
-            & At(plane2, jfk));
+            & Airport(airport1)
+            & Airport(airport2)
+            & At(cargo1, airport2)
+            & At(cargo2, airport1)
+            & At(plane1, airport1)
+            & At(plane2, airport2));
 
         private record TestCase(Problem Problem, State State, OperableGoal Goal, float ExpectedCost);
 
@@ -40,61 +40,57 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .GivenTestContext()
             .AndEachOf(() => new TestCase[]
             {
-                ////// Unload (or indeed Fly - ignoring preconds means ignoring 'type'..) cargo1 to jfk,
-                ////// = 1
-                ////new TestCase(
-                ////    Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
-                ////    State: AirCargoInitialState,
-                ////    Goal: At(cargo1, jfk),
-                ////    ExpectedCost: 1),
+                // Unload (or indeed Fly - ignoring preconds means ignoring 'type'..) cargo1 to airport1,
+                // = 1
+                new TestCase(
+                    Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
+                    State: AirCargoInitialState,
+                    Goal: At(cargo1, airport1),
+                    ExpectedCost: 1),
 
-                ////// Unload (or indeed Fly - ignoring preconds means ignoring 'type'..) cargo1 to jfk,
-                ////// Unload (or indeed Fly - ignoring preconds means ignoring 'type'..) cargo2 to sfo,
-                ////// = 2
-                ////new TestCase(
-                ////    Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
-                ////    State: AirCargoInitialState,
-                ////    Goal: At(cargo1, jfk) & At(cargo2, sfo),
-                ////    ExpectedCost: 2),
+                // Unload (or indeed Fly - ignoring preconds means ignoring 'type'..) cargo1 to airport1,
+                // Unload (or indeed Fly - ignoring preconds means ignoring 'type'..) cargo2 to airport2,
+                // = 2
+                new TestCase(
+                    Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
+                    State: AirCargoInitialState,
+                    Goal: At(cargo1, airport1) & At(cargo2, airport2),
+                    ExpectedCost: 2),
 
-                ////// e.g. the result of a Fly(cargo1, sfo, jfk) being seen as relevant to the goal state and thus regressed
-                ////// Impossible - cargo can never be a plane
-                ////// = float.PositiveInfinity
-                ////new TestCase(
-                ////    Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
-                ////    State: AirCargoInitialState,
-                ////    Goal: At(cargo1, sfo) & Plane(cargo1) & Airport(sfo) & Airport(jfk),
-                ////    ExpectedCost: float.PositiveInfinity),
+                // e.g. the regression of Fly(cargo1, airport2, airport1) from the "standard" air cargo goal
+                // Impossible - cargo can never be a plane
+                // = float.PositiveInfinity
+                new TestCase(
+                    Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
+                    State: AirCargoInitialState,
+                    Goal: At(cargo1, airport1) & Plane(cargo1) & Airport(airport2) & Airport(airport1),
+                    ExpectedCost: float.PositiveInfinity),
 
-                // e.g. the result of a Unload(cargo1, sfo, jfk) being seen as relevant to the goal state - NB includes a variable
-                // Load(cargo2, somePlane)
-                // Fly(plane, sfo) (or Unload(somePlane, plane, sfo) - see above) 
-                // Plane(somePlane) not an action, but... meh, im being intuitive here. if we allow unify in satisfied element check, this actually becomes 1..
+                // e.g. the regression of Unload(cargo1, somePlane, airport1) includes a variable
                 new TestCase(
                     Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
                     State: AirCargoInitialState,
                     Goal: Plane(somePlane) 
-                        & In(cargo2, somePlane)
-                        & At(somePlane, sfo)
-                        & Cargo(cargo2)
-                        & Airport(sfo),
-                    ExpectedCost: 3),
+                        & In(cargo1, somePlane)
+                        & At(somePlane, airport1)
+                        & Cargo(cargo1)
+                        & Airport(airport1),
+                    ExpectedCost: 1),
 
-                // e.g. the result of a Unload(cargo1, sfo, jfk) being seen as relevant to the goal state - NB includes a variable
-                // Load(cargo2, somePlane)
-                // Unload(cargo, plane, jfk) (or Fly)
-                // Plane(somePlane)
-                // Fly(somePlane, sfo) (or Unload)
+                // e.g. the result of a Unload(cargo1, somePlane, airport1) being seen as relevant to the goal state - NB includes a variable
+                // As above - Plane(somePlane) is 2..
                 new TestCase(
                     Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
                     State: AirCargoInitialState,
-                    Goal: Plane(somePlane)
-                        & In(cargo2, somePlane)
-                        & At(somePlane, sfo)
-                        & Cargo(cargo2)
-                        & Airport(sfo)
-                        & At(cargo1, jfk),
-                    ExpectedCost: 4),
+                    Goal: Plane(somePlane) // met by state
+                        & In(cargo1, somePlane) // load
+                        & At(somePlane, airport1) // met by state
+                        & Cargo(cargo1) // met by state
+                        & Airport(airport1) // met by state
+
+                        // the 'other' inital goal, that is not affected by the regression..
+                        & At(cargo2, airport2), // unload (or fly)
+                    ExpectedCost: 2),
             })
             .When((_, tc) => new IgnorePreconditionsGreedySetCover(tc.Problem).EstimateCost(tc.State, tc.Goal))
             .ThenReturns()
