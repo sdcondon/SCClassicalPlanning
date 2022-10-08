@@ -2,12 +2,15 @@
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
+using System.Diagnostics;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
 {
     /// <summary>
     /// State space search heuristic that ignores preconditions and uses a greedy set cover algorithm
-    /// to provide its estimate. Not "admissable" (mostly because greedy set cover can overestimate) - 
+    /// to provide its estimate.
+    /// <para/>
+    /// Not "admissable" (mostly because greedy set cover can overestimate) - 
     /// so the plans discovered using it won't necessarily be optimal, but better than heuristics
     /// that don't examine the available actions at all..
     /// </summary>
@@ -29,11 +32,10 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// <returns>An estimate of the cost of getting from the given state to a state that satisfies the given goal.</returns>
         public float EstimateCost(State state, Goal goal)
         {
-            // hmm. *almost* what we want, I think..
-            //var relevantEffects = ProblemInspector.GetRelevantActions(problem, goal).Select(a => a.Effect); 
-            var relevantEffects = GetRelevantEffects(goal); 
-            var coveringActionCount = GetCoveringActionCount(GetUnsatisfiedLiterals(state, goal), relevantEffects);
+            var unsatisfiedGoalElements = GetUnsatisfiedGoalElements(state, goal);
+            var relevantEffects = GetRelevantEffects(unsatisfiedGoalElements, state.Elements);
 
+            var coveringActionCount = GetCoveringActionCount(unsatisfiedGoalElements, relevantEffects);
             if (coveringActionCount == -1)
             {
                 return float.PositiveInfinity;
@@ -44,25 +46,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
             }
         }
 
-        /// So very very slow.
-        public IEnumerable<Effect> GetRelevantEffects(Goal goal)
-        {
-            foreach (var actionSchema in problem.Domain.Actions)
-            {
-                foreach (var effectElement in actionSchema.Effect.Elements)
-                {
-                    foreach (var goalElement in goal.Elements)
-                    {
-                        if (LiteralUnifier.TryCreate(goalElement, effectElement, out var unifier))
-                        {
-                            yield return new VariableSubstitutionEffectTransformation(unifier).ApplyTo(actionSchema.Effect);
-                        }
-                    }
-                }
-            }
-        }
-
-        private static HashSet<Literal> GetUnsatisfiedLiterals(State state, Goal goal)
+        private static HashSet<Literal> GetUnsatisfiedGoalElements(State state, Goal goal)
         {
             // At some point might want to test whether the cost of keeping elements ordered outweighs the cost of having to do stuff like this the long way..
             var uncovered = new HashSet<Literal>();
@@ -74,8 +58,61 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
                     uncovered.Add(goalElement);
                 }
             }
-
             return uncovered;
+
+
+            ////var uncovered = new HashSet<Literal>(goal.Elements);
+            ////foreach (var goalElement in goal.Elements)
+            ////{
+            ////    // Unifying here because positive elements of the goal can include variables..
+            ////    if (goalElement.IsPositive && state.Elements.Any(e => LiteralUnifier.TryCreate(goalElement, e, out var _)))
+            ////    {
+            ////        uncovered.Remove(goalElement);
+            ////    }
+            ////    else if (goalElement.IsNegated && !state.Elements.Contains(goalElement.Predicate))
+            ////    {
+            ////        uncovered.Remove(goalElement);
+            ////    }
+            ////}
+            ////return uncovered;
+        }
+
+        /// <summary>
+        /// Gets the transformed effect of each action (given the terms in the goal)
+        /// whose effect matches at least one element of the goal
+        /// </summary>
+        /// <param name="goal"></param>
+        /// <returns></returns>
+        public IEnumerable<Effect> GetRelevantEffects(IEnumerable<Literal> goalElements, IEnumerable<Predicate> stateElements)
+        {
+            foreach (var goalElement in goalElements)
+            {
+                foreach (var actionSchema in problem.Domain.Actions)
+                {
+                    foreach (var effectElement in actionSchema.Effect.Elements)
+                    {
+                        if (LiteralUnifier.TryCreate(effectElement, goalElement, out var unifier))
+                        {
+                            var transformedEffectElement = new VariableSubstitutionEffectTransformation(unifier).ApplyTo(actionSchema.Effect);
+
+                            var message = $"Goal {goalElement} matched by effect {transformedEffectElement} from {actionSchema.Identifier}({string.Join(",", unifier.Bindings.Select(kvp => $"{kvp.Key}:{kvp.Value}"))})";
+                            Debug.WriteLine(message);
+
+                            yield return transformedEffectElement;
+                        }
+                    }
+                }
+
+                // could of course do this in getunsatisfied goal elements - but having experimented with it a bit,
+                // it really feels like they should count against the cost.. todo: alternative and benchmarking..
+                foreach (var stateElement in stateElements)
+                {
+                    if (LiteralUnifier.TryCreate(stateElement, goalElement, out var unifier))
+                    {
+                        yield return new Effect(goalElement);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -104,7 +141,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
                 }
                 else
                 {
-                    // we couldn't cover any elements - unsolvable!
+                    // we couldn't cover any more elements - unsolvable!
                     return -1;
                 }
             }
