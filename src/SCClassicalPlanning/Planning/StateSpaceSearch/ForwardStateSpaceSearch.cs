@@ -116,7 +116,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public StateSpaceNode To => new StateSpaceNode(problem, toState);
 
             /// <summary>
-            /// Gets the action that is regressed over to achieve this goal transition.
+            /// Gets the action that is applied to achieve this goal transition.
             /// </summary>
             public Action Action { get; }
 

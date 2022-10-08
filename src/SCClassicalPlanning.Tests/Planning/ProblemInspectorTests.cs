@@ -101,18 +101,18 @@ namespace SCClassicalPlanning.Planning
                         // the important bit - leaves variables alone if it can
                         Unload(new Constant("cargo"), new VariableReference("plane"), new Constant("sfo")),
 
-                        // These three serve as an interesting indication of why backward state space searching
-                        // is so slow with this lib. Obviously none of these actions make sense - their preconditions could
-                        // never be satisfied (e.g. cargo will never be a plane, plane1 will never be an airport, etc)
-                        // but of course these constraints are expressed as preconditions, and relevancy (as we implement it -
-                        // in its most basic form) is nothing to do with preconditions per se.
+                        // The following three serve as an interesting indication of why backward state space searching
+                        // is so slow with this lib/problem. Obviously none of these actions make sense - their preconditions
+                        // could never be satisfied (cargo will never be a plane, plane1 will never be an airport, etc).
+                        // Of course, relevancy (as we implement it here - in its most basic form) is nothing to do with preconditions per se.
                         //
                         // A good heuristic will of course note that the pre-conditions are unreachable
                         // and the associated state space edges will thus never be explored. But these non-starters
                         // are generated at every step and take a lot of time to generate and chew through. This
                         // is a good example of why even very simple/early versions of PDDL include a TYPED
-                        // predicate parameter lists.. For the purposes of this lib (without any extensions), its 
-                        // an example of why its not a good idea to re-use predicates for different "types".
+                        // predicate parameter lists.. For the purposes of this lib (without any extensions), the
+                        // takeaway should be that it not a good idea to re-use predicates for different "types" -
+                        // i.e. used "typed" predicates, even though we don't actually have a type system.
                         Fly(new Constant("cargo"), new Constant("plane1"), new Constant("sfo")),
                         Fly(new Constant("cargo"), new Constant("plane2"), new Constant("sfo")),
                         Fly(new Constant("cargo"), new Constant("cargo"), new Constant("sfo")),

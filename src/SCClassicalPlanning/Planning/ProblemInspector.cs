@@ -7,6 +7,9 @@ namespace SCClassicalPlanning.Planning
 {
     /// <summary>
     /// Various problem inspection methods, useful to planners.
+    /// <para/>
+    /// NB: Might ultimately be useful to extract an interface from this and allow planners to use other strategies
+    /// (that leverage extensions such as type systems and axioms..). But for now at least, its just static.
     /// </summary>
     public static class ProblemInspector
     {
@@ -237,9 +240,9 @@ namespace SCClassicalPlanning.Planning
                         yield return (schema, potentialSubstitution);
                     }
                     else foreach (var substitution in ExpandNonMatchesWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
-                    {
-                        yield return (schema, substitution);
-                    }
+                        {
+                            yield return (schema, substitution);
+                        }
                 }
             }
         }

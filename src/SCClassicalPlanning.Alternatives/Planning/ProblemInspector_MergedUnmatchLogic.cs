@@ -8,7 +8,6 @@ namespace SCClassicalPlanning.Planning
     /// Just includes a version of ProblemInspector.GetRelevantActionSchemas that attempts to be more efficient,
     /// but unfortunately doesn't quite do the job. Worth keeping around for pondering, though.
     /// </summary>
-    [Obsolete("Don't use me")]
     public static class ProblemInspector_MergedUnmatchLogic
     {
         /// <summary>

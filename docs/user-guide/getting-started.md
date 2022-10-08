@@ -28,7 +28,7 @@ using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.A
 Constant Table = new(nameof(Table));
 
 // Our domain defines four predicates (essentially, facts about zero or more elements of the domain that,
-// in any given state, are either true or not. As mentioned in the user guide for SCFirstOrderLogic, creating
+// in any given state, are either true or not). As mentioned in the user guide for SCFirstOrderLogic, creating
 // helper methods for your predicates is highly recommended. Note that we're using OperablePredicate here.
 // Its not required, but makes everything nice and succinct because it means we can use & and ! to combine them.
 // See the SCFirstOrderLogic docs for details.
