@@ -9,15 +9,20 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
     /// </summary>
     public static class SpareTire
     {
+        static SpareTire()
+        {
+            Domain  = new Domain(new Action[]
+            {
+                Remove(Var("object"), Var("location")),
+                PutOn(Var("tire")),
+                LeaveOvernight(),
+            });
+        }
+
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Spare Tire" domain.
         /// </summary>
-        public static Domain Domain => new Domain(new Action[]
-        {
-            Remove(Var("object"), Var("location")),
-            PutOn(Var("tire")),
-            LeaveOvernight(),
-        });
+        public static Domain Domain { get; }
 
         public static Constant Spare { get; } = new(nameof(Spare));
         public static Constant Flat { get; } = new(nameof(Flat));

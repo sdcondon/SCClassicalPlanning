@@ -9,14 +9,23 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
     /// </summary>
     public static class BlocksWorld
     {
+        static BlocksWorld()
+        {
+            VariableDeclaration block = new(nameof(block));
+            VariableDeclaration from = new(nameof(from));
+            VariableDeclaration to = new(nameof(to));
+
+            Domain = new Domain(new Action[]
+            {
+                Move(block, from, to),
+                MoveToTable(block, from),
+            });
+        }
+
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
         /// </summary>
-        public static Domain Domain => new Domain(new Action[]
-        {
-            Move(Var("block"), Var("fromBlock"), Var("toBlock")),
-            MoveToTable(Var("block"), Var("from")),
-        });
+        public static Domain Domain { get; }
 
         public static Constant Table { get; } = new(nameof(Table));
 
