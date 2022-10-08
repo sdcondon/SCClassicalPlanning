@@ -134,19 +134,37 @@ namespace SCClassicalPlanning.Planning
         /// Gets the (action schema, *ground* variable substitution) pairings that represent actions that are relevant to a given goal in a given problem.
         /// <para/>
         /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
-        /// It'd be nice to be able to have an equivalent nethod (in <see cref="Domain"/>) that can return <see cref="Action"/>s that have
-        /// some variable references in them, with constraints on the substitutions that can be made if necessary. Having played with this idea a little
-        /// though, there are.. some subtleties - which go some some to explaining why even the earliest versions of PDDL have things like axioms and types..
+        /// It'd obviously be nice to be leave variables alone is its feasible (perhaps even allowing for constraints when some values are okay but others are
+        /// not). Having played with this idea a little though, there are.. some subtleties - which go some way to explaining why even the earliest versions
+        /// of PDDL have things like types and axioms..
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>
         /// <returns>The actions that are relevant to the given state.</returns>
         public static IEnumerable<(Action schema, VariableSubstitution substitution)> GetRelevantActionSchemaSubstitutions(Problem problem, Goal goal)
         {
+            // Local method to check that a given unifier results in an unconstrained non-match with the negation of the elements of the goal.
+            // Worth it because ExpandNonMatchesWithGoalNegation is potentially so expensive.
+            bool IsUnconstrainedNonMatchWithGoalNegation(IEnumerable<Literal> effectElements, VariableSubstitution unifier)
+            {
+                foreach (var effectElement in effectElements)
+                {
+                    foreach (var goalElement in goal.Elements)
+                    {
+                        if (LiteralUnifier.TryUpdateUnsafe(goalElement, unifier.ApplyTo(effectElement).Negate(), new VariableSubstitution(unifier)))
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            }
+
             // Local method to create variable subsitutions such that the negation of the effects elements transformed by the substitution do not match any of the goal's elements.
             // effectElements: The (remaining) elements of the effect to be matched.
             // returns: An enumerable of VariableSubstitutions that can be applied to the effect elements to make none of them match the negation of a goal element
-            IEnumerable<VariableSubstitution> UnmatchWithGoalNegation(IEnumerable<Literal> effectElements, VariableSubstitution unifier)
+            IEnumerable<VariableSubstitution> ExpandNonMatchesWithGoalNegation(IEnumerable<Literal> effectElements, VariableSubstitution unifier)
             {
                 if (!effectElements.Any())
                 {
@@ -162,8 +180,7 @@ namespace SCClassicalPlanning.Planning
                     // transformed by the existing unifier does not occur in the goal. However, if there are any that
                     // do not occur, we need to check for the existence of the negation of the literal formed by substituting EVERY combination of
                     // objects in the problem for the as yet unbound variables. This is obviously VERY expensive for large problems with lots of objects -
-                    // though I guess clever indexing could help (support for indexing is TODO). Would be nice to do this at the domain level, if constrained
-                    // variables aren't a problem..
+                    // though I guess clever indexing could help (support for indexing is TODO).
                     IEnumerable<VariableSubstitution> allPossibleUnifiers = new List<VariableSubstitution>() { unifier };
                     var unboundVariables = firstEffectElement.Predicate.Arguments.OfType<VariableReference>().Except(unifier.Bindings.Keys);
                     foreach (var unboundVariable in unboundVariables)
@@ -182,7 +199,7 @@ namespace SCClassicalPlanning.Planning
 
                         if (!goal.Elements.Contains(possibleLiteral.Negate()))
                         {
-                            foreach (var restOfGoalElementsUnifier in UnmatchWithGoalNegation(effectElements.Skip(1), firstEffectElementUnifier))
+                            foreach (var restOfGoalElementsUnifier in ExpandNonMatchesWithGoalNegation(effectElements.Skip(1), firstEffectElementUnifier))
                             {
                                 yield return restOfGoalElementsUnifier;
                             }
@@ -203,8 +220,6 @@ namespace SCClassicalPlanning.Planning
                     // We return each unification we find immediately - for an effect to be relevant it only needs to match at least one element of the goal.
                     foreach (var goalElement in goal.Elements)
                     {
-                        // TODO: using LiteralUnifier is perhaps overkill given that we know we're functionless,
-                        // but will do for now. (doesn't necessarily cost more..)
                         if (LiteralUnifier.TryCreate(goalElement, effectElement, out var unifier))
                         {
                             yield return unifier;
@@ -217,7 +232,11 @@ namespace SCClassicalPlanning.Planning
             {
                 foreach (var potentialSubstitution in MatchWithGoal(schema.Effect.Elements))
                 {
-                    foreach (var substitution in UnmatchWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
+                    if (IsUnconstrainedNonMatchWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
+                    {
+                        yield return (schema, potentialSubstitution);
+                    }
+                    else foreach (var substitution in ExpandNonMatchesWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
                     {
                         yield return (schema, substitution);
                     }
