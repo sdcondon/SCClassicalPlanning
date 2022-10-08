@@ -1,11 +1,15 @@
-﻿using SCFirstOrderLogic;
+﻿using SCClassicalPlanning.ProblemManipulation;
+using SCFirstOrderLogic;
+using SCFirstOrderLogic.SentenceManipulation;
+using SCFirstOrderLogic.SentenceManipulation.Unification;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
 {
     /// <summary>
     /// State space search heuristic that ignores preconditions and uses a greedy set cover algorithm
-    /// to provide its estimate. Not admissable (mostly because greedy set cover can overestimate),
-    /// but better than heuristics that don't examine the available actions at all..
+    /// to provide its estimate. Not "admissable" (mostly because greedy set cover can overestimate) - 
+    /// so the plans discovered using it won't necessarily be optimal, but better than heuristics
+    /// that don't examine the available actions at all..
     /// </summary>
     public class IgnorePreconditionsGreedySetCover
     {
@@ -21,6 +25,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         {
             // hmm. *almost* what we want, I think..
             var relevantActions = ProblemInspector.GetRelevantActions(problem, goal); 
+            //var relevantActions = GetRelevantActions(goal); 
             var coveringActionCount = GetCoveringActionCount(GetUnsatisfiedLiterals(state, goal), relevantActions);
 
             if (coveringActionCount == -1)
@@ -33,6 +38,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
             }
         }
 
+        /// So very very slow.
         ////public IEnumerable<Action> GetRelevantActions(Goal goal)
         ////{
         ////    foreach (var actionSchema in problem.Domain.Actions)
@@ -106,6 +112,30 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
             }
 
             return coveringActionCount;
+        }
+
+        /// <summary>
+        /// Utility class to transform <see cref="Goal"/> instances using a given <see cref="VariableSubstitution"/>.
+        /// </summary>
+        private class VariableSubstitutionGoalTransformation : RecursiveGoalTransformation
+        {
+            private readonly VariableSubstitution substitution;
+
+            public VariableSubstitutionGoalTransformation(VariableSubstitution substitution) => this.substitution = substitution;
+
+            public override Literal ApplyTo(Literal literal) => substitution.ApplyTo(literal);
+        }
+
+        /// <summary>
+        /// Utility class to transform <see cref="Effect"/> instances using a given <see cref="VariableSubstitution"/>.
+        /// </summary>
+        private class VariableSubstitutionEffectTransformation : RecursiveEffectTransformation
+        {
+            private readonly VariableSubstitution substitution;
+
+            public VariableSubstitutionEffectTransformation(VariableSubstitution substitution) => this.substitution = substitution;
+
+            public override Literal ApplyTo(Literal literal) => substitution.ApplyTo(literal);
         }
     }
 }
