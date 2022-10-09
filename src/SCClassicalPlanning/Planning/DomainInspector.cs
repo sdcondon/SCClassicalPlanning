@@ -10,8 +10,8 @@ namespace SCClassicalPlanning.Planning
     public static class DomainInspector
     {
         /// <summary>
-        /// Gets the variable substitution that must be made to convert the matching action schema (with the matching identifier)
-        /// in the <see cref="Domain.Actions"/> collection of the given domain to the given action.
+        /// Gets the variable substitution that must be made to transform the matching action schema (with the matching identifier)
+        /// in the <see cref="Domain.Actions"/> of the given domain to the given action.
         /// <para/>
         /// Intended to be useful for succinct output of plan steps. We don't want to "bloat" our action model with this
         /// information (planners won't and shouldn't care what the original variable name was), but it is useful when

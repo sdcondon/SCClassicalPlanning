@@ -44,13 +44,14 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 getEdgeCost: e => getActionCost(e.Action),
                 getEstimatedCostToTarget: n => estimateCostToGoal(problem.InitialState, n.Goal));
 
-            await Task.Run(() => search.Complete());
+            await search.CompleteAsync();
+            // TODO: support interrogable plans
             ////var exploredEdges = new HashSet<StateSpaceEdge>();
             ////while (!search.IsConcluded)
             ////{
             ////    search.NextStep();
 
-            ////    var newEdges = search.Visited.Values/*.Where(i => !i.IsOnFrontier)*/.Select(i => i.Edge);
+            ////    var newEdges = search.Visited.Values.Where(i => !i.IsOnFrontier).Select(i => i.Edge);
             ////    foreach (var edge in newEdges)
             ////    {
             ////        if (!object.Equals(edge, default(StateSpaceEdge)) && !exploredEdges.Contains(edge))
@@ -69,7 +70,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 throw new ArgumentException("Problem is unsolvable", nameof(problem));
             }
-}
+        }
 
         private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
         {
@@ -86,8 +87,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(problem, Goal);
 
             /// <inheritdoc />
+            public override bool Equals(object? obj) => obj is StateSpaceNode node && Equals(node);
+
+            /// <inheritdoc />
             // NB: this struct is private - so we don't need to look at the problem, since it'll always match
-            public bool Equals(StateSpaceNode node) => node.Goal.Equals(Goal);
+            public bool Equals(StateSpaceNode node) => Equals(Goal, node.Goal);
 
             /// <inheritdoc />
             public override int GetHashCode() => HashCode.Combine(Goal);

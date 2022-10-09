@@ -44,7 +44,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 getEdgeCost: e => getActionCost(e.Action),
                 getEstimatedCostToTarget: n => estimateCostToGoal(n.State, problem.Goal));
 
-            await Task.Run(() => search.Complete()); // todo?: worth adding all the Steppable stuff like in FoL?
+            await search.CompleteAsync(); // todo?: worth adding all the Steppable stuff like in FoL?
 
             if (!object.Equals(search.Target, default(StateSpaceNode)))
             {
