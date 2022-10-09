@@ -234,14 +234,17 @@ namespace SCClassicalPlanning.Planning
             {
                 foreach (var potentialSubstitution in MatchWithGoal(schema.Effect.Elements))
                 {
-                    if (IsUnconstrainedNonMatchWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
-                    {
-                        yield return (schema, potentialSubstitution);
-                    }
-                    else foreach (var substitution in ExpandNonMatchesWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
+                    ////if (IsUnconstrainedNonMatchWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
+                    ////{
+                    ////    yield return (schema, potentialSubstitution);
+                    ////}
+                    ////else
+                    ////{
+                        foreach (var substitution in ExpandNonMatchesWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
                         {
                             yield return (schema, substitution);
                         }
+                    ////}
                 }
             }
         }
