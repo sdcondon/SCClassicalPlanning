@@ -3,13 +3,15 @@ using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics;
 using SCFirstOrderLogic;
+using SCFirstOrderLogic.Inference;
+using SCFirstOrderLogic.Inference.Resolution;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.SpareTire;
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
-#if false
     public static class BackwardStateSpaceSearchTests
     {
         public static Test AirCargoScenario => TestThat
@@ -25,6 +27,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
                 return new TestCase(
                     Domain: AirCargo.Domain,
+                    Invariants: Array.Empty<Sentence>(),
                     InitialState: new(
                         Cargo(cargo1)
                         & Cargo(cargo2)
@@ -55,6 +58,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
                 return new TestCase(
                     Domain: BlocksWorld.Domain,
+                    Invariants: new Sentence[] { ForAll(A, B, If(On(A, B), !Clear(B))), },
                     InitialState: new(
                         Block(blockA)
                         & Equal(blockA, blockA)
@@ -88,6 +92,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
                 return new TestCase(
                     Domain: BlocksWorld.Domain,
+                    Invariants: new Sentence[] { ForAll(A, B, If(On(A, B), !Clear(B))), },
                     InitialState: new(
                         Block(blockA)
                         & Equal(blockA, blockA)
@@ -124,6 +129,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 return new TestCase(
                     Domain: SpareTire.Domain,
+                    Invariants: Array.Empty<Sentence>(),
                     InitialState: new(
                         SpareTire.ImplicitState
                         & IsAt(Flat, Axle)
@@ -136,16 +142,25 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
             .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter(SpareTire.Domain).Format(p)));
 
-        private record TestCase(Domain Domain, State InitialState, Goal Goal)
+        private record TestCase(Domain Domain, IEnumerable<Sentence> Invariants, State InitialState, Goal Goal)
         {
             public Plan Execute()
             {
                 var problem = new Problem(Domain, InitialState, Goal);
-                var heuristic = new IgnorePreconditionsGreedySetCover(problem);
+
+                var invariantKb = new SimpleResolutionKnowledgeBase(
+                    new SimpleClauseStore(),
+                    SimpleResolutionKnowledgeBase.Filters.None,
+                    SimpleResolutionKnowledgeBase.PriorityComparisons.UnitPreference);
+                invariantKb.Tell(Invariants);
+
+                var innerHeuristic = new IgnorePreconditionsGreedySetCover(problem).EstimateCost;
+                //var innerHeuristic = ElementDifferenceCount.EstimateCost;
+
+                var heuristic = new GoalInvariantCheck(invariantKb, innerHeuristic);
                 var planner = new BackwardStateSpaceSearch(heuristic.EstimateCost);
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
             }
         }
     }
-#endif
 }

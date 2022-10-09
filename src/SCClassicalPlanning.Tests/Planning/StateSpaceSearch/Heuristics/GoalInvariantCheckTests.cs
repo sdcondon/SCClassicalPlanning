@@ -12,7 +12,7 @@ using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
-    public static class InvariantCheckTests
+    public static class GoalInvariantCheckTests
     {
         private static readonly Constant blockA = new(nameof(blockA));
         private static readonly Constant blockB = new(nameof(blockB));
@@ -31,7 +31,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             & Clear(blockB)
             & Clear(blockC));
 
-        private record TestCase(IEnumerable<Sentence> Invariants, State State, OperableGoal Goal, float ExpectedCost);
+        private record TestCase(IEnumerable<Sentence> Invariants, OperableState State, OperableGoal Goal, float ExpectedCost);
 
         public static Test EstimateCostBehaviour => TestThat
             .GivenTestContext()
@@ -40,36 +40,42 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 new TestCase(
                     Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
                     State: BlocksWorldInitialState,
-                    Goal: Block(Table), // Fine - invariants don't rule this out
+                    Goal: Goal.Empty, // Fine
                     ExpectedCost: 0),
 
                 new TestCase(
                     Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
                     State: BlocksWorldInitialState,
-                    Goal: !Block(blockA), // Contradicts Block(blockA)
+                    Goal: Block(Table), // Fine
+                    ExpectedCost: 0),
+
+                new TestCase(
+                    Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
+                    State: BlocksWorldInitialState,
+                    Goal: !Block(blockA), // Violates Block(blockA)
                     ExpectedCost: float.PositiveInfinity),
 
                 new TestCase(
                     Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
                     State: BlocksWorldInitialState,
-                    Goal: On(blockA, blockB) & Clear(blockB), // Nope - violates on/clear relationship
+                    Goal: On(blockA, blockB) & Clear(blockB), // Violates on/clear relationship
                     ExpectedCost: float.PositiveInfinity),
 
                 new TestCase(
                     Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
                     State: BlocksWorldInitialState,
                     Goal: On(blockB, blockA) & Clear(blockB), // Fine
-                    ExpectedCost: 0)
+                    ExpectedCost: 0),
             })
             .When((_, tc) =>
             {
                 var kb = new SimpleResolutionKnowledgeBase(
                     new SimpleClauseStore(),
                     SimpleResolutionKnowledgeBase.Filters.None,
-                    SimpleResolutionKnowledgeBase.PriorityComparisons.UnitPreference);
+                    SimpleResolutionKnowledgeBase.PriorityComparisons.None); // No point in unitpref, 'cos query is all unit clauses..
                 kb.Tell(tc.Invariants);
 
-                return new InvariantCheck(kb, (s, g) => 0).EstimateCost(tc.State, tc.Goal);
+                return new GoalInvariantCheck(kb, (s, g) => 0).EstimateCost(tc.State, tc.Goal);
             })
             .ThenReturns()
             .And((_, tc, rv) => rv.Should().Be(tc.ExpectedCost));
