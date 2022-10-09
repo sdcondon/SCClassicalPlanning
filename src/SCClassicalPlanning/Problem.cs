@@ -19,6 +19,10 @@ namespace SCClassicalPlanning
         /// <param name="initialState">The initial state of the problem.</param>
         /// <param name="goal">The goal of the problem.</param>
         /// <param name="objects">The objects that exist in this problem.</param>
+        // TODO-SIGNIFICANT: Problematic design-wise.. Large? IO? Fairly big deal because could have significant impact.
+        // Should Objects and InitialState ctor params be replaced with something like an 'IStateStore'? 
+        // Perhaps also leave existing ctor that implicitly uses MemoryStateStore.
+        // Explore this. Later.
         public Problem(Domain domain, State initialState, Goal goal, IList<Constant> objects)
         {
             Domain = domain;
@@ -52,19 +56,11 @@ namespace SCClassicalPlanning
 
         /// <summary>
         /// Gets the objects that exist in the problem.
-        /// <para/>
-        /// TODO-SIGNIFICANT: Problematic design-wise.. Large? IO? Fairly big deal because could have significant impact.
-        /// Should Objects and InitialState be replaced with something like an 'IStateStore'? Which would perhaps mean that State should be IState?
-        /// Explore this. Later.
         /// </summary>
         public ReadOnlyCollection<Constant> Objects { get; }
 
         /// <summary>
         /// Gets the initial state of the problem.
-        /// <para/>
-        /// TODO-SIGNIFICANT: Problematic design-wise.. Large? IO? Fairly big deal because could have significant impact.
-        /// Should Objects and InitialState be replaced with something like an 'IStateStore'? Which would perhaps mean that State should be IState?
-        /// Explore this. Later.
         /// </summary>
         public State InitialState { get; }
 

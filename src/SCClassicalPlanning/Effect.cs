@@ -10,10 +10,7 @@ namespace SCClassicalPlanning
     /// <see cref="Effect"/>s are essentially a set of (functionless) <see cref="Literal"/>s. The positive ones indicates predicates that are added to a
     /// state by the effect's application. The negative ones indicate predicates that are removed. Effects are applied as the result of <see cref="Action"/>s.
     /// <para/>
-    /// TODO: probably should add some verification that all literals are functionless.
-    /// <br/>TODO: Should also probably store add and delete lists separately,
-    /// for performance. Application and Regression are going to be far more common than wanting to get all elements. Then again, if and this is expanded to richer
-    /// PDDL functionality (or if we want to allow extension.. - unlikely given the motivator for the project, but..)
+    /// NB: doesn't actually validate that its elements are functionless - because the right place to do that is in the planning algorithms.
     /// </summary>
     public class Effect
     {
@@ -43,6 +40,9 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Gets the set of literals that comprise this effect.
         /// </summary>
+        // TODO-PERFORMANCE: Should perhaps store add and delete lists separately, for performance. Application and Regression are going to be far more common than wanting to get all elements.
+        // Then again, if and this is expanded to richer PDDL functionality (or if we want to allow extension.. - unlikely given the motivator for the project, but..).
+        // In any case, add some benchmarks before making any changes.
         public ImmutableHashSet<Literal> Elements { get; }
 
         /// <summary>

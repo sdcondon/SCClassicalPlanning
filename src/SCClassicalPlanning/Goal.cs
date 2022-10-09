@@ -11,8 +11,7 @@ namespace SCClassicalPlanning
     /// to satisfy the goal. The negative ones indicate predicates that must NOT exist in a state for it to satisfy the goal. Goals are used to describe the end goal of <see cref="Problem"/>
     /// instances, as well as the precondition of <see cref="Action"/> instances.
     /// <para/>
-    /// TODO: probably should add some verification that all literals are functionless. TODO: Should also probably store add and delete lists separately,
-    /// for performance. Application and Regression are going to be far more common than wanting to get all elements of a state.
+    /// NB: doesn't actually validate that its elements are functionless - because the right place to do that is in the planning algorithms.
     /// </summary>
     public class Goal
     {
@@ -44,6 +43,10 @@ namespace SCClassicalPlanning
         /// The positive ones indicate predicates that must exist in a <see cref="State"/> in order for the goal to be satisfied.
         /// The negative ones indicate predicates that must NOT exist in a <see cref="State"/> in order for the goal to be satisfied.
         /// </summary>
+        // TODO-PERFORMANCE: Should perhaps store positive and negative elements separately, for performance.
+        // Application and Regression are going to be far more common than wanting to get all elements.
+        // Then again, if and this is expanded to richer PDDL functionality (or if we want to allow extension.. - unlikely given the motivator for the project, but..).
+        // In any case, add some benchmarks before making any changes.
         public ImmutableHashSet<Literal> Elements { get; }
 
         /// <summary>
