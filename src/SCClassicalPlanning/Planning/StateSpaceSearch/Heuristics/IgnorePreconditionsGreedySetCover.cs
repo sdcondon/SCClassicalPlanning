@@ -41,7 +41,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
             var relevantEffects = GetRelevantEffects(unsatisfiedGoalElements, state.Elements);
             if (relevantEffects.Count() == 0)
             {
-                return -1;
+                return float.PositiveInfinity;
             }
 
             var coveringActionCount = GetCoveringActionCount(unsatisfiedGoalElements, relevantEffects);
@@ -68,7 +68,6 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
             ////    }
             ////}
             ////return uncovered;
-
 
             var uncovered = new HashSet<Literal>(goal.Elements);
             foreach (var goalElement in goal.Elements)
