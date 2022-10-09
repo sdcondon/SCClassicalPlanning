@@ -52,8 +52,14 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 new TestCase(
                     Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
                     State: BlocksWorldInitialState,
-                    Goal: On(blockA, blockB) & Clear(blockB), // Nope - violates invariant
+                    Goal: On(blockA, blockB) & Clear(blockB), // Nope - violates on/clear relationship
                     ExpectedCost: float.PositiveInfinity),
+
+                new TestCase(
+                    Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
+                    State: BlocksWorldInitialState,
+                    Goal: On(blockB, blockA) & Clear(blockB), // Fine
+                    ExpectedCost: 0)
             })
             .When((_, tc) =>
             {
