@@ -18,7 +18,7 @@ In this section, we use the ["blocks world"](https://en.wikipedia.org/wiki/Block
 
 ```csharp
 using SCClassicalPlanning; // for Goal, Effect, Action, Domain, Problem, State
-using SCFirstOrderLogic; // for Constant, Term, Predicate, VariableDeclaration
+using SCFirstOrderLogic; // for Constant, Term, Predicate, VariableDeclaration, EqualitySymbol
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // for OperablePredicate
 using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.Action. I'd rather not rename it..
 
@@ -29,13 +29,16 @@ Constant Table = new(nameof(Table));
 
 // Our domain defines four predicates (essentially, facts about zero or more elements of the domain that,
 // in any given state, are either true or not). As mentioned in the user guide for SCFirstOrderLogic, creating
-// helper methods for your predicates is highly recommended. Note that we're using OperablePredicate here.
-// Its not required, but makes everything nice and succinct because it means we can use & and ! to combine them.
-// See the SCFirstOrderLogic docs for details.
+// helper methods for your predicates, as we do below, is highly recommended.
+// NB #1: note that we're using OperablePredicate here. Its not required, but makes everything nice and succinct because
+// it means we can use & and ! to combine them. See the SCFirstOrderLogic docs for details.
+// NB #2: Also note the use of EqualitySymbol.Instance here to identify the equality predicate. While at present there's
+// no special handling of equality in any of the algorithms (in here or in SCFirstOrderLogic), its worth using this anyway
+// - even if only for future-proofing.
 OperablePredicate On(Term above, Term below) => new Predicate(nameof(On), above, below);
 OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
 OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
-OperablePredicate Equal(Term x, Term y) => new Predicate(nameof(Equal), x, y);
+OperablePredicate Equal(Term x, Term y) => new Predicate(EqualitySymbol.Instance, x, y);
 
 // Now declare some variables for use in our action schemas:
 VariableDeclaration block = new(nameof(block));

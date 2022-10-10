@@ -32,7 +32,7 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         public static OperablePredicate On(Term above, Term below) => new Predicate(nameof(On), above, below);
         public static OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
         public static OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
-        public static OperablePredicate Equal(Term x, Term y) => new Predicate(nameof(Equal), x, y);
+        public static OperablePredicate Equal(Term x, Term y) => new Predicate(EqualitySymbol.Instance, x, y);
 
         public static Action Move(Term block, Term from, Term toBlock) => new OperableAction(
             identifier: nameof(Move),

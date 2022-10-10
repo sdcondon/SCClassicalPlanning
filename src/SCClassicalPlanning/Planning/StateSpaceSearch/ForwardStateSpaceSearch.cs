@@ -36,7 +36,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         }
 
         /// <inheritdoc />
-        public async Task<Plan> CreatePlanAsync(Problem problem)
+        public async Task<Plan> CreatePlanAsync(Problem problem, CancellationToken cancellationToken = default)
         {
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.InitialState),
@@ -44,7 +44,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 getEdgeCost: e => getActionCost(e.Action),
                 getEstimatedCostToTarget: n => estimateCostToGoal(n.State, problem.Goal));
 
-            await search.CompleteAsync(); // todo?: worth adding all the Steppable stuff like in FoL?
+            await search.CompleteAsync(1, cancellationToken); // todo?: worth adding all the Steppable stuff like in FoL?
 
             if (!object.Equals(search.Target, default(StateSpaceNode)))
             {

@@ -36,7 +36,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         }
 
         /// <inheritdoc />
-        public async Task<Plan> CreatePlanAsync(Problem problem)
+        public async Task<Plan> CreatePlanAsync(Problem problem, CancellationToken cancellationToken = default)
         {
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.Goal),
@@ -44,7 +44,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 getEdgeCost: e => getActionCost(e.Action),
                 getEstimatedCostToTarget: n => estimateCostToGoal(problem.InitialState, n.Goal));
 
-            await search.CompleteAsync();
+            await search.CompleteAsync(1, cancellationToken);
             // TODO: support interrogable plans
             ////var exploredEdges = new HashSet<StateSpaceEdge>();
             ////while (!search.IsConcluded)
