@@ -80,7 +80,7 @@ Action moveToTable = new(
 
 // Now we are finally ready to declare our domain.
 // A domain defines the common aspects of all problems that occur within it.
-// Specifically, what actions are available:
+// Minimally, what actions are available:
 var domain = new Domain(moveToBlock, moveToTable);
 
 // Now we declare a few more constants.

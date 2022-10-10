@@ -89,7 +89,7 @@ namespace SCClassicalPlanning
             public override Term ApplyTo(Term term)
             {
                 // Ultimately, it might be a nice quality-of-life improvement to
-                // keep variable names as is if its appropriate (e.g. if its the same
+                // keep variable names as-is if its appropriate (e.g. if its the same
                 // in all copies of this predicate) - but can come back to that.
                 symbols.MoveNext();
                 return new VariableReference(symbols.Current);
