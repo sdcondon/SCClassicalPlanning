@@ -85,11 +85,10 @@ var domain = new Domain(moveToBlock, moveToTable);
 
 // Finally, we can declare our problem.
 // Problems exist in a given domain, and consist of an initial state, an end goal, and a collection of objects that exist.
-// Note that here we have used a constructor overload without explicitly specifying what objects exist. This overload will
-// assume the existing objects are precisely the Constants that are referred to by the initial state and goal.
 Constant blockA = new(nameof(blockA));
 Constant blockB = new(nameof(blockB));
 Constant blockC = new(nameof(blockC));
+
 var problem = new Problem(
     domain: domain,
     initialState: new State(
