@@ -13,37 +13,39 @@ namespace SCClassicalPlanning
     public class Problem
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Problem"/> class.
-        /// </summary>
-        /// <param name="domain">The domain in which this problem resides.</param>
-        /// <param name="initialState">The initial state of the problem.</param>
-        /// <param name="goal">The goal of the problem.</param>
-        /// <param name="objects">The objects that exist in this problem.</param>
-        // TODO-SIGNIFICANT: Problematic design-wise.. Large? IO? Fairly big deal because could have significant impact.
-        // Should Objects and InitialState ctor params be replaced with something like an 'IStateStore'? 
-        // Perhaps also leave existing ctor that implicitly uses MemoryStateStore.
-        // Explore this. Later.
-        public Problem(Domain domain, State initialState, Goal goal, IList<Constant> objects)
-        {
-            Domain = domain;
-            Objects = new ReadOnlyCollection<Constant>(objects);
-            InitialState = initialState;
-            Goal = goal;
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="Problem"/> class, in which the objects that exist are inferred from the constants that are present in the initial state and the goal.
         /// </summary>
         /// <param name="domain">The domain in which this problem resides.</param>
         /// <param name="initialState">The initial state of the problem.</param>
         /// <param name="goal">The goal of the problem.</param>
         public Problem(Domain domain, State initialState, Goal goal)
+            : this(domain, initialState, goal, Array.Empty<Constant>())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Problem"/> class.
+        /// </summary>
+        /// <param name="domain">The domain in which this problem resides.</param>
+        /// <param name="initialState">The initial state of the problem.</param>
+        /// <param name="goal">The goal of the problem.</param>
+        /// <param name="additionalConstants">
+        /// Any constants that exist in the problem other than those defined by the domain, initial state and goal.
+        /// Yes, this is unusual - but we shouldn't preclude objects that serve as 'catalysts' (so don't feature
+        /// in initial state or goal) and are used in actions that place no pre-conditions on them. (Very) unlikely but possible.
+        /// Algorithms that can deal with variables don't need to know about such objects, but e.g. GraphPlan needs to know.
+        /// </param>
+        // TODO-SIGNIFICANT: Problematic design-wise.. Large? IO? Fairly big deal because could have significant impact.
+        // Should Objects and InitialState ctor params be replaced with something like an 'IStateStore'? 
+        // Perhaps also leave existing ctor that implicitly uses MemoryStateStore.
+        // Explore this. Later.
+        public Problem(Domain domain, State initialState, Goal goal, IList<Constant> additionalConstants)
         {
             Domain = domain;
             InitialState = initialState;
             Goal = goal;
 
-            var constants = new HashSet<Constant>();
+            var constants = new HashSet<Constant>(additionalConstants);
             StateConstantFinder.Instance.Visit(initialState, constants);
             GoalConstantFinder.Instance.Visit(goal, constants);
             Objects = new ReadOnlyCollection<Constant>(constants.ToArray());
