@@ -1,9 +1,11 @@
-﻿#if false
-using FluentAssertions;
+﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains;
+using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using SCFirstOrderLogic;
-using static SCClassicalPlanning.ExampleDomains.AirCargo;
+using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
+using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
+using static SCClassicalPlanning.ExampleDomains.FromAIaMA.SpareTire;
 using static SCClassicalPlanning.ExampleDomains.Container;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
@@ -14,79 +16,51 @@ namespace SCClassicalPlanning
         private static readonly Constant element1 = new(nameof(element1));
         private static readonly Constant element2 = new(nameof(element2));
 
-        private record GetRelevantActionsTestCase(Domain Domain, Goal Goal, Action[] ExpectedResult);
+        private record ConstructionTestCase(Domain Domain, IEnumerable<Predicate> ExpectedPredicates, IEnumerable<Constant> ExpectedConstants);
 
-        public static Test GetRelevantActionsBehaviour => TestThat
-            .GivenEachOf(() => new GetRelevantActionsTestCase[]
+        public static Test ConstructionBehaviour => TestThat
+            .GivenEachOf(() => new ConstructionTestCase[]
             {
                 new(
                     Domain: Container.Domain,
-                    Goal: new(IsPresent(element1)),
-                    ExpectedResult: new[]
-                    {
-                        Add(element1),
-                        Swap(R, element1),
-                    }),
+                    ExpectedPredicates: new Predicate[] { IsPresent(A) },
+                    ExpectedConstants: Array.Empty<Constant>()),
 
                 new(
-                    Domain: Container.Domain,
-                    Goal: new(IsPresent(element1) & IsPresent(element2)),
-                    ExpectedResult: new[]
+                    Domain: AirCargo.Domain,
+                    ExpectedPredicates: new Predicate[]
                     {
-                        Add(element1),
-                        Add(element2),
-                        //Swap(R, element1) where R != element2,
-                        //Swap(R, element2) where R != element1,
-                    }),
+                        Cargo(A),
+                        Plane(A),
+                        Airport(A),
+                        At(A, B),
+                        In(A, B),
+                    },
+                    ExpectedConstants: Array.Empty<Constant>()),
 
                 new(
-                    Domain: Container.Domain,
-                    Goal: new(IsPresent(element1) & !IsPresent(element2)),
-                    ExpectedResult: new[]
+                    Domain: BlocksWorld.Domain,
+                    ExpectedPredicates: new Predicate[]
                     {
-                        Add(element1),
-                        Remove(element2),
-                        Swap(R, element1),
-                        Swap(element2, A),
-                    }),
+                        On(A, B),
+                        Block(A),
+                        Clear(A),
+                        Equal(A, B),
+                    },
+                    ExpectedConstants: new[] { Table }),
 
                 new(
-                    Domain: Container.Domain,
-                    Goal: new(!IsPresent(element1) & !IsPresent(element2)),
-                    ExpectedResult: new[]
+                    Domain: SpareTire.Domain,
+                    ExpectedPredicates: new Predicate[]
                     {
-                        Remove(element1),
-                        Remove(element2),
-                        //Swap(element1, A) where A != element2,
-                        //Swap(element2, A) where A != element1,
-                    }),
-
-                ////new(
-                ////    Domain: AirCargo.Domain,
-                ////    Goal: new(At(new Constant("cargo2"), new Constant("sfo"))),
-                ////    ExpectedResult: new Action[]
-                ///     {
-                ///         Unload(new Constant("cargo2"), P, new Constant("sfo")),
-                ///     }),
+                        IsTire(A),
+                        IsAt(A, B),
+                    },
+                    ExpectedConstants: new[] { Spare, Flat, Ground, Axle, Trunk }),
             })
-            .When(tc => tc.Domain.GetRelevantActions(tc.Goal))
+            .When(tc => tc.Domain) // ... :/ yeah, pointless, would be better to invoke ctor in the test action. Means the test name is a bit of a lie, but.. meh.
             .ThenReturns()
-            .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult));
-
-        // Model for a variable symbol that is precluded from taking particular values...
-        // #1 Is this approach justifiable?
-        // #2 Or would it need to be separate? i.e. ConstrainedGoal(Elements, Constraints..). Better than new Term type.
-        // #3 Or would it need to be a different Term type (which'd obv cause problems for SCFirstOrderLogic - REALLY want to avoid this approach)
-        // On first glance, I think I actually prefer #2..
-        // Experiment with me.. Later. Sticking point will obviously be if/how constraints can propogate backwards..
-        public class ConstrainedVariableSymbol
-        {
-            public ConstrainedVariableSymbol(object originalSymbol, IEnumerable<Constant> precludedValues) => (OriginalSymbol, PrecludedValues) = (originalSymbol, precludedValues);
-
-            public object OriginalSymbol { get; }
-
-            public IEnumerable<Constant> PrecludedValues { get; }
-        }
+            .And((tc, r) => r.Predicates.Should().BeEquivalentTo(tc.ExpectedPredicates))
+            .And((tc, r) => r.Constants.Should().BeEquivalentTo(tc.ExpectedConstants));
     }
 }
-#endif
