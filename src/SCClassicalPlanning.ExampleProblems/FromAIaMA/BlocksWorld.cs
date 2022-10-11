@@ -9,18 +9,7 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
     /// </summary>
     public static class BlocksWorld
     {
-        static BlocksWorld()
-        {
-            VariableDeclaration block = new(nameof(block));
-            VariableDeclaration from = new(nameof(from));
-            VariableDeclaration to = new(nameof(to));
-
-            Domain = new Domain(new Action[]
-            {
-                Move(block, from, to),
-                MoveToTable(block, from),
-            });
-        }
+        static BlocksWorld() => Domain = MakeDomain();
 
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
@@ -62,5 +51,19 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                 On(block, Table)
                 & Clear(from)
                 & !On(block, from));
+
+        // NB: This is in its own method rather than the static ctor so that we can run tests against domain construction.
+        internal static Domain MakeDomain()
+        {
+            VariableDeclaration block = new(nameof(block));
+            VariableDeclaration from = new(nameof(from));
+            VariableDeclaration to = new(nameof(to));
+
+            return new Domain(new Action[]
+            {
+                Move(block, from, to),
+                MoveToTable(block, from),
+            });
+        }
     }
 }

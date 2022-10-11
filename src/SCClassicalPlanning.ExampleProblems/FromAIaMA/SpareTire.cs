@@ -9,15 +9,7 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
     /// </summary>
     public static class SpareTire
     {
-        static SpareTire()
-        {
-            Domain  = new Domain(new Action[]
-            {
-                Remove(Var("object"), Var("location")),
-                PutOn(Var("tire")),
-                LeaveOvernight(),
-            });
-        }
+        static SpareTire() => Domain = MakeDomain();
 
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Spare Tire" domain.
@@ -59,5 +51,16 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                 & !IsAt(Flat, Ground)
                 & !IsAt(Flat, Axle)
                 & !IsAt(Flat, Trunk));
+
+        // NB: This is in its own method rather than the static ctor so that we can run tests against domain construction.
+        internal static Domain MakeDomain()
+        {
+            return new Domain(new Action[]
+            {
+                Remove(Var("object"), Var("location")),
+                PutOn(Var("tire")),
+                LeaveOvernight(),
+            });
+        }
     }
 }

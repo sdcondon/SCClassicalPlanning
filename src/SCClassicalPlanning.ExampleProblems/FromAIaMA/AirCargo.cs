@@ -9,21 +9,7 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
     /// </summary>
     public static class AirCargo
     {
-        static AirCargo()
-        {
-            VariableDeclaration cargo = new(nameof(cargo));
-            VariableDeclaration plane = new(nameof(plane));
-            VariableDeclaration airport = new(nameof(airport));
-            VariableDeclaration from = new(nameof(from));
-            VariableDeclaration to = new(nameof(to));
-
-            Domain = new Domain(new Action[]
-            {
-                Load(cargo, plane, airport),
-                Unload(cargo, plane, airport),
-                Fly(plane, from, to),
-            });
-        }
+        static AirCargo() => Domain = MakeDomain();
 
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates Air Cargo domain.
@@ -71,5 +57,22 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
             effect:
                 !At(plane, from)
                 & At(plane, to));
+
+        // NB: This is in its own method rather than the static ctor so that we can run tests against domain construction.
+        internal static Domain MakeDomain()
+        {
+            VariableDeclaration cargo = new(nameof(cargo));
+            VariableDeclaration plane = new(nameof(plane));
+            VariableDeclaration airport = new(nameof(airport));
+            VariableDeclaration from = new(nameof(from));
+            VariableDeclaration to = new(nameof(to));
+
+            return new Domain(new Action[]
+            {
+                Load(cargo, plane, airport),
+                Unload(cargo, plane, airport),
+                Fly(plane, from, to),
+            });
+        }
     }
 }

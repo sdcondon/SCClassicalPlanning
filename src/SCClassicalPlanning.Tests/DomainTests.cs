@@ -16,18 +16,18 @@ namespace SCClassicalPlanning
         private static readonly Constant element1 = new(nameof(element1));
         private static readonly Constant element2 = new(nameof(element2));
 
-        private record ConstructionTestCase(Domain Domain, IEnumerable<Predicate> ExpectedPredicates, IEnumerable<Constant> ExpectedConstants);
+        private record ConstructionTestCase(Func<Domain> MakeDomain, IEnumerable<Predicate> ExpectedPredicates, IEnumerable<Constant> ExpectedConstants);
 
         public static Test ConstructionBehaviour => TestThat
-            .GivenEachOf(() => new ConstructionTestCase[]
+            .GivenEachOf<ConstructionTestCase>(() => new ConstructionTestCase[]
             {
                 new(
-                    Domain: Container.Domain,
+                    MakeDomain: Container.MakeDomain,
                     ExpectedPredicates: new Predicate[] { IsPresent(A) },
                     ExpectedConstants: Array.Empty<Constant>()),
 
                 new(
-                    Domain: AirCargo.Domain,
+                    MakeDomain: AirCargo.MakeDomain,
                     ExpectedPredicates: new Predicate[]
                     {
                         Cargo(A),
@@ -39,7 +39,7 @@ namespace SCClassicalPlanning
                     ExpectedConstants: Array.Empty<Constant>()),
 
                 new(
-                    Domain: BlocksWorld.Domain,
+                    MakeDomain: BlocksWorld.MakeDomain,
                     ExpectedPredicates: new Predicate[]
                     {
                         On(A, B),
@@ -50,7 +50,7 @@ namespace SCClassicalPlanning
                     ExpectedConstants: new[] { Table }),
 
                 new(
-                    Domain: SpareTire.Domain,
+                    MakeDomain: SpareTire.MakeDomain,
                     ExpectedPredicates: new Predicate[]
                     {
                         IsTire(A),
@@ -58,7 +58,7 @@ namespace SCClassicalPlanning
                     },
                     ExpectedConstants: new[] { Spare, Flat, Ground, Axle, Trunk }),
             })
-            .When(tc => tc.Domain) // ... :/ yeah, pointless, would be better to invoke ctor in the test action. Means the test name is a bit of a lie, but.. meh.
+            .When<Domain>((Func<ConstructionTestCase, Domain>)(tc => (Domain)tc.DomainCtor())) 
             .ThenReturns()
             .And((tc, r) => r.Predicates.Should().BeEquivalentTo(tc.ExpectedPredicates))
             .And((tc, r) => r.Constants.Should().BeEquivalentTo(tc.ExpectedConstants));
