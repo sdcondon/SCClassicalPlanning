@@ -75,7 +75,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                     SimpleResolutionKnowledgeBase.PriorityComparisons.None); // No point in unitpref, 'cos query is all unit clauses..
                 kb.Tell(tc.Invariants);
 
-                return new GoalInvariantCheck(kb, (s, g) => 0).EstimateCost(tc.State, tc.Goal);
+                return new GoalInvariantCheck(kb, new DelegateHeuristic((s, g) => 0)).EstimateCost(tc.State, tc.Goal);
             })
             .ThenReturns()
             .And((_, tc, rv) => rv.Should().Be(tc.ExpectedCost));

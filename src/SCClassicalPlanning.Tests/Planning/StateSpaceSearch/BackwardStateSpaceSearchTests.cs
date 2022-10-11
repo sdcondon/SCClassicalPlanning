@@ -12,7 +12,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
     public static class BackwardStateSpaceSearchTests
     {
-        private record TestCase(Problem Problem, Func<State, Goal, float> Heuristic);
+        private record TestCase(Problem Problem, IHeuristic Heuristic);
 
         public static Test CreatedPlanValidity => TestThat
             .GivenTestContext()
@@ -51,7 +51,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .And((_, tc, pl) => tc.Problem.Goal.IsSatisfiedBy(pl.ApplyTo(tc.Problem.InitialState)).Should().BeTrue())
             .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
 
-        private static Func<State, Goal, float> MakeInvariantCheckingHeuristic(Problem problem, IEnumerable<Sentence> invariants)
+        private static IHeuristic MakeInvariantCheckingHeuristic(Problem problem, IEnumerable<Sentence> invariants)
         {
             var invariantKb = new SimpleResolutionKnowledgeBase(
                 new SimpleClauseStore(),
@@ -59,9 +59,9 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 SimpleResolutionKnowledgeBase.PriorityComparisons.UnitPreference);
             invariantKb.Tell(invariants);
 
-            var innerHeuristic = new IgnorePreconditionsGreedySetCover(problem).EstimateCost;
+            var innerHeuristic = new IgnorePreconditionsGreedySetCover(problem);
 
-            return new GoalInvariantCheck(invariantKb, innerHeuristic).EstimateCost;
+            return new GoalInvariantCheck(invariantKb, innerHeuristic);
         }
 
         private static Problem MakeBigBlocksWorldProblem()

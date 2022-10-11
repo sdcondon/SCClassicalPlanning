@@ -9,7 +9,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
     /// starting from the current state. The cost estimate is maximum level cost of any of the goal's
     /// elements.
     /// </summary>
-    public class PlanningGraphMaxLevel
+    public class PlanningGraphMaxLevel : IHeuristic
     {
         private readonly Problem problem;
 
@@ -22,7 +22,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// <inheritdoc/>
         public float EstimateCost(State state, Goal goal)
         {
-            var planningGraph = new PlanningGraph(problem.Domain, state, problem.Objects);
+            var planningGraph = new PlanningGraph(problem, state);
 
             // TODO: deal with not found (=> float.positiveInfinity)
             return goal.Elements.Max(e => planningGraph.FindProposition(e));

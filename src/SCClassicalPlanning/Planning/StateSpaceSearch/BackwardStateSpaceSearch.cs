@@ -12,27 +12,27 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     /// </summary>
     public class BackwardStateSpaceSearch : IPlanner
     {
+        private readonly IHeuristic heuristic;
         private readonly Func<Action, float> getActionCost;
-        private readonly Func<State, Goal, float> estimateCostToGoal;
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the number of actions in the resulting plan.
         /// </summary>
-        /// <param name="estimateCountOfActionsToGoal">The heuristic to use - should give an estimate of the number of actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
-        public BackwardStateSpaceSearch(Func<State, Goal, float> estimateCountOfActionsToGoal)
-            : this(a => 1f, estimateCountOfActionsToGoal)
+        /// <param name="heuristic">The heuristic to use - the returned cost will be interpreted as the estimated number of actions that need to be performed.</param>
+        public BackwardStateSpaceSearch(IHeuristic heuristic)
+            : this(heuristic, a => 1f)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the total "cost" of actions in the resulting plan.
         /// </summary>
+        /// <param name="heuristic">The heuristic to use - with the returned cost will be interpreted as the estimated total cost of the actions that need to be performed.</param>
         /// <param name="getActionCost">A delegate to retrieve the cost of an action.</param>
-        /// <param name="estimateCostToGoal">The heuristic to use - should give an estimate of the total cost of the actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
-        public BackwardStateSpaceSearch(Func<Action, float> getActionCost, Func<State, Goal, float> estimateCostToGoal)
+        public BackwardStateSpaceSearch(IHeuristic heuristic, Func<Action, float> getActionCost)
         {
+            this.heuristic = heuristic;
             this.getActionCost = getActionCost;
-            this.estimateCostToGoal = estimateCostToGoal;
         }
 
         /// <inheritdoc />
@@ -42,7 +42,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 source: new StateSpaceNode(problem, problem.Goal),
                 isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
                 getEdgeCost: e => getActionCost(e.Action),
-                getEstimatedCostToTarget: n => estimateCostToGoal(problem.InitialState, n.Goal));
+                getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
 
             await search.CompleteAsync(1, cancellationToken);
             // TODO: support interrogable plans

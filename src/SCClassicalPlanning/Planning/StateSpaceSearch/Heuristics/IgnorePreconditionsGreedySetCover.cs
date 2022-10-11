@@ -14,7 +14,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
     /// so the plans discovered using it won't necessarily be optimal, but better than heuristics
     /// that don't examine the available actions at all..
     /// </summary>
-    public class IgnorePreconditionsGreedySetCover
+    public class IgnorePreconditionsGreedySetCover : IHeuristic
     {
         private readonly Problem problem;
 

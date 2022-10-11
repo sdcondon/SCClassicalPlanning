@@ -24,9 +24,9 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
     /// the occurences of this predicate in the initial state must persist throughout the problem.
     /// Might research / play with this idea at some point.
     /// </summary>
-    public class GoalInvariantCheck
+    public class GoalInvariantCheck : IHeuristic
     {
-        private readonly Func<State, Goal, float> innerHeuristic;
+        private readonly IHeuristic innerHeuristic;
         private readonly IKnowledgeBase knowledgeBase;
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// </summary>
         /// <param name="invariantsKnowledgeBase">A knowledge base containing all of the invariants of the problem.</param>
         /// <param name="innerHeuristic">The inner heuristic to invoke if no invariants are violated by the goal.</param>
-        public GoalInvariantCheck(IKnowledgeBase invariantsKnowledgeBase, Func<State, Goal, float> innerHeuristic)
+        public GoalInvariantCheck(IKnowledgeBase invariantsKnowledgeBase, IHeuristic innerHeuristic)
         {
             this.innerHeuristic = innerHeuristic;
             this.knowledgeBase = invariantsKnowledgeBase;
@@ -73,7 +73,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
                 }
             }
 
-            return innerHeuristic(state, goal);
+            return innerHeuristic.EstimateCost(state, goal);
         }
 
         /// <summary>

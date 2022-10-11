@@ -10,9 +10,10 @@
     /// One of the things that this heuristic simply can't do is tell when preconditions are unsatisfiable - which is very bad 
     /// news for a backward state space search, because you rely on being able to do this to prune branches.
     /// </summary>
-    public static class UnsatisfiedGoalCount
+    public class UnsatisfiedGoalCount : IHeuristic
     {
-        public static float EstimateCost(State state, Goal goal)
+        /// <inheritdoc/>
+        public float EstimateCost(State state, Goal goal)
         {
             return goal.PositivePredicates.Except(state.Elements).Count()
                 + goal.NegativePredicates.Intersect(state.Elements).Count();

@@ -12,15 +12,15 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     /// </summary>
     public class ForwardStateSpaceSearch : IPlanner
     {
+        private readonly IHeuristic heuristic;
         private readonly Func<Action, float> getActionCost;
-        private readonly Func<State, Goal, float> estimateCostToGoal;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the number of actions in the resulting plan.
         /// </summary>
-        /// <param name="estimateCountOfActionsToGoal">The heuristic to use - should give an estimate of the number of actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
-        public ForwardStateSpaceSearch(Func<State, Goal, float> estimateCountOfActionsToGoal)
-            : this(a => 1f, estimateCountOfActionsToGoal)
+        /// <param name="heuristic">The heuristic to use - with the "cost" being interpreted as the estimated number of actions that need to be performed.</param>
+        public ForwardStateSpaceSearch(IHeuristic heuristic)
+            : this(heuristic, e => 1f)
         {
         }
 
@@ -28,11 +28,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the total "cost" of actions in the resulting plan.
         /// </summary>
         /// <param name="getActionCost">A delegate to retrieve the cost of an action.</param>
-        /// <param name="estimateCostToGoal">The heuristic to use - should give an estimate of the total cost of the actions required to get from the state represented by the first argument to a state that satisfies the goal represented by the second argument.</param>
-        public ForwardStateSpaceSearch(Func<Action, float> getActionCost, Func<State, Goal, float> estimateCostToGoal)
+        /// <param name="heuristic">The heuristic to use - with the "cost" being interpreted as the estimated total cost of the actions that need to be performed.</param>
+        public ForwardStateSpaceSearch(IHeuristic heuristic, Func<Action, float> getActionCost)
         {
+            this.heuristic = heuristic;
             this.getActionCost = getActionCost;
-            this.estimateCostToGoal = estimateCostToGoal;
         }
 
         /// <inheritdoc />
@@ -42,7 +42,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 source: new StateSpaceNode(problem, problem.InitialState),
                 isTarget: n => n.State.Satisfies(problem.Goal),
                 getEdgeCost: e => getActionCost(e.Action),
-                getEstimatedCostToTarget: n => estimateCostToGoal(n.State, problem.Goal));
+                getEstimatedCostToTarget: n => heuristic.EstimateCost(n.State, problem.Goal));
 
             await search.CompleteAsync(1, cancellationToken); // todo?: worth adding all the Steppable stuff like in FoL?
 
@@ -69,6 +69,10 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             /// <inheritdoc />
             public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(problem, State);
+
+            /// <inheritdoc />
+            // Just to shut static analysis up..
+            public override bool Equals(object? obj) => obj is StateSpaceNode node && Equals(node);
 
             /// <inheritdoc />
             // NB: this struct is private - so we don't need to look at the problem, since it'll always match
@@ -116,10 +120,10 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             }
 
             /// <inheritdoc />
-            public StateSpaceNode From => new StateSpaceNode(problem, fromState);
+            public StateSpaceNode From => new(problem, fromState);
 
             /// <inheritdoc />
-            public StateSpaceNode To => new StateSpaceNode(problem, toState);
+            public StateSpaceNode To => new(problem, toState);
 
             /// <summary>
             /// Gets the action that is applied to achieve this goal transition.
