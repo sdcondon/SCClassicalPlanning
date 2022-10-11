@@ -31,6 +31,14 @@ namespace SCClassicalPlanning.ExampleDomains
             precondition: IsPresent(remove) & !IsPresent(add),
             effect: !IsPresent(remove) & IsPresent(add));
 
+        /// <summary>
+        /// Creates a new <see cref="Problem"/> instance that refers to this domain.
+        /// </summary>
+        /// <param name="initialState">The initial state of the problem.</param>
+        /// <param name="goal">The initial state of the problem.</param>
+        /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
+        public static Problem MakeProblem(State initialState, Goal goal) => new Problem(Domain, initialState, goal);
+
         // NB: This is in its own method so that we can run tests against domain construction.
         internal static Domain MakeDomain()
         {

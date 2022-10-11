@@ -9,12 +9,31 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
     /// </summary>
     public static class SpareTire
     {
-        static SpareTire() => Domain = MakeDomain();
+        static SpareTire()
+        {
+            Domain = MakeDomain();
+
+            ExampleProblem = MakeProblem(
+                initialState: new(
+                    IsTire(Spare)
+                    & IsTire(Flat)
+                    & IsAt(Flat, Axle)
+                    & IsAt(Spare, Trunk)),
+                goal: new(
+                    IsAt(Spare, Axle)));
+        }
 
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Spare Tire" domain.
         /// </summary>
         public static Domain Domain { get; }
+
+        /// <summary>
+        /// Gets an instance of the customary example problem in this domain.
+        /// In the initial state, the Spare (is a tire and) is in the Trunk, and the Flat (is a tire and) is on the Axle.
+        /// The goal is to get the Spare onto the Axle.
+        /// </summary>
+        public static Problem ExampleProblem { get; }
 
         public static Constant Spare { get; } = new(nameof(Spare));
         public static Constant Flat { get; } = new(nameof(Flat));
@@ -51,6 +70,14 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                 & !IsAt(Flat, Ground)
                 & !IsAt(Flat, Axle)
                 & !IsAt(Flat, Trunk));
+
+        /// <summary>
+        /// Creates a new <see cref="Problem"/> instance that refers to this domain.
+        /// </summary>
+        /// <param name="initialState">The initial state of the problem.</param>
+        /// <param name="goal">The initial state of the problem.</param>
+        /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
+        public static Problem MakeProblem(State initialState, Goal goal) => new(Domain, initialState, goal);
 
         // NB: This is in its own method rather than the static ctor so that we can run tests against domain construction.
         internal static Domain MakeDomain()

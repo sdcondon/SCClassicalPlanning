@@ -9,12 +9,46 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
     /// </summary>
     public static class AirCargo
     {
-        static AirCargo() => Domain = MakeDomain();
+        static AirCargo()
+        {
+            Domain = MakeDomain();
+
+            Constant cargo1 = new(nameof(cargo1));
+            Constant cargo2 = new(nameof(cargo2));
+            Constant plane1 = new(nameof(plane1));
+            Constant plane2 = new(nameof(plane2));
+            Constant airport1 = new(nameof(airport1));
+            Constant airport2 = new(nameof(airport2));
+
+            ExampleProblem = MakeProblem(
+                initialState: new(
+                    Cargo(cargo1)
+                    & Cargo(cargo2)
+                    & Plane(plane1)
+                    & Plane(plane2)
+                    & Airport(airport1)
+                    & Airport(airport2)
+                    & At(cargo1, airport1)
+                    & At(cargo2, airport2)
+                    & At(plane1, airport1)
+                    & At(plane2, airport2)),
+                goal: new(
+                    At(cargo2, airport1)
+                    & At(cargo1, airport2)));
+        }
 
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates Air Cargo domain.
         /// </summary>
         public static Domain Domain { get; }
+
+        /// <summary>
+        /// Gets an instance of the customary example problem in this domain.
+        /// Consists of two airports, two planes and two pieces of cargo.
+        /// In the initial state, plane1 and cargo1 are at airport1; plane1 and cargo1 are at airport2.
+        /// The goal is to get cargo2 to airport1 and cargo1 to airport2.
+        /// </summary>
+        public static Problem ExampleProblem { get; }
 
         public static OperablePredicate Cargo(Term cargo) => new Predicate(nameof(Cargo), cargo);
         public static OperablePredicate Plane(Term plane) => new Predicate(nameof(Plane), plane);
@@ -57,6 +91,14 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
             effect:
                 !At(plane, from)
                 & At(plane, to));
+
+        /// <summary>
+        /// Creates a new <see cref="Problem"/> instance that refers to this domain.
+        /// </summary>
+        /// <param name="initialState">The initial state of the problem.</param>
+        /// <param name="goal">The initial state of the problem.</param>
+        /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
+        public static Problem MakeProblem(State initialState, Goal goal) => new Problem(Domain, initialState, goal);
 
         // NB: This is in its own method rather than the static ctor so that we can run tests against domain construction.
         internal static Domain MakeDomain()

@@ -58,7 +58,7 @@ namespace SCClassicalPlanning
                     },
                     ExpectedConstants: new[] { Spare, Flat, Ground, Axle, Trunk }),
             })
-            .When<Domain>((Func<ConstructionTestCase, Domain>)(tc => (Domain)tc.DomainCtor())) 
+            .When<Domain>(tc => tc.MakeDomain()) 
             .ThenReturns()
             .And((tc, r) => r.Predicates.Should().BeEquivalentTo(tc.ExpectedPredicates))
             .And((tc, r) => r.Constants.Should().BeEquivalentTo(tc.ExpectedConstants));

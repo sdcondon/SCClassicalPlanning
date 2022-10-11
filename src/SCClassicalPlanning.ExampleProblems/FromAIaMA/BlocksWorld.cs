@@ -9,7 +9,39 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
     /// </summary>
     public static class BlocksWorld
     {
-        static BlocksWorld() => Domain = MakeDomain();
+        static BlocksWorld()
+        {
+            Domain = MakeDomain();
+
+            Constant blockA = new(nameof(blockA));
+            Constant blockB = new(nameof(blockB));
+            Constant blockC = new(nameof(blockC));
+
+            ExampleProblem = MakeProblem(
+                initialState: new(
+                    Block(blockA)
+                    & Equal(blockA, blockA)
+                    & Block(blockB)
+                    & Equal(blockB, blockB)
+                    & Block(blockC)
+                    & Equal(blockC, blockC)
+                    & On(blockA, Table)
+                    & On(blockB, Table)
+                    & On(blockC, blockA)
+                    & Clear(blockB)
+                    & Clear(blockC)),
+                goal: new(
+                    On(blockA, blockB)
+                    & On(blockB, blockC)));
+        }
+
+        /// <summary>
+        /// Gets an instance of the customary example problem in this domain.
+        /// Consists of three blocks.
+        /// In the initial state, blocks A and B are on the table and block C is on top of block A.
+        /// The goal is to get block B on top of block C, and block A on top of block B.
+        /// </summary>
+        public static Problem ExampleProblem { get; }
 
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
@@ -51,6 +83,14 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                 On(block, Table)
                 & Clear(from)
                 & !On(block, from));
+
+        /// <summary>
+        /// Creates a new <see cref="Problem"/> instance that refers to this domain.
+        /// </summary>
+        /// <param name="initialState">The initial state of the problem.</param>
+        /// <param name="goal">The initial state of the problem.</param>
+        /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
+        public static Problem MakeProblem(State initialState, Goal goal) => new Problem(Domain, initialState, goal);
 
         // NB: This is in its own method rather than the static ctor so that we can run tests against domain construction.
         internal static Domain MakeDomain()

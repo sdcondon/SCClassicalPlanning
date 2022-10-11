@@ -5,162 +5,98 @@ using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.SpareTire;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
     public static class BackwardStateSpaceSearchTests
     {
-        public static Test AirCargoScenario => TestThat
+        private record TestCase(Problem Problem, Func<State, Goal, float> Heuristic);
+
+        public static Test CreatedPlanValidity => TestThat
             .GivenTestContext()
-            .And(() =>
+            .AndEachOf(() => new TestCase[]
             {
-                Constant cargo1 = new(nameof(cargo1));
-                Constant cargo2 = new(nameof(cargo2));
-                Constant plane1 = new(nameof(plane1));
-                Constant plane2 = new(nameof(plane2));
-                Constant airport1 = new(nameof(airport1));
-                Constant airport2 = new(nameof(airport2));
+                new(
+                    Problem: AirCargo.ExampleProblem,
+                    Heuristic: MakeInvariantCheckingHeuristic(
+                        AirCargo.ExampleProblem,
+                        Array.Empty<Sentence>())),
 
-                return new TestCase(
-                    Domain: AirCargo.Domain,
-                    Invariants: Array.Empty<Sentence>(),
-                    InitialState: new(
-                        Cargo(cargo1)
-                        & Cargo(cargo2)
-                        & Plane(plane1)
-                        & Plane(plane2)
-                        & Airport(airport1)
-                        & Airport(airport2)
-                        & At(cargo1, airport2)
-                        & At(cargo2, airport1)
-                        & At(plane1, airport1)
-                        & At(plane2, airport2)),
-                    Goal: new(
-                        At(cargo1, airport1)
-                        & At(cargo2, airport2)));
+                new(
+                    Problem: BlocksWorld.ExampleProblem,
+                    Heuristic: MakeInvariantCheckingHeuristic(
+                        BlocksWorld.ExampleProblem,
+                        new Sentence[] { ForAll(A, B, If(On(A, B), !Clear(B))), })),
+
+                new(
+                    Problem: SpareTire.ExampleProblem,
+                    Heuristic: MakeInvariantCheckingHeuristic(
+                        SpareTire.ExampleProblem,
+                        Array.Empty<Sentence>())),
+
+                new(
+                    Problem: MakeBigBlocksWorldProblem(),
+                    Heuristic: MakeInvariantCheckingHeuristic(
+                        MakeBigBlocksWorldProblem(),
+                        new Sentence[] { ForAll(A, B, If(On(A, B), !Clear(B))), })),
             })
-            .When((_, tc) => tc.Execute())
-            .ThenReturns()
-            .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
-            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter(AirCargo.Domain).Format(p)));
-
-        public static Test BlocksWorldScenario => TestThat
-            .GivenTestContext()
-            .And(() =>
+            .When((_, tc) =>
             {
-                Constant blockA = new(nameof(blockA));
-                Constant blockB = new(nameof(blockB));
-                Constant blockC = new(nameof(blockC));
-
-                return new TestCase(
-                    Domain: BlocksWorld.Domain,
-                    Invariants: new Sentence[] { ForAll(A, B, If(On(A, B), !Clear(B))), },
-                    InitialState: new(
-                        Block(blockA)
-                        & Equal(blockA, blockA)
-                        & Block(blockB)
-                        & Equal(blockB, blockB)
-                        & Block(blockC)
-                        & Equal(blockC, blockC)
-                        & On(blockA, Table)
-                        & On(blockB, Table)
-                        & On(blockC, blockA)
-                        & Clear(blockB)
-                        & Clear(blockC)),
-                    Goal: new(
-                        On(blockA, blockB)
-                        & On(blockB, blockC)));
+                var planner = new BackwardStateSpaceSearch(tc.Heuristic);
+                return planner.CreatePlanAsync(tc.Problem).GetAwaiter().GetResult();
             })
-            .When((_, tc) => tc.Execute())
             .ThenReturns()
-            .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
-            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter(BlocksWorld.Domain).Format(p)));
+            .And((_, tc, pl) => tc.Problem.Goal.IsSatisfiedBy(pl.ApplyTo(tc.Problem.InitialState)).Should().BeTrue())
+            .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
 
-        public static Test BigBlocksWorldScenario => TestThat
-            .GivenTestContext()
-            .And(() =>
-            {
-                Constant blockA = new(nameof(blockA));
-                Constant blockB = new(nameof(blockB));
-                Constant blockC = new(nameof(blockC));
-                Constant blockD = new(nameof(blockD));
-                Constant blockE = new(nameof(blockE));
-
-                return new TestCase(
-                    Domain: BlocksWorld.Domain,
-                    Invariants: new Sentence[] { ForAll(A, B, If(On(A, B), !Clear(B))), },
-                    InitialState: new(
-                        Block(blockA)
-                        & Equal(blockA, blockA)
-                        & Block(blockB)
-                        & Equal(blockB, blockB)
-                        & Block(blockC)
-                        & Equal(blockC, blockC)
-                        & Block(blockD)
-                        & Equal(blockD, blockD)
-                        & Block(blockE)
-                        & Equal(blockE, blockE)
-                        & On(blockA, Table)
-                        & On(blockB, Table)
-                        & On(blockC, blockA)
-                        & On(blockD, blockB)
-                        & On(blockE, Table)
-                        & Clear(blockC)
-                        & Clear(blockD)
-                        & Clear(blockE)),
-                    Goal: new(
-                        On(blockA, blockB)
-                        & On(blockB, blockC)
-                        & On(blockC, blockD)
-                        & On(blockD, blockE)));
-            })
-            .When((_, tc) => tc.Execute())
-            .ThenReturns()
-            .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
-            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter(BlocksWorld.Domain).Format(p)));
-
-        public static Test SpareTireScenario => TestThat
-            .GivenTestContext()
-            .And(() =>
-            {
-                return new TestCase(
-                    Domain: SpareTire.Domain,
-                    Invariants: Array.Empty<Sentence>(),
-                    InitialState: new(
-                        SpareTire.ImplicitState
-                        & IsAt(Flat, Axle)
-                        & IsAt(Spare, Trunk)),
-                    Goal: new(
-                        IsAt(Spare, Axle)));
-            })
-            .When((_, tc) => tc.Execute())
-            .ThenReturns()
-            .And((_, tc, p) => tc.Goal.IsSatisfiedBy(p.ApplyTo(tc.InitialState)).Should().BeTrue())
-            .And((cxt, _, p) => cxt.WriteOutputLine(new PlanFormatter(SpareTire.Domain).Format(p)));
-
-        private record TestCase(Domain Domain, IEnumerable<Sentence> Invariants, State InitialState, Goal Goal)
+        private static Func<State, Goal, float> MakeInvariantCheckingHeuristic(Problem problem, IEnumerable<Sentence> invariants)
         {
-            public Plan Execute()
-            {
-                var problem = new Problem(Domain, InitialState, Goal);
+            var invariantKb = new SimpleResolutionKnowledgeBase(
+                new SimpleClauseStore(),
+                SimpleResolutionKnowledgeBase.Filters.None,
+                SimpleResolutionKnowledgeBase.PriorityComparisons.UnitPreference);
+            invariantKb.Tell(invariants);
 
-                var invariantKb = new SimpleResolutionKnowledgeBase(
-                    new SimpleClauseStore(),
-                    SimpleResolutionKnowledgeBase.Filters.None,
-                    SimpleResolutionKnowledgeBase.PriorityComparisons.UnitPreference);
-                invariantKb.Tell(Invariants);
+            var innerHeuristic = new IgnorePreconditionsGreedySetCover(problem).EstimateCost;
 
-                var innerHeuristic = new IgnorePreconditionsGreedySetCover(problem).EstimateCost;
-                //var innerHeuristic = ElementDifferenceCount.EstimateCost;
+            return new GoalInvariantCheck(invariantKb, innerHeuristic).EstimateCost;
+        }
 
-                var heuristic = new GoalInvariantCheck(invariantKb, innerHeuristic);
-                var planner = new BackwardStateSpaceSearch(heuristic.EstimateCost);
-                return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
-            }
+        private static Problem MakeBigBlocksWorldProblem()
+        {
+            Constant blockA = new(nameof(blockA));
+            Constant blockB = new(nameof(blockB));
+            Constant blockC = new(nameof(blockC));
+            Constant blockD = new(nameof(blockD));
+            Constant blockE = new(nameof(blockE));
+
+            return BlocksWorld.MakeProblem(
+                initialState: new(
+                    Block(blockA)
+                    & Equal(blockA, blockA)
+                    & Block(blockB)
+                    & Equal(blockB, blockB)
+                    & Block(blockC)
+                    & Equal(blockC, blockC)
+                    & Block(blockD)
+                    & Equal(blockD, blockD)
+                    & Block(blockE)
+                    & Equal(blockE, blockE)
+                    & On(blockA, Table)
+                    & On(blockB, Table)
+                    & On(blockC, blockA)
+                    & On(blockD, blockB)
+                    & On(blockE, Table)
+                    & Clear(blockD)
+                    & Clear(blockE)
+                    & Clear(blockC)),
+                goal: new(
+                    On(blockA, blockB)
+                    & On(blockB, blockC)
+                    & On(blockC, blockD)
+                    & On(blockD, blockE)));
         }
     }
 }

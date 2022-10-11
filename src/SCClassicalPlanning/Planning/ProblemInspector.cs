@@ -8,7 +8,7 @@ namespace SCClassicalPlanning.Planning
     /// <summary>
     /// Various problem inspection methods, useful to planners.
     /// <para/>
-    /// NB: Might ultimately be useful to extract an interface from this and allow planners to use other strategies
+    /// TODO-EXTENSIBILITY: Might ultimately be useful to extract an interface(s) from this and allow planners to use other strategies
     /// (that leverage extensions such as type systems and axioms..). But for now at least, its just static.
     /// </summary>
     public static class ProblemInspector
@@ -65,19 +65,7 @@ namespace SCClassicalPlanning.Planning
                         // one would hope that it is a very rare scenario to have a variable that doesn't occur in ANY positive goal elements (most
                         // will at least occur in e.g. a 'type' predicate). But this is obviously VERY expensive when it occurs - though I guess
                         // clever indexing could help (support for indexing is TODO).
-                        IEnumerable<VariableSubstitution> allPossibleUnifiers = new List<VariableSubstitution>() { unifier };
-                        var unboundVariables = firstGoalElement.Predicate.Arguments.OfType<VariableReference>().Except(unifier.Bindings.Keys);
-                        foreach (var unboundVariable in unboundVariables)
-                        {
-                            allPossibleUnifiers = allPossibleUnifiers.SelectMany(u => problem.Objects.Select(o =>
-                            {
-                                var newBindings = new Dictionary<VariableReference, Term>(u.Bindings);
-                                newBindings[unboundVariable] = o;
-                                return new VariableSubstitution(newBindings);
-                            }));
-                        }
-
-                        foreach (var firstGoalElementUnifier in allPossibleUnifiers)
+                        foreach (var firstGoalElementUnifier in GetAllPossibleSubstitutions(problem, firstGoalElement.Predicate, unifier))
                         {
                             var possiblePredicate = firstGoalElementUnifier.ApplyTo(firstGoalElement.Predicate).Predicate;
 
@@ -269,6 +257,23 @@ namespace SCClassicalPlanning.Planning
                     new VariableSubstitutionGoalTransformation(Substitution).ApplyTo(Schema.Precondition),
                     new VariableSubstitutionEffectTransformation(Substitution).ApplyTo(Schema.Effect));
             }
+        }
+
+        public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Problem problem, Predicate predicate, VariableSubstitution unifier)
+        {
+            IEnumerable<VariableSubstitution> allPossibleSubstitutions = new List<VariableSubstitution>() { unifier };
+            var unboundVariables = predicate.Arguments.OfType<VariableReference>().Except(unifier.Bindings.Keys);
+            foreach (var unboundVariable in unboundVariables)
+            {
+                allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(u => problem.Objects.Select(o =>
+                {
+                    var newBindings = new Dictionary<VariableReference, Term>(u.Bindings);
+                    newBindings[unboundVariable] = o;
+                    return new VariableSubstitution(newBindings);
+                }));
+            }
+
+            return allPossibleSubstitutions;
         }
 
         /// <summary>
