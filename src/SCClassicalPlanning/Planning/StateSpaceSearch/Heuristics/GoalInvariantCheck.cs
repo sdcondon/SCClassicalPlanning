@@ -1,7 +1,6 @@
 ﻿using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
-using SCFirstOrderLogic.SentenceManipulation;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
 {
@@ -26,8 +25,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
     /// </summary>
     public class GoalInvariantCheck : IHeuristic
     {
-        private readonly IHeuristic innerHeuristic;
         private readonly IKnowledgeBase knowledgeBase;
+        private readonly IHeuristic innerHeuristic;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GoalInvariantCheck"/>.
@@ -36,8 +35,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// <param name="innerHeuristic">The inner heuristic to invoke if no invariants are violated by the goal.</param>
         public GoalInvariantCheck(IKnowledgeBase invariantsKnowledgeBase, IHeuristic innerHeuristic)
         {
-            this.innerHeuristic = innerHeuristic;
             this.knowledgeBase = invariantsKnowledgeBase;
+            this.innerHeuristic = innerHeuristic;
         }
 
         /// <summary>
