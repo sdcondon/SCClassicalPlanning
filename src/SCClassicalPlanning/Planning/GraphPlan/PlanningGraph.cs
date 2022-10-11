@@ -10,28 +10,30 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// </summary>
     public class PlanningGraph
     {
-        private readonly Domain domain;
+        private readonly Problem problem;
         private readonly List<IEnumerable<Literal>> propositionLayers = new();
         private readonly List<IEnumerable<Action>> actionLayers = new();
 
-        private int expandedToLevel;
-        //private bool levelledOff;
-        //private int levelsOffAtLayer;
+        private int expandedToLevel = 0;
+        private bool levelledOff = false;
+        private int levelledOffAtLayer = int.MaxValue;
 
         /// <summary>
         /// Initialises a new instance of the <see cref="PlanningGraph"/> class.
         /// </summary>
-        public PlanningGraph(Domain domain, State state, IEnumerable<Constant> objects)
+        /// <param name="problem">The problem being solved.</param>
+        /// <param name="state">The state to start from.</param>
+        public PlanningGraph(Problem problem, State state)
         {
-            this.domain = domain;
+            this.problem = problem;
 
             // Planning graphs only work with propositions - no variables allowed.
             // So here we iterate every possible ground predicate (by subsituting every combination of known constants
             // for its arguments - add positive if its in the initial state, otherwise negative
             var layer0 = new List<Literal>();
-            foreach (var predicateTemplate in domain.Predicates)
+            foreach (var predicateTemplate in problem.Domain.Predicates)
             {
-                foreach (var substitution in ProblemInspector.GetAllPossibleSubstitutions(objects, predicateTemplate, new VariableSubstitution()))
+                foreach (var substitution in ProblemInspector.GetAllPossibleSubstitutions(problem.Objects, predicateTemplate, new VariableSubstitution()))
                 {
                     // Ugh - compiler assuming wrong overload - perhaps because conversion is implicit and method is more concrete? Implicit conversion a mistake, I think.
                     Predicate predicate = (Predicate)substitution.ApplyTo(predicateTemplate).ToSentence();
@@ -48,7 +50,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
 
             propositionLayers.Add(layer0);
-            expandedToLevel = 0; // Jus' for emphasis..
         }
 
 
@@ -60,12 +61,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <returns></returns>
         public IEnumerable<Literal> GetPropositions(int step)
         {
-            while (expandedToLevel < step)
+            while (expandedToLevel < step && !levelledOff)
             {
                 Expand();
             }
 
-            return propositionLayers[step];
+            return propositionLayers[Math.Min(step, levelledOffAtLayer)];
         }
 
         /// <summary>
@@ -76,12 +77,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <returns></returns>
         public IEnumerable<Action> GetActions(int step)
         {
-            while (expandedToLevel < step + 1)
+            while (expandedToLevel < step + 1 && !levelledOff)
             {
                 Expand();
             }
 
-            return actionLayers[step];
+            return actionLayers[Math.Min(step, levelledOffAtLayer)];
         }
 
         /// <summary>
@@ -96,11 +97,21 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private void Expand()
         {
-            // get all applicable actions given the "state" defined by the current layer
-            var currentState = new State(propositionLayers[expandedToLevel].Where(p => p.IsPositive).Select(p => p.Predicate));// index me!
-
             throw new NotImplementedException();
-            //ProblemInspector.GetApplicableActions(problem, currentState);
+
+            // get all applicable actions given the "state" defined by the current layer
+            var currentState = new State(propositionLayers[expandedToLevel].Where(p => p.IsPositive).Select(p => p.Predicate)); // indexing support? at least a dictionary?
+
+            foreach (var action in ProblemInspector.GetApplicableActions(problem, currentState))
+            {
+                // create new action node
+
+                // link preconditional propositions to node
+
+                // create/get effect nodes and link
+
+                // etc..
+            }
         }
 
 #if false
