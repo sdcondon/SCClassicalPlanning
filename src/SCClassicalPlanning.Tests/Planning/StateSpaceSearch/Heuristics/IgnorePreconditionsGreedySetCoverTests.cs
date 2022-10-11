@@ -3,10 +3,7 @@ using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics;
 using SCFirstOrderLogic;
-using System.Numerics;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.SpareTire;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch
@@ -15,24 +12,10 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     {
         private static readonly Constant cargo1 = new(nameof(cargo1));
         private static readonly Constant cargo2 = new(nameof(cargo2));
-        private static readonly Constant plane1 = new(nameof(plane1));
-        private static readonly Constant plane2 = new(nameof(plane2));
         private static readonly Constant airport1 = new(nameof(airport1));
         private static readonly Constant airport2 = new(nameof(airport2));
 
         private static readonly VariableDeclaration somePlane = new(nameof(somePlane));
-
-        private static readonly State AirCargoInitialState = new(
-            Cargo(cargo1)
-            & Cargo(cargo2)
-            & Plane(plane1)
-            & Plane(plane2)
-            & Airport(airport1)
-            & Airport(airport2)
-            & At(cargo1, airport2)
-            & At(cargo2, airport1)
-            & At(plane1, airport1)
-            & At(plane2, airport2));
 
         private record TestCase(Problem Problem, State State, OperableGoal Goal, float ExpectedCost);
 
@@ -44,7 +27,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 // = 1
                 new TestCase(
                     Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
-                    State: AirCargoInitialState,
+                    State: AirCargo.ExampleProblem.InitialState,
                     Goal: At(cargo1, airport1),
                     ExpectedCost: 1),
 
@@ -53,7 +36,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 // = 2
                 new TestCase(
                     Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
-                    State: AirCargoInitialState,
+                    State: AirCargo.ExampleProblem.InitialState,
                     Goal: At(cargo1, airport1) & At(cargo2, airport2),
                     ExpectedCost: 2),
 
@@ -62,14 +45,14 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 // = float.PositiveInfinity
                 new TestCase(
                     Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
-                    State: AirCargoInitialState,
+                    State: AirCargo.ExampleProblem.InitialState,
                     Goal: At(cargo1, airport1) & Plane(cargo1) & Airport(airport2) & Airport(airport1),
                     ExpectedCost: float.PositiveInfinity),
 
                 // e.g. the regression of Unload(cargo1, somePlane, airport1) includes a variable
                 new TestCase(
                     Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
-                    State: AirCargoInitialState,
+                    State: AirCargo.ExampleProblem.InitialState,
                     Goal: Plane(somePlane) 
                         & In(cargo1, somePlane)
                         & At(somePlane, airport1)
@@ -81,7 +64,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 // As above - Plane(somePlane) is 2..
                 new TestCase(
                     Problem: new(AirCargo.Domain, State.Empty, Goal.Empty),
-                    State: AirCargoInitialState,
+                    State: AirCargo.ExampleProblem.InitialState,
                     Goal: Plane(somePlane) // met by state
                         & In(cargo1, somePlane) // load
                         & At(somePlane, airport1) // met by state
