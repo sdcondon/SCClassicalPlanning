@@ -124,11 +124,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         }
 
         /// <summary>
-        /// Implements a greedy set cover algorithm of the (effects of) the given actions over the given target set of literals.
+        /// Implements a greedy set cover algorithm of the given effects over the given target set of literals.
         /// Returns the count of how many actions were needed, or -1 if it failed.
         /// </summary>
         /// <param name="target"></param>
-        /// <param name="relevantActions"></param>
+        /// <param name="relevantEffects"></param>
         /// <returns></returns>
         private static int GetCoveringActionCount(IEnumerable<Literal> target, IEnumerable<Effect> relevantEffects)
         {

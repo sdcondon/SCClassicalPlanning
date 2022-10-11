@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
-using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
@@ -9,7 +8,7 @@ using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
-namespace SCClassicalPlanning.Planning.StateSpaceSearch
+namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
 {
     public static class GoalInvariantCheckTests
     {
@@ -57,7 +56,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 var kb = new SimpleResolutionKnowledgeBase(
                     new SimpleClauseStore(),
                     SimpleResolutionKnowledgeBase.Filters.None,
-                    SimpleResolutionKnowledgeBase.PriorityComparisons.None); // No point in unitpref, 'cos query is all unit clauses..
+                    SimpleResolutionKnowledgeBase.PriorityComparisons.None); // No point in unitpreference, 'cos query is *all* unit clauses..
                 kb.Tell(tc.Invariants);
 
                 return new GoalInvariantCheck(kb, new DelegateHeuristic((s, g) => 0)).EstimateCost(tc.State, tc.Goal);
