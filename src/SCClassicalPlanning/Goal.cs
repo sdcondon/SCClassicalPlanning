@@ -73,9 +73,13 @@ namespace SCClassicalPlanning
         /// Gets a value indicating whether this goal is satisfied by a particular state.
         /// <para/>
         /// A goal is satisfied by a state if all of its positive elements and none of its negative elements are present in the state.
+        /// NB: This methods checks only if the goal is satisfied by the state exactly - meaning that it'll never return true if the goal
+        /// has variables in it. I'm still indecisive as to whether the unification logic that is required to be more intelligent belongs
+        /// in here (well, in State - but you know what I mean) or elsewhere.
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
+        // TODO: Will need to decide the above when adding support variables in goals
         public bool IsSatisfiedBy(State state) => state.Satisfies(this);
 
         /// <summary>
@@ -89,7 +93,7 @@ namespace SCClassicalPlanning
         {
             // Goals should be small-ish, so I'm not too worried by the inefficiency here.
             // Otherwise could think about sorting the set of elements (e.g. using ImmutableSortedSet sorted by hash code), maybe?
-            // Would need testing whether benefit is outweighed by constructing the ordered set in first place..
+            // Would need testing whether the benefit is outweighed by constructing the ordered set in first place.
             return obj is Goal goal && goal.Elements.IsSubsetOf(Elements) && Elements.IsSubsetOf(goal.Elements);
         }
 

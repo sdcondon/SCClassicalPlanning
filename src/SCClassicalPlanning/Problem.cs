@@ -32,13 +32,15 @@ namespace SCClassicalPlanning
         /// <param name="additionalConstants">
         /// Any constants that exist in the problem other than those defined by the domain, initial state and goal.
         /// Yes, this is unusual - but we shouldn't preclude objects that serve as 'catalysts' (so don't feature
-        /// in initial state or goal) and are used in actions that place no pre-conditions on them. (Very) unlikely but possible.
-        /// Algorithms that can deal with variables don't need to know about such objects, but e.g. GraphPlan needs to know.
+        /// in initial state or goal) and are used in actions that place no pre-conditions on them. (Very - most action params
+        /// will at least have a 'type' constraint placed on them) unlikely but possible. Algorithms that can deal with
+        /// variables don't need to know about such objects, but e.g. GraphPlan needs to know.
         /// </param>
-        // TODO-SIGNIFICANT: Problematic design-wise.. Large? IO? Fairly big deal because could have significant impact.
-        // Should Objects and InitialState ctor params be replaced with something like an 'IStateStore'? 
-        // Perhaps also leave existing ctor that implicitly uses MemoryStateStore.
-        // Explore this. Later.
+        // TODO-EXTENSIBILITY: Problematic.. Large state? IO? Fairly big deal because could have significant impact.
+        // Should initialState and additionalConstants ctor params be replaced/accompanied with something like an 'IStateStore' (and 'IConstantStore')?
+        // These two then provide lookup functionality needed by planners - thus allowing for the use of appropriate indices?
+        // Perhaps also leave existing ctor that implicitly uses e.g. HashSetStateStore.
+        // Explore this. Later (prob last thing before v1 - want a 'complete' solution before looking at refactoring and abstractions).
         public Problem(Domain domain, State initialState, Goal goal, IList<Constant> additionalConstants)
         {
             Domain = domain;
