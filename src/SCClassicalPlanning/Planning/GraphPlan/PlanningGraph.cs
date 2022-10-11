@@ -1,6 +1,5 @@
 ﻿using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
-using SCGraphTheory;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
@@ -11,7 +10,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// </summary>
     public class PlanningGraph
     {
-        private readonly Problem problem;
+        private readonly Domain domain;
         private readonly List<IEnumerable<Literal>> propositionLayers = new();
         private readonly List<IEnumerable<Action>> actionLayers = new();
 
@@ -22,22 +21,22 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <summary>
         /// Initialises a new instance of the <see cref="PlanningGraph"/> class.
         /// </summary>
-        /// <param name="problem">The problem that the planning graph represents.</param>
-        public PlanningGraph(Problem problem)
+        public PlanningGraph(Domain domain, State state, IEnumerable<Constant> objects)
         {
-            this.problem = problem;
+            this.domain = domain;
 
             // Planning graphs only work with propositions - no variables allowed.
             // So here we iterate every possible ground predicate (by subsituting every combination of known constants
             // for its arguments - add positive if its in the initial state, otherwise negative
             var layer0 = new List<Literal>();
-            foreach (var predicateTemplate in problem.Domain.Predicates)
+            foreach (var predicateTemplate in domain.Predicates)
             {
-                foreach (var substitution in ProblemInspector.GetAllPossibleSubstitutions(problem, predicateTemplate, new VariableSubstitution()))
+                foreach (var substitution in ProblemInspector.GetAllPossibleSubstitutions(objects, predicateTemplate, new VariableSubstitution()))
                 {
-                    Predicate predicate = (Predicate)substitution.ApplyTo(predicateTemplate).ToSentence(); // Ugh - why is compiler assuming this overload? because conversion is implicit and method is more concrete?
+                    // Ugh - compiler assuming wrong overload - perhaps because conversion is implicit and method is more concrete? Implicit conversion a mistake, I think.
+                    Predicate predicate = (Predicate)substitution.ApplyTo(predicateTemplate).ToSentence();
 
-                    if (problem.InitialState.Elements.Contains(predicate))
+                    if (state.Elements.Contains(predicate))
                     {
                         layer0.Add(predicate);
                     }
@@ -49,7 +48,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
 
             propositionLayers.Add(layer0);
-            expandedToLevel = 0;
+            expandedToLevel = 0; // Jus' for emphasis..
         }
 
 
@@ -63,22 +62,48 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         {
             while (expandedToLevel < step)
             {
-                throw new NotImplementedException();
+                Expand();
             }
 
             return propositionLayers[step];
         }
 
-#if false
         /// <summary>
-        /// Gets the actions that are available 
+        /// Gets the actions that are present at a given layer of the graph - 
+        /// with layer 0 being the initial state.
         /// </summary>
         /// <param name="step"></param>
         /// <returns></returns>
         public IEnumerable<Action> GetActions(int step)
         {
+            while (expandedToLevel < step + 1)
+            {
+                Expand();
+            }
+
+            return actionLayers[step];
         }
 
+        /// <summary>
+        /// Gets the layer in which a given proposition first occurs.
+        /// </summary>
+        /// <param name="proposition"></param>
+        /// <returns></returns>
+        public int FindProposition(Literal proposition)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void Expand()
+        {
+            // get all applicable actions given the "state" defined by the current layer
+            var currentState = new State(propositionLayers[expandedToLevel].Where(p => p.IsPositive).Select(p => p.Predicate));// index me!
+
+            throw new NotImplementedException();
+            //ProblemInspector.GetApplicableActions(problem, currentState);
+        }
+
+#if false
         /// <summary>
         /// Interface for nodes of a planning graph.
         /// </summary>

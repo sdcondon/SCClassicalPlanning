@@ -15,12 +15,12 @@ Stuff I want to do before ticking the major version number to 1.
 - [x] Forward search 'works':
   - [x] the tests pass in a timely fashion with the example domains.
 - [ ] Backward search 'works':
-  - [ ] The tests pass in a timely fashion with the example domains.
+  - [x] The tests pass in a timely fashion with the example domains.
   - [ ] Backward search can work with goals with variables in them.
 - [ ] We have simple implementations of state space search heuristics:
     - [x] one that could be described as using "ignore preconditions"
     - [ ] one that could be described as using "ignore delete lists"
-    - [ ] perhaps some others
+    - [x] perhaps some others
 - [ ] We have a simple PlanningGraph implementation
 - [ ] We have a simple GraphPlan implementation
 - [ ] I've at least considered all of the existing TODOs. Most notably the ones around State abstraction and state indexing - so its at least conceivable that someone could extend it to be workable with large (secondary-storage requiring) problems.

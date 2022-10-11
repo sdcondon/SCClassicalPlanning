@@ -65,7 +65,7 @@ namespace SCClassicalPlanning.Planning
                         // one would hope that it is a very rare scenario to have a variable that doesn't occur in ANY positive goal elements (most
                         // will at least occur in e.g. a 'type' predicate). But this is obviously VERY expensive when it occurs - though I guess
                         // clever indexing could help (support for indexing is TODO).
-                        foreach (var firstGoalElementUnifier in GetAllPossibleSubstitutions(problem, firstGoalElement.Predicate, unifier))
+                        foreach (var firstGoalElementUnifier in GetAllPossibleSubstitutions(problem.Objects, firstGoalElement.Predicate, unifier))
                         {
                             var possiblePredicate = firstGoalElementUnifier.ApplyTo(firstGoalElement.Predicate).Predicate;
 
@@ -259,13 +259,13 @@ namespace SCClassicalPlanning.Planning
             }
         }
 
-        public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Problem problem, Predicate predicate, VariableSubstitution unifier)
+        public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(IEnumerable<Constant> objects, Predicate predicate, VariableSubstitution unifier)
         {
             IEnumerable<VariableSubstitution> allPossibleSubstitutions = new List<VariableSubstitution>() { unifier };
             var unboundVariables = predicate.Arguments.OfType<VariableReference>().Except(unifier.Bindings.Keys);
             foreach (var unboundVariable in unboundVariables)
             {
-                allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(u => problem.Objects.Select(o =>
+                allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(u => objects.Select(o =>
                 {
                     var newBindings = new Dictionary<VariableReference, Term>(u.Bindings);
                     newBindings[unboundVariable] = o;

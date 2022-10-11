@@ -67,7 +67,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                         !Clear(Table) // Also fine, given how the domain works
                     }.Select(s => new Literal(s)).ToHashSet()),
             })
-            .When(tc => new PlanningGraph(tc.Problem))
+            .When(tc => new PlanningGraph(tc.Problem.Domain, tc.Problem.InitialState, tc.Problem.Objects))
             .ThenReturns()
             .And((tc, rv) => rv.GetPropositions(0).Should().BeEquivalentTo(tc.ExpectedLayer0Propositions.OfType<Literal>()));
     }
