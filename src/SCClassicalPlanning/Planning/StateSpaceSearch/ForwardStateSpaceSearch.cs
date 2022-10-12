@@ -71,8 +71,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(problem, State);
 
             /// <inheritdoc />
+            public override bool Equals(object? obj) => obj is StateSpaceNode node && Equals(node);
+
+            /// <inheritdoc />
             // NB: this struct is private - so we don't need to look at the problem, since it'll always match
-            public bool Equals(StateSpaceNode node) => node.State.Equals(State);
+            public bool Equals(StateSpaceNode node) => Equals(State, node.State);
 
             /// <inheritdoc />
             public override int GetHashCode() => HashCode.Combine(State);
