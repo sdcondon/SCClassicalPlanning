@@ -191,9 +191,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var newPropositionLevel = new Dictionary<Literal, PropositionNode>();
             var changesOccured = false;
 
-            // We don't need propositions to link back to the actions that they are the effects of long-term
+            // We don't need propositions to link back to the actions that they are the effects of *long-term*
             // (i.e. included in the graph), but we do need it temporarily to establish mutexes. So just use a 
-            // dictionary. Efficiency improvements to follow at some point. Maybe.
+            // dictionary. Yeah, a bit hacky - efficiency improvements to follow at some point. Maybe.
             var newActionsByNewProposition = new Dictionary<Literal, List<Action>>();
 
             // First we need to get all applicable actions from the "state" defined by the current layer.
@@ -204,8 +204,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             foreach (var action in ProblemInspector.GetApplicableActions(problem, currentState))
             {
                 // Add an action node to the new action layer:
-                var actionNode = new ActionNode(action);
-                newActionLevel.Add(action, actionNode);
+                var actionNode = newActionLevel[action] = new ActionNode(action);
 
                 // Link all of the preconditions to the new action node:
                 foreach (var preconditionElement in action.Precondition.Elements)
@@ -248,14 +247,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
 
             // Now we need to add the maintenance/no-op actions:
-            foreach (var kvp in currentPropositionLevel)
+            foreach (var (proposition, propositionNode) in currentPropositionLevel)
             {
-                var (proposition, propositionNode) = (kvp.Key, kvp.Value);
-
                 // Add a no-op action & link its precondition
                 var action = MakeNoOp(proposition);
-                var actionNode = new ActionNode(action);
-                newActionLevel.Add(action, actionNode);
+                var actionNode = newActionLevel[action] = new ActionNode(action);
                 propositionNode.Actions.Add(actionNode);
 
                 // Make a note if this action isn't in the current layer - it means that the graph hasn't levelled off yet:
@@ -307,7 +303,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
 
             // Add proposition mutexes
-           var propositionIndex = 0;
+            var propositionIndex = 0;
             foreach (var (proposition, propositionNode) in newPropositionLevel)
             {
                 foreach (var (otherProposition, otherPropositionNode) in newPropositionLevel.Take(propositionIndex))
