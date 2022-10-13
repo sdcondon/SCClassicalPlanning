@@ -120,30 +120,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <returns>The level at which all of a set of propositions first occurs, with no pair being mutually exclusive.</returns>
         public int GetSetLevel(IEnumerable<Literal> propositions)
         {
-            bool SetPresentWithNoMutexesAt(int level)
-            {
-                var i = 0; // bleugh. first pass..
-                foreach (var proposition in propositions)
-                {
-                    if (!GetPropositionLevel(level).TryGetValue(proposition, out var node))
-                    {
-                        return false;
-                    }
-
-                    if (node.Mutexes.Select(e => e.Proposition).Intersect(propositions.Take(i)).Any())
-                    {
-                        return false;
-                    }
-
-                    i++;
-                }
-
-                return true;
-            }
-
             // Meh, will do for now - yes its a loop, but each layer is a dictionary
             var level = 0;
-            while (!SetPresentWithNoMutexesAt(level))
+            while (!SetPresentWithNoMutexesAt(propositions, level))
             {
                 if (level == levelledOffAtLayer)
                 {
@@ -154,6 +133,34 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
 
             return level;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether all of a set of propositions are present at a given level,
+        /// with no pair of them being mutually exclusive.
+        /// </summary>
+        /// <param name="propositions">The propositions to look for.</param>
+        /// <param name="level">The graph level to consider.</param>
+        /// <returns></returns>
+        bool SetPresentWithNoMutexesAt(IEnumerable<Literal> propositions, int level)
+        {
+            var propositionIndex = 0;
+            foreach (var proposition in propositions)
+            {
+                if (!GetPropositionLevel(level).TryGetValue(proposition, out var node))
+                {
+                    return false;
+                }
+
+                if (node.Mutexes.Select(e => e.Proposition).Intersect(propositions.Take(propositionIndex)).Any())
+                {
+                    return false;
+                }
+
+                propositionIndex++;
+            }
+
+            return true;
         }
 
         private Dictionary<Literal, PropositionNode> GetPropositionLevel(int level)
@@ -271,15 +278,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
 
             // Add action mutexes
-            int i = 0; // bleugh
-            foreach (var kvp in newActionLevel)
+            var actionIndex = 0;
+            foreach (var (action, actionNode) in newActionLevel)
             {
-                var (action, actionNode) = (kvp.Key, kvp.Value);
-
-                foreach (var otherKvp in newActionLevel.Take(i))
+                foreach (var (otherAction, otherActionNode) in newActionLevel.Take(actionIndex))
                 {
-                    var (otherAction, otherActionNode) = (otherKvp.Key, otherKvp.Value);
-
                     // check for inconsistent effects:
                     if (otherAction.Effect.Elements.Overlaps(action.Effect.Elements.Select(l => l.Negate())))
                     {
@@ -300,19 +303,15 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     }
                 }
 
-                i++;
+                actionIndex++;
             }
 
             // Add proposition mutexes
-            i = 0;
-            foreach (var kvp in newPropositionLevel)
+           var propositionIndex = 0;
+            foreach (var (proposition, propositionNode) in newPropositionLevel)
             {
-                var (proposition, propositionNode) = (kvp.Key, kvp.Value);
-
-                foreach (var otherKvp in newPropositionLevel.Take(i))
+                foreach (var (otherProposition, otherPropositionNode) in newPropositionLevel.Take(propositionIndex))
                 {
-                    var (otherProposition, otherPropositionNode) = (otherKvp.Key, otherKvp.Value);
-
                     bool AllActionsMutex()
                     {
                         foreach (var action in newActionsByNewProposition[proposition])
@@ -343,7 +342,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     }
                 }
 
-                i++;
+                propositionIndex++;
             }
 
             if (!changesOccured)
@@ -363,7 +362,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         // NB: while an EMPTY goal and effect would at first glance seem to be intuitive - it is
         // defined like this to assist with mutex creation. Feels hacky to me, but this is
         // apparently what is done..
-        public static Action MakeNoOp(Literal proposition) => new("NOOP", new(proposition), new(proposition));
+        internal static Action MakeNoOp(Literal proposition) => new("NOOP", new(proposition), new(proposition));
 
         /// <summary>
         /// Representation of the proposition node in a planning graph.
@@ -372,7 +371,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
         /// should we ever want to do that.
         /// </summary>
-        public class PropositionNode
+        private class PropositionNode
         {
             internal PropositionNode(Literal proposition) => Proposition = proposition;
 
@@ -390,7 +389,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
         /// should we ever want to do that.
         /// </summary>
-        public class ActionNode
+        private class ActionNode
         {
             internal ActionNode(Action action) => Action = action;
 
