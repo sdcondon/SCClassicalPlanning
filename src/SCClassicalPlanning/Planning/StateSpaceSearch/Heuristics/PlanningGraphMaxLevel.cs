@@ -24,8 +24,18 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         {
             var planningGraph = new PlanningGraph(problem, state);
 
-            // TODO: deal with not found (=> float.positiveInfinity)
-            return goal.Elements.Max(e => planningGraph.FindProposition(e));
+            return goal.Elements.Max(e =>
+            {
+                var level = planningGraph.GetLevel(e);
+                if (level != -1)
+                {
+                    return level;
+                }
+                else
+                {
+                    return float.PositiveInfinity;
+                }
+            });
         }
     }
 }

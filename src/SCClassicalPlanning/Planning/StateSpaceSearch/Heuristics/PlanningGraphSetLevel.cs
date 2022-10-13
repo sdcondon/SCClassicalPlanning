@@ -6,10 +6,10 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
     /// Heuristic that uses a "max level" planning graph heuristic.
     /// <para/>
     /// To give an estimate, it first constructs a planning graph (yup, this is rather expensive..)
-    /// starting from the current state. The cost estimate is the sum of the level costs of all of the goal's
+    /// starting from the current state. The cost estimate is the maximum level cost of any of the goal's
     /// elements.
     /// </summary>
-    public class PlanningGraphLevelSum : IHeuristic
+    public class PlanningGraphSetLevel : IHeuristic
     {
         private readonly Problem problem;
 
@@ -17,25 +17,22 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// Initialises a new instance of the <see cref="PlanningGraphMaxLevel"/> class.
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
-        public PlanningGraphLevelSum(Problem problem) => this.problem = problem;
+        public PlanningGraphSetLevel(Problem problem) => this.problem = problem;
 
         /// <inheritdoc/>
         public float EstimateCost(State state, Goal goal)
         {
             var planningGraph = new PlanningGraph(problem, state);
 
-            return goal.Elements.Sum(e =>
+            var level = planningGraph.GetSetLevel(goal.Elements);
+            if (level != -1)
             {
-                var level = planningGraph.GetLevel(e);
-                if (level != -1)
-                {
-                    return level;
-                }
-                else
-                {
-                    return float.PositiveInfinity;
-                }
-            });
+                return level;
+            }
+            else
+            {
+                return float.PositiveInfinity;
+            }
         }
     }
 }

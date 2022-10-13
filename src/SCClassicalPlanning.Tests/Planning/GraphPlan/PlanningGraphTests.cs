@@ -3,6 +3,7 @@ using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
+using static SCClassicalPlanning.ExampleDomains.FromAIaMA.HaveCakeAndEatCakeToo;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
@@ -15,7 +16,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private record ConstructionTestCase(Problem Problem, ISet<Literal> ExpectedLayer0Propositions);
 
-        public static Test ConstructionBehaviour => TestThat
+        public static Test LargeGraphConstructionBehaviour => TestThat
             .GivenEachOf(() => new ConstructionTestCase[]
             {
                 new(
@@ -70,5 +71,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             .When(tc => new PlanningGraph(tc.Problem, tc.Problem.InitialState))
             .ThenReturns()
             .And((tc, rv) => rv.GetPropositions(0).Should().BeEquivalentTo(tc.ExpectedLayer0Propositions.OfType<Literal>()));
+
+        // NB: yeah, pretty terrible coverage (testing large outputs is generally a PITA)
+        // note that it gets indirectly tested via the PlanningGraph heuristics tests.
+        // Will also extend at some point - should at least completely cover the cake example -
+        // which i think has only 2 levels..
     }
 }
