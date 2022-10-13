@@ -17,8 +17,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         private readonly List<Dictionary<Action, ActionNode>> actionLevels = new();
 
         private int expandedToLevel = 0;
-        private bool levelledOff = false;
-        private int levelledOffAtLayer = int.MaxValue;
 
         /// <summary>
         /// Initialises a new instance of the <see cref="PlanningGraph"/> class.
@@ -47,6 +45,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             propositionLevels.Add(propositionLevel0);
         }
 
+        public bool LevelledOff { get; private set; } = false;
+
+        public int? LevelledOffAtLevel { get; private set; } = null;
+
         /// <summary>
         /// Gets the (ground!) literals that are present at a given level of the graph - 
         /// with level 0 being the initial state.
@@ -56,17 +58,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         public IEnumerable<Literal> GetPropositions(int level)
         {
             return GetPropositionLevel(level).Keys;
-        }
-
-        /// <summary>
-        /// Gets the (ground!) literals that are present at a given level of the graph - 
-        /// with level 0 being the initial state.
-        /// </summary>
-        /// <param name="level"></param>
-        /// <returns></returns>
-        public IEnumerable<(Literal Proposition, IEnumerable<Literal> Mutexes)> GetPropositionsWithMutexes(int level)
-        {
-            return GetPropositionLevel(level).Select(kvp => (kvp.Key, kvp.Value.Mutexes.Select(e => e.Proposition)));
         }
 
         /// <summary>
@@ -81,17 +72,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         }
 
         /// <summary>
-        /// Gets the actions that are present at a given level of the graph - 
-        /// with level 0 being the initial state.
-        /// </summary>
-        /// <param name="level"></param>
-        /// <returns></returns>
-        public IEnumerable<(Action Action, IEnumerable<Action> Mutexes)> GetActionsWithMutexes(int level)
-        {
-            return GetActionLevel(level).Select(kvp => (kvp.Key, kvp.Value.Mutexes.Select(e => e.Action)));
-        }
-
-        /// <summary>
         /// Gets the level at which a given proposition first occurs.
         /// </summary>
         /// <param name="proposition">The proposition to look for.</param>
@@ -102,7 +82,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var level = 0;
             while (!GetPropositionLevel(level).ContainsKey(proposition))
             {
-                if (level == levelledOffAtLayer)
+                if (level == LevelledOffAtLevel)
                 {
                     return -1;
                 }
@@ -124,7 +104,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var level = 0;
             while (!SetPresentWithNoMutexesAt(propositions, level))
             {
-                if (level == levelledOffAtLayer)
+                if (level == LevelledOffAtLevel)
                 {
                     return -1;
                 }
@@ -142,7 +122,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <param name="propositions">The propositions to look for.</param>
         /// <param name="level">The graph level to consider.</param>
         /// <returns></returns>
-        bool SetPresentWithNoMutexesAt(IEnumerable<Literal> propositions, int level)
+        public bool SetPresentWithNoMutexesAt(IEnumerable<Literal> propositions, int level)
         {
             var propositionIndex = 0;
             foreach (var proposition in propositions)
@@ -165,25 +145,25 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private Dictionary<Literal, PropositionNode> GetPropositionLevel(int level)
         {
-            while (expandedToLevel < level && !levelledOff)
+            while (expandedToLevel < level && !LevelledOff)
             {
-                PopulateNextLevel();
+                MakeNextLevel();
             }
 
-            return propositionLevels[Math.Min(level, levelledOffAtLayer)];
+            return propositionLevels[Math.Min(level, LevelledOffAtLevel ?? int.MaxValue)];
         }
 
         private Dictionary<Action, ActionNode> GetActionLevel(int level)
         {
-            while (expandedToLevel < level + 1 && !levelledOff)
+            while (expandedToLevel < level + 1 && !LevelledOff)
             {
-                PopulateNextLevel();
+                MakeNextLevel();
             }
 
-            return actionLevels[Math.Min(level, levelledOffAtLayer)];
+            return actionLevels[Math.Min(level, LevelledOffAtLevel ?? int.MaxValue)];
         }
 
-        private void PopulateNextLevel()
+        private void MakeNextLevel()
         {
             var currentPropositionLevel = propositionLevels[expandedToLevel];
 
@@ -279,23 +259,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             {
                 foreach (var (otherAction, otherActionNode) in newActionLevel.Take(actionIndex))
                 {
-                    // check for inconsistent effects:
-                    if (otherAction.Effect.Elements.Overlaps(action.Effect.Elements.Select(l => l.Negate())))
+                    if (otherAction.Effect.Elements.Overlaps(action.Effect.Elements.Select(l => l.Negate())) // inconsistent effects
+                        || otherAction.Effect.Elements.Overlaps(action.Precondition.Elements.Select(l => l.Negate())) // interference
+                        || otherAction.Precondition.Elements.Overlaps(action.Precondition.Elements.Select(l => l.Negate()))) // competing needs
                     {
-                        actionNode.Mutexes.Add(otherActionNode);
-                        otherActionNode.Mutexes.Add(actionNode);
-                    }
-                    // check for interference:
-                    else if (otherAction.Effect.Elements.Overlaps(action.Precondition.Elements.Select(l => l.Negate())))
-                    {
-                        actionNode.Mutexes.Add(otherActionNode);
-                        otherActionNode.Mutexes.Add(actionNode);
-                    }
-                    // check for competing needs:
-                    else if (otherAction.Precondition.Elements.Overlaps(action.Precondition.Elements.Select(l => l.Negate())))
-                    {
-                        actionNode.Mutexes.Add(otherActionNode);
-                        otherActionNode.Mutexes.Add(actionNode);
+                        ActionNode.AddMutex(actionNode, otherActionNode);
                     }
                 }
 
@@ -324,17 +292,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                         return true;
                     }
 
-                    // check for negation:
-                    if (proposition.Negate().Equals(otherProposition))
+                    if (proposition.Negate().Equals(otherProposition) // negation
+                        || AllActionsMutex()) // inconsistent support
                     {
-                        propositionNode.Mutexes.Add(otherPropositionNode);
-                        otherPropositionNode.Mutexes.Add(propositionNode);
-                    }
-                    // check for inconsistent support:
-                    else if (AllActionsMutex())
-                    {
-                        propositionNode.Mutexes.Add(otherPropositionNode);
-                        otherPropositionNode.Mutexes.Add(propositionNode);
+                        PropositionNode.AddMutex(propositionNode, otherPropositionNode);
                     }
                 }
 
@@ -343,8 +304,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             if (!changesOccured)
             {
-                levelledOff = true;
-                levelledOffAtLayer = expandedToLevel;
+                LevelledOff = true;
+                LevelledOffAtLevel = expandedToLevel;
             }
             else
             {
@@ -376,6 +337,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             internal Collection<ActionNode> Actions { get; } = new();
 
             internal Collection<PropositionNode> Mutexes { get; } = new();
+
+            internal static void AddMutex(PropositionNode x, PropositionNode y)
+            {
+                x.Mutexes.Add(y);
+                y.Mutexes.Add(x);
+            }
         }
 
         /// <summary>
@@ -394,6 +361,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             internal Collection<PropositionNode> Effects { get; } = new();
 
             internal Collection<ActionNode> Mutexes { get; } = new();
+
+            internal static void AddMutex(ActionNode x, ActionNode y)
+            {
+                x.Mutexes.Add(y);
+                y.Mutexes.Add(x);
+            }
         }
     }
 }
