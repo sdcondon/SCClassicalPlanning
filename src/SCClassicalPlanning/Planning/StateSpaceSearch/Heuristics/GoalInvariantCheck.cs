@@ -22,6 +22,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
     /// The simplest example of this is if a predicate doesn't appear in any effects. If this is true, the
     /// the occurences of this predicate in the initial state must persist throughout the problem.
     /// Might research / play with this idea at some point.
+    /// <para/>
+    /// TODO: thinking about it, this might be better implemented as part of a strategy for determining
+    /// relevant actions - happens earlier and means that we could e.g. not even consider goal elements that
+    /// are entailed by the invariants (e.g. IsBlock(BlockA)) - as we don't need to worry about things that
+    /// will always be true.
     /// </summary>
     public class GoalInvariantCheck : IHeuristic
     {

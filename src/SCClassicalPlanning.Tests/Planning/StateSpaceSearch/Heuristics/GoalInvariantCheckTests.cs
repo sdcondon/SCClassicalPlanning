@@ -18,8 +18,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         private record TestCase(IEnumerable<Sentence> Invariants, OperableState State, OperableGoal Goal, float ExpectedCost);
 
         public static Test EstimateCostBehaviour => TestThat
-            .GivenTestContext()
-            .AndEachOf(() => new TestCase[]
+            .GivenEachOf(() => new TestCase[]
             {
                 new TestCase(
                     Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
@@ -51,7 +50,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
                     Goal: On(blockB, blockA) & Clear(blockB), // Fine
                     ExpectedCost: 0),
             })
-            .When((_, tc) =>
+            .When(tc =>
             {
                 var kb = new SimpleResolutionKnowledgeBase(
                     new SimpleClauseStore(),
@@ -62,6 +61,6 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
                 return new GoalInvariantCheck(kb, new DelegateHeuristic((s, g) => 0)).EstimateCost(tc.State, tc.Goal);
             })
             .ThenReturns()
-            .And((_, tc, rv) => rv.Should().Be(tc.ExpectedCost));
+            .And((tc, rv) => rv.Should().Be(tc.ExpectedCost));
     }
 }

@@ -19,8 +19,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         private record TestCase(Problem Problem, State State, OperableGoal Goal, float ExpectedCost);
 
         public static Test EstimateCostBehaviour => TestThat
-            .GivenTestContext()
-            .AndEachOf(() => new TestCase[]
+            .GivenEachOf(() => new TestCase[]
             {
                 // Unload (or indeed Fly - ignoring preconds means ignoring 'type'..) cargo1 to airport1,
                 // = 1
@@ -74,8 +73,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
                         & At(cargo1, airport2), // unload (or fly)
                     ExpectedCost: 2),
             })
-            .When((_, tc) => new IgnorePreconditionsGreedySetCover(tc.Problem).EstimateCost(tc.State, tc.Goal))
+            .When(tc => new IgnorePreconditionsGreedySetCover(tc.Problem).EstimateCost(tc.State, tc.Goal))
             .ThenReturns()
-            .And((_, tc, rv) => rv.Should().Be(tc.ExpectedCost));
+            .And((tc, rv) => rv.Should().Be(tc.ExpectedCost));
     }
 }

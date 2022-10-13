@@ -178,8 +178,11 @@ namespace SCClassicalPlanning.Planning
                     {
                         allPossibleUnifiers = allPossibleUnifiers.SelectMany(u => problem.Objects.Select(o =>
                         {
-                            var newBindings = new Dictionary<VariableReference, Term>(u.Bindings);
-                            newBindings[unboundVariable] = o;
+                            var newBindings = new Dictionary<VariableReference, Term>(u.Bindings)
+                            {
+                                [unboundVariable] = o
+                            };
+
                             return new VariableSubstitution(newBindings);
                         }));
                     }
@@ -267,8 +270,11 @@ namespace SCClassicalPlanning.Planning
             {
                 allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(u => objects.Select(o =>
                 {
-                    var newBindings = new Dictionary<VariableReference, Term>(u.Bindings);
-                    newBindings[unboundVariable] = o;
+                    var newBindings = new Dictionary<VariableReference, Term>(u.Bindings)
+                    {
+                        [unboundVariable] = o
+                    };
+
                     return new VariableSubstitution(newBindings);
                 }));
             }
