@@ -7,18 +7,16 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
 {
     public class PlanningGraphSetLevelTests
     {
-        private record TestCase(Problem Problem, State State, OperableGoal Goal, float ExpectedCost);
+        private record TestCase(Problem Problem, float ExpectedCost);
 
         public static Test EstimateCost => TestThat
             .GivenEachOf(() => new TestCase[]
             {
                 new(
                     Problem: HaveCakeAndEatCakeToo.ExampleProblem,
-                    State: HaveCakeAndEatCakeToo.ExampleProblem.InitialState,
-                    Goal: HaveCakeAndEatCakeToo.ExampleProblem.Goal,
                     ExpectedCost: 2),
             })
-            .When(tc => new PlanningGraphSetLevel(tc.Problem).EstimateCost(tc.State, tc.Goal))
+            .When(tc => new PlanningGraphSetLevel(tc.Problem.Domain).EstimateCost(tc.Problem.InitialState, tc.Problem.Goal))
             .ThenReturns()
             .And((tc, rv) => rv.Should().Be(tc.ExpectedCost));
     }

@@ -11,18 +11,18 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
     /// </summary>
     public class PlanningGraphMaxLevel : IHeuristic
     {
-        private readonly Problem problem;
+        private readonly Domain domain;
 
         /// <summary>
         /// Initialises a new instance of the <see cref="PlanningGraphMaxLevel"/> class.
         /// </summary>
-        /// <param name="problem">The problem being solved.</param>
-        public PlanningGraphMaxLevel(Problem problem) => this.problem = problem;
+        /// <param name="domain">The relevant domain.</param>
+        public PlanningGraphMaxLevel(Domain domain) => this.domain = domain;
 
         /// <inheritdoc/>
         public float EstimateCost(State state, Goal goal)
         {
-            var planningGraph = new PlanningGraph(problem, state);
+            var planningGraph = new PlanningGraph(new(domain, state, goal));
 
             return goal.Elements.Max(e =>
             {

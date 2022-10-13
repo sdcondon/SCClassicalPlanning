@@ -24,14 +24,13 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// Initialises a new instance of the <see cref="PlanningGraph"/> class.
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
-        /// <param name="state">The state to start from.</param>
-        public PlanningGraph(Problem problem, State state)
+        public PlanningGraph(Problem problem)
         {
             this.problem = problem;
 
             // Planning graphs only work with propositions - no variables allowed.
             // So here we iterate every possible ground predicate (by subsituting every combination of known constants
-            // for its arguments - add positive if its in the initial state, otherwise negative
+            // for its arguments - add positive if it's in the initial state, otherwise negative
             var propositionLevel0 = new Dictionary<Literal, PropositionNode>();
             foreach (var predicateTemplate in problem.Domain.Predicates)
             {
@@ -40,7 +39,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     // Ugh - compiler assuming wrong overload - perhaps because conversion is implicit and method is more concrete?
                     // Implicit conversion of predicate to literal a mistake, I think.
                     var predicate = (Predicate)substitution.ApplyTo(predicateTemplate).ToSentence();
-                    var proposition = new Literal(predicate, !state.Elements.Contains(predicate));
+                    var proposition = new Literal(predicate, !problem.InitialState.Elements.Contains(predicate));
                     propositionLevel0.Add(proposition, new PropositionNode(proposition));
                 }
             }
