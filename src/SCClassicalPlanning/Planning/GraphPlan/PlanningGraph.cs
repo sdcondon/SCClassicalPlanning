@@ -66,7 +66,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <returns></returns>
         public IEnumerable<(Literal Proposition, IEnumerable<Literal> Mutexes)> GetPropositionsWithMutexes(int level)
         {
-            return GetPropositionLevel(level).Select(kvp => (kvp.Key, kvp.Value.Edges.OfType<PropositionMutexEdge>().Select(e => e.To.Proposition)));
+            return GetPropositionLevel(level).Select(kvp => (kvp.Key, kvp.Value.Mutexes.Select(e => e.Proposition)));
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <returns></returns>
         public IEnumerable<(Action Action, IEnumerable<Action> Mutexes)> GetActionsWithMutexes(int level)
         {
-            return GetActionLevel(level).Select(kvp => (kvp.Key, kvp.Value.Edges.OfType<ActionMutexEdge>().Select(e => e.To.Action)));
+            return GetActionLevel(level).Select(kvp => (kvp.Key, kvp.Value.Mutexes.Select(e => e.Action)));
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                         return false;
                     }
 
-                    if (node.Edges.OfType<PropositionMutexEdge>().Select(e => e.To.Proposition).Intersect(propositions.Take(i)).Any())
+                    if (node.Mutexes.Select(e => e.Proposition).Intersect(propositions.Take(i)).Any())
                     {
                         return false;
                     }
@@ -204,7 +204,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 foreach (var preconditionElement in action.Precondition.Elements)
                 {
                     var preconditionElementNode = currentPropositionLevel[preconditionElement];
-                    preconditionElementNode.Edges.Add(new ActionEdge(preconditionElementNode, actionNode));
+                    preconditionElementNode.Actions.Add(actionNode);
                 }
 
                 // Make a note if this action isn't in the current layer - it means that the graph hasn't levelled off yet:
@@ -227,7 +227,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     }
 
                     // Link the new action node to nodes of its effect elements:
-                    actionNode.Edges.Add(new PropositionEdge(actionNode, propositionNode));
+                    actionNode.Effects.Add(propositionNode);
 
                     // also make a (temporary!) note of the actions that led to each effect - for mutex calculation
                     newActionsByNewProposition[effectElement].Add(action);
@@ -243,11 +243,13 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             // Now we need to add the maintenance/no-op actions:
             foreach (var kvp in currentPropositionLevel)
             {
+                var (proposition, propositionNode) = (kvp.Key, kvp.Value);
+
                 // Add a no-op action & link its precondition
-                var action = MakeNoOp(kvp.Key);
+                var action = MakeNoOp(proposition);
                 var actionNode = new ActionNode(action);
                 newActionLevel.Add(action, actionNode);
-                kvp.Value.Edges.Add(new ActionEdge(kvp.Value, actionNode));
+                propositionNode.Actions.Add(actionNode);
 
                 // Make a note if this action isn't in the current layer - it means that the graph hasn't levelled off yet:
                 // NB: ..because looking at the propositions isn't enough - different actions could lead to the same
@@ -258,14 +260,14 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
 
                 // Create a new proposition node if we need to:
-                if (!newPropositionLevel.TryGetValue(kvp.Key, out var newPropositionNode))
+                if (!newPropositionLevel.TryGetValue(proposition, out var newPropositionNode))
                 {
-                    newPropositionNode = newPropositionLevel[kvp.Key] = new PropositionNode(kvp.Key);
-                    newActionsByNewProposition[kvp.Key] = new List<Action>();
+                    newPropositionNode = newPropositionLevel[proposition] = new PropositionNode(proposition);
+                    newActionsByNewProposition[proposition] = new List<Action>();
                 }
 
-                actionNode.Edges.Add(new PropositionEdge(actionNode, newPropositionNode));
-                newActionsByNewProposition[kvp.Key].Add(action);
+                actionNode.Effects.Add(newPropositionNode);
+                newActionsByNewProposition[proposition].Add(action);
             }
 
             // Add action mutexes
@@ -281,20 +283,20 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     // check for inconsistent effects:
                     if (otherAction.Effect.Elements.Overlaps(action.Effect.Elements.Select(l => l.Negate())))
                     {
-                        actionNode.Edges.Add(new ActionMutexEdge(actionNode, otherActionNode)); // could include type of mutex in edge, but meh
-                        otherActionNode.Edges.Add(new ActionMutexEdge(otherActionNode, actionNode));
+                        actionNode.Mutexes.Add(otherActionNode);
+                        otherActionNode.Mutexes.Add(actionNode);
                     }
                     // check for interference:
                     else if (otherAction.Effect.Elements.Overlaps(action.Precondition.Elements.Select(l => l.Negate())))
                     {
-                        actionNode.Edges.Add(new ActionMutexEdge(actionNode, otherActionNode));
-                        otherActionNode.Edges.Add(new ActionMutexEdge(otherActionNode, actionNode));
+                        actionNode.Mutexes.Add(otherActionNode);
+                        otherActionNode.Mutexes.Add(actionNode);
                     }
                     // check for competing needs:
                     else if (otherAction.Precondition.Elements.Overlaps(action.Precondition.Elements.Select(l => l.Negate())))
                     {
-                        actionNode.Edges.Add(new ActionMutexEdge(actionNode, otherActionNode));
-                        otherActionNode.Edges.Add(new ActionMutexEdge(otherActionNode, actionNode));
+                        actionNode.Mutexes.Add(otherActionNode);
+                        otherActionNode.Mutexes.Add(actionNode);
                     }
                 }
 
@@ -317,7 +319,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                         {
                             foreach (var otherAction in newActionsByNewProposition[otherProposition])
                             {
-                                if (!newActionLevel[action].Edges.Any(e => e is ActionMutexEdge mutex && mutex.To.Action.Equals(newActionLevel[otherAction].Action)))
+                                if (!newActionLevel[action].Mutexes.Any(m => m.Action.Equals(newActionLevel[otherAction].Action)))
                                 {
                                     return false;
                                 }
@@ -330,14 +332,14 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     // check for negation:
                     if (proposition.Negate().Equals(otherProposition))
                     {
-                        propositionNode.Edges.Add(new PropositionMutexEdge(propositionNode, otherPropositionNode));
-                        otherPropositionNode.Edges.Add(new PropositionMutexEdge(otherPropositionNode, propositionNode));
+                        propositionNode.Mutexes.Add(otherPropositionNode);
+                        otherPropositionNode.Mutexes.Add(propositionNode);
                     }
                     // check for inconsistent support:
                     else if (AllActionsMutex())
                     {
-                        propositionNode.Edges.Add(new PropositionMutexEdge(propositionNode, otherPropositionNode));
-                        otherPropositionNode.Edges.Add(new PropositionMutexEdge(otherPropositionNode, propositionNode));
+                        propositionNode.Mutexes.Add(otherPropositionNode);
+                        otherPropositionNode.Mutexes.Add(propositionNode);
                     }
                 }
 
@@ -364,107 +366,39 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         public static Action MakeNoOp(Literal proposition) => new("NOOP", new(proposition), new(proposition));
 
         /// <summary>
-        /// Interface for nodes of a planning graph.
+        /// Representation of the proposition node in a planning graph.
         /// <para/>
-        /// TODO: Empty interface is obviously bad design. We should probably consider the precondition-and-effect graph and the mutex graph
-        /// as two separate graphs (that happen to contain the same nodes). For the next pass. Although, more to the point - unless any of the
-        /// algorithms actually use this as a graph (i.e. apply graph algorithms to it), there's absolutely no point in modelling it as one..
+        /// NB: We don't make use of SCGraphTheory for the planning graph because none of the algorithms that use 
+        /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
+        /// should we ever want to do that.
         /// </summary>
-        public interface INode : INode<INode, IEdge>
-        {
-        }
-
-        /// <summary>
-        /// Interface for edges of a planning graph.
-        /// <para/>
-        /// TODO: Empty interface is obviously bad design. We should probably consider the precondition-and-effect graph and the mutex graph
-        /// as two separate graphs (that happen to contain the same nodes). For the next pass. Although, more to the point - unless any of the
-        /// algorithms actually use this as a graph (i.e. apply graph algorithms to it), there's absolutely no point in modelling it as one..
-        /// </summary>
-        public interface IEdge : IEdge<INode, IEdge>
-        {
-        }
-
-        public class PropositionNode : INode
+        public class PropositionNode
         {
             internal PropositionNode(Literal proposition) => Proposition = proposition;
 
             public Literal Proposition { get; }
 
-            internal Collection<IEdge> Edges { get; } = new Collection<IEdge>();
+            internal Collection<ActionNode> Actions { get; } = new();
 
-            IReadOnlyCollection<IEdge> INode<INode, IEdge>.Edges => Edges;
+            internal Collection<PropositionNode> Mutexes { get; } = new();
         }
 
         /// <summary>
-        /// Container for information about an edge that connects a <see cref="PropositionNode"/> to
-        /// an <see cref="ActionNode"/> in the same layer.
+        /// Representation of the action node in a planning graph.
+        /// <para/>
+        /// NB: We don't make use of SCGraphTheory for the planning graph because none of the algorithms that use 
+        /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
+        /// should we ever want to do that.
         /// </summary>
-        public class ActionEdge : IEdge
-        {
-            internal ActionEdge(PropositionNode from, ActionNode to) => (From, To) = (from, to);
-
-            public PropositionNode From { get; }
-
-            public ActionNode To { get; }
-
-            INode IEdge<INode, IEdge>.From => From;
-
-            INode IEdge<INode, IEdge>.To => To;
-        }
-
-        public class ActionMutexEdge : IEdge
-        {
-            internal ActionMutexEdge(ActionNode from, ActionNode to) => (From, To) = (from, to);
-
-            public ActionNode From { get; }
-
-            public ActionNode To { get; }
-
-            INode IEdge<INode, IEdge>.From => From;
-
-            INode IEdge<INode, IEdge>.To => To;
-        }
-
-        public class PropositionMutexEdge : IEdge
-        {
-            internal PropositionMutexEdge(PropositionNode from, PropositionNode to) => (From, To) = (from, to);
-
-            public PropositionNode From { get; }
-
-            public PropositionNode To { get; }
-
-            INode IEdge<INode, IEdge>.From => From;
-
-            INode IEdge<INode, IEdge>.To => To;
-        }
-
-        public class ActionNode : INode
+        public class ActionNode
         {
             internal ActionNode(Action action) => Action = action;
 
             public Action Action { get; }
 
-            internal Collection<IEdge> Edges { get; } = new Collection<IEdge>();
+            internal Collection<PropositionNode> Effects { get; } = new();
 
-            IReadOnlyCollection<IEdge> INode<INode, IEdge>.Edges => Edges;
-        }
-
-        /// <summary>
-        /// Container for information about an edge that connects an <see cref="ActionNode"/> to
-        /// a <see cref="PropositionNode"/> in the next layer.
-        /// </summary>
-        public class PropositionEdge : IEdge
-        {
-            internal PropositionEdge(ActionNode from, PropositionNode to) => (From, To) = (from, to);
-
-            public ActionNode From { get; }
-
-            public PropositionNode To { get; }
-
-            INode IEdge<INode, IEdge>.From => From;
-
-            INode IEdge<INode, IEdge>.To => To;
+            internal Collection<ActionNode> Mutexes { get; } = new();
         }
     }
 }
