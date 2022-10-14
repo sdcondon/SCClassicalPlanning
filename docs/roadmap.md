@@ -21,9 +21,11 @@ Stuff I want to do before ticking the major version number to 1.
     - [x] one that could be described as using "ignore preconditions"
     - [ ] one that could be described as using "ignore delete lists"
     - [x] perhaps some others
-- [ ] We have a simple PlanningGraph implementation
+- [x] We have a simple PlanningGraph implementation
 - [ ] We have a simple GraphPlan implementation
-- [ ] I've at least considered all of the existing TODOs. Most notably the ones around State abstraction and state indexing - so its at least conceivable that someone could extend it to be workable with large (secondary-storage requiring) problems.
+- [ ] I've at least considered all of the existing TODOs.
+      [ ] Most notably the ones around State abstraction and state indexing - so its at least conceivable that someone could extend it to be workable with large (secondary-storage requiring) problems.
+      [ ] Also want to allow planners to open up the planning process. E.g. allowing consumers to see the search in state space searching, and the planning graph in graphplan. Perhaps even allow for them to be created step-by-step. Yes this is overhead, but given the purpose of the lib.. Likely accomplished by having IPlanner return a PlanningTask rather than a Task<Plan>
 
 ### Post-V1
 
