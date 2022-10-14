@@ -25,7 +25,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
 
             return goal.Elements.Sum(e =>
             {
-                var level = planningGraph.GetLevel(e);
+                var level = planningGraph.GetLevelCost(e);
                 if (level != -1)
                 {
                     return level;

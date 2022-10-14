@@ -1,6 +1,5 @@
 ﻿using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
-using SCGraphTheory;
 using System.Collections.ObjectModel;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
@@ -82,7 +81,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// </summary>
         /// <param name="proposition">The proposition to look for.</param>
         /// <returns>The level at which the given proposition first occurs.</returns>
-        public int GetLevel(Literal proposition)
+        public int GetLevelCost(Literal proposition)
         {
             // meh, will do for now - yes its a loop, but each layer is a dictionary
             var level = 0;
@@ -192,6 +191,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 {
                     var preconditionElementNode = currentPropositionLevel[preconditionElement];
                     preconditionElementNode.Actions.Add(actionNode);
+                    actionNode.Preconditions.Add(preconditionElementNode);
                 }
 
                 // Make a note if this action isn't in the current layer - it means that the graph hasn't levelled off yet:
@@ -211,10 +211,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     {
                         propositionNode = newPropositionLevel[effectElement] = new PropositionNode(effectElement);
 
-                        // Make a note if this effect isn't in the current layer - it means that the graph hasn't levelled off yet:
+                        // Make a note if this effect isn't in the current layer - it means that the graph hasn't levelled off yet
+                        // (TODO: do we actually need this, given that the action determines the effect, and we check for new actions. ponder me)
                         if (!currentPropositionLevel.ContainsKey(effectElement))
                         {
                             changesOccured = true;
+                            // levelCost[effectElement] = expandedToLevel + 1; <-- something for the next pass, maybe
                         }
                     }
 
@@ -325,7 +327,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <para/>
         /// NB: We don't make use of the SCGraphTheory abstraction for the planning graph because none of the algorithms that use 
         /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
-        /// should we ever want to do that.
+        /// should we ever want to do that (probably just by layering some structs over the top of these existing classes).
         /// </summary>
         private class PropositionNode
         {
@@ -345,7 +347,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <para/>
         /// NB: We don't make use of SCGraphTheory abstraction for the planning graph because none of the algorithms that use 
         /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
-        /// should we ever want to do that.
+        /// should we ever want to do that (probably just by layering some structs over the top of these existing classes).
         /// </summary>
         private class ActionNode
         {
@@ -354,6 +356,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             public Action Action { get; }
 
             internal Collection<PropositionNode> Effects { get; } = new();
+
+            internal Collection<PropositionNode> Preconditions { get; } = new();
 
             internal Collection<ActionNode> Mutexes { get; } = new();
         }
