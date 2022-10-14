@@ -45,8 +45,14 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             propositionLevels.Add(propositionLevel0);
         }
 
-        public bool LevelledOff { get; private set; } = false;
+        /// <summary>
+        /// Gets a value indicating whether the graph has levelled off.
+        /// </summary>
+        public bool LevelledOff => LevelledOffAtLevel.HasValue;
 
+        /// <summary>
+        /// Gets the level at which the graph levelled off - or null if the graph has not yet levelled off.
+        /// </summary>
         public int? LevelledOffAtLevel { get; private set; } = null;
 
         /// <summary>
@@ -171,13 +177,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var newPropositionLevel = new Dictionary<Literal, PropositionNode>();
             var changesOccured = false;
 
-            // We don't need propositions to link back to the actions that they are the effects of *long-term*
-            // (i.e. included in the graph), but we do need it temporarily to establish mutexes. So just use a 
-            // dictionary. Yeah, a bit hacky - efficiency improvements to follow at some point. Maybe.
-            var newActionsByNewProposition = new Dictionary<Literal, List<Action>>();
-
             // First we need to get all applicable actions from the "state" defined by the current layer.
-            // TODO: indexing support? somehow keying positive versus negative feels useful? Meh, slow anyway..
+            // indexing support? somehow keying positive versus negative feels useful? Meh, slow anyway..
             var currentState = new State(currentPropositionLevel.Keys.Where(p => p.IsPositive).Select(p => p.Predicate));
 
             // Now we iterate all those applicable actions - ultimately to build the next action and proposition layers.
@@ -209,20 +210,18 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     if (!newPropositionLevel.TryGetValue(effectElement, out var propositionNode))
                     {
                         propositionNode = newPropositionLevel[effectElement] = new PropositionNode(effectElement);
-                        newActionsByNewProposition[effectElement] = new List<Action>();
+
+                        // Make a note if this effect isn't in the current layer - it means that the graph hasn't levelled off yet:
+                        if (!currentPropositionLevel.ContainsKey(effectElement))
+                        {
+                            changesOccured = true;
+                        }
                     }
 
-                    // Link the new action node to nodes of its effect elements:
+                    // Link the new action node to the (*possibly* new) proposition node as an effect,
+                    // and link the proposition node back to the action node as a cause.
                     actionNode.Effects.Add(propositionNode);
-
-                    // also make a (temporary!) note of the actions that led to each effect - for mutex calculation
-                    newActionsByNewProposition[effectElement].Add(action);
-
-                    // Make a note if this effect isn't in the current layer - it means that the graph hasn't levelled off yet:
-                    if (!currentPropositionLevel.ContainsKey(effectElement))
-                    {
-                        changesOccured = true;
-                    }
+                    propositionNode.Causes.Add(actionNode);
                 }
             }
 
@@ -246,11 +245,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 if (!newPropositionLevel.TryGetValue(proposition, out var newPropositionNode))
                 {
                     newPropositionNode = newPropositionLevel[proposition] = new PropositionNode(proposition);
-                    newActionsByNewProposition[proposition] = new List<Action>();
                 }
 
                 actionNode.Effects.Add(newPropositionNode);
-                newActionsByNewProposition[proposition].Add(action);
+                newPropositionNode.Causes.Add(actionNode);
             }
 
             // Add action mutexes
@@ -263,7 +261,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                         || otherAction.Effect.Elements.Overlaps(action.Precondition.Elements.Select(l => l.Negate())) // interference
                         || otherAction.Precondition.Elements.Overlaps(action.Precondition.Elements.Select(l => l.Negate()))) // competing needs
                     {
-                        ActionNode.AddMutex(actionNode, otherActionNode);
+                        actionNode.Mutexes.Add(otherActionNode);
+                        otherActionNode.Mutexes.Add(actionNode);
                     }
                 }
 
@@ -278,11 +277,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 {
                     bool AllActionsMutex()
                     {
-                        foreach (var action in newActionsByNewProposition[proposition])
+                        foreach (var actionNode in propositionNode.Causes)
                         {
-                            foreach (var otherAction in newActionsByNewProposition[otherProposition])
+                            foreach (var otherActionNode in otherPropositionNode.Causes)
                             {
-                                if (!newActionLevel[action].Mutexes.Any(m => m.Action.Equals(newActionLevel[otherAction].Action)))
+                                if (!actionNode.Mutexes.Any(m => m.Action.Equals(otherActionNode.Action)))
                                 {
                                     return false;
                                 }
@@ -295,7 +294,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     if (proposition.Negate().Equals(otherProposition) // negation
                         || AllActionsMutex()) // inconsistent support
                     {
-                        PropositionNode.AddMutex(propositionNode, otherPropositionNode);
+                        propositionNode.Mutexes.Add(otherPropositionNode);
+                        otherPropositionNode.Mutexes.Add(propositionNode);
                     }
                 }
 
@@ -304,7 +304,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             if (!changesOccured)
             {
-                LevelledOff = true;
                 LevelledOffAtLevel = expandedToLevel;
             }
             else
@@ -322,9 +321,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         internal static Action MakeNoOp(Literal proposition) => new("NOOP", new(proposition), new(proposition));
 
         /// <summary>
-        /// Representation of the proposition node in a planning graph.
+        /// Representation of a proposition node in a planning graph.
         /// <para/>
-        /// NB: We don't make use of SCGraphTheory for the planning graph because none of the algorithms that use 
+        /// NB: We don't make use of the SCGraphTheory abstraction for the planning graph because none of the algorithms that use 
         /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
         /// should we ever want to do that.
         /// </summary>
@@ -336,19 +335,15 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             internal Collection<ActionNode> Actions { get; } = new();
 
-            internal Collection<PropositionNode> Mutexes { get; } = new();
+            internal Collection<ActionNode> Causes { get; } = new();
 
-            internal static void AddMutex(PropositionNode x, PropositionNode y)
-            {
-                x.Mutexes.Add(y);
-                y.Mutexes.Add(x);
-            }
+            internal Collection<PropositionNode> Mutexes { get; } = new();
         }
 
         /// <summary>
-        /// Representation of the action node in a planning graph.
+        /// Representation of an action node in a planning graph.
         /// <para/>
-        /// NB: We don't make use of SCGraphTheory for the planning graph because none of the algorithms that use 
+        /// NB: We don't make use of SCGraphTheory abstraction for the planning graph because none of the algorithms that use 
         /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
         /// should we ever want to do that.
         /// </summary>
@@ -361,12 +356,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             internal Collection<PropositionNode> Effects { get; } = new();
 
             internal Collection<ActionNode> Mutexes { get; } = new();
-
-            internal static void AddMutex(ActionNode x, ActionNode y)
-            {
-                x.Mutexes.Add(y);
-                y.Mutexes.Add(x);
-            }
         }
     }
 }

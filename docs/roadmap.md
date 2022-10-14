@@ -30,3 +30,5 @@ Stuff I want to do before ticking the major version number to 1.
 ### Post-V1
 
 Honestly not sure - might call it 'done' at that point, might continue playing with it. Will certainly be willing to tralk to any interested parties about it. Time will tell.
+
+* Strong naming and package signing: only if it becomes popular or people ask for it. Certificates cost money..

@@ -62,22 +62,15 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             public StateSpaceNode(Problem problem, State state) => (this.problem, State) = (problem, state);
 
-            /// <summary>
-            /// Gets the state represented by this node.
-            /// </summary>
             public State State { get; }
 
-            /// <inheritdoc />
             public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(problem, State);
 
-            /// <inheritdoc />
             public override bool Equals(object? obj) => obj is StateSpaceNode node && Equals(node);
 
-            /// <inheritdoc />
             // NB: this struct is private - so we don't need to look at the problem, since it'll always match
             public bool Equals(StateSpaceNode node) => Equals(State, node.State);
 
-            /// <inheritdoc />
             public override int GetHashCode() => HashCode.Combine(State);
         }
 
@@ -88,10 +81,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             public StateSpaceNodeEdges(Problem problem, State state) => (this.problem, this.state) = (problem, state);
 
-            /// <inheritdoc />
             public int Count => ProblemInspector.GetApplicableActions(problem, state).Count();
 
-            /// <inheritdoc />
             public IEnumerator<StateSpaceEdge> GetEnumerator()
             {
                 foreach (var action in ProblemInspector.GetApplicableActions(problem, state))
@@ -100,7 +91,6 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 }
             }
 
-            /// <inheritdoc />
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
@@ -118,18 +108,12 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 this.Action = action;
             }
 
-            /// <inheritdoc />
             public StateSpaceNode From => new(problem, fromState);
 
-            /// <inheritdoc />
             public StateSpaceNode To => new(problem, toState);
 
-            /// <summary>
-            /// Gets the action that is applied to achieve this goal transition.
-            /// </summary>
             public Action Action { get; }
 
-            /// <inheritdoc />
             public override string ToString() => new PlanFormatter(problem.Domain).Format(Action);
         }
     }

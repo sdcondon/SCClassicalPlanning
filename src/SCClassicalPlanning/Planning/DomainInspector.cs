@@ -25,7 +25,7 @@ namespace SCClassicalPlanning.Planning
         /// <returns>A <see cref="VariableSubstitution"/> that maps the variables as defined in the schema to the terms referred to in the provided action.</returns>
         public static VariableSubstitution GetMappingFromSchema(Domain domain, Action action)
         {
-            // NB: All rationalisations aside, this is a bit naff. Sort me out.
+            // TODO: All rationalisations aside, this is a bit naff. Sort me out.
 
             // Note that this is mostly awkward due to the unordered nature of elements. if we preserved the order of things in our model classes then
             // matching would of course be much easier. HOWEVER, of course when it comes to equality (super important) we need order NOT to matter.
