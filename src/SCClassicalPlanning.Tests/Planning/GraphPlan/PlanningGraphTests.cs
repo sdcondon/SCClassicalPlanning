@@ -70,7 +70,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             })
             .When(tc => new PlanningGraph(tc.Problem))
             .ThenReturns()
-            .And((tc, rv) => rv.GetPropositions(0).Should().BeEquivalentTo(tc.ExpectedLayer0Propositions.OfType<Literal>()));
+            .And((tc, rv) => rv.GetLevel(0).Propositions.Should().BeEquivalentTo(tc.ExpectedLayer0Propositions.OfType<Literal>()));
 
         // NB: yeah, pretty terrible coverage (testing large outputs is generally a PITA)
         // note that it gets indirectly tested via the PlanningGraph heuristics tests.

@@ -96,6 +96,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             /// <inheritdoc />
             public override int GetHashCode() => HashCode.Combine(Goal);
 
+            /// <inheritdoc />
             public override string ToString() => Goal.ToString();
         }
 
@@ -137,10 +138,10 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             }
 
             /// <inheritdoc />
-            public StateSpaceNode From => new StateSpaceNode(problem, fromGoal);
+            public StateSpaceNode From => new(problem, fromGoal);
 
             /// <inheritdoc />
-            public StateSpaceNode To => new StateSpaceNode(problem, toGoal);
+            public StateSpaceNode To => new(problem, toGoal);
 
             /// <summary>
             /// Gets the action that is regressed over to achieve this goal transition.
