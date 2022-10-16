@@ -2,7 +2,8 @@
 {
     /// <summary>
     /// Interface for state space search heuristic implementations. That is, types that can estimate the
-    /// cost of getting from a given state to a state that satisfies a given goal.
+    /// "cost" (whatever that means in the context of the problem being solved) of getting from a given
+    /// state to a state that satisfies a given goal.
     /// </summary>
     public interface IHeuristic
     {
