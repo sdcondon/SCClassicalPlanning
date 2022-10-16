@@ -62,7 +62,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             ////    }
             ////}
 
-            if (!object.Equals(search.Target, default(StateSpaceNode)))
+            if (search.IsSucceeded())
             {
                 return new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
             }

@@ -46,7 +46,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
             await search.CompleteAsync(1, cancellationToken); // todo?: worth adding all the Steppable stuff like in FoL?
 
-            if (!object.Equals(search.Target, default(StateSpaceNode)))
+            if (search.IsSucceeded())
             {
                 return new Plan(search.PathToTarget().Select(e => e.Action).ToList());
             }
