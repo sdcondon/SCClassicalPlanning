@@ -45,7 +45,7 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         /// <summary>
         /// Gets an instance of the customary example problem in this domain.
         /// Consists of two airports, two planes and two pieces of cargo.
-        /// In the initial state, plane1 and cargo1 are at airport1; plane1 and cargo1 are at airport2.
+        /// In the initial state, plane1 and cargo1 are at airport1; plane2 and cargo2 are at airport2.
         /// The goal is to get cargo2 to airport1 and cargo1 to airport2.
         /// </summary>
         public static Problem ExampleProblem { get; }

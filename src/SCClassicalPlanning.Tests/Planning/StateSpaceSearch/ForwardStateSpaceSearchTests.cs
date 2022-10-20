@@ -22,7 +22,6 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 var heuristic = new IgnorePreconditionsGreedySetCover(problem);
                 var planner = new ForwardStateSpaceSearch(heuristic);
-                //var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
             })
             .ThenReturns()
