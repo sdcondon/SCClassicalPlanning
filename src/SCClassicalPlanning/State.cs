@@ -98,16 +98,16 @@ namespace SCClassicalPlanning
             public static HashSet<Predicate> Visit(Sentence sentence)
             {
                 var elements = new HashSet<Predicate>();
-                Instance.Visit(sentence, ref elements);
+                Instance.Visit(sentence, elements);
                 return elements;
             }
 
             /// <inheritdoc/>
-            public override void Visit(Sentence sentence, ref HashSet<Predicate> predicates)
+            public override void Visit(Sentence sentence, HashSet<Predicate> predicates)
             {
                 if (sentence is Conjunction conjunction)
                 {
-                    base.Visit(conjunction, ref predicates);
+                    base.Visit(conjunction, predicates);
                 }
                 else if (sentence is Predicate predicate)
                 {

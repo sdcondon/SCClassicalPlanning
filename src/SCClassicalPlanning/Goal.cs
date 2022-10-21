@@ -126,17 +126,17 @@ namespace SCClassicalPlanning
             public static HashSet<Literal> Visit(Sentence sentence)
             {
                 var elements = new HashSet<Literal>();
-                Instance.Visit(sentence, ref elements);
+                Instance.Visit(sentence, elements);
                 return elements;
             }
 
             /// <inheritdoc/>
-            public override void Visit(Sentence sentence, ref HashSet<Literal> literals)
+            public override void Visit(Sentence sentence, HashSet<Literal> literals)
             {
                 if (sentence is Conjunction conjunction)
                 {
                     // The sentence is assumed to be a conjunction of literals - so just skip past all the conjunctions at the root.
-                    base.Visit(conjunction, ref literals);
+                    base.Visit(conjunction, literals);
                 }
                 else
                 {

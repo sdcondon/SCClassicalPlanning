@@ -107,7 +107,7 @@ namespace SCClassicalPlanning
         {
             public static EffectConstantFinder Instance { get; } = new();
 
-            public override void Visit(Constant constant, ref HashSet<Constant> constants) => constants.Add(constant);
+            public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
         }
     }
 }

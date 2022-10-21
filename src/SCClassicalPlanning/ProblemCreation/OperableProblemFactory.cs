@@ -42,7 +42,7 @@ namespace SCClassicalPlanning.ProblemCreation
             public static implicit operator OperableGoal(OperableSentence sentence)
             {
                 var literals = new HashSet<Literal>();
-                LiteralConjunctionVisitor.Instance.Visit(sentence, ref literals);
+                LiteralConjunctionVisitor.Instance.Visit(sentence, literals);
                 return new(literals);
             }
         }
@@ -60,7 +60,7 @@ namespace SCClassicalPlanning.ProblemCreation
             public static implicit operator OperableState(OperableSentence sentence)
             {
                 var predicates = new HashSet<Predicate>();
-                PredicateConjunctionVisitor.Instance.Visit(sentence, ref predicates);
+                PredicateConjunctionVisitor.Instance.Visit(sentence, predicates);
                 return new(predicates);
             }
         } 
@@ -78,7 +78,7 @@ namespace SCClassicalPlanning.ProblemCreation
             public static implicit operator OperableEffect(OperableSentence sentence)
             {
                 var literals = new HashSet<Literal>();
-                LiteralConjunctionVisitor.Instance.Visit(sentence, ref literals);
+                LiteralConjunctionVisitor.Instance.Visit(sentence, literals);
                 return new(literals);
             }
         }
@@ -94,12 +94,12 @@ namespace SCClassicalPlanning.ProblemCreation
             public static LiteralConjunctionVisitor Instance { get; } = new LiteralConjunctionVisitor();
 
             /// <inheritdoc/>
-            public override void Visit(Sentence sentence, ref HashSet<Literal> literals)
+            public override void Visit(Sentence sentence, HashSet<Literal> literals)
             {
                 if (sentence is Conjunction conjunction)
                 {
                     // The sentence is assumed to be a conjunction of literals - so just skip past all the conjunctions at the root.
-                    base.Visit(conjunction, ref literals);
+                    base.Visit(conjunction, literals);
                 }
                 else
                 {
@@ -122,11 +122,11 @@ namespace SCClassicalPlanning.ProblemCreation
             public static PredicateConjunctionVisitor Instance { get; } = new PredicateConjunctionVisitor();
 
             /// <inheritdoc/>
-            public override void Visit(Sentence sentence, ref HashSet<Predicate> predicates)
+            public override void Visit(Sentence sentence, HashSet<Predicate> predicates)
             {
                 if (sentence is Conjunction conjunction)
                 {
-                    base.Visit(conjunction, ref predicates);
+                    base.Visit(conjunction, predicates);
                 }
                 else if (sentence is Predicate predicate)
                 {
