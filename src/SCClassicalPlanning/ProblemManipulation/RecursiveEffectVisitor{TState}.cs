@@ -1,5 +1,4 @@
 ﻿using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
 
 namespace SCClassicalPlanning.ProblemManipulation
 {
@@ -7,7 +6,7 @@ namespace SCClassicalPlanning.ProblemManipulation
     /// Base class for recursive visitors of <see cref="Effect"/> instances that reference external visitation state
     /// (as opposed to maintaining state as fields of the visitor).
     /// </summary>
-    public abstract class RecursiveEffectVisitor<TState> : IEffectVisitor<TState>, ILiteralVisitor<TState>, ITermVisitor<TState>
+    public abstract class RecursiveEffectVisitor<TState>
     {
         /// <summary>
         /// Visits a <see cref="Effect"/> instance.

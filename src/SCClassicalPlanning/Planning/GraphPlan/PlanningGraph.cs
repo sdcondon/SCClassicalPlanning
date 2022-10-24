@@ -26,7 +26,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             this.problem = problem;
 
             // Planning graphs only work with propositions - no variables allowed.
-            // So here we iterate every possible ground predicate (by subsituting every combination of known constants
+            // So here we iterate every possible ground predicate (by substituting every combination of known constants
             // for its arguments - add positive if it's in the initial state, otherwise negative
             var propositionLevel0 = new Dictionary<Literal, PropositionNode>();
             foreach (var predicateTemplate in problem.Domain.Predicates)
@@ -58,7 +58,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// Gets the level at which a given proposition first occurs.
         /// </summary>
         /// <param name="proposition">The proposition to look for.</param>
-        /// <returns>The level at which the given proposition first occurs.</returns>
+        /// <returns>The level at which the given proposition first occurs, or -1 if it does not occur.</returns>
         public int GetLevelCost(Literal proposition)
         {
             // meh, will do for now - yes its a loop, but each iteration is a dictionary key lookup

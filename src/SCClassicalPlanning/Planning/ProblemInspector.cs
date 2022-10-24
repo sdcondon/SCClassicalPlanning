@@ -114,10 +114,7 @@ namespace SCClassicalPlanning.Planning
             foreach (var (Schema, Substitution) in GetApplicableActionSchemaSubstitutions(problem, state))
             {
                 // For each substitution, apply it to the action schema and return it:
-                yield return new Action(
-                    Schema.Identifier,
-                    new VariableSubstitutionGoalTransformation(Substitution).ApplyTo(Schema.Precondition),
-                    new VariableSubstitutionEffectTransformation(Substitution).ApplyTo(Schema.Effect));
+                yield return new VariableSubstitutionActionTransformation(Substitution).ApplyTo(Schema);
             }
         }
 
@@ -136,13 +133,13 @@ namespace SCClassicalPlanning.Planning
         {
             // Local method to check that a given unifier results in an unconstrained non-match with the negation of the elements of the goal.
             // Worth it because ExpandNonMatchesWithGoalNegation is potentially so expensive.
-            bool IsUnconstrainedNonMatchWithGoalNegation(IEnumerable<Literal> effectElements, VariableSubstitution unifier)
+            bool IsUnconstrainedNonMatchWithGoalNegation(IEnumerable<Literal> effectElements, VariableSubstitution substitution)
             {
                 foreach (var effectElement in effectElements)
                 {
                     foreach (var goalElement in goal.Elements)
                     {
-                        if (LiteralUnifier.TryUpdateUnsafe(goalElement, unifier.ApplyTo(effectElement).Negate(), new VariableSubstitution(unifier)))
+                        if (LiteralUnifier.TryUpdateUnsafe(goalElement, substitution.ApplyTo(effectElement).Negate(), new VariableSubstitution(substitution)))
                         {
                             return false;
                         }
@@ -155,11 +152,11 @@ namespace SCClassicalPlanning.Planning
             // Local method to create variable subsitutions such that the negation of the effects elements transformed by the substitution do not match any of the goal's elements.
             // effectElements: The (remaining) elements of the effect to be matched.
             // returns: An enumerable of VariableSubstitutions that can be applied to the effect elements to make none of them match the negation of a goal element
-            IEnumerable<VariableSubstitution> ExpandNonMatchesWithGoalNegation(IEnumerable<Literal> effectElements, VariableSubstitution unifier)
+            IEnumerable<VariableSubstitution> ExpandNonMatchesWithGoalNegation(IEnumerable<Literal> effectElements, VariableSubstitution substitution)
             {
                 if (!effectElements.Any())
                 {
-                    yield return unifier;
+                    yield return substitution;
                 }
                 else
                 {
@@ -172,8 +169,8 @@ namespace SCClassicalPlanning.Planning
                     // do not occur, we need to check for the existence of the negation of the literal formed by substituting EVERY combination of
                     // objects in the problem for the as yet unbound variables. This is obviously VERY expensive for large problems with lots of objects -
                     // though I guess clever indexing could help (support for indexing is TODO).
-                    IEnumerable<VariableSubstitution> allPossibleUnifiers = new List<VariableSubstitution>() { unifier };
-                    var unboundVariables = firstEffectElement.Predicate.Arguments.OfType<VariableReference>().Except(unifier.Bindings.Keys);
+                    IEnumerable<VariableSubstitution> allPossibleUnifiers = new List<VariableSubstitution>() { substitution };
+                    var unboundVariables = firstEffectElement.Predicate.Arguments.OfType<VariableReference>().Except(substitution.Bindings.Keys);
                     foreach (var unboundVariable in unboundVariables)
                     {
                         allPossibleUnifiers = allPossibleUnifiers.SelectMany(u => problem.Objects.Select(o =>
@@ -244,7 +241,7 @@ namespace SCClassicalPlanning.Planning
         /// Gets the *ground* actions that are relevant to a given goal in a given problem.
         /// <para/>
         /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
-        /// It'd be nice to be able to have an equivalent nethod (in <see cref="Domain"/>) that can return <see cref="Action"/>s that have
+        /// It'd be nice to be able to have an equivalent method (in <see cref="DomainInspector"/>) that can return <see cref="Action"/>s that have
         /// some variable references in them, with constraints on the substitutions that can be made if necessary. Having played with this idea a little
         /// though, there are.. some subtleties - which provide some insight into explaining why even the earliest versions of PDDL have things like axioms and types..
         /// </summary>
@@ -255,17 +252,14 @@ namespace SCClassicalPlanning.Planning
         {
             foreach (var (Schema, Substitution) in GetRelevantActionSchemaSubstitutions(problem, goal))
             {
-                yield return new Action(
-                    Schema.Identifier,
-                    new VariableSubstitutionGoalTransformation(Substitution).ApplyTo(Schema.Precondition),
-                    new VariableSubstitutionEffectTransformation(Substitution).ApplyTo(Schema.Effect));
+                yield return new VariableSubstitutionActionTransformation(Substitution).ApplyTo(Schema);
             }
         }
 
-        public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(IEnumerable<Constant> objects, Predicate predicate, VariableSubstitution unifier)
+        public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(IEnumerable<Constant> objects, Predicate predicate, VariableSubstitution substitution)
         {
-            IEnumerable<VariableSubstitution> allPossibleSubstitutions = new List<VariableSubstitution>() { unifier };
-            var unboundVariables = predicate.Arguments.OfType<VariableReference>().Except(unifier.Bindings.Keys);
+            IEnumerable<VariableSubstitution> allPossibleSubstitutions = new List<VariableSubstitution>() { substitution };
+            var unboundVariables = predicate.Arguments.OfType<VariableReference>().Except(substitution.Bindings.Keys);
             foreach (var unboundVariable in unboundVariables)
             {
                 allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(u => objects.Select(o =>
@@ -283,25 +277,13 @@ namespace SCClassicalPlanning.Planning
         }
 
         /// <summary>
-        /// Utility class to transform <see cref="Goal"/> instances using a given <see cref="VariableSubstitution"/>.
+        /// Utility class to transform <see cref="Action"/> instances using a given <see cref="VariableSubstitution"/>.
         /// </summary>
-        private class VariableSubstitutionGoalTransformation : RecursiveGoalTransformation
+        private class VariableSubstitutionActionTransformation : RecursiveActionTransformation
         {
             private readonly VariableSubstitution substitution;
 
-            public VariableSubstitutionGoalTransformation(VariableSubstitution substitution) => this.substitution = substitution;
-
-            public override Literal ApplyTo(Literal literal) => substitution.ApplyTo(literal);
-        }
-
-        /// <summary>
-        /// Utility class to transform <see cref="Effect"/> instances using a given <see cref="VariableSubstitution"/>.
-        /// </summary>
-        private class VariableSubstitutionEffectTransformation : RecursiveEffectTransformation
-        {
-            private readonly VariableSubstitution substitution;
-
-            public VariableSubstitutionEffectTransformation(VariableSubstitution substitution) => this.substitution = substitution;
+            public VariableSubstitutionActionTransformation(VariableSubstitution substitution) => this.substitution = substitution;
 
             public override Literal ApplyTo(Literal literal) => substitution.ApplyTo(literal);
         }

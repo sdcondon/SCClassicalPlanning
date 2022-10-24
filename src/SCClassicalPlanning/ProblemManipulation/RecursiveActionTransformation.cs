@@ -3,10 +3,30 @@
 namespace SCClassicalPlanning.ProblemManipulation
 {
     /// <summary>
-    /// Base class for recursive transformations of <see cref="Sentence"/> instances to other <see cref="Sentence"/> instances.
+    /// Base class for recursive transformations of <see cref="Action"/> instances to other <see cref="Action"/> instances.
     /// </summary>
-    public abstract class RecursiveGoalTransformation
+    public abstract class RecursiveActionTransformation
     {
+        /// <summary>
+        /// Applies this transformation to a <see cref="Action"/> instance.
+        /// <para/>
+        /// The default implementation returns a <see cref="Action"/> with the same identifier, and with a goal and effect that is the result of applying the transformation to the action's goal and effect respectively.
+        /// </summary>
+        /// <param name="action">The action to visit.</param>
+        /// <returns>The transformed <see cref="Action"/>.</returns>
+        public virtual Action ApplyTo(Action action)
+        {
+            var precondition = ApplyTo(action.Precondition);
+            var effect = ApplyTo(action.Effect);
+
+            if (precondition != action.Precondition || effect != action.Effect)
+            {
+                return new(action.Identifier, precondition, effect);
+            }
+
+            return action;
+        }
+
         /// <summary>
         /// Applies this transformation to a <see cref="Goal"/> instance.
         /// <para/>
@@ -24,6 +44,25 @@ namespace SCClassicalPlanning.ProblemManipulation
             }
 
             return goal;
+        }
+
+        /// <summary>
+        /// Applies this transformation to a <see cref="Effect"/> instance.
+        /// <para/>
+        /// The default implementation returns a <see cref="Effect"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
+        /// </summary>
+        /// <param name="effect">The effect to transform.</param>
+        /// <returns>The transformed effect.</returns>
+        public virtual Effect ApplyTo(Effect effect)
+        {
+            var elements = effect.Elements.Select(a => ApplyTo(a)).ToList();
+
+            if (elements.Zip(effect.Elements, (x, y) => (x, y)).Any(t => t.x != t.y))
+            {
+                return new Effect(elements);
+            }
+
+            return effect;
         }
 
         /// <summary>

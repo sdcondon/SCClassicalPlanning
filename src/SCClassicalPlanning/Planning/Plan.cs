@@ -19,7 +19,7 @@ namespace SCClassicalPlanning.Planning
         public IReadOnlyCollection<Action> Steps { get; }
 
         /// <summary>
-        /// Applies "this" plan to a given state.
+        /// Applies this plan to a given state.
         /// </summary>
         public State ApplyTo(State state)
         {

@@ -6,7 +6,7 @@ namespace SCClassicalPlanning.ProblemManipulation
     /// Base class for recursive visitors of <see cref="State"/> instances that reference external visitation state
     /// (as opposed to maintaining state as fields of the visitor).
     /// </summary>
-    public abstract class RecursiveStateVisitor<TState> : IStateVisitor<TState>
+    public abstract class RecursiveStateVisitor<TState>
     {
         /// <summary>
         /// Visits a <see cref="State"/> instance.

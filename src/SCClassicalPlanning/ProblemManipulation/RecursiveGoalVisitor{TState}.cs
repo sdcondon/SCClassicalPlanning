@@ -6,7 +6,7 @@ namespace SCClassicalPlanning.ProblemManipulation
     /// Base class for recursive visitors of <see cref="Goal"/> instances that reference external visitation state
     /// (as opposed to maintaining state as fields of the visitor).
     /// </summary>
-    public abstract class RecursiveGoalVisitor<TState> : IGoalVisitor<TState>
+    public abstract class RecursiveGoalVisitor<TState>
     {
         /// <summary>
         /// Visits a <see cref="Goal"/> instance.
