@@ -169,22 +169,7 @@ namespace SCClassicalPlanning.Planning
                     // do not occur, we need to check for the existence of the negation of the literal formed by substituting EVERY combination of
                     // objects in the problem for the as yet unbound variables. This is obviously VERY expensive for large problems with lots of objects -
                     // though I guess clever indexing could help (support for indexing is TODO).
-                    IEnumerable<VariableSubstitution> allPossibleUnifiers = new List<VariableSubstitution>() { substitution };
-                    var unboundVariables = firstEffectElement.Predicate.Arguments.OfType<VariableReference>().Except(substitution.Bindings.Keys);
-                    foreach (var unboundVariable in unboundVariables)
-                    {
-                        allPossibleUnifiers = allPossibleUnifiers.SelectMany(u => problem.Objects.Select(o =>
-                        {
-                            var newBindings = new Dictionary<VariableReference, Term>(u.Bindings)
-                            {
-                                [unboundVariable] = o
-                            };
-
-                            return new VariableSubstitution(newBindings);
-                        }));
-                    }
-
-                    foreach (var firstEffectElementUnifier in allPossibleUnifiers)
+                    foreach (var firstEffectElementUnifier in GetAllPossibleSubstitutions(problem.Objects, firstEffectElement.Predicate, substitution))
                     {
                         var possibleLiteral = firstEffectElementUnifier.ApplyTo(firstEffectElement);
 
