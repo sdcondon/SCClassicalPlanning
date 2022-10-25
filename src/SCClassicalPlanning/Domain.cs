@@ -24,8 +24,7 @@ namespace SCClassicalPlanning
             var predicates = new HashSet<Predicate>();
             foreach (var action in actions)
             {
-                GoalPredicateFinder.Instance.Visit(action.Precondition, predicates);
-                EffectPredicateFinder.Instance.Visit(action.Effect, predicates);
+                PredicateFinder.Instance.Visit(action, predicates);
             }
 
             Predicates = new ReadOnlyCollection<Predicate>(predicates.ToList());
@@ -33,8 +32,7 @@ namespace SCClassicalPlanning
             var constants = new HashSet<Constant>();
             foreach (var action in actions)
             {
-                GoalConstantFinder.Instance.Visit(action.Precondition, constants);
-                EffectConstantFinder.Instance.Visit(action.Effect, constants);
+                ConstantFinder.Instance.Visit(action, constants);
             }
 
             Constants = new ReadOnlyCollection<Constant>(constants.ToList());
@@ -61,9 +59,9 @@ namespace SCClassicalPlanning
         /// </summary>
         public ReadOnlyCollection<Constant> Constants { get; }
 
-        private class GoalPredicateFinder : RecursiveGoalVisitor<HashSet<Predicate>>
+        private class PredicateFinder : RecursiveActionVisitor<HashSet<Predicate>>
         {
-            public static GoalPredicateFinder Instance { get; } = new();
+            public static PredicateFinder Instance { get; } = new();
 
             public override void Visit(Predicate predicate, HashSet<Predicate> predicates)
             {
@@ -71,16 +69,7 @@ namespace SCClassicalPlanning
             }
         }
 
-        private class EffectPredicateFinder : RecursiveEffectVisitor<HashSet<Predicate>>
-        {
-            public static EffectPredicateFinder Instance { get; } = new();
-
-            public override void Visit(Predicate predicate, HashSet<Predicate> predicates)
-            {
-                predicates.Add((Predicate)new VariableChanger().ApplyTo(predicate));
-            }
-        }
-
+        // TODO: why did i add this? add explanatory comment. also, why does it act on terms and not variable refs?
         private class VariableChanger : RecursiveSentenceTransformation
         {
             // Yeah, could be safer, but realistically not going to have a predicate with this many parameters..
@@ -96,16 +85,9 @@ namespace SCClassicalPlanning
             }
         }
 
-        private class GoalConstantFinder : RecursiveGoalVisitor<HashSet<Constant>>
+        private class ConstantFinder : RecursiveActionVisitor<HashSet<Constant>>
         {
-            public static GoalConstantFinder Instance { get; } = new();
-
-            public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
-        }
-
-        private class EffectConstantFinder : RecursiveEffectVisitor<HashSet<Constant>>
-        {
-            public static EffectConstantFinder Instance { get; } = new();
+            public static ConstantFinder Instance { get; } = new();
 
             public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
         }

@@ -260,17 +260,5 @@ namespace SCClassicalPlanning.Planning
 
             return allPossibleSubstitutions;
         }
-
-        /// <summary>
-        /// Utility class to transform <see cref="Action"/> instances using a given <see cref="VariableSubstitution"/>.
-        /// </summary>
-        private class VariableSubstitutionActionTransformation : RecursiveActionTransformation
-        {
-            private readonly VariableSubstitution substitution;
-
-            public VariableSubstitutionActionTransformation(VariableSubstitution substitution) => this.substitution = substitution;
-
-            public override Literal ApplyTo(Literal literal) => substitution.ApplyTo(literal);
-        }
     }
 }
