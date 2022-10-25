@@ -1,11 +1,12 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Equivalency;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using SCFirstOrderLogic;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 using static SCClassicalPlanning.ExampleDomains.Container;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.Planning
 {
@@ -99,6 +100,32 @@ namespace SCClassicalPlanning.Planning
             })
             .When(tc => DomainInspector.GetRelevantActions(tc.Domain, tc.Goal))
             .ThenReturns()
-            .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult));
+            .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult, ExpectVariablesToBeStandardised));
+
+        public static EquivalencyAssertionOptions<Action> ExpectVariablesToBeStandardised(this EquivalencyAssertionOptions<Action> opts)
+        {
+            return opts
+                .RespectingRuntimeTypes()
+                .ComparingByMembers<Action>()
+                .ComparingByMembers<Goal>()
+                .ComparingByMembers<Effect>()
+                .ComparingByMembers<Literal>()
+                .ComparingByMembers<Predicate>()
+                .ComparingByMembers<Term>()
+                .Using<VariableReference>(cxt =>
+                {
+                    cxt.Subject
+                        .Symbol.Should().BeOfType<DomainInspector.StandardisedVariableSymbol>()
+                        .Which.OriginalSymbol.Should().Be(cxt.Expectation.Symbol);
+                })
+                .WhenTypeIs<VariableReference>()
+                .Using<VariableDeclaration>(cxt =>
+                {
+                    cxt.Subject
+                        .Symbol.Should().BeOfType<DomainInspector.StandardisedVariableSymbol>()
+                        .Which.OriginalSymbol.Should().Be(cxt.Expectation.Symbol);
+                })
+                .WhenTypeIs<VariableDeclaration>();
+        }
     }
 }

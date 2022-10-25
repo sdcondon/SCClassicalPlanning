@@ -2,6 +2,7 @@
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SCClassicalPlanning.Planning
 {
@@ -83,9 +84,8 @@ namespace SCClassicalPlanning.Planning
         /// <returns>The actions that are relevant to the given state.</returns>
         public static IEnumerable<(Action schema, VariableSubstitution substitution, Goal constraints)> GetRelevantActionSchemaSubstitutions(Domain domain, Goal goal)
         {
-            // Local method to check that a given unifier results in an unconstrained non-match with the negation of the elements of the goal.
-            // Worth it because ExpandNonMatchesWithGoalNegation is potentially so expensive.
-            bool TryGetConstraints(IEnumerable<Literal> effectElements, VariableSubstitution substitution, out Goal constraints)
+            // Local method to find any constraints that apply to a given substitution for none of the goals elements to be negated.
+            bool TryGetConstraints(IEnumerable<Literal> effectElements, VariableSubstitution substitution, [MaybeNullWhen(false)]out Goal constraints)
             {
                 List<Literal> constraintElements = new();
 
@@ -97,20 +97,20 @@ namespace SCClassicalPlanning.Planning
 
                         if (LiteralUnifier.TryUpdateUnsafe(goalElement, substitution.ApplyTo(effectElement).Negate(), clashingSubstitution))
                         {
-                            var constrainedVars = clashingSubstitution.Bindings.Where(k => !substitution.Bindings.ContainsKey(k.Key));
+                            var precludedBindings = clashingSubstitution.Bindings.Where(k => !substitution.Bindings.ContainsKey(k.Key));
 
-                            if (!constrainedVars.Any())
+                            if (precludedBindings.Any())
+                            {
+                                foreach (var kvp in precludedBindings)
+                                {
+                                    constraintElements.Add(new Literal(new Predicate(EqualitySymbol.Instance, kvp.Key, kvp.Value), true));
+                                }
+                            }
+                            else
                             {
                                 // We didn't need to specify any further vars to get a conflict - so this substitution won't work at all.
                                 constraints = null;
                                 return false;
-                            }
-                            else
-                            {
-                                foreach (var kvp in constrainedVars)
-                                {
-                                    constraintElements.Add(new Literal(new Predicate(EqualitySymbol.Instance, kvp.Key, kvp.Value), true));
-                                }
                             }
                         }
                     }
@@ -141,13 +141,13 @@ namespace SCClassicalPlanning.Planning
 
             foreach (var schema in domain.Actions)
             {
-                // TODO: "standardise" here.
+                var standardisedSchema = new Standardisation().ApplyTo(schema);
 
-                foreach (var substitution in MatchWithGoal(schema.Effect.Elements).Distinct())
+                foreach (var substitution in MatchWithGoal(standardisedSchema.Effect.Elements).Distinct())
                 {
-                    if (TryGetConstraints(schema.Effect.Elements, substitution, out var constraints))
+                    if (TryGetConstraints(standardisedSchema.Effect.Elements, substitution, out var constraints))
                     {
-                        yield return (schema, substitution, constraints);
+                        yield return (standardisedSchema, substitution, constraints);
                     }
                 }
             }
@@ -163,19 +163,42 @@ namespace SCClassicalPlanning.Planning
         {
             foreach (var (Schema, Substitution, Constraints) in GetRelevantActionSchemaSubstitutions(domain, goal))
             {
-                yield return new VariableSubstitutionActionTransformation(Substitution, Constraints).ApplyTo(Schema);
+                yield return new SchemaTransformation(Substitution, Constraints).ApplyTo(Schema);
             }
         }
 
-        /// <summary>
-        /// Utility class to transform <see cref="Action"/> instances using a given <see cref="VariableSubstitution"/>.
-        /// </summary>
-        private class VariableSubstitutionActionTransformation : RecursiveActionTransformation
+        private class Standardisation : RecursiveActionTransformation
+        {
+            private readonly Dictionary<VariableDeclaration, VariableDeclaration> mapping = new();
+
+            public override VariableDeclaration ApplyTo(VariableDeclaration variableDeclaration)
+            {
+                if (!mapping.TryGetValue(variableDeclaration, out var standardisedVariableDeclaration))
+                {
+                    standardisedVariableDeclaration = mapping[variableDeclaration] = new VariableDeclaration(new StandardisedVariableSymbol(variableDeclaration.Symbol));
+                }
+
+                return standardisedVariableDeclaration;
+            }
+        }
+
+        // NB: does not override equality - so equality has reference semantics.
+        // This is important to be able to use the same action more than once in a plan.
+        internal class StandardisedVariableSymbol
+        {
+            public StandardisedVariableSymbol(object originalSymbol) => OriginalSymbol = originalSymbol;
+
+            internal object OriginalSymbol { get; }
+
+            public override string ToString() => $"<{OriginalSymbol}>";
+        }
+
+        private class SchemaTransformation : RecursiveActionTransformation
         {
             private readonly VariableSubstitution substitution;
             private readonly Goal constraints;
 
-            public VariableSubstitutionActionTransformation(VariableSubstitution substitution, Goal constraints)
+            public SchemaTransformation(VariableSubstitution substitution, Goal constraints)
             {
                 this.substitution = substitution;
                 this.constraints = constraints;

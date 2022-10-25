@@ -30,6 +30,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="SCClassicalPlanning.Tests" />
+    <InternalsVisibleTo Include="SCClassicalPlanning.Alternatives" />
+    <InternalsVisibleTo Include="SCClassicalPlanning.Benchmarks" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\SCClassicalPlanning.png" Pack="true" PackagePath="\" Link="_PackageContent\SCClassicalPlanning.png" />
     <None Update="_PackageContent\SCClassicalPlanning.md" Pack="true" PackagePath="README.md" />
   </ItemGroup>
