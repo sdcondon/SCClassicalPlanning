@@ -65,23 +65,12 @@ namespace SCClassicalPlanning
 
             public override void Visit(Predicate predicate, HashSet<Predicate> predicates)
             {
-                predicates.Add((Predicate)new VariableChanger().ApplyTo(predicate));
-            }
-        }
-
-        // TODO: why did i add this? add explanatory comment. also, why does it act on terms and not variable refs?
-        private class VariableChanger : RecursiveSentenceTransformation
-        {
-            // Yeah, could be safer, but realistically not going to have a predicate with this many parameters..
-            private readonly IEnumerator<string> symbols = Enumerable.Range(0, 26).Select(i => ((char)('A' + i)).ToString()).GetEnumerator();
-
-            public override Term ApplyTo(Term term)
-            {
-                // Ultimately, it might be a nice quality-of-life improvement to
-                // keep variable names as-is if its appropriate (e.g. if its the same
+                // Standardise the arguments so that we unify all occurences of the same predicate (with the same symbol and same number of args)
+                // Yeah, could be safer, but realistically not going to have a predicate with this many parameters..
+                // Ultimately, it might be a nice quality-of-life improvement to keep variable names as-is if its appropriate (e.g. if its the same
                 // in all copies of this predicate) - but can come back to that.
-                symbols.MoveNext();
-                return new VariableReference(symbols.Current);
+                var standardisedParameters = Enumerable.Range(0, predicate.Arguments.Count).Select(i => new VariableReference(((char)('A' + i)).ToString())).ToArray();
+                predicates.Add(new Predicate(predicate.Symbol, standardisedParameters));
             }
         }
 
