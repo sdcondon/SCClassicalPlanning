@@ -1,6 +1,18 @@
-﻿using SCClassicalPlanning.ProblemManipulation;
+﻿// Copyright 2022 Simon Condon
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
 using System.Collections.ObjectModel;
 
 namespace SCClassicalPlanning
@@ -65,7 +77,7 @@ namespace SCClassicalPlanning
 
             public override void Visit(Predicate predicate, HashSet<Predicate> predicates)
             {
-                // Standardise the arguments so that we unify all occurences of the same predicate (with the same symbol and same number of args)
+                // Standardise the arguments so that we unify all occurences of the 'same' predicate (with the same symbol and same number of arguments)
                 // Yeah, could be safer, but realistically not going to have a predicate with this many parameters..
                 // Ultimately, it might be a nice quality-of-life improvement to keep variable names as-is if its appropriate (e.g. if its the same
                 // in all copies of this predicate) - but can come back to that.
