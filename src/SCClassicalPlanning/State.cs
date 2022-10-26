@@ -13,6 +13,7 @@
 // limitations under the License.
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
+using SCFirstOrderLogic.SentenceManipulation.Unification;
 using System.Collections.Immutable;
 
 namespace SCClassicalPlanning
@@ -73,6 +74,63 @@ namespace SCClassicalPlanning
         /// <param name="goal">The goal to check.</param>
         /// <returns>A value indicating whether this state satisfies a given goal.</returns>
         public bool Satisfies(Goal goal) => Elements.IsSupersetOf(goal.PositivePredicates) && !Elements.Overlaps(goal.NegativePredicates);
+
+        /// <summary>
+        /// Gets the substitutions (if any) that can be applied to this state to satisfy the given goal.
+        /// </summary>
+        /// <param name="goal">The goal to check.</param>
+        /// <returns>An enumerable of substitutions that satisfy the goal.</returns>
+        public IEnumerable<VariableSubstitution> GetSatisfyingSubstitutions(Goal goal)
+        {
+            bool UnifiesNegativeGoalElement(VariableSubstitution substitution)
+            {
+                List<Literal> constraintElements = new();
+
+                foreach (var goalElement in goal.NegativePredicates)
+                {
+                    if (Elements.Contains((Predicate)substitution.ApplyTo(goalElement).ToSentence()))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            IEnumerable<VariableSubstitution> GetPositiveGoalElementUnifiers(IEnumerable<Predicate> positiveGoalPredicates, VariableSubstitution substitution)
+            {
+                if (!positiveGoalPredicates.Any())
+                {
+                    yield return substitution;
+                }
+                else
+                {
+                    var firstGoalElement = positiveGoalPredicates.First();
+
+                    // Here we iterate through all elements of the state, trying to find unifications with the first goal element.
+                    foreach (var stateElement in Elements)
+                    {
+                        var firstGoalElementUnifier = new VariableSubstitution(substitution);
+
+                        if (LiteralUnifier.TryUpdateUnsafe(firstGoalElement, stateElement, firstGoalElementUnifier))
+                        {
+                            foreach (var restOfGoalElementsUnifier in GetPositiveGoalElementUnifiers(positiveGoalPredicates.Skip(1), firstGoalElementUnifier))
+                            {
+                                yield return restOfGoalElementsUnifier;
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach (var substitution in GetPositiveGoalElementUnifiers(goal.PositivePredicates, new VariableSubstitution()).Distinct())
+            {
+                if (!UnifiesNegativeGoalElement(substitution))
+                {
+                    yield return substitution;
+                }
+            }
+        }
 
         /// <inheritdoc />
         public override bool Equals(object? obj)

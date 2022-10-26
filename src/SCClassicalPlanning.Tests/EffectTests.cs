@@ -12,39 +12,6 @@ namespace SCClassicalPlanning
         private static readonly Constant element1 = new(nameof(element1));
         private static readonly Constant element2 = new(nameof(element2));
 
-        private record ApplyToTestCase(State State, Effect Effect, State ExpectedResult);
-
-        public static Test ApplyToBehaviour => TestThat
-            .GivenEachOf(() => new ApplyToTestCase[]
-            {
-                // Adds atom
-                new(
-                    State: State.Empty,
-                    Effect: new(IsPresent(element1)),
-                    ExpectedResult: new(IsPresent(element1))),
-
-                // Removes atom
-                new(
-                    State: new(IsPresent(element1)),
-                    Effect: new(!IsPresent(element1)),
-                    ExpectedResult: State.Empty),
-
-                // Doesn't add duplicate
-                new(
-                    State: new(IsPresent(element1)),
-                    Effect: new(IsPresent(element1)),
-                    ExpectedResult: new(IsPresent(element1))),
-
-                // Doesn't complain about removing non-present element
-                new(
-                    State: State.Empty,
-                    Effect: new(!IsPresent(element1)),
-                    ExpectedResult: State.Empty),
-            })
-            .When(tc => tc.Effect.ApplyTo(tc.State))
-            .ThenReturns()
-            .And((tc, s) => s.Should().BeEquivalentTo(tc.ExpectedResult));
-
         private record IsRelevantToTestCase(Goal Goal, Effect Effect, bool ExpectedResult);
 
         public static Test IsRelevantToBehaviour => TestThat
