@@ -37,9 +37,9 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                         Array.Empty<Sentence>())),
 
                 new(
-                    Problem: MakeBigBlocksWorldProblem(),
+                    Problem: BlocksWorld.LargeExampleProblem,
                     Heuristic: MakeInvariantCheckingHeuristic(
-                        MakeBigBlocksWorldProblem(),
+                        BlocksWorld.LargeExampleProblem,
                         new Sentence[] { ForAll(A, B, If(On(A, B), !Clear(B))), })),
             })
             .When((_, tc) =>
@@ -62,41 +62,6 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             var innerHeuristic = new IgnorePreconditionsGreedySetCover(problem);
 
             return new GoalInvariantCheck(invariantKb, innerHeuristic);
-        }
-
-        private static Problem MakeBigBlocksWorldProblem()
-        {
-            Constant blockA = new(nameof(blockA));
-            Constant blockB = new(nameof(blockB));
-            Constant blockC = new(nameof(blockC));
-            Constant blockD = new(nameof(blockD));
-            Constant blockE = new(nameof(blockE));
-
-            return BlocksWorld.MakeProblem(
-                initialState: new(
-                    Block(blockA)
-                    & Equal(blockA, blockA)
-                    & Block(blockB)
-                    & Equal(blockB, blockB)
-                    & Block(blockC)
-                    & Equal(blockC, blockC)
-                    & Block(blockD)
-                    & Equal(blockD, blockD)
-                    & Block(blockE)
-                    & Equal(blockE, blockE)
-                    & On(blockA, Table)
-                    & On(blockB, Table)
-                    & On(blockC, blockA)
-                    & On(blockD, blockB)
-                    & On(blockE, Table)
-                    & Clear(blockD)
-                    & Clear(blockE)
-                    & Clear(blockC)),
-                goal: new(
-                    On(blockA, blockB)
-                    & On(blockB, blockC)
-                    & On(blockC, blockD)
-                    & On(blockD, blockE)));
         }
     }
 }

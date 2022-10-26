@@ -33,6 +33,35 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                 goal: new(
                     On(blockA, blockB)
                     & On(blockB, blockC)));
+
+            Constant blockD = new(nameof(blockD));
+            Constant blockE = new(nameof(blockE));
+
+            LargeExampleProblem = MakeProblem(
+                initialState: new(
+                    Block(blockA)
+                    & Equal(blockA, blockA)
+                    & Block(blockB)
+                    & Equal(blockB, blockB)
+                    & Block(blockC)
+                    & Equal(blockC, blockC)
+                    & Block(blockD)
+                    & Equal(blockD, blockD)
+                    & Block(blockE)
+                    & Equal(blockE, blockE)
+                    & On(blockA, Table)
+                    & On(blockB, Table)
+                    & On(blockC, blockA)
+                    & On(blockD, blockB)
+                    & On(blockE, Table)
+                    & Clear(blockD)
+                    & Clear(blockE)
+                    & Clear(blockC)),
+                goal: new(
+                    On(blockA, blockB)
+                    & On(blockB, blockC)
+                    & On(blockC, blockD)
+                    & On(blockD, blockE)));
         }
 
         /// <summary>
@@ -42,6 +71,12 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         /// The goal is to get block B on top of block C, and block A on top of block B.
         /// </summary>
         public static Problem ExampleProblem { get; }
+
+        /// <summary>
+        /// Gets an instance of an example problem in this domain that is larger than the customery 3-block <see cref="ExampleProblem"/>.
+        /// Consists of five blocks.
+        /// </summary>
+        public static Problem LargeExampleProblem { get; }
 
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
