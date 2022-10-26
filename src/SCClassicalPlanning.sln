@@ -14,13 +14,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B5ACFEC3-2BED-4BA8-809D-35D2AF01F917}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		..\.gitignore = ..\.gitignore
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
+		..\README.md = ..\README.md
+		..\LICENSE.txt = ..\LICENSE.txt
 		SCClassicalPlanning.pdn = SCClassicalPlanning.pdn
 		SCClassicalPlanning.png = SCClassicalPlanning.png
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SCClassicalPlanning.Alternatives", "SCClassicalPlanning.Alternatives\SCClassicalPlanning.Alternatives.csproj", "{5D3255D0-A98D-4244-A5AC-3B32D15421A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanning.Alternatives", "SCClassicalPlanning.Alternatives\SCClassicalPlanning.Alternatives.csproj", "{5D3255D0-A98D-4244-A5AC-3B32D15421A6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
