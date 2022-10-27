@@ -16,7 +16,7 @@ using SCFirstOrderLogic;
 namespace SCClassicalPlanning.ProblemManipulation
 {
     /// <summary>
-    /// Base class for recursive transformations of <see cref="Sentence"/> instances to other <see cref="Sentence"/> instances.
+    /// Base class for recursive transformations of <see cref="Goal"/> instances to other <see cref="Goal"/> instances.
     /// </summary>
     public abstract class RecursiveGoalTransformation
     {

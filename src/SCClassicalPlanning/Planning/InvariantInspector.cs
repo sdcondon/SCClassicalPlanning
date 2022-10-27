@@ -43,19 +43,20 @@ namespace SCClassicalPlanning.Planning
         public static Goal RemoveTrivialElements(Goal goal, IKnowledgeBase invariantsKB)
         {
             var modified = false;
-            var elements = goal.Elements;
+            var remainingElements = goal.Elements;
+
             foreach (var element in goal.Elements)
             {
                 if (invariantsKB.Ask(element.ToSentence()))
                 {
-                    elements = elements.Remove(element);
+                    remainingElements = remainingElements.Remove(element);
                     modified = true;
                 }
             }
 
             if (modified)
             {
-                return new(elements);
+                return new(remainingElements);
             }
             else
             {

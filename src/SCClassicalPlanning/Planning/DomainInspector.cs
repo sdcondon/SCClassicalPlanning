@@ -200,7 +200,8 @@ namespace SCClassicalPlanning.Planning
 
         // NB: does not override equality - so equality has reference semantics.
         // This is important to be able to use the same action more than once in a plan.
-        // TODO: Probable issue - when identifying distinct states in state space search, some degree of recognition of variables being the same would be useful..
+        // TODO-BUG-MAJOR: Probable issue - when identifying distinct goals in state space search, some degree of recognition of variables being the same would be useful.
+        // Might need to be logic in Goal, not here..
         internal class StandardisedVariableSymbol
         {
             public StandardisedVariableSymbol(object originalSymbol) => OriginalSymbol = originalSymbol;

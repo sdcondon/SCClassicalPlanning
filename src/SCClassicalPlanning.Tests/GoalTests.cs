@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCFirstOrderLogic;
-using static SCClassicalPlanning.ExampleDomains.Container;
 
 namespace SCClassicalPlanning
 {

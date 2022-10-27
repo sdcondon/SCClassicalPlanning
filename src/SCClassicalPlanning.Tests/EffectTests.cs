@@ -17,38 +17,32 @@ namespace SCClassicalPlanning
         public static Test IsRelevantToBehaviour => TestThat
             .GivenEachOf(() => new IsRelevantToTestCase[]
             {
-                // fulfills positive element
-                new(
+                new( // fulfills positive element
                     Goal: new(IsPresent(element1)),
                     Effect: new(IsPresent(element1)),
                     ExpectedResult: true),
 
-                // fulfills negative element
-                new(
+                new( // fulfills negative element
                     Goal: new(!IsPresent(element1)),
                     Effect: new(!IsPresent(element1)),
                     ExpectedResult: true),
 
-                // fulfills positive & negative element
-                new(
+                new( // fulfills positive & negative element
                     Goal: new(!IsPresent(element1) & IsPresent(element2)),
                     Effect: new(!IsPresent(element1) & IsPresent(element2)),
                     ExpectedResult: true),
 
-                // doesn't fulfill any elements
-                new(
+                new( // doesn't fulfill any elements
                     Goal: new(!IsPresent(element1) & IsPresent(element2)),
                     Effect: new(IsPresent(element1) & !IsPresent(element2)),
                     ExpectedResult: false),
 
-                // fulfills positive element, undoes positive element
-                new(
+                new( // fulfills positive element, undoes positive element
                     Goal: new(IsPresent(element1) & IsPresent(element2)),
                     Effect: new(!IsPresent(element1) & IsPresent(element2)),
                     ExpectedResult: false),
 
-                // Variable doesn't confuse matters..
-                new(
+                new( // Variable doesn't confuse matters..
                     Goal: new(At(new Constant("C2"), new Constant("JFK"))),
                     Effect: new(At(new Constant("C2"), new Constant("JFK")) & !In(new Constant("C2"), P)),
                     ExpectedResult: true),
