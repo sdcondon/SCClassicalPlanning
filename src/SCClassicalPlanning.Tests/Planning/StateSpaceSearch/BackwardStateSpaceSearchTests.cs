@@ -48,7 +48,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 return planner.CreatePlanAsync(tc.Problem).GetAwaiter().GetResult();
             })
             .ThenReturns()
-            .And((_, tc, pl) => tc.Problem.Goal.IsSatisfiedBy(pl.ApplyTo(tc.Problem.InitialState)).Should().BeTrue())
+            .And((_, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
             .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
 
         private static IHeuristic MakeInvariantCheckingHeuristic(Domain domain, IEnumerable<Sentence> invariants)

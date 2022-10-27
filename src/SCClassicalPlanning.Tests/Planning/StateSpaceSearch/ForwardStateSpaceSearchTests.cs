@@ -23,7 +23,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
             })
             .ThenReturns()
-            .And((_, pr, pl) => pr.Goal.IsSatisfiedBy(pl.ApplyTo(pr.InitialState)).Should().BeTrue())
+            .And((_, pr, pl) => pl.ApplyTo(pr.InitialState).Satisfies(pr.Goal).Should().BeTrue())
             .And((cxt, pr, pl) => cxt.WriteOutputLine(new PlanFormatter(pr.Domain).Format(pl)));
     }
 }
