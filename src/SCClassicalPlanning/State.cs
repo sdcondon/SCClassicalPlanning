@@ -69,6 +69,8 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Gets a value indicating whether this state satisfies a given goal.
         /// <para/>
+        /// TODO: assumes ground goal. Depending on performance diff, change or add alternative that doesn't.
+        /// <para/>
         /// A goal is satisfied by a state if all of its positive elements and none of its negative elements are present in the state.
         /// </summary>
         /// <param name="goal">The goal to check.</param>

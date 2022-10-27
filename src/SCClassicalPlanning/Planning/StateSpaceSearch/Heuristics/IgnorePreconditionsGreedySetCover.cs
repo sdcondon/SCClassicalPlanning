@@ -29,13 +29,13 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
     /// </summary>
     public class IgnorePreconditionsGreedySetCover : IHeuristic
     {
-        private readonly Problem problem;
+        private readonly Domain domain;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IgnorePreconditionsGreedySetCover"/> class.
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
-        public IgnorePreconditionsGreedySetCover(Problem problem) => this.problem = problem;
+        public IgnorePreconditionsGreedySetCover(Domain domain) => this.domain = domain;
 
         /// <summary>
         /// Estimates the cost of getting from the given state to a state that satisfies the given goal.
@@ -108,7 +108,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         {
             foreach (var goalElement in goalElements)
             {
-                foreach (var actionSchema in problem.Domain.Actions)
+                foreach (var actionSchema in domain.Actions)
                 {
                     foreach (var effectElement in actionSchema.Effect.Elements)
                     {

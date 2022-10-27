@@ -18,7 +18,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             })
             .When((_, problem) =>
             {
-                var heuristic = new IgnorePreconditionsGreedySetCover(problem);
+                var heuristic = new IgnorePreconditionsGreedySetCover(problem.Domain);
                 var planner = new ForwardStateSpaceSearch(heuristic);
                 return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
             })

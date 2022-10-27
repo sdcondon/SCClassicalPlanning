@@ -21,25 +21,25 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 new(
                     Problem: AirCargo.ExampleProblem,
                     Heuristic: MakeInvariantCheckingHeuristic(
-                        AirCargo.ExampleProblem,
+                        AirCargo.Domain,
                         Array.Empty<Sentence>())),
 
                 new(
                     Problem: BlocksWorld.ExampleProblem,
                     Heuristic: MakeInvariantCheckingHeuristic(
-                        BlocksWorld.ExampleProblem,
+                        BlocksWorld.Domain,
                         new Sentence[] { ForAll(A, B, If(On(A, B), !Clear(B))), })),
 
                 new(
                     Problem: SpareTire.ExampleProblem,
                     Heuristic: MakeInvariantCheckingHeuristic(
-                        SpareTire.ExampleProblem,
+                        SpareTire.Domain,
                         Array.Empty<Sentence>())),
 
                 new(
                     Problem: BlocksWorld.LargeExampleProblem,
                     Heuristic: MakeInvariantCheckingHeuristic(
-                        BlocksWorld.LargeExampleProblem,
+                        BlocksWorld.Domain,
                         new Sentence[] { ForAll(A, B, If(On(A, B), !Clear(B))), })),
             })
             .When((_, tc) =>
@@ -51,7 +51,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .And((_, tc, pl) => tc.Problem.Goal.IsSatisfiedBy(pl.ApplyTo(tc.Problem.InitialState)).Should().BeTrue())
             .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
 
-        private static IHeuristic MakeInvariantCheckingHeuristic(Problem problem, IEnumerable<Sentence> invariants)
+        private static IHeuristic MakeInvariantCheckingHeuristic(Domain domain, IEnumerable<Sentence> invariants)
         {
             var invariantKb = new SimpleResolutionKnowledgeBase(
                 new SimpleClauseStore(),
@@ -59,7 +59,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 SimpleResolutionKnowledgeBase.PriorityComparisons.UnitPreference);
             invariantKb.Tell(invariants);
 
-            var innerHeuristic = new IgnorePreconditionsGreedySetCover(problem);
+            var innerHeuristic = new IgnorePreconditionsGreedySetCover(domain);
 
             return new GoalInvariantCheck(invariantKb, innerHeuristic);
         }
