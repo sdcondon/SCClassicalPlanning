@@ -21,6 +21,8 @@ namespace SCClassicalPlanning.Planning
 {
     /// <summary>
     /// Various domain inspection methods, useful to planners.
+    /// <para/>
+    /// TODO: consider making this instantiable - domain passed to ctor. Opens way for caching etc.
     /// </summary>
     public static class DomainInspector
     {
@@ -90,12 +92,12 @@ namespace SCClassicalPlanning.Planning
         }
 
         /// <summary>
-        /// Gets the (action schema, variable substitution) pairings that represent actions that are relevant to a given goal in a given problem.
+        /// Gets the (action schema, variable substitution, variable constraints) tuples that represent actions that are relevant to a given goal in a given problem.
         /// </summary>
         /// <param name="domain">The domain of the problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>
         /// <returns>The actions that are relevant to the given state.</returns>
-        public static IEnumerable<(Action schema, VariableSubstitution substitution, Goal constraints)> GetRelevantActionSchemaSubstitutions(Domain domain, Goal goal)
+        public static IEnumerable<(Action schema, VariableSubstitution substitution, Goal constraints)> GetRelevantActionDetails(Domain domain, Goal goal)
         {
             // Local method to find any constraints that apply to a given substitution for none of the goals elements to be negated.
             bool TryGetConstraints(IEnumerable<Literal> effectElements, VariableSubstitution substitution, [MaybeNullWhen(false)]out Goal constraints)
@@ -175,7 +177,7 @@ namespace SCClassicalPlanning.Planning
         /// <returns>The actions that are relevant to the given state.</returns>
         public static IEnumerable<Action> GetRelevantActions(Domain domain, Goal goal)
         {
-            foreach (var (Schema, Substitution, Constraints) in GetRelevantActionSchemaSubstitutions(domain, goal))
+            foreach (var (Schema, Substitution, Constraints) in GetRelevantActionDetails(domain, goal))
             {
                 yield return new SchemaTransformation(Substitution, Constraints).ApplyTo(Schema);
             }
@@ -198,6 +200,7 @@ namespace SCClassicalPlanning.Planning
 
         // NB: does not override equality - so equality has reference semantics.
         // This is important to be able to use the same action more than once in a plan.
+        // TODO: Probable issue - when identifying distinct states in state space search, some degree of recognition of variables being the same would be useful..
         internal class StandardisedVariableSymbol
         {
             public StandardisedVariableSymbol(object originalSymbol) => OriginalSymbol = originalSymbol;

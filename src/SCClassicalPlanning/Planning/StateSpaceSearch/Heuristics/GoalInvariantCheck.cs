@@ -11,8 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using SCClassicalPlanning.ProblemManipulation;
-using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 
 namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
@@ -43,17 +41,17 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
     /// </summary>
     public class GoalInvariantCheck : IHeuristic
     {
-        private readonly IKnowledgeBase knowledgeBase;
+        private readonly IKnowledgeBase invariantsKB;
         private readonly IHeuristic innerHeuristic;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GoalInvariantCheck"/>.
         /// </summary>
-        /// <param name="invariantsKnowledgeBase">A knowledge base containing all of the invariants of the problem.</param>
+        /// <param name="invariantsKB">A knowledge base containing all of the invariants of the problem.</param>
         /// <param name="innerHeuristic">The inner heuristic to invoke if no invariants are violated by the goal.</param>
-        public GoalInvariantCheck(IKnowledgeBase invariantsKnowledgeBase, IHeuristic innerHeuristic)
+        public GoalInvariantCheck(IKnowledgeBase invariantsKB, IHeuristic innerHeuristic)
         {
-            this.knowledgeBase = invariantsKnowledgeBase;
+            this.invariantsKB = invariantsKB;
             this.innerHeuristic = innerHeuristic;
         }
 
@@ -65,46 +63,12 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// <returns><see cref="float.PositiveInfinity"/> if any invariants are violated by the goal. Otherwise, the cost estimated by the inner heuristic.</returns>
         public float EstimateCost(State state, Goal goal)
         {
-            // One would assume that the inner heuristic would return 0 if there are no elements
-            // in the goal - but its not our business to shortcut that
-            if (goal.Elements.Count > 0)
+            if (InvariantInspector.IsGoalPrecludedByInvariants(goal, invariantsKB))
             {
-                var variables = new HashSet<VariableDeclaration>();
-                GoalVariableFinder.Instance.Visit(goal, variables);
-
-                // Annoying performance hit - goals are essentially already in CNF, but our knowledge bases want to do the conversion themselves.. Meh, never mind.
-                // TODO: Perhaps a ToSentence in Goal? (and others..)
-                var goalSentence = goal.Elements.Skip(1).Aggregate(goal.Elements.First().ToSentence(), (c, e) => new Conjunction(c, e.ToSentence()));
-
-                foreach (var variable in variables)
-                {
-                    goalSentence = new ExistentialQuantification(variable, goalSentence);
-                }
-
-                // Note the negation here. We're not asking if the invariants mean that the goal MUST
-                // be true (that will of course generally not be the case!), we're asking if the goal
-                // CANNOT be true - that is, if its NEGATION must be true.
-                if (knowledgeBase.Ask(new Negation(goalSentence)))
-                {
-                    return float.PositiveInfinity;
-                }
+                return float.PositiveInfinity;
             }
 
             return innerHeuristic.EstimateCost(state, goal);
-        }
-
-        /// <summary>
-        /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="SCClassicalPlanning.Goal"/>, and add them to a given <see cref="HashSet{T}"/>.
-        /// </summary>
-        private class GoalVariableFinder : RecursiveGoalVisitor<HashSet<VariableDeclaration>>
-        {
-            /// <summary>
-            /// Gets a singleton instance of the <see cref="GoalVariableFinder"/> class.
-            /// </summary>
-            public static GoalVariableFinder Instance { get; } = new();
-
-            /// <inheritdoc/>
-            public override void Visit(VariableDeclaration variable, HashSet<VariableDeclaration> variables) => variables.Add(variable);
         }
     }
 }

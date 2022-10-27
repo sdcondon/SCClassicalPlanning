@@ -32,7 +32,7 @@ namespace SCClassicalPlanning.Planning
         /// <param name="problem">The problem being solved.</param>
         /// <param name="state">The state to retrieve the applicable actions for.</param>
         /// <returns>The actions that are applicable from the given state.</returns>
-        public static IEnumerable<(Action schema, VariableSubstitution substitution)> GetApplicableActionSchemaSubstitutions(Problem problem, State state)
+        public static IEnumerable<(Action schema, VariableSubstitution substitution)> GetApplicableActionDetails(Problem problem, State state)
         {
             // Local method to (recursively) match a set of (remaining) goal elements to the given state.
             // goalElements: The remaining elements of the goal to be matched
@@ -78,7 +78,7 @@ namespace SCClassicalPlanning.Planning
                         // one would hope that it is a very rare scenario to have a variable that doesn't occur in ANY positive goal elements (most
                         // will at least occur in e.g. a 'type' predicate). But this is obviously VERY expensive when it occurs - though I guess
                         // clever indexing could help (support for indexing is TODO).
-                        foreach (var firstGoalElementUnifier in GetAllPossibleSubstitutions(problem.Objects, firstGoalElement.Predicate, unifier))
+                        foreach (var firstGoalElementUnifier in GetAllPossibleSubstitutions(problem, firstGoalElement.Predicate, unifier))
                         {
                             var possiblePredicate = firstGoalElementUnifier.ApplyTo(firstGoalElement.Predicate).Predicate;
 
@@ -124,7 +124,7 @@ namespace SCClassicalPlanning.Planning
         public static IEnumerable<Action> GetApplicableActions(Problem problem, State state)
         {
             // Now we can try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
-            foreach (var (Schema, Substitution) in GetApplicableActionSchemaSubstitutions(problem, state))
+            foreach (var (Schema, Substitution) in GetApplicableActionDetails(problem, state))
             {
                 // For each substitution, apply it to the action schema and return it:
                 yield return new VariableSubstitutionActionTransformation(Substitution).ApplyTo(Schema);
@@ -135,33 +135,13 @@ namespace SCClassicalPlanning.Planning
         /// Gets the (action schema, *ground* variable substitution) pairings that represent actions that are relevant to a given goal in a given problem.
         /// <para/>
         /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
-        /// It'd obviously be nice to be leave variables alone is its feasible (perhaps even allowing for constraints when some values are okay but others are
-        /// not). Having played with this idea a little though, there are.. some subtleties - which go some way to explaining why even the earliest versions
-        /// of PDDL have things like types and axioms..
+        /// See <see cref="DomainInspector.GetRelevantActionDetails(Domain, Goal)"/> for a variable-preserving equivalent to this method.
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>
         /// <returns>The actions that are relevant to the given state.</returns>
-        public static IEnumerable<(Action schema, VariableSubstitution substitution)> GetRelevantActionSchemaSubstitutions(Problem problem, Goal goal)
+        public static IEnumerable<(Action schema, VariableSubstitution substitution)> GetRelevantActionDetails(Problem problem, Goal goal)
         {
-            // Local method to check that a given unifier results in an unconstrained non-match with the negation of the elements of the goal.
-            // Worth it because ExpandNonMatchesWithGoalNegation is potentially so expensive.
-            bool IsUnconstrainedNonMatchWithGoalNegation(IEnumerable<Literal> effectElements, VariableSubstitution substitution)
-            {
-                foreach (var effectElement in effectElements)
-                {
-                    foreach (var goalElement in goal.Elements)
-                    {
-                        if (LiteralUnifier.TryUpdateUnsafe(goalElement, substitution.ApplyTo(effectElement).Negate(), new VariableSubstitution(substitution)))
-                        {
-                            return false;
-                        }
-                    }
-                }
-
-                return true;
-            }
-
             // Local method to create variable subsitutions such that the negation of the effects elements transformed by the substitution do not match any of the goal's elements.
             // effectElements: The (remaining) elements of the effect to be matched.
             // returns: An enumerable of VariableSubstitutions that can be applied to the effect elements to make none of them match the negation of a goal element
@@ -182,7 +162,7 @@ namespace SCClassicalPlanning.Planning
                     // do not occur, we need to check for the existence of the negation of the literal formed by substituting EVERY combination of
                     // objects in the problem for the as yet unbound variables. This is obviously VERY expensive for large problems with lots of objects -
                     // though I guess clever indexing could help (support for indexing is TODO).
-                    foreach (var firstEffectElementUnifier in GetAllPossibleSubstitutions(problem.Objects, firstEffectElement.Predicate, substitution))
+                    foreach (var firstEffectElementUnifier in GetAllPossibleSubstitutions(problem, firstEffectElement.Predicate, substitution))
                     {
                         var possibleLiteral = firstEffectElementUnifier.ApplyTo(firstEffectElement);
 
@@ -220,17 +200,10 @@ namespace SCClassicalPlanning.Planning
             {
                 foreach (var potentialSubstitution in MatchWithGoal(schema.Effect.Elements))
                 {
-                    ////if (IsUnconstrainedNonMatchWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
-                    ////{
-                    ////    yield return (schema, potentialSubstitution);
-                    ////}
-                    ////else
-                    ////{
-                        foreach (var substitution in ExpandNonMatchesWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
-                        {
-                            yield return (schema, substitution);
-                        }
-                    ////}
+                    foreach (var substitution in ExpandNonMatchesWithGoalNegation(schema.Effect.Elements, potentialSubstitution))
+                    {
+                        yield return (schema, substitution);
+                    }
                 }
             }
         }
@@ -239,28 +212,26 @@ namespace SCClassicalPlanning.Planning
         /// Gets the *ground* actions that are relevant to a given goal in a given problem.
         /// <para/>
         /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
-        /// It'd be nice to be able to have an equivalent method (in <see cref="DomainInspector"/>) that can return <see cref="Action"/>s that have
-        /// some variable references in them, with constraints on the substitutions that can be made if necessary. Having played with this idea a little
-        /// though, there are.. some subtleties - which provide some insight into explaining why even the earliest versions of PDDL have things like axioms and types..
+        /// See <see cref="DomainInspector.GetRelevantActions(Domain, Goal)"/> for a variable-preserving equivalent to this method.
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>
         /// <returns>The actions that are relevant to the given state.</returns>
         public static IEnumerable<Action> GetRelevantActions(Problem problem, Goal goal)
         {
-            foreach (var (Schema, Substitution) in GetRelevantActionSchemaSubstitutions(problem, goal))
+            foreach (var (Schema, Substitution) in GetRelevantActionDetails(problem, goal))
             {
                 yield return new VariableSubstitutionActionTransformation(Substitution).ApplyTo(Schema);
             }
         }
 
-        public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(IEnumerable<Constant> objects, Predicate predicate, VariableSubstitution substitution)
+        public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Problem problem, Predicate predicate, VariableSubstitution substitution)
         {
             IEnumerable<VariableSubstitution> allPossibleSubstitutions = new List<VariableSubstitution>() { substitution };
             var unboundVariables = predicate.Arguments.OfType<VariableReference>().Except(substitution.Bindings.Keys);
             foreach (var unboundVariable in unboundVariables)
             {
-                allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(u => objects.Select(o =>
+                allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(u => problem.Objects.Select(o =>
                 {
                     var newBindings = new Dictionary<VariableReference, Term>(u.Bindings)
                     {

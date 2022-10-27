@@ -44,7 +44,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var propositionLevel0 = new Dictionary<Literal, PropositionNode>();
             foreach (var predicateTemplate in problem.Domain.Predicates)
             {
-                foreach (var substitution in ProblemInspector.GetAllPossibleSubstitutions(problem.Objects, predicateTemplate, new VariableSubstitution()))
+                foreach (var substitution in ProblemInspector.GetAllPossibleSubstitutions(problem, predicateTemplate, new VariableSubstitution()))
                 {
                     // Ugh - compiler assuming wrong overload - perhaps because conversion is implicit and method is more concrete?
                     // Implicit conversion of predicate to literal a mistake, I think.
