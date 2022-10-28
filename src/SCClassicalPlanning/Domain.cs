@@ -13,7 +13,7 @@
 // limitations under the License.
 using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 
 namespace SCClassicalPlanning
 {
@@ -29,9 +29,9 @@ namespace SCClassicalPlanning
         /// Initializes a new instance of the <see cref="Domain"/> class.
         /// </summary>
         /// <param name="actions">The set of actions that exist within the domain.</param>
-        public Domain(IList<Action> actions) // TODO: perhaps allow for the specification of additional constants?
+        public Domain(IEnumerable<Action> actions) // TODO: perhaps allow for the specification of additional constants?
         {
-            Actions = new ReadOnlyCollection<Action>(actions);
+            Actions = actions.ToImmutableHashSet();
 
             var predicates = new HashSet<Predicate>();
             foreach (var action in actions)
@@ -39,7 +39,7 @@ namespace SCClassicalPlanning
                 PredicateFinder.Instance.Visit(action, predicates);
             }
 
-            Predicates = new ReadOnlyCollection<Predicate>(predicates.ToList());
+            Predicates = predicates.ToImmutableHashSet();
 
             var constants = new HashSet<Constant>();
             foreach (var action in actions)
@@ -47,7 +47,7 @@ namespace SCClassicalPlanning
                 ConstantFinder.Instance.Visit(action, constants);
             }
 
-            Constants = new ReadOnlyCollection<Constant>(constants.ToList());
+            Constants = constants.ToImmutableHashSet();
         }
 
         /// <summary>
@@ -59,17 +59,17 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Gets the set of actions that exist within the domain.
         /// </summary>
-        public ReadOnlyCollection<Action> Actions { get; }
+        public ImmutableHashSet<Action> Actions { get; }
 
         /// <summary>
         /// Gets the set of predicates that exist within the domain.
         /// </summary>
-        public ReadOnlyCollection<Predicate> Predicates { get; }
+        public ImmutableHashSet<Predicate> Predicates { get; }
 
         /// <summary>
         /// Gets the set of constants that exist within the domain
         /// </summary>
-        public ReadOnlyCollection<Constant> Constants { get; }
+        public ImmutableHashSet<Constant> Constants { get; }
 
         private class PredicateFinder : RecursiveActionVisitor<HashSet<Predicate>>
         {

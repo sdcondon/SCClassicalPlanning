@@ -54,7 +54,7 @@ namespace SCClassicalPlanning.Planning
                         var unboundVariables = firstEffectElement.Predicate.Arguments.OfType<VariableReference>().Except(unifier.Bindings.Keys);
                         foreach (var unboundVariable in unboundVariables)
                         {
-                            allPossibleUnifiers = allPossibleUnifiers.SelectMany(u => problem.Objects.Select(o =>
+                            allPossibleUnifiers = allPossibleUnifiers.SelectMany(u => problem.Constants.Select(o =>
                             {
                                 var newBindings = new Dictionary<VariableReference, Term>(u.Bindings);
                                 newBindings[unboundVariable] = o;

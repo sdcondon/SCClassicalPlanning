@@ -166,7 +166,7 @@ namespace SCClassicalPlanning
         /// </summary>
         private class ConstructionVisitor : RecursiveSentenceVisitor<HashSet<Predicate>>
         {
-            private static readonly ConstructionVisitor Instance = new ConstructionVisitor();
+            private static readonly ConstructionVisitor Instance = new();
 
             public static HashSet<Predicate> Visit(Sentence sentence)
             {
@@ -175,7 +175,6 @@ namespace SCClassicalPlanning
                 return elements;
             }
 
-            /// <inheritdoc/>
             public override void Visit(Sentence sentence, HashSet<Predicate> predicates)
             {
                 if (sentence is Conjunction conjunction)

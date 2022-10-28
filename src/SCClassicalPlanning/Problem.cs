@@ -13,7 +13,7 @@
 // limitations under the License.
 using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 
 namespace SCClassicalPlanning
 {
@@ -54,7 +54,7 @@ namespace SCClassicalPlanning
         // These two then provide lookup functionality needed by planners - thus allowing for the use of appropriate indices?
         // Perhaps also leave existing ctor that implicitly uses e.g. HashSetStateStore.
         // Explore this. Later (prob last thing before v1 - want a 'complete' solution before looking at refactoring and abstractions).
-        public Problem(Domain domain, State initialState, Goal goal, IList<Constant> additionalConstants)
+        public Problem(Domain domain, State initialState, Goal goal, IEnumerable<Constant> additionalConstants)
         {
             Domain = domain;
             InitialState = initialState;
@@ -63,7 +63,7 @@ namespace SCClassicalPlanning
             var constants = new HashSet<Constant>(additionalConstants);
             StateConstantFinder.Instance.Visit(initialState, constants);
             GoalConstantFinder.Instance.Visit(goal, constants);
-            Objects = new ReadOnlyCollection<Constant>(constants.ToArray());
+            Constants = constants.ToImmutableHashSet();
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Gets the objects that exist in the problem.
         /// </summary>
-        public ReadOnlyCollection<Constant> Objects { get; }
+        public ImmutableHashSet<Constant> Constants { get; }
 
         /// <summary>
         /// Gets the initial state of the problem.

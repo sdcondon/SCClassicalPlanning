@@ -238,7 +238,7 @@ namespace SCClassicalPlanning.Planning
             var unboundVariables = predicate.Arguments.OfType<VariableReference>().Except(substitution.Bindings.Keys);
             foreach (var unboundVariable in unboundVariables)
             {
-                allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(u => problem.Objects.Select(o =>
+                allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(u => problem.Constants.Select(o =>
                 {
                     var newBindings = new Dictionary<VariableReference, Term>(u.Bindings)
                     {
