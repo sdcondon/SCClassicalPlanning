@@ -122,7 +122,7 @@ Once you have a problem, the types in the `SCClassicalPlanning.Planning` namespa
 ```csharp
 using SCClassicalPlanning.Planning; // for PlanFormatter and CreatePlan extension method (plan creation is async by default)
 using SCClassicalPlanning.Planning.StateSpaceSearch; // for ForwardStateSpaceSearch
-using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // for ElementDifferenceCount
+using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // for UnsatisfiedGoalCount
 
 // First instantiate a ForwardStateSpaceSearch, specifying a heuristic to use (a delegate that
 // estimates the number of actions it will take to get from a given state to a state that satisfies
@@ -136,7 +136,7 @@ using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // for ElementDi
 // it can't rule out unsatisfiable goals) and isn't that great for most forward searches either
 // (note it's not admissable, so can give non-optimal plans). However, it suffices for the very simple
 // problem we are trying to solve here:
-var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
+var planner = new ForwardStateSpaceSearch(new UnsatisfiedGoalCount());
 
 // Tell the planner to create a plan for our problem:
 var plan = planner.CreatePlan(problem);
@@ -163,8 +163,8 @@ Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.Goal)}!");
 
 ### Using Backward State Space Search
 
-As above, but using `var planner = new BackwardStateSpaceSearch(heuristic)`, where heuristic is a `Func<State, Goal, float>`.
-As mentioned above, ElementDifferenceCount.EstimateCost is useless for this. Either create one specifically for your
+As above, but using `var planner = new BackwardStateSpaceSearch(heuristic)`, where heuristic is an `IHeuristic`.
+As mentioned above, UnsatisfiedGoalCount is useless for this. Either create one specifically for your
 domain, or wait until I implement some more generic ones (working on a precondition-ignoring greedy set cover at the time
 of writing).
 
