@@ -41,7 +41,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
     /// </summary>
     public class GoalInvariantCheck : IHeuristic
     {
-        private readonly IKnowledgeBase invariantsKB;
+        private readonly InvariantInspector invariantInspector;
         private readonly IHeuristic innerHeuristic;
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// <param name="innerHeuristic">The inner heuristic to invoke if no invariants are violated by the goal.</param>
         public GoalInvariantCheck(IKnowledgeBase invariantsKB, IHeuristic innerHeuristic)
         {
-            this.invariantsKB = invariantsKB;
+            this.invariantInspector = new InvariantInspector(invariantsKB);
             this.innerHeuristic = innerHeuristic;
         }
 
@@ -63,7 +63,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// <returns><see cref="float.PositiveInfinity"/> if any invariants are violated by the goal. Otherwise, the cost estimated by the inner heuristic.</returns>
         public float EstimateCost(State state, Goal goal)
         {
-            if (InvariantInspector.IsGoalPrecludedByInvariants(goal, invariantsKB))
+            if (invariantInspector.IsGoalPrecludedByInvariants(goal))
             {
                 return float.PositiveInfinity;
             }

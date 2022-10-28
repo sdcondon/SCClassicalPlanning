@@ -143,13 +143,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         {
             private readonly Problem problem;
             private readonly Goal fromGoal;
-            private readonly Goal toGoal;
 
             public StateSpaceEdge(Problem problem, Goal fromGoal, Action action)
             {
                 this.problem = problem;
                 this.fromGoal = fromGoal;
-                this.toGoal = action.Regress(fromGoal);
                 this.Action = action;
             }
 
@@ -157,7 +155,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public StateSpaceNode From => new(problem, fromGoal);
 
             /// <inheritdoc />
-            public StateSpaceNode To => new(problem, toGoal);
+            public StateSpaceNode To => new(problem, Action.Regress(fromGoal));
 
             /// <summary>
             /// Gets the action that is regressed over to achieve this goal transition.

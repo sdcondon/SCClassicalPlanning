@@ -57,23 +57,22 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 getEdgeCost: e => getActionCost(e.Action),
                 getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
 
-            //await search.CompleteAsync(1, cancellationToken);
+            await search.CompleteAsync(1, cancellationToken);
+            ////var exploredEdges = new HashSet<StateSpaceEdge>();
+            ////while (!search.IsConcluded)
+            ////{
+            ////    search.NextStep();
 
-            var exploredEdges = new HashSet<StateSpaceEdge>();
-            while (!search.IsConcluded)
-            {
-                search.NextStep();
-
-                var newEdges = search.Visited.Values.Where(i => !i.IsOnFrontier).Select(i => i.Edge);
-                foreach (var edge in newEdges)
-                {
-                    if (!object.Equals(edge, default(StateSpaceEdge)) && !exploredEdges.Contains(edge))
-                    {
-                        var h = heuristic.EstimateCost(problem.InitialState, edge.To.Goal);
-                        exploredEdges.Add(edge);
-                    }
-                }
-            }
+            ////    var newEdges = search.Visited.Values.Where(i => !i.IsOnFrontier).Select(i => i.Edge);
+            ////    foreach (var edge in newEdges)
+            ////    {
+            ////        if (!object.Equals(edge, default(StateSpaceEdge)) && !exploredEdges.Contains(edge))
+            ////        {
+            ////            var h = heuristic.EstimateCost(problem.InitialState, edge.To.Goal);
+            ////            exploredEdges.Add(edge);
+            ////        }
+            ////    }
+            ////}
 
             if (search.IsSucceeded())
             {
@@ -140,13 +139,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         {
             private readonly Domain domain;
             private readonly Goal fromGoal;
-            private readonly Goal toGoal;
 
             public StateSpaceEdge(Domain domain, Goal fromGoal, Action action)
             {
                 this.domain = domain;
                 this.fromGoal = fromGoal;
-                this.toGoal = action.Regress(fromGoal);
                 this.Action = action;
             }
 
@@ -154,7 +151,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public StateSpaceNode From => new(domain, fromGoal);
 
             /// <inheritdoc />
-            public StateSpaceNode To => new(domain, toGoal);
+            public StateSpaceNode To => new(domain, Action.Regress(fromGoal));
 
             /// <summary>
             /// Gets the action that is regressed over to achieve this goal transition.

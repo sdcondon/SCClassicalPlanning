@@ -1,12 +1,8 @@
 ﻿using FluentAssertions;
 using FlUnit;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using SCClassicalPlanning.ExampleDomains;
-using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using SCFirstOrderLogic;
-using System.Numerics;
 using static SCClassicalPlanning.ExampleDomains.Container;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
 
 namespace SCClassicalPlanning.Planning
 {
@@ -82,42 +78,6 @@ namespace SCClassicalPlanning.Planning
                         Remove(element1),
                         Remove(element2),
                     }),
-
-                // test for variable preservation - which ive commented out for the mo
-                ////new(
-                ////    Problem: new Problem(
-                ////        domain: AirCargo.Domain,
-                ////        initialState: new(
-                ////            Cargo(new Constant("cargo"))
-                ////            & Plane(new Constant("plane1"))
-                ////            & Plane(new Constant("plane2"))
-                ////            & Airport(new Constant("sfo"))
-                ////            & At(new Constant("cargo"), new Constant("sfo"))
-                ////            & At(new Constant("plane1"), new Constant("sfo"))
-                ////            & At(new Constant("plane2"), new Constant("sfo"))),
-                ////        goal: Goal.Empty),
-                ////    Goal: new(At(new Constant("cargo"), new Constant("sfo"))),
-                ////    ExpectedResult: new Action[]
-                ////    {
-                ////        // the important bit - leaves variables alone if it can
-                ////        Unload(new Constant("cargo"), new VariableReference("plane"), new Constant("sfo")),
-
-                ////        // The following three serve as an interesting indication of why backward state space searching
-                ////        // is so slow with this lib/problem. Obviously none of these actions make sense - their preconditions
-                ////        // could never be satisfied (cargo will never be a plane, plane1 will never be an airport, etc).
-                ////        // Of course, relevancy (as we implement it here - in its most basic form) is nothing to do with preconditions per se.
-                ////        //
-                ////        // A good heuristic will of course note that the pre-conditions are unreachable
-                ////        // and the associated state space edges will thus never be explored. But these non-starters
-                ////        // are generated at every step and take a lot of time to generate and chew through. This
-                ////        // is a good example of why even very simple/early versions of PDDL include a TYPED
-                ////        // predicate parameter lists.. For the purposes of this lib (without any extensions), the
-                ////        // takeaway should be that it not a good idea to re-use predicates for different "types" -
-                ////        // i.e. used "typed" predicates, even though we don't actually have a type system.
-                ////        Fly(new Constant("cargo"), new Constant("plane1"), new Constant("sfo")),
-                ////        Fly(new Constant("cargo"), new Constant("plane2"), new Constant("sfo")),
-                ////        Fly(new Constant("cargo"), new Constant("cargo"), new Constant("sfo")),
-                ////    }),
             })
             .When(tc => ProblemInspector.GetRelevantActions(tc.Problem, tc.Goal))
             .ThenReturns()

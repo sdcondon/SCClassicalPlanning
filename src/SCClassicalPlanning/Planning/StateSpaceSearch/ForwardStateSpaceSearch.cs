@@ -111,19 +111,17 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         {
             private readonly Problem problem;
             private readonly State fromState;
-            private readonly State toState;
 
             public StateSpaceEdge(Problem problem, State state, Action action)
             {
                 this.problem = problem;
                 this.fromState = state;
-                this.toState = action.ApplyTo(fromState);
                 this.Action = action;
             }
 
             public StateSpaceNode From => new(problem, fromState);
 
-            public StateSpaceNode To => new(problem, toState);
+            public StateSpaceNode To => new(problem, Action.ApplyTo(fromState));
 
             public Action Action { get; }
 

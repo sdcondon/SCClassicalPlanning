@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using SCFirstOrderLogic.Inference;
 using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
 using System.Collections;
@@ -26,14 +27,15 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     public class BackwardStateSpaceSearch : IPlanner
     {
         private readonly IHeuristic heuristic;
+        private readonly InvariantInspector invariantInspector;
         private readonly Func<Action, float> getActionCost;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the number of actions in the resulting plan.
         /// </summary>
         /// <param name="heuristic">The heuristic to use - the returned cost will be interpreted as the estimated number of actions that need to be performed.</param>
-        public BackwardStateSpaceSearch(IHeuristic heuristic)
-            : this(heuristic, a => 1f)
+        public BackwardStateSpaceSearch(IHeuristic heuristic, IKnowledgeBase invariantsKB = null)
+            : this(heuristic, a => 1f, invariantsKB)
         {
         }
 
@@ -42,23 +44,24 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         /// </summary>
         /// <param name="heuristic">The heuristic to use - with the returned cost will be interpreted as the estimated total cost of the actions that need to be performed.</param>
         /// <param name="getActionCost">A delegate to retrieve the cost of an action.</param>
-        public BackwardStateSpaceSearch(IHeuristic heuristic, Func<Action, float> getActionCost)
+        public BackwardStateSpaceSearch(IHeuristic heuristic, Func<Action, float> getActionCost, IKnowledgeBase invariantsKB = null)
         {
             this.heuristic = heuristic;
             this.getActionCost = getActionCost;
+            this.invariantInspector = new InvariantInspector(invariantsKB);
         }
 
         /// <inheritdoc />
         public async Task<Plan> CreatePlanAsync(Problem problem, CancellationToken cancellationToken = default)
         {
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
-                source: new StateSpaceNode(problem, problem.Goal),
+                source: new StateSpaceNode(new PlanningTask(problem, invariantInspector), problem.Goal),
                 isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
                 getEdgeCost: e => getActionCost(e.Action),
                 getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
 
             await search.CompleteAsync(1, cancellationToken);
-            // TODO: support interrogable plans
+            //TODO: support interrogable plans
             ////var exploredEdges = new HashSet<StateSpaceEdge>();
             ////while (!search.IsConcluded)
             ////{
@@ -85,11 +88,14 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             }
         }
 
+        // mostly just to keep the structs small at this point
+        private record PlanningTask(Problem Problem, InvariantInspector InvariantInspector);
+
         private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
         {
-            private readonly Problem problem;
+            private readonly PlanningTask planningTask;
 
-            public StateSpaceNode(Problem problem, Goal goal) => (this.problem, Goal) = (problem, goal);
+            public StateSpaceNode(PlanningTask planningTask, Goal goal) => (this.planningTask, Goal) = (planningTask, goal);
 
             /// <summary>
             /// Gets the goal represented by this node.
@@ -97,7 +103,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public Goal Goal { get; }
 
             /// <inheritdoc />
-            public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(problem, Goal);
+            public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(planningTask, Goal);
 
             /// <inheritdoc />
             public override bool Equals(object? obj) => obj is StateSpaceNode node && Equals(node);
@@ -115,20 +121,31 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
         private struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
         {
-            private readonly Problem problem;
+            private readonly PlanningTask planningTask;
             private readonly Goal goal;
 
-            public StateSpaceNodeEdges(Problem problem, Goal goal) => (this.problem, this.goal) = (problem, goal);
+            public StateSpaceNodeEdges(PlanningTask planningTask, Goal goal) => (this.planningTask, this.goal) = (planningTask, goal);
 
             /// <inheritdoc />
-            public int Count => ProblemInspector.GetRelevantActions(problem, goal).Count();
+            public int Count => ProblemInspector.GetRelevantActions(planningTask.Problem, goal).Count();
 
             /// <inheritdoc />
             public IEnumerator<StateSpaceEdge> GetEnumerator()
             {
-                foreach (var action in ProblemInspector.GetRelevantActions(problem, goal))
+                foreach (var action in ProblemInspector.GetRelevantActions(planningTask.Problem, goal))
                 {
-                    yield return new StateSpaceEdge(problem, goal, action);
+                    var effectiveAction = action;
+
+                    var nonTrivialPreconditions = planningTask.InvariantInspector.RemoveTrivialElements(action.Precondition);
+                    if (nonTrivialPreconditions != action.Precondition)
+                    {
+                        effectiveAction = new(action.Identifier, nonTrivialPreconditions, action.Effect);
+                    }
+
+                    if (!planningTask.InvariantInspector.IsGoalPrecludedByInvariants(effectiveAction.Regress(goal)))
+                    {
+                        yield return new StateSpaceEdge(planningTask, goal, effectiveAction);
+                    }
                 }
             }
 
@@ -138,21 +155,21 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
         private struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
         {
-            private readonly Problem problem;
+            private readonly PlanningTask planningTask;
             private readonly Goal fromGoal;
 
-            public StateSpaceEdge(Problem problem, Goal fromGoal, Action action)
+            public StateSpaceEdge(PlanningTask planningTask, Goal fromGoal, Action action)
             {
-                this.problem = problem;
+                this.planningTask = planningTask;
                 this.fromGoal = fromGoal;
                 this.Action = action;
             }
 
             /// <inheritdoc />
-            public StateSpaceNode From => new(problem, fromGoal);
+            public StateSpaceNode From => new(planningTask, fromGoal);
 
             /// <inheritdoc />
-            public StateSpaceNode To => new(problem, Action.Regress(fromGoal));
+            public StateSpaceNode To => new(planningTask, Action.Regress(fromGoal));
 
             /// <summary>
             /// Gets the action that is regressed over to achieve this goal transition.
@@ -160,7 +177,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public Action Action { get; }
 
             /// <inheritdoc />
-            public override string ToString() => new PlanFormatter(problem.Domain).Format(Action);
+            public override string ToString() => new PlanFormatter(planningTask.Problem.Domain).Format(Action);
         }
     }
 }
