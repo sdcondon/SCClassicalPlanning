@@ -102,25 +102,25 @@ namespace SCClassicalPlanning.Benchmarks.Planning
         [Benchmark]
         public Plan ForwardStateSpaceSearch()
         {
-            return new ForwardStateSpaceSearch(CurrentTestCase!.Heuristic).CreatePlanAsync(CurrentTestCase.Problem).GetAwaiter().GetResult();
+            return new ForwardStateSpaceSearch(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
         public Plan BackwardStateSpaceSearch()
         {
-            return new BackwardStateSpaceSearch(CurrentTestCase!.Heuristic).CreatePlanAsync(CurrentTestCase.Problem).GetAwaiter().GetResult();
+            return new BackwardStateSpaceSearch(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
         public Plan BackwardStateSpaceSearch_PropositionalWithoutKB()
         {
-            return new BackwardStateSpaceSearch_PropositionalWithoutKB(CurrentTestCase!.Heuristic).CreatePlanAsync(CurrentTestCase.Problem).GetAwaiter().GetResult();
+            return new BackwardStateSpaceSearch_PropositionalWithoutKB(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
         public Plan BackwardStateSpaceSearch_PropositionalWithKB()
         {
-            return new BackwardStateSpaceSearch_PropositionalWithKB(CurrentTestCase!.Heuristic, CurrentTestCase.InvariantsKB).CreatePlanAsync(CurrentTestCase.Problem).GetAwaiter().GetResult();
+            return new BackwardStateSpaceSearch_PropositionalWithKB(CurrentTestCase!.Heuristic, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
         }
 
         private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)
