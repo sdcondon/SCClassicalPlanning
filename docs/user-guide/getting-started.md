@@ -120,7 +120,7 @@ Once you have a problem, the types in the `SCClassicalPlanning.Planning` namespa
 ### Using Forward State Space Search
 
 ```csharp
-using SCClassicalPlanning.Planning; // for PlanFormatter
+using SCClassicalPlanning.Planning; // for PlanFormatter and CreatePlan extension method (plan creation is async by default)
 using SCClassicalPlanning.Planning.StateSpaceSearch; // for ForwardStateSpaceSearch
 using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // for ElementDifferenceCount
 
@@ -139,7 +139,7 @@ using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics; // for ElementDi
 var planner = new ForwardStateSpaceSearch(ElementDifferenceCount.EstimateCost);
 
 // Tell the planner to create a plan for our problem:
-var plan = planner.CreatePlanAsync(problem).GetAwaiter().GetResult(); // obviously just use await if in an async method
+var plan = planner.CreatePlan(problem);
 
 // Now let's verify that applying the plan results in a state that satisfies the goal,
 // printing out the actions included in the plan in the process:

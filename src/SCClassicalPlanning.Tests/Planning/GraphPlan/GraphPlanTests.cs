@@ -20,7 +20,7 @@
 ////            .When((_, tc) =>
 ////            {
 ////                var planner = new GraphPlan();
-////                return planner.CreatePlanAsync(tc).GetAwaiter().GetResult();
+////                return planner.CreatePlan(tc);
 ////            })
 ////            .ThenReturns()
 ////            .And((_, tc, pl) => tc.Goal.IsSatisfiedBy(pl.ApplyTo(tc.InitialState)).Should().BeTrue())

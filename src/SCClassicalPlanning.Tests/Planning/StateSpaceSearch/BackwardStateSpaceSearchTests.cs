@@ -175,7 +175,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                         ForAll(A, B, If(On(A, B), !Clear(B))),
                     })),
             })
-            .When((_, makePlanner, tc) => makePlanner(tc.Heuristic).CreatePlanAsync(tc.Problem).GetAwaiter().GetResult())
+            .When((_, makePlanner, tc) => makePlanner(tc.Heuristic).CreatePlan(tc.Problem))
             .ThenReturns()
             .And((_, _, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
             .And((cxt, _, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));

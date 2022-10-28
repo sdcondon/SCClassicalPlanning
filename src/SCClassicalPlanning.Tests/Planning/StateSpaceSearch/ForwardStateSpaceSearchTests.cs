@@ -20,7 +20,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 var heuristic = new IgnorePreconditionsGreedySetCover(problem.Domain);
                 var planner = new ForwardStateSpaceSearch(heuristic);
-                return planner.CreatePlanAsync(problem).GetAwaiter().GetResult();
+                return planner.CreatePlan(problem);
             })
             .ThenReturns()
             .And((_, pr, pl) => pl.ApplyTo(pr.InitialState).Satisfies(pr.Goal).Should().BeTrue())
