@@ -126,11 +126,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             return propositionLevels[Math.Min(index, LevelledOffAtLevel ?? int.MaxValue)];
         }
 
-        /// <summary>
-        /// Retrieves an object representing a particular 'action' level within the graph. Expands the graph if necessary.
-        /// </summary>
-        /// <param name="index">The index of the level to retrieve.</param>
-        /// <returns>An object representing the level.</returns>
+        /////// <summary>
+        /////// Retrieves an object representing a particular 'action' level within the graph. Expands the graph if necessary.
+        /////// </summary>
+        /////// <param name="index">The index of the level to retrieve.</param>
+        /////// <returns>An object representing the level.</returns>
         ////private ActionLevel GetActionLevel(int index)
         ////{
         ////    while (expandedToLevel < index + 1 && !LevelledOff)
@@ -307,16 +307,36 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 PreviousLevel = previousLevel;
             }
 
+            /// <summary>
+            /// Gets the previous level of the graph - or null if this is the level that represents the initial state of the problem.
+            /// </summary>
             public Level? PreviousLevel { get; }
 
+            /// <summary>
+            /// Gets the index of this level - with node index 0 indicating the propositions of the initial state of the problem.
+            /// </summary>
             public int Index { get; }
 
+            /// <summary>
+            /// Gets all of the planning graph nodes in this level, keyed by their respective propositions.
+            /// </summary>
             public IReadOnlyDictionary<Literal, PropositionNode> NodesByProposition { get; }
 
+            /// <summary>
+            /// Gets an enumerable of the propositions in this level.
+            /// </summary>
             public IEnumerable<Literal> Propositions => NodesByProposition.Keys;
 
+            /// <summary>
+            /// Gets an enumerable of the planning graph nodes in this level.
+            /// </summary>
             public IEnumerable<PropositionNode> Nodes => NodesByProposition.Values;
 
+            /// <summary>
+            /// Gets a value indicating whether this level contains a given proposition.
+            /// </summary>
+            /// <param name="proposition">The proposition to check for.</param>
+            /// <returns>True if and only if the given proposition is present in this level.</returns>
             public bool Contains(Literal proposition) => NodesByProposition.ContainsKey(proposition);
 
             /// <summary>
@@ -358,6 +378,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         {
             internal PropositionNode(Literal proposition) => Proposition = proposition;
 
+            /// <summary>
+            /// Gets the proposition represented by this node.
+            /// </summary>
             public Literal Proposition { get; }
 
             internal Collection<ActionNode> Actions { get; } = new();
@@ -378,6 +401,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         {
             internal ActionNode(Action action) => Action = action;
 
+            /// <summary>
+            /// Gets the action represented by this node.
+            /// </summary>
             public Action Action { get; }
 
             internal Collection<PropositionNode> Effects { get; } = new();

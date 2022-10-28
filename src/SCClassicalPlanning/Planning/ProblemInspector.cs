@@ -225,6 +225,13 @@ namespace SCClassicalPlanning.Planning
             }
         }
 
+        /// <summary>
+        /// Gets all possible variable substitutions that populate each of the arguments of a given predicate with a constant. Uses all constants of a given problem, and uses an existing substitution as a constraint.
+        /// </summary>
+        /// <param name="problem">The problem being solved.</param>
+        /// <param name="predicate">The predicate to create all possible substitutions for.</param>
+        /// <param name="substitution">The substitution to use as a constraint.</param>
+        /// <returns>All possible subsitutions that populate each of the arguments of the given predicate with a constant.</returns>
         public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Problem problem, Predicate predicate, VariableSubstitution substitution)
         {
             IEnumerable<VariableSubstitution> allPossibleSubstitutions = new List<VariableSubstitution>() { substitution };

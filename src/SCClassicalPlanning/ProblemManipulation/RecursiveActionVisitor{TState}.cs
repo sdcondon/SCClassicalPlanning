@@ -27,6 +27,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation just visits the action's precondition and effect.
         /// </summary>
         /// <param name="action">The action to visit.</param>
+        /// <param name="visitState">The state of this visit.</param>
         public virtual void Visit(Action action, TState visitState)
         {
             Visit(action.Precondition, visitState);
@@ -38,6 +39,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation just visits all of the goal's elements.
         /// </summary>
         /// <param name="goal">The <see cref="Goal"/> instance to visit.</param>
+        /// <param name="visitState">The state of this visit.</param>
         public virtual void Visit(Goal goal, TState visitState)
         {
             foreach (var literal in goal.Elements)
@@ -51,6 +53,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation just visits all of the effect's elements.
         /// </summary>
         /// <param name="effect">The <see cref="Effect"/> instance to visit.</param>
+        /// <param name="visitState">The state of this visit.</param>
         public virtual void Visit(Effect effect, TState visitState)
         {
             foreach (var literal in effect.Elements)
@@ -64,6 +67,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation just visits the underlying predicate.
         /// </summary>
         /// <param name="literal">The <see cref="Literal"/> instance to visit.</param>
+        /// <param name="visitState">The state of this visit.</param>
         public virtual void Visit(Literal literal, TState visitState)
         {
             Visit(literal.Predicate, visitState);
@@ -74,6 +78,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation just visits each of the arguments.
         /// </summary>
         /// <param name="predicate">The <see cref="Predicate"/> instance to visit.</param>
+        /// <param name="visitState">The state of this visit.</param>
         public virtual void Visit(Predicate predicate, TState visitState)
         {
             foreach (var argument in predicate.Arguments)
@@ -87,6 +92,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation invokes the Visit method appropriate to the runtime type of the term.
         /// </summary>
         /// <param name="term">The term to visit.</param>
+        /// <param name="visitState">The state of this visit.</param>
         public virtual void Visit(Term term, TState visitState)
         {
             switch (term)
@@ -108,6 +114,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation doesn't do anything.
         /// </summary>
         /// <param name="constant">The constant to visit.</param>
+        /// <param name="visitState">The state of this visit.</param>
         public virtual void Visit(Constant constant, TState visitState)
         {
         }
@@ -117,6 +124,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// Since all terms in classical planning should be functionless, the default implementation throws an exception.
         /// </summary>
         /// <param name="function">The function to visit.</param>
+        /// <param name="visitState">The state of this visit.</param>
         public virtual void Visit(Function function, TState visitState)
         {
             throw new NotSupportedException();
@@ -127,6 +135,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation just visits the variable's declaration
         /// </summary>
         /// <param name="variableReference">The variable reference to visit.</param>
+        /// <param name="visitState">The state of this visit.</param>
         public virtual void Visit(VariableReference variableReference, TState visitState)
         {
             Visit(variableReference.Declaration, visitState);
@@ -137,6 +146,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation doesn't do anything.
         /// </summary>
         /// <param name="variableDeclaration">The variable declaration to visit.</param>
+        /// <param name="visitState">The state of this visit.</param>
         public virtual void Visit(VariableDeclaration variableDeclaration, TState visitState)
         {
         }

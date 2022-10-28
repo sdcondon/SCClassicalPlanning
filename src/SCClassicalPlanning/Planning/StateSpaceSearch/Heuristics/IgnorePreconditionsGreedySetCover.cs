@@ -34,7 +34,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// <summary>
         /// Initializes a new instance of the <see cref="IgnorePreconditionsGreedySetCover"/> class.
         /// </summary>
-        /// <param name="problem">The problem being solved.</param>
+        /// <param name="domain">The domain of the problem being solved.</param>
         public IgnorePreconditionsGreedySetCover(Domain domain) => this.domain = domain;
 
         /// <summary>
@@ -46,13 +46,13 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         public float EstimateCost(State state, Goal goal)
         {
             var unsatisfiedGoalElements = GetUnsatisfiedGoalElements(state, goal);
-            if (unsatisfiedGoalElements.Count() == 0)
+            if (!unsatisfiedGoalElements.Any())
             {
                 return 0;
             }
 
             var relevantEffects = GetRelevantEffects(unsatisfiedGoalElements, state.Elements);
-            if (relevantEffects.Count() == 0)
+            if (!relevantEffects.Any())
             {
                 return float.PositiveInfinity;
             }
@@ -98,12 +98,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
             return uncovered;
         }
 
-        /// <summary>
-        /// Gets the transformed effect of each action (given the terms in the goal)
-        /// whose effect matches at least one element of the goal
-        /// </summary>
-        /// <param name="goal"></param>
-        /// <returns></returns>
+        // Gets the transformed effect of each action (given the terms in the goal)
+        // whose effect matches at least one element of the goal.
         private IEnumerable<Effect> GetRelevantEffects(IEnumerable<Literal> goalElements, IEnumerable<Predicate> stateElements)
         {
             foreach (var goalElement in goalElements)
@@ -136,13 +132,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
             }
         }
 
-        /// <summary>
-        /// Implements a greedy set cover algorithm of the given effects over the given target set of literals.
-        /// Returns the count of how many actions were needed, or -1 if it failed.
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="relevantEffects"></param>
-        /// <returns></returns>
+        // Implements a greedy set cover algorithm of the given effects over the given target set of literals.
+        // Returns the count of how many actions were needed, or -1 if it failed.
         private static int GetCoveringActionCount(IEnumerable<Literal> target, IEnumerable<Effect> relevantEffects)
         {
             var uncovered = new HashSet<Literal>(target);

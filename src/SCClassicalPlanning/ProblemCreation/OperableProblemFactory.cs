@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCFirstOrderLogic;
+using SCFirstOrderLogic.SentenceCreation;
 using SCFirstOrderLogic.SentenceManipulation;
 using System.Collections.Immutable;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
@@ -27,8 +28,17 @@ namespace SCClassicalPlanning.ProblemCreation
     /// </summary>
     public static class OperableProblemFactory
     {
+        /// <summary>
+        /// Surrogate type for <see cref="Action"/> that uses <see cref="OperableGoal"/> and <see cref="OperableEffect"/>. Implicitly convertible to and from <see cref="Action"/>.
+        /// </summary>
         public class OperableAction
         {
+            /// <summary>
+            /// Initialises a new instance of the <see cref="OperableAction"/> class.
+            /// </summary>
+            /// <param name="identifier">The unique identifier of the action.</param>
+            /// <param name="precondition">The precondition of the action.</param>
+            /// <param name="effect">The effect of the action.</param>
             public OperableAction(object identifier, OperableGoal precondition, OperableEffect effect) => (Identifier, Precondition, Effect) = (identifier, precondition, effect);
 
             internal object Identifier { get; }
@@ -37,21 +47,44 @@ namespace SCClassicalPlanning.ProblemCreation
 
             internal OperableEffect Effect { get; }
 
+            /// <summary>
+            /// Defines the implicit conversion of an <see cref="Action"/> instance to an <see cref="OperableAction"/>.
+            /// </summary>
+            /// <param name="action">The <see cref="Action"/> to convert.</param>
             public static implicit operator OperableAction(Action action) => new(action.Identifier, action.Precondition, action.Effect);
 
+            /// <summary>
+            /// Defines the implicit conversion of an <see cref="OperableAction"/> instance to an <see cref="Action"/>.
+            /// </summary>
+            /// <param name="action">The <see cref="OperableAction"/> to convert.</param>
             public static implicit operator Action(OperableAction action) => new(action.Identifier, action.Precondition, action.Effect);
         }
 
+        /// <summary>
+        /// Surrogate type for <see cref="Goal"/> that is implictly convertible from an <see cref="OperableSentence"/>. Also implicitly convertible to and from <see cref="Goal"/>.
+        /// </summary>
         public class OperableGoal
         {
             internal OperableGoal(IEnumerable<Literal> elements) => Elements = elements.ToImmutableHashSet();
 
             internal IReadOnlySet<Literal> Elements { get; }
 
+            /// <summary>
+            /// Defines the implicit conversion of an <see cref="Goal"/> instance to an <see cref="OperableGoal"/>.
+            /// </summary>
+            /// <param name="goal">The <see cref="Goal"/> to convert.</param>
             public static implicit operator OperableGoal(Goal goal) => new(goal.Elements);
 
+            /// <summary>
+            /// Defines the implicit conversion of an <see cref="OperableGoal"/> instance to an <see cref="Goal"/>.
+            /// </summary>
+            /// <param name="goal">The <see cref="OperableGoal"/> to convert.</param>
             public static implicit operator Goal(OperableGoal goal) => new(goal.Elements);
 
+            /// <summary>
+            /// Defines the implicit conversion of an <see cref="OperableSentence"/> instance to an <see cref="OperableGoal"/>.
+            /// </summary>
+            /// <param name="sentence">The <see cref="Sentence"/> to convert.</param>
             public static implicit operator OperableGoal(OperableSentence sentence)
             {
                 var literals = new HashSet<Literal>();
@@ -60,34 +93,64 @@ namespace SCClassicalPlanning.ProblemCreation
             }
         }
 
+        /// <summary>
+        /// Surrogate type for <see cref="State"/> that is implictly convertible from an <see cref="OperableSentence"/>. Also implicitly convertible to and from <see cref="State"/>.
+        /// </summary>
         public class OperableState
         {
             internal OperableState(IEnumerable<Predicate> elements) => Elements = elements.ToImmutableHashSet();
 
             internal IReadOnlySet<Predicate> Elements { get; }
 
+            /// <summary>
+            /// Defines the implicit conversion of an <see cref="State"/> instance to an <see cref="OperableState"/>.
+            /// </summary>
+            /// <param name="state">The <see cref="State"/> to convert.</param>
             public static implicit operator OperableState(State state) => new(state.Elements);
 
+            /// <summary>
+            /// Defines the implicit conversion of an <see cref="OperableState"/> instance to an <see cref="State"/>.
+            /// </summary>
+            /// <param name="state">The <see cref="OperableState"/> to convert.</param>
             public static implicit operator State(OperableState state) => new(state.Elements);
 
+            /// <summary>
+            /// Defines the implicit conversion of an <see cref="OperableSentence"/> instance to an <see cref="OperableState"/>.
+            /// </summary>
+            /// <param name="sentence">The <see cref="Sentence"/> to convert.</param>
             public static implicit operator OperableState(OperableSentence sentence)
             {
                 var predicates = new HashSet<Predicate>();
                 PredicateConjunctionVisitor.Instance.Visit(sentence, predicates);
                 return new(predicates);
             }
-        } 
+        }
 
+        /// <summary>
+        /// Surrogate type for <see cref="Effect"/> that is implictly convertible from an <see cref="OperableSentence"/>. Also implicitly convertible to and from <see cref="Effect"/>.
+        /// </summary>
         public class OperableEffect
         {
-            public OperableEffect(IEnumerable<Literal> elements) => Elements = elements.ToImmutableHashSet();
+            internal OperableEffect(IEnumerable<Literal> elements) => Elements = elements.ToImmutableHashSet();
 
-            public IReadOnlySet<Literal> Elements { get; }
+            internal IReadOnlySet<Literal> Elements { get; }
 
+            /// <summary>
+            /// Defines the implicit conversion of an <see cref="Effect"/> instance to an <see cref="OperableEffect"/>.
+            /// </summary>
+            /// <param name="effect">The <see cref="Effect"/> to convert.</param>
             public static implicit operator OperableEffect(Effect effect) => new(effect.Elements);
 
+            /// <summary>
+            /// Defines the implicit conversion of an <see cref="OperableEffect"/> instance to an <see cref="Effect"/>.
+            /// </summary>
+            /// <param name="effect">The <see cref="OperableEffect"/> to convert.</param>
             public static implicit operator Effect(OperableEffect effect) => new(effect.Elements);
 
+            /// <summary>
+            /// Defines the implicit conversion of an <see cref="OperableSentence"/> instance to an <see cref="OperableEffect"/>.
+            /// </summary>
+            /// <param name="sentence">The <see cref="Sentence"/> to convert.</param>
             public static implicit operator OperableEffect(OperableSentence sentence)
             {
                 var literals = new HashSet<Literal>();

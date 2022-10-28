@@ -221,8 +221,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             /// <inheritdoc />
             public StateSpaceNode To => new(graphLevel.PreviousLevel!, new Goal(Actions.SelectMany(a => a.Precondition.Elements)));
 
-            /// <inheritdoc />
-            //public override string ToString() => new PlanFormatter(problem.Domain).Format(Action);
+            /////// <inheritdoc />
+            ////public override string ToString() => new PlanFormatter(problem.Domain).Format(Action);
         }
     }
 }

@@ -27,8 +27,17 @@ namespace SCClassicalPlanning.Planning
     {
         private readonly Domain domain;
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="PlanFormatter"/> class.
+        /// </summary>
+        /// <param name="domain">The domain of the plans that will be formatted by this instance. Used to establish succinct output for individual actions.</param>
         public PlanFormatter(Domain domain) => this.domain = domain;
 
+        /// <summary>
+        /// Creates a human-readable string representation of a given plan.
+        /// </summary>
+        /// <param name="plan">The plan to format.</param>
+        /// <returns>A string representing the given plan. Each line of the output describes the next action in the plan.</returns>
         public string Format(Plan plan)
         {
             var builder = new StringBuilder();
@@ -41,6 +50,11 @@ namespace SCClassicalPlanning.Planning
             return builder.ToString();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
         public string Format(Action action)
         {
             VariableSubstitution substitution = DomainInspector.GetMappingFromSchema(domain, action);
