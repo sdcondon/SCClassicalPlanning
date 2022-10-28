@@ -23,7 +23,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     /// <para/>
     /// See section 10.2.2 of "Artificial Intelligence: A Modern Approach" for more on this.
     /// </summary>
-    public class BackwardStateSpaceSearch_WithoutKB : IPlanner
+    public class BackwardStateSpaceSearch_LiftedWithoutKB : IPlanner
     {
         private readonly IHeuristic heuristic;
         private readonly Func<Action, float> getActionCost;
@@ -32,7 +32,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the number of actions in the resulting plan.
         /// </summary>
         /// <param name="heuristic">The heuristic to use - the returned cost will be interpreted as the estimated number of actions that need to be performed.</param>
-        public BackwardStateSpaceSearch_WithoutKB(IHeuristic heuristic)
+        public BackwardStateSpaceSearch_LiftedWithoutKB(IHeuristic heuristic)
             : this(heuristic, a => 1f)
         {
         }
@@ -42,7 +42,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         /// </summary>
         /// <param name="heuristic">The heuristic to use - with the returned cost will be interpreted as the estimated total cost of the actions that need to be performed.</param>
         /// <param name="getActionCost">A delegate to retrieve the cost of an action.</param>
-        public BackwardStateSpaceSearch_WithoutKB(IHeuristic heuristic, Func<Action, float> getActionCost)
+        public BackwardStateSpaceSearch_LiftedWithoutKB(IHeuristic heuristic, Func<Action, float> getActionCost)
         {
             this.heuristic = heuristic;
             this.getActionCost = getActionCost;

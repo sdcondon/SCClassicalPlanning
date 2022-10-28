@@ -1,0 +1,18 @@
+﻿|                                          Method |     CurrentTestCase |           Mean |         Error |        StdDev |         Gen0 |       Gen1 |      Gen2 |     Allocated |
+|------------------------------------------------ |-------------------- |---------------:|--------------:|--------------:|-------------:|-----------:|----------:|--------------:|
+|                         ForwardStateSpaceSearch | Test(...)se } [239] |    27,517.1 us |     161.79 us |     143.42 us |    3531.2500 |    31.2500 |         - |    21645.9 KB |
+|                         ForwardStateSpaceSearch | Test(...)se } [239] |     4,265.1 us |      10.96 us |       9.15 us |     460.9375 |    70.3125 |         - |     2847.6 KB |
+|                         ForwardStateSpaceSearch | Test(...)se } [239] |       793.4 us |      13.08 us |      12.23 us |      67.3828 |     2.9297 |         - |     412.73 KB |
+|                         ForwardStateSpaceSearch | Test(...)se } [239] |    11,035.2 us |      59.76 us |      55.90 us |    1359.3750 |   296.8750 |         - |    8361.71 KB |
+|                        BackwardStateSpaceSearch | Test(...)se } [239] |   638,238.8 us |   5,221.19 us |   4,883.90 us |   90000.0000 |  1000.0000 |         - |  555577.09 KB |
+|                        BackwardStateSpaceSearch | Test(...)se } [239] |    45,213.1 us |     245.14 us |     229.31 us |    6083.3333 |   583.3333 |         - |   37716.26 KB |
+|                        BackwardStateSpaceSearch | Test(...)se } [239] |       985.5 us |       4.39 us |       4.11 us |      99.6094 |     5.8594 |         - |     616.81 KB |
+|                        BackwardStateSpaceSearch | Test(...)se } [239] | 7,446,573.4 us | 119,217.04 us | 111,515.69 us | 1005000.0000 | 32000.0000 | 3000.0000 |  6149526.1 KB |
+| BackwardStateSpaceSearch_PropositionalWithoutKB | Test(...)se } [239] |   656,070.7 us |  12,942.00 us |  16,828.26 us |   90000.0000 |  1000.0000 |         - |  555577.09 KB |
+| BackwardStateSpaceSearch_PropositionalWithoutKB | Test(...)se } [239] |    47,431.2 us |     585.07 us |     518.65 us |    6090.9091 |   636.3636 |         - |   37716.27 KB |
+| BackwardStateSpaceSearch_PropositionalWithoutKB | Test(...)se } [239] |     1,014.0 us |      11.42 us |      10.68 us |      99.6094 |     5.8594 |         - |     616.81 KB |
+| BackwardStateSpaceSearch_PropositionalWithoutKB | Test(...)se } [239] | 7,719,206.0 us |  45,935.04 us |  42,967.66 us | 1005000.0000 | 32000.0000 | 3000.0000 | 6149526.02 KB |
+|    BackwardStateSpaceSearch_PropositionalWithKB | Test(...)se } [239] |   895,539.8 us |  11,716.55 us |  10,959.67 us |  120000.0000 |  5000.0000 | 1000.0000 |   736919.7 KB |
+|    BackwardStateSpaceSearch_PropositionalWithKB | Test(...)se } [239] |    28,831.6 us |     401.93 us |     375.97 us |    5093.7500 |    31.2500 |         - |   31309.06 KB |
+|    BackwardStateSpaceSearch_PropositionalWithKB | Test(...)se } [239] |     1,346.8 us |       4.55 us |       3.80 us |     134.7656 |    41.0156 |         - |      830.3 KB |
+|    BackwardStateSpaceSearch_PropositionalWithKB | Test(...)se } [239] |   245,298.7 us |   1,510.08 us |   1,338.64 us |   55666.6667 |  1000.0000 |         - |  342304.27 KB |

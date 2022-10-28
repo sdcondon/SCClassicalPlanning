@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SCClassicalPlanning.Alternatives\SCClassicalPlanning.Alternatives.csproj" />
     <ProjectReference Include="..\SCClassicalPlanning.ExampleProblems\SCClassicalPlanning.ExampleDomains.csproj" />
     <ProjectReference Include="..\SCClassicalPlanning\SCClassicalPlanning.csproj" />
   </ItemGroup>

@@ -12,7 +12,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 {
     public static class BackwardStateSpaceSearchTests
     {
-        private record TestCase(Problem Problem, IHeuristic Heuristic);
+        private record TestCase(Problem Problem, IHeuristic Heuristic, IKnowledgeBase InvariantsKB);
 
         public static Test CreatedPlanValidity => TestThat
             .GivenTestContext()
@@ -20,27 +20,72 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 new(
                     Problem: AirCargo.ExampleProblem,
-                    Heuristic: MakeInvariantCheckingHeuristic(
-                        AirCargo.Domain,
-                        Array.Empty<Sentence>())),
+                    Heuristic: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
+                    InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
                 new(
                     Problem: BlocksWorld.ExampleProblem,
-                    Heuristic: MakeInvariantCheckingHeuristic(
-                        BlocksWorld.Domain,
-                        new Sentence[] { ForAll(A, B, If(On(A, B), !Clear(B))), })),
+                    Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    {
+                        // TODO: slicker support for unique names assumption worth looking into at some point.. 
+                        Block(new Constant("blockA")),
+                        Equal(new Constant("blockA"), new Constant("blockA")),
+                        !Equal(new Constant("blockA"), new Constant("blockB")),
+                        !Equal(new Constant("blockA"), new Constant("blockC")),
+                        Block(new Constant("blockB")),
+                        !Equal(new Constant("blockB"), new Constant("blockA")),
+                        Equal(new Constant("blockB"), new Constant("blockB")),
+                        !Equal(new Constant("blockB"), new Constant("blockC")),
+                        Block(new Constant("blockC")),
+                        !Equal(new Constant("blockC"), new Constant("blockA")),
+                        !Equal(new Constant("blockC"), new Constant("blockB")),
+                        Equal(new Constant("blockC"), new Constant("blockC")),
+                        ForAll(A, B, If(On(A, B), !Clear(B))),
+                    })),
 
                 new(
                     Problem: SpareTire.ExampleProblem,
-                    Heuristic: MakeInvariantCheckingHeuristic(
-                        SpareTire.Domain,
-                        Array.Empty<Sentence>())),
+                    Heuristic: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
+                    InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
                 new(
                     Problem: BlocksWorld.LargeExampleProblem,
-                    Heuristic: MakeInvariantCheckingHeuristic(
-                        BlocksWorld.Domain,
-                        new Sentence[] { ForAll(A, B, If(On(A, B), !Clear(B))), })),
+                    Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    {
+                        Block(new Constant("blockA")),
+                        Equal(new Constant("blockA"), new Constant("blockA")),
+                        !Equal(new Constant("blockA"), new Constant("blockB")),
+                        !Equal(new Constant("blockA"), new Constant("blockC")),
+                        !Equal(new Constant("blockA"), new Constant("blockD")),
+                        !Equal(new Constant("blockA"), new Constant("blockE")),
+                        Block(new Constant("blockB")),
+                        !Equal(new Constant("blockB"), new Constant("blockA")),
+                        Equal(new Constant("blockB"), new Constant("blockB")),
+                        !Equal(new Constant("blockB"), new Constant("blockC")),
+                        !Equal(new Constant("blockB"), new Constant("blockD")),
+                        !Equal(new Constant("blockB"), new Constant("blockE")),
+                        Block(new Constant("blockC")),
+                        !Equal(new Constant("blockC"), new Constant("blockA")),
+                        !Equal(new Constant("blockC"), new Constant("blockB")),
+                        Equal(new Constant("blockC"), new Constant("blockC")),
+                        !Equal(new Constant("blockC"), new Constant("blockD")),
+                        !Equal(new Constant("blockC"), new Constant("blockE")),
+                        Block(new Constant("blockD")),
+                        !Equal(new Constant("blockD"), new Constant("blockA")),
+                        !Equal(new Constant("blockD"), new Constant("blockB")),
+                        !Equal(new Constant("blockD"), new Constant("blockC")),
+                        Equal(new Constant("blockD"), new Constant("blockD")),
+                        !Equal(new Constant("blockD"), new Constant("blockE")),
+                        Block(new Constant("blockE")),
+                        !Equal(new Constant("blockE"), new Constant("blockA")),
+                        !Equal(new Constant("blockE"), new Constant("blockB")),
+                        !Equal(new Constant("blockE"), new Constant("blockC")),
+                        !Equal(new Constant("blockE"), new Constant("blockD")),
+                        Equal(new Constant("blockE"), new Constant("blockE")),
+                        ForAll(A, B, If(On(A, B), !Clear(B))),
+                    })),
             })
             .When((_, tc) =>
             {
@@ -51,7 +96,91 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .And((_, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
             .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
 
-        private static IHeuristic MakeInvariantCheckingHeuristic(Domain domain, IEnumerable<Sentence> invariants)
+        public static Test CreatedPlanValidity_AlternativeImplementations => TestThat
+            .GivenTestContext()
+            .AndEachOf(() => new Func<IHeuristic, IPlanner>[]
+            {
+                // h => new BackwardStateSpaceSearch_LiftedWithoutKB(h), // too slow to be workable
+                h => new BackwardStateSpaceSearch_PropositionalWithoutKB(h),
+                h => new BackwardStateSpaceSearch_PropositionalWithKB(h), // Why is this so slow - it should be faster? Interrogable planning processes will help diagnose. 
+            })
+            .AndEachOf(() => new TestCase[]
+            {
+                new(
+                    Problem: AirCargo.ExampleProblem,
+                    Heuristic: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
+                    InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
+
+                new(
+                    Problem: BlocksWorld.ExampleProblem,
+                    Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    {
+                        // TODO: slicker support for unique names assumption worth looking into at some point.. 
+                        Block(new Constant("blockA")),
+                        Equal(new Constant("blockA"), new Constant("blockA")),
+                        !Equal(new Constant("blockA"), new Constant("blockB")),
+                        !Equal(new Constant("blockA"), new Constant("blockC")),
+                        Block(new Constant("blockB")),
+                        !Equal(new Constant("blockB"), new Constant("blockA")),
+                        Equal(new Constant("blockB"), new Constant("blockB")),
+                        !Equal(new Constant("blockB"), new Constant("blockC")),
+                        Block(new Constant("blockC")),
+                        !Equal(new Constant("blockC"), new Constant("blockA")),
+                        !Equal(new Constant("blockC"), new Constant("blockB")),
+                        Equal(new Constant("blockC"), new Constant("blockC")),
+                        ForAll(A, B, If(On(A, B), !Clear(B))),
+                    })),
+
+                new(
+                    Problem: SpareTire.ExampleProblem,
+                    Heuristic: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
+                    InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
+
+                new(
+                    Problem: BlocksWorld.LargeExampleProblem,
+                    Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    {
+                        Block(new Constant("blockA")),
+                        Equal(new Constant("blockA"), new Constant("blockA")),
+                        !Equal(new Constant("blockA"), new Constant("blockB")),
+                        !Equal(new Constant("blockA"), new Constant("blockC")),
+                        !Equal(new Constant("blockA"), new Constant("blockD")),
+                        !Equal(new Constant("blockA"), new Constant("blockE")),
+                        Block(new Constant("blockB")),
+                        !Equal(new Constant("blockB"), new Constant("blockA")),
+                        Equal(new Constant("blockB"), new Constant("blockB")),
+                        !Equal(new Constant("blockB"), new Constant("blockC")),
+                        !Equal(new Constant("blockB"), new Constant("blockD")),
+                        !Equal(new Constant("blockB"), new Constant("blockE")),
+                        Block(new Constant("blockC")),
+                        !Equal(new Constant("blockC"), new Constant("blockA")),
+                        !Equal(new Constant("blockC"), new Constant("blockB")),
+                        Equal(new Constant("blockC"), new Constant("blockC")),
+                        !Equal(new Constant("blockC"), new Constant("blockD")),
+                        !Equal(new Constant("blockC"), new Constant("blockE")),
+                        Block(new Constant("blockD")),
+                        !Equal(new Constant("blockD"), new Constant("blockA")),
+                        !Equal(new Constant("blockD"), new Constant("blockB")),
+                        !Equal(new Constant("blockD"), new Constant("blockC")),
+                        Equal(new Constant("blockD"), new Constant("blockD")),
+                        !Equal(new Constant("blockD"), new Constant("blockE")),
+                        Block(new Constant("blockE")),
+                        !Equal(new Constant("blockE"), new Constant("blockA")),
+                        !Equal(new Constant("blockE"), new Constant("blockB")),
+                        !Equal(new Constant("blockE"), new Constant("blockC")),
+                        !Equal(new Constant("blockE"), new Constant("blockD")),
+                        Equal(new Constant("blockE"), new Constant("blockE")),
+                        ForAll(A, B, If(On(A, B), !Clear(B))),
+                    })),
+            })
+            .When((_, makePlanner, tc) => makePlanner(tc.Heuristic).CreatePlanAsync(tc.Problem).GetAwaiter().GetResult())
+            .ThenReturns()
+            .And((_, _, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
+            .And((cxt, _, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
+
+        private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)
         {
             var invariantKb = new SimpleResolutionKnowledgeBase(
                 new SimpleClauseStore(),
@@ -59,9 +188,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 SimpleResolutionKnowledgeBase.PriorityComparisons.UnitPreference);
             invariantKb.Tell(invariants);
 
-            var innerHeuristic = new IgnorePreconditionsGreedySetCover(domain);
-
-            return new GoalInvariantCheck(invariantKb, innerHeuristic);
+            return invariantKb;
         }
     }
 }
