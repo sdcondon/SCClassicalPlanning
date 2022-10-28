@@ -15,16 +15,21 @@ namespace SCClassicalPlanning.Benchmarks.Planning
     [InProcess]
     public class PlannerBenchmarks
     {
-        public record TestCase(Problem Problem, IHeuristic Heuristic, IKnowledgeBase InvariantsKB);
+        public record TestCase(string Label, Problem Problem, IHeuristic Heuristic, IKnowledgeBase InvariantsKB)
+        {
+            public override string ToString() => Label;
+        }
 
         public static IEnumerable<TestCase> TestCases { get; } = new TestCase[]
         {
             new(
+                Label: "Air Cargo",
                 Problem: AirCargo.ExampleProblem,
                 Heuristic: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
                 InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
             new(
+                Label: "Blocks - Small",
                 Problem: BlocksWorld.ExampleProblem,
                 Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
                 InvariantsKB: MakeInvariantsKB(new Sentence[]
@@ -46,11 +51,13 @@ namespace SCClassicalPlanning.Benchmarks.Planning
                 })),
 
             new(
+                Label: "Spare Tire",
                 Problem: SpareTire.ExampleProblem,
                 Heuristic: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
                 InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
             new(
+                Label: "Blocks - Large",
                 Problem: BlocksWorld.LargeExampleProblem,
                 Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
                 InvariantsKB: MakeInvariantsKB(new Sentence[]
@@ -118,6 +125,7 @@ namespace SCClassicalPlanning.Benchmarks.Planning
 
         private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)
         {
+            // TODO: our KBs are all definite clauses - forward chaining doable and almost certainly quicker
             var invariantKb = new SimpleResolutionKnowledgeBase(
                 new SimpleClauseStore(),
                 SimpleResolutionKnowledgeBase.Filters.None,
