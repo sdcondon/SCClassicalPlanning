@@ -1,4 +1,4 @@
-![SCClassicalPlanning Icon](src/SCClassicalPlanning.png)
+![SCClassicalPlanning Icon](src/SCClassicalPlanning-128.png)
 
 # SCClassicalPlanning
 
