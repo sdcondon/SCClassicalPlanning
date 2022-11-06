@@ -17,13 +17,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		..\.gitignore = ..\.gitignore
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
-		..\README.md = ..\README.md
 		..\LICENSE.txt = ..\LICENSE.txt
+		..\README.md = ..\README.md
 		SCClassicalPlanning.pdn = SCClassicalPlanning.pdn
-		SCClassicalPlanning.png = SCClassicalPlanning.png
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanning.Alternatives", "SCClassicalPlanning.Alternatives\SCClassicalPlanning.Alternatives.csproj", "{5D3255D0-A98D-4244-A5AC-3B32D15421A6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SCClassicalPlanning.Documentation", "SCClassicalPlanning.Documentation\SCClassicalPlanning.Documentation.csproj", "{99FBC8B3-44A7-45B6-B225-0ADA63A44525}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +52,10 @@ Global
 		{5D3255D0-A98D-4244-A5AC-3B32D15421A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D3255D0-A98D-4244-A5AC-3B32D15421A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D3255D0-A98D-4244-A5AC-3B32D15421A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99FBC8B3-44A7-45B6-B225-0ADA63A44525}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99FBC8B3-44A7-45B6-B225-0ADA63A44525}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99FBC8B3-44A7-45B6-B225-0ADA63A44525}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99FBC8B3-44A7-45B6-B225-0ADA63A44525}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

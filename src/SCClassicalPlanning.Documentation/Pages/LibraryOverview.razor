@@ -1,0 +1,29 @@
+﻿@page "/library-overview"
+
+<PageTitle>Library Overview</PageTitle>
+
+<h1>Library Overview</h1>
+
+<p>Here is a quick overview of the namespaces found within this library. Reading this should give you some helpful context for diving a little deeper:</p>
+
+<ul>
+  <li>
+    <b><code>SCClassicalPlanning</code></b>: the root namespace contains classes representing individual elements of planning problems (problems, domains, states, actions, goals and effects).
+    <ul>
+      <li>
+        <b><code>Planning</code></b>: intended as the top-level namespace for actual planning algorithms. Directly contains <code>IPlanner</code>, an interface for types capable of creating plans to solve problems.
+        <ul>
+          <li><b><code>GraphPlan</code></b>: Contains an implementation of <code>IPlanner</code> that uses the GraphPlan algorithm - as well as some supporting types.</li>
+          <li>
+            <b><code>StateSpaceSearch</code></b>: contains <code>IPlanner</code> implementations that use very simple forms of forward and backward state space search.
+            <ul>
+              <li><b><code>Heuristics</code></b>: contains heuristic implementations for use by state space search planners.</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><b><code>ProblemCreation</code></b>: contains types that assist with the creation of problems and their constituent elements.</li>
+      <li><b><code>ProblemManipulation</code></b>: contains types to assist with the manipulation of problems and their consituent elements.</li>
+    </ul>
+  </li>
+</ul>

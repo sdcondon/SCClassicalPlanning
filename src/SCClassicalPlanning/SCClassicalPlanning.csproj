@@ -12,7 +12,7 @@
     <Product>SCClassicalPlanning</Product>
     <PackageId>SCClassicalPlanning</PackageId>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>SCClassicalPlanning.png</PackageIcon>
+    <PackageIcon>SCClassicalPlanning-128.png</PackageIcon>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
    
@@ -25,7 +25,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SCFirstOrderLogic" Version="3.0.0-pre.2" />
+    <PackageReference Include="SCFirstOrderLogic" Version="3.0.0-pre.3" />
     <PackageReference Include="SCGraphTheory.Search" Version="2.5.0" />
   </ItemGroup>
 
@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\SCClassicalPlanning.png" Pack="true" PackagePath="\" Link="_PackageContent\SCClassicalPlanning.png" />
+    <None Include="..\SCClassicalPlanning-128.png" Pack="true" PackagePath="\" Link="_PackageContent\SCClassicalPlanning-128.png" />
     <None Update="_PackageContent\SCClassicalPlanning.md" Pack="true" PackagePath="README.md" />
   </ItemGroup>
 
