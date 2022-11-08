@@ -2,25 +2,4 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Home</h1>
-
-<p>Basic but fully functional and documented <a href="https://www.google.com/search?q=classical+planning">classical planning</a> implementations.
-  Somewhat influenced by chapter 10 of <em>Artificial Intelligence: A Modern Approach (3rd Edition - <a href="https://www.google.com/search?q=isbn+978-1292153964">ISBN 978-1292153964</a>)</em>.
-Intended first and foremost to assist with learning and experimentation, but will (by the time v1 arrives) include extension points (and async support) so that it is at least conceivable that it could be (extended to be) useful in a production scenario.
-Includes:</p>
-
-<ul>
-    <li>A model for planning problems that consists of <a href="https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/Problem.cs">Problem</a>, <a href="https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/Domain.cs">Domain</a>, <a href="https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/State.cs">State</a>, <a href="https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/Goal.cs">Goal</a>, <a href="https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/Action.cs">Action</a>, and <a href="https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/Effect.cs">Effect</a>.
-    Note that while this is a significantly smaller model than that capable of being expressed with even the earliest versions of <a href="https://en.wikipedia.org/wiki/Planning_Domain_Definition_Language">PDDL</a>, it does go further than chapter 10 of AIaMA  - partly out of necessity (to create a coherent set of functionality), and partly to (partially!) "bridge the gap" between the rough ideas in this chapter and real, production-ready planners.</li>
-    <li>A few basic planner implementations. One that uses forward state space search, one that uses backward state space search, and one that uses graphplan (NB: GraphPlan not there just yet - will appear prior to v1).</li>
-</ul>
-
-<p>As mentioned above, the main goal here is for it to be a resource for learning and experimentation.
-As such, care has been taken to include good type and member documentation, as well as <a href="https://learn.microsoft.com/en-us/dotnet/standard/library-guidance/sourcelink">Source Link</a> to allow for debugging - and explanatory inline comments in the source code where appropriate.</p>
-
-<p>The recommended initial learning path is as follows:</p>
-
-<ol>
-<li><b><a href="library-overview">Library Overview</a>:</b> This is the recommended first stop. Provides a quick overview of the library - useful context for diving a little deeper</li>
-<li><b><a href="getting-started">Getting Started</a>:</b> Guidance for writing your first code that consumes this library</li>
-</ol>
+<Markdown MarkdownUri="md/index.md"></Markdown>

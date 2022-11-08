@@ -1,59 +1,6 @@
 ﻿@page "/roadmap"
+@page "/roadmap.md"
 
 <PageTitle>Roadmap</PageTitle>
 
-<h1>Roadmap</h1>
-
-<h2>Vision</h2>
-
-<p>As mentioned in the package overview, the main goal here is learning and experimentation - both for myself and others.
-I certainly understand that there's a fallacy here (we learn by doing - so the fact that I've learned by doing this doesn't mean that others will learn by consuming it), but I would hope that others will find it interesting, even if not useful.</p>
-
-<p>There is a secondary goal of providing a starting point for extension to something properly useful - hence the attention that I'll pay to finding useful abstractions before we hit v1.
-There is of course potential for this to conflict with the main goal - by abstracting, we add complexity, which can make things harder to learn. I'll try my best to strike a good compromise when it happens.</p>
-
-<h2>Pre-V1</h2>
-
-<p>Stuff I want to do before ticking the major version number to 1:</p>
-
-<ul>
-  <li>
-    Forward search 'works':
-    <ul>
-      <li>the tests pass in a timely fashion with the example domains.</li>
-    </ul>
-  </li>
-  <li>
-    Backward search 'works':
-    <ul>
-      <li>The tests pass in a timely fashion with the example domains.</li>
-      <li>Backward search can work with goals with variables in them.</li>
-    </ul>
-  </li>
-  <li>
-    We have simple implementations of state space search heuristics:
-    <ul>
-      <li>one that could be described as using "ignore preconditions"</li>
-      <li>one that could be described as using "ignore delete lists"</li>
-      <li>perhaps some others</li>
-    </ul>
-  </li>
-  <li>We have a simple PlanningGraph implementation</li>
-  <li>We have a simple GraphPlan implementation</li>
-  <li>
-    I've at least considered all of the existing TODOs.
-    <ul>
-      <li>Most notably the ones around State abstraction and state indexing - so its at least conceivable that someone could extend it to be workable with large (secondary-storage requiring) problems.</li>
-      <li>Also want to allow planners to open up the planning process. E.g. allowing consumers to see the search in state space searching, and the planning graph in graphplan. Perhaps even allow for them to be created step-by-step. Yes this is overhead, but given the purpose of the lib.. Likely accomplished by having IPlanner return a PlanningTask rather than a Task</li>
-    </ul>
-  </li>
-</ul>
-
-<h2>Post-V1</h2>
-
-<p>Honestly not sure - might call it 'done' at that point, might continue playing with it.
-Will certainly be willing to talk to any interested parties about it. Time will tell.</p>
-
-<ul>
-    <li>Strong naming and package signing: only if it becomes popular or people ask for it. Certificates cost money..</li>
-</ul>
+<Markdown MarkdownUri="md/roadmap.md"></Markdown>
