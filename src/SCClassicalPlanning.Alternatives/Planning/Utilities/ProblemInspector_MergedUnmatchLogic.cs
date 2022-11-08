@@ -2,7 +2,7 @@
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
 
-namespace SCClassicalPlanning.Planning
+namespace SCClassicalPlanning.Alternatives.Planning.Utilities
 {
     /// <summary>
     /// Just includes a version of ProblemInspector.GetRelevantActionSchemas that attempts to be more efficient,

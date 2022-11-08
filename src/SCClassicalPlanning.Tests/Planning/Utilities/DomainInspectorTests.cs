@@ -8,7 +8,7 @@ using static SCClassicalPlanning.ExampleDomains.Container;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
-namespace SCClassicalPlanning.Planning
+namespace SCClassicalPlanning.Planning.Utilities
 {
     public static class DomainInspectorTests
     {

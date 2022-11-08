@@ -16,7 +16,7 @@ using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
 
-namespace SCClassicalPlanning.Planning
+namespace SCClassicalPlanning.Planning.Utilities
 {
     /// <summary>
     /// Various problem inspection methods, useful to planners.

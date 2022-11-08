@@ -4,7 +4,7 @@ using SCClassicalPlanning.ExampleDomains;
 using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.Container;
 
-namespace SCClassicalPlanning.Planning
+namespace SCClassicalPlanning.Planning.Utilities
 {
     public static class ProblemInspectorTests
     {

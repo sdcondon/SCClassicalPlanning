@@ -17,7 +17,7 @@ using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
 using System.Diagnostics.CodeAnalysis;
 
-namespace SCClassicalPlanning.Planning
+namespace SCClassicalPlanning.Planning.Utilities
 {
     /// <summary>
     /// Various domain inspection methods, useful to planners.
@@ -100,7 +100,7 @@ namespace SCClassicalPlanning.Planning
         public static IEnumerable<(Action schema, VariableSubstitution substitution, Goal constraints)> GetRelevantActionDetails(Domain domain, Goal goal)
         {
             // Local method to find any constraints that apply to a given substitution for none of the goals elements to be negated.
-            bool TryGetConstraints(IEnumerable<Literal> effectElements, VariableSubstitution substitution, [MaybeNullWhen(false)]out Goal constraints)
+            bool TryGetConstraints(IEnumerable<Literal> effectElements, VariableSubstitution substitution, [MaybeNullWhen(false)] out Goal constraints)
             {
                 List<Literal> constraintElements = new();
 
