@@ -20,10 +20,8 @@ namespace SCClassicalPlanning
     /// <summary>
     /// Container for information about an effect - some change in the state of a system.
     /// <para/>
-    /// <see cref="Effect"/>s are essentially a set of (functionless) <see cref="Literal"/>s. The positive ones indicates predicates that are added to a
+    /// <see cref="Effect"/>s are essentially a set of <see cref="Literal"/>s. The positive ones indicates predicates that are added to a
     /// state by the effect's application. The negative ones indicate predicates that are removed. Effects are applied as the result of <see cref="Action"/>s.
-    /// <para/>
-    /// NB: doesn't actually validate that its elements are functionless - because the right place to do that is in the planning algorithms.
     /// </summary>
     public class Effect
     {

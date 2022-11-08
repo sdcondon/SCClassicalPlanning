@@ -20,11 +20,9 @@ namespace SCClassicalPlanning
     /// <summary>
     /// Container for information about a goal.
     /// <para/>
-    /// A <see cref="Goal"/> is essentially just a set of (functionless) <see cref="Literal"/>s. The positive ones indicate predicates that must exist in a <see cref="State"/> for it 
+    /// A <see cref="Goal"/> is essentially just a set of <see cref="Literal"/>s. The positive ones indicate predicates that must exist in a <see cref="State"/> for it 
     /// to satisfy the goal. The negative ones indicate predicates that must NOT exist in a state for it to satisfy the goal. Goals are used to describe the end goal of <see cref="Problem"/>
     /// instances, as well as the precondition of <see cref="Action"/> instances.
-    /// <para/>
-    /// NB: doesn't actually validate that its elements are functionless - because the right place to do that is in the planning algorithms.
     /// </summary>
     public class Goal
     {

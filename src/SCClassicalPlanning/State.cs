@@ -21,11 +21,11 @@ namespace SCClassicalPlanning
     /// <summary>
     /// Container for information about a state.
     /// <para/>
-    /// A state is essentially just a set of ground (i.e. variable-free), functionless <see cref="Predicate"/>s. State instances occur as the initial state of <see cref="Problem"/>
+    /// A state is essentially just a set of ground (i.e. variable-free) <see cref="Predicate"/>s. State instances occur as the initial state of <see cref="Problem"/>
     /// instances - and are also used by some planning algorithms to track intermediate states while looking for a solution to a problem.
     /// <para/>
-    /// TODO: probably should add some verification in ctor that all elements are ground and functionless. Or.. not - don't want to sap performane by validating on
-    /// every step in plan creation.. Best of both worlds would be nice.
+    /// TODO: probably should add some verification in ctor that all elements are ground. Or.. not - don't want to sap performance by validating on
+    /// every step in plan creation.. Best of both worlds would be nice (internal vs public..?).
     /// </summary>
     public class State
     {
