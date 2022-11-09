@@ -16,8 +16,11 @@ namespace SCClassicalPlanning.Planning.Utilities
         /// <summary>
         /// Initialises a new instance of the <see cref="InvariantInspector"/> class.
         /// </summary>
-        /// <param name="knowledgeBase">A knowledge base that has been told all of the invariants.</param>
-        public InvariantInspector(IKnowledgeBase knowledgeBase) => invariantsKB = knowledgeBase;
+        /// <param name="knowledgeBase">A knowledge base that contains all of the invariants.</param>
+        public InvariantInspector(IKnowledgeBase knowledgeBase)
+        {
+            invariantsKB = knowledgeBase ?? throw new ArgumentNullException(nameof(knowledgeBase));
+        }
 
         /// <summary>
         /// Gets a value indicating whether the invariants mean that a given goal is impossible to achieve.
@@ -27,11 +30,6 @@ namespace SCClassicalPlanning.Planning.Utilities
         /// <returns>A (task that returns a) value indicating whether the invariants mean that the given goal is impossible to achieve.</returns>
         public async Task<bool> IsGoalPrecludedByInvariantsAsync(Goal goal, CancellationToken cancellationToken = default)
         {
-            if (invariantsKB == null)
-            {
-                return false;
-            }
-
             if (!isPrecludedGoalResultCache.TryGetValue(goal, out bool isPrecludedGoal))
             {
                 if (goal.Elements.Count > 0)
@@ -81,11 +79,6 @@ namespace SCClassicalPlanning.Planning.Utilities
         /// <returns>A (task that returns a) goal with all of the trivial elements removed.</returns>
         public async Task<Goal> RemoveTrivialElementsAsync(Goal goal, CancellationToken cancellationToken = default)
         {
-            if (invariantsKB == null)
-            {
-                return goal;
-            }
-
             var modified = false;
             var remainingElements = goal.Elements;
 

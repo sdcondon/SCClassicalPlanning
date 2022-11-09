@@ -28,7 +28,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     public class BackwardStateSpaceSearch_PropositionalWithKB : IPlanner
     {
         private readonly IHeuristic heuristic;
-        private readonly InvariantInspector invariantInspector;
+        private readonly InvariantInspector? invariantInspector;
         private readonly Func<Action, float> getActionCost;
         
         /// <summary>
@@ -49,7 +49,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         {
             this.heuristic = heuristic;
             this.getActionCost = getActionCost;
-            this.invariantInspector = new InvariantInspector(invariantsKB);
+            this.invariantInspector = invariantsKB != null ? new InvariantInspector(invariantsKB) : null;
         }
 
         /// <inheritdoc />
@@ -90,7 +90,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         }
 
         // mostly just to keep the structs small at this point
-        private record PlanningTask(Problem Problem, InvariantInspector InvariantInspector);
+        private record PlanningTask(Problem Problem, InvariantInspector? InvariantInspector);
 
         private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
         {
@@ -135,17 +135,24 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 foreach (var action in ProblemInspector.GetRelevantActions(planningTask.Problem, goal))
                 {
-                    var effectiveAction = action;
-
-                    var nonTrivialPreconditions = planningTask.InvariantInspector.RemoveTrivialElements(action.Precondition);
-                    if (nonTrivialPreconditions != action.Precondition)
+                    if (planningTask.InvariantInspector != null)
                     {
-                        effectiveAction = new(action.Identifier, nonTrivialPreconditions, action.Effect);
+                        var effectiveAction = action;
+
+                        var nonTrivialPreconditions = planningTask.InvariantInspector.RemoveTrivialElements(action.Precondition);
+                        if (nonTrivialPreconditions != action.Precondition)
+                        {
+                            effectiveAction = new(action.Identifier, nonTrivialPreconditions, action.Effect);
+                        }
+
+                        if (!planningTask.InvariantInspector.IsGoalPrecludedByInvariants(effectiveAction.Regress(goal)))
+                        {
+                            yield return new StateSpaceEdge(planningTask, goal, effectiveAction);
+                        }
                     }
-
-                    if (!planningTask.InvariantInspector.IsGoalPrecludedByInvariants(effectiveAction.Regress(goal)))
+                    else
                     {
-                        yield return new StateSpaceEdge(planningTask, goal, effectiveAction);
+                        yield return new StateSpaceEdge(planningTask, goal, action);
                     }
                 }
             }
