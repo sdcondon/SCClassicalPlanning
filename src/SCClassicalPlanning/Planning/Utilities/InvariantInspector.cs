@@ -10,7 +10,7 @@ namespace SCClassicalPlanning.Planning.Utilities
     public class InvariantInspector
     {
         private readonly IKnowledgeBase invariantsKB;
-        private readonly Dictionary<Goal, bool> isPrecludedGoalResultCache = new();
+        private readonly Dictionary<Goal, bool> isPrecludedGoalResultCache = new() { [Goal.Empty] = false };
         private readonly Dictionary<Literal, bool> isTrivialElementResultCache = new();
 
         /// <summary>
@@ -32,29 +32,22 @@ namespace SCClassicalPlanning.Planning.Utilities
         {
             if (!isPrecludedGoalResultCache.TryGetValue(goal, out bool isPrecludedGoal))
             {
-                if (goal.Elements.Count > 0)
+                var variables = new HashSet<VariableDeclaration>();
+                GoalVariableFinder.Instance.Visit(goal, variables);
+
+                // TODO-SCFIRSTORDERLOGIC-MAYBE: Annoying performance hit - goals are essentially already in CNF, but our knowledge bases want to do the conversion themselves.. Meh, never mind.
+                // TODO: Perhaps a ToSentence in Goal? (and others..)
+                var goalSentence = goal.Elements.Skip(1).Aggregate(goal.Elements.First().ToSentence(), (c, e) => new Conjunction(c, e.ToSentence()));
+
+                foreach (var variable in variables)
                 {
-                    var variables = new HashSet<VariableDeclaration>();
-                    GoalVariableFinder.Instance.Visit(goal, variables);
-
-                    // TODO-SCFIRSTORDERLOGIC-MAYBE: Annoying performance hit - goals are essentially already in CNF, but our knowledge bases want to do the conversion themselves.. Meh, never mind.
-                    // TODO: Perhaps a ToSentence in Goal? (and others..)
-                    var goalSentence = goal.Elements.Skip(1).Aggregate(goal.Elements.First().ToSentence(), (c, e) => new Conjunction(c, e.ToSentence()));
-
-                    foreach (var variable in variables)
-                    {
-                        goalSentence = new ExistentialQuantification(variable, goalSentence);
-                    }
-
-                    // Note the negation here. We're not asking if the invariants mean that the goal MUST
-                    // be true (that will of course generally not be the case!), we're asking if the goal
-                    // CANNOT be true - that is, if its NEGATION must be true.
-                    isPrecludedGoal = isPrecludedGoalResultCache[goal] = await invariantsKB.AskAsync(new Negation(goalSentence), cancellationToken);
+                    goalSentence = new ExistentialQuantification(variable, goalSentence);
                 }
-                else
-                {
-                    isPrecludedGoal = isPrecludedGoalResultCache[goal] = false;
-                }
+
+                // Note the negation here. We're not asking if the invariants mean that the goal MUST
+                // be true (that will of course generally not be the case!), we're asking if the goal
+                // CANNOT be true - that is, if its NEGATION must be true.
+                isPrecludedGoal = isPrecludedGoalResultCache[goal] = await invariantsKB.AskAsync(new Negation(goalSentence), cancellationToken);
             }
 
             return isPrecludedGoal;
