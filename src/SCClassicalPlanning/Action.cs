@@ -43,7 +43,7 @@ namespace SCClassicalPlanning
 
         /// <summary>
         /// Gets the effect of the action.
-        /// This is what is applied to a state when the action is applied.
+        /// This is the change that is made to a state when the action is applied.
         /// </summary>
         public Effect Effect { get; }
 

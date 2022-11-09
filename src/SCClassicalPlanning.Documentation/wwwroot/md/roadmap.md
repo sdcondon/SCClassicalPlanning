@@ -1,7 +1,7 @@
 ﻿# Roadmap
 
-As mentioned in the package overview, the main goal here is learning and experimentation - both for myself and others.
-I certainly understand that there's a fallacy here (we learn by doing - so the fact that I've learned by doing this doesn't mean that others will learn by consuming it), but I would hope that others will find it interesting, even if not useful.
+As mentioned in the package overview, the main goal here is learning and experimentation.
+As such, I will likely consider it "done" when I feel that this goal is met - when it becomes a substantial enough resource for people who are learning classical planning.
 
 There is a secondary goal of providing a starting point for extension to something properly useful - hence the attention that I'll pay to finding useful abstractions before we hit v1.
 There is of course potential for this to conflict with the main goal - by abstracting, we add complexity, which can make things harder to learn. I'll try my best to strike a good compromise when it happens.
