@@ -84,8 +84,8 @@ namespace SCClassicalPlanning.ProblemManipulation
         {
             return term switch
             {
-                Constant constant => ApplyTo(constant),
                 VariableReference variable => ApplyTo(variable),
+                Constant constant => ApplyTo(constant),
                 Function function => ApplyTo(function),
                 _ => throw new ArgumentException($"Unsupported Term type '{term.GetType()}'", nameof(term))
             };
@@ -95,7 +95,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// Applies this transformation to a <see cref="Constant"/> instance.
         /// The default implementation simply returns the constant unchanged.
         /// </summary>
-        /// <param name="constant">The constant to visit.</param>
+        /// <param name="constant">The constant to transform.</param>
         /// <returns>The transformed term.</returns>
         public virtual Term ApplyTo(Constant constant)
         {
@@ -103,10 +103,28 @@ namespace SCClassicalPlanning.ProblemManipulation
         }
 
         /// <summary>
+        /// Applies this transformation to a <see cref="Function"/> instance.
+        /// The default implementation returns a <see cref="Function"/> with the same Symbol and with an argument list that is the result of calling <see cref="ApplyTo(Term)"/> on each of the existing arguments.
+        /// </summary>
+        /// <param name="function">The function to transform.</param>
+        /// <returns>The transformed term.</returns>
+        public virtual Term ApplyTo(Function function)
+        {
+            var arguments = function.Arguments.Select(a => ApplyTo(a)).ToList();
+
+            if (arguments.Zip(function.Arguments, (x, y) => (x, y)).Any(t => t.x != t.y))
+            {
+                return new Function(function.Symbol, arguments);
+            }
+
+            return function;
+        }
+
+        /// <summary>
         /// Applies this transformation to a <see cref="VariableReference"/> instance.
         /// The default implementation returns a <see cref="VariableReference"/> referring to the variable that is the result of calling <see cref="ApplyTo(VariableDeclaration)"/> on the current declaration.
         /// </summary>
-        /// <param name="variable">The variable to visit.</param>
+        /// <param name="variable">The variable reference to transform.</param>
         /// <returns>The transformed term.</returns>
         public virtual Term ApplyTo(VariableReference variable)
         {

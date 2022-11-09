@@ -25,7 +25,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// <para/>
         /// The default implementation returns a <see cref="Action"/> with the same identifier, and with a goal and effect that is the result of applying the transformation to the action's goal and effect respectively.
         /// </summary>
-        /// <param name="action">The action to visit.</param>
+        /// <param name="action">The action to transform.</param>
         /// <returns>The transformed <see cref="Action"/>.</returns>
         public virtual Action ApplyTo(Action action)
         {
@@ -45,7 +45,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// <para/>
         /// The default implementation returns a <see cref="Goal"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
         /// </summary>
-        /// <param name="goal">The sentence to visit.</param>
+        /// <param name="goal">The goal to transform.</param>
         /// <returns>The transformed <see cref="Goal"/>.</returns>
         public virtual Goal ApplyTo(Goal goal)
         {
@@ -82,8 +82,8 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// Applies this transformation to a <see cref="Literal"/> instance. 
         /// The default implementation returns a <see cref="Literal"/> with the same positivity as the existing literal and a predicate that it the result of calling <see cref="ApplyTo(Predicate)"/> on the existing predicate.
         /// </summary>
-        /// <param name="literal">The <see cref="Literal"/> instance to visit.</param>
-        /// <returns>The transformed predicate.</returns>
+        /// <param name="literal">The <see cref="Literal"/> instance to transform.</param>
+        /// <returns>The transformed literal.</returns>
         public virtual Literal ApplyTo(Literal literal)
         {
             var predicate = ApplyTo(literal.Predicate);
@@ -99,7 +99,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// Applies this transformation to a <see cref="Predicate"/> instance. 
         /// The default implementation returns a <see cref="Predicate"/> with the same Symbol and with an argument list that is the result of calling <see cref="ApplyTo(Term)"/> on all of the existing arguments.
         /// </summary>
-        /// <param name="predicate">The <see cref="Predicate"/> instance to visit.</param>
+        /// <param name="predicate">The <see cref="Predicate"/> instance to transform.</param>
         /// <returns>The transformed predicate.</returns>
         public virtual Predicate ApplyTo(Predicate predicate)
         {
@@ -123,29 +123,18 @@ namespace SCClassicalPlanning.ProblemManipulation
         {
             return term switch
             {
-                Constant constant => ApplyTo(constant),
                 VariableReference variable => ApplyTo(variable),
+                Constant constant => ApplyTo(constant),
                 Function function => ApplyTo(function),
                 _ => throw new ArgumentException($"Unsupported Term type '{term.GetType()}'", nameof(term))
             };
         }
 
         /// <summary>
-        /// Applies this transformation to a <see cref="Constant"/> instance.
-        /// The default implementation simply returns the constant unchanged.
-        /// </summary>
-        /// <param name="constant">The constant to visit.</param>
-        /// <returns>The transformed term.</returns>
-        public virtual Term ApplyTo(Constant constant)
-        {
-            return constant;
-        }
-
-        /// <summary>
         /// Applies this transformation to a <see cref="VariableReference"/> instance.
         /// The default implementation returns a <see cref="VariableReference"/> referring to the variable that is the result of calling <see cref="ApplyTo(VariableDeclaration)"/> on the current declaration.
         /// </summary>
-        /// <param name="variable">The variable to visit.</param>
+        /// <param name="variable">The variable reference to transform.</param>
         /// <returns>The transformed term.</returns>
         public virtual Term ApplyTo(VariableReference variable)
         {
@@ -156,6 +145,35 @@ namespace SCClassicalPlanning.ProblemManipulation
             }
 
             return variable;
+        }
+
+        /// <summary>
+        /// Applies this transformation to a <see cref="Constant"/> instance.
+        /// The default implementation simply returns the constant unchanged.
+        /// </summary>
+        /// <param name="constant">The constant to transform.</param>
+        /// <returns>The transformed term.</returns>
+        public virtual Term ApplyTo(Constant constant)
+        {
+            return constant;
+        }
+
+        /// <summary>
+        /// Applies this transformation to a <see cref="Function"/> instance.
+        /// The default implementation returns a <see cref="Function"/> with the same Symbol and with an argument list that is the result of calling <see cref="ApplyTo(Term)"/> on each of the existing arguments.
+        /// </summary>
+        /// <param name="function">The function to transform.</param>
+        /// <returns>The transformed term.</returns>
+        public virtual Term ApplyTo(Function function)
+        {
+            var arguments = function.Arguments.Select(a => ApplyTo(a)).ToList();
+
+            if (arguments.Zip(function.Arguments, (x, y) => (x, y)).Any(t => t.x != t.y))
+            {
+                return new Function(function.Symbol, arguments);
+            }
+
+            return function;
         }
 
         /// <summary>

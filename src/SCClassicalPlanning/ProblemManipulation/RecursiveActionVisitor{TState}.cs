@@ -97,16 +97,29 @@ namespace SCClassicalPlanning.ProblemManipulation
         {
             switch (term)
             {
-                case Constant constant:
-                    Visit(constant, visitState);
-                    break;
                 case VariableReference variableReference:
                     Visit(variableReference, visitState);
                     break;
+                case Constant constant:
+                    Visit(constant, visitState);
+                    break;
+                case Function function:
+                    Visit(function, visitState);
+                    break;
                 default:
-                    // NB: FUNCTIONS UNSUPPORTED
                     throw new ArgumentException("Unsupported term type", nameof(term));
             };
+        }
+
+        /// <summary>
+        /// Visits a <see cref="VariableReference"/> instance.
+        /// The default implementation just visits the variable's declaration
+        /// </summary>
+        /// <param name="variableReference">The variable reference to visit.</param>
+        /// <param name="visitState">The state of this visit.</param>
+        public virtual void Visit(VariableReference variableReference, TState visitState)
+        {
+            Visit(variableReference.Declaration, visitState);
         }
 
         /// <summary>
@@ -121,24 +134,16 @@ namespace SCClassicalPlanning.ProblemManipulation
 
         /// <summary>
         /// Visits a <see cref="Function"/> instance.
-        /// Since all terms in classical planning should be functionless, the default implementation throws an exception.
+        /// The default implementation just visits each of the arguments.
         /// </summary>
         /// <param name="function">The function to visit.</param>
-        /// <param name="visitState">The state of this visit.</param>
-        public virtual void Visit(Function function, TState visitState)
+        /// <param name="state">The state of this visit.</param>
+        public virtual void Visit(Function function, TState state)
         {
-            throw new NotSupportedException();
-        }
-
-        /// <summary>
-        /// Visits a <see cref="VariableReference"/> instance.
-        /// The default implementation just visits the variable's declaration
-        /// </summary>
-        /// <param name="variableReference">The variable reference to visit.</param>
-        /// <param name="visitState">The state of this visit.</param>
-        public virtual void Visit(VariableReference variableReference, TState visitState)
-        {
-            Visit(variableReference.Declaration, visitState);
+            foreach (var argument in function.Arguments)
+            {
+                Visit(argument, state);
+            }
         }
 
         /// <summary>
