@@ -19,10 +19,6 @@ namespace SCClassicalPlanning.Planning
 {
     /// <summary>
     /// Formatting logic for plans (and actions).
-    /// <para/>
-    /// TODO: Add and use an actionSchemas ctor parameter (IEnumerable of Action) - used for variable names. Could of course instead have a dictionary
-    /// prop within actions, but its tautologous and wasteful of resources given that we only want it for explanations. This approach gives us nicer
-    /// separation of concerns.
     /// </summary>
     public class PlanFormatter
     {
