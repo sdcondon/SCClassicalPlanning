@@ -70,12 +70,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 getEdgeCost: e => 1,
                 getEstimatedCostToTarget: EstimateCost);
 
-            await search.CompleteAsync(1, cancellationToken);
+            await search.CompleteAsync(cancellationToken);
 
             // todo: nogoods - ..or query search tree for nogoods here?
             // otherwise going to have to open things up and not use this a* implementation.
 
-            if (search.IsSucceeded())
+            if (search.IsSucceeded)
             {
                 return new SolutionExtractionResult(
                     Success: true,

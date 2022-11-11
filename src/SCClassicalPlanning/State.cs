@@ -78,7 +78,7 @@ namespace SCClassicalPlanning
         public bool Satisfies(Goal goal) => Elements.IsSupersetOf(goal.PositivePredicates) && !Elements.Overlaps(goal.NegativePredicates);
 
         /// <summary>
-        /// Gets the substitutions (if any) that can be applied to this state to satisfy the given goal.
+        /// Gets the substitutions (if any) that can be applied to a given goal so that this state satisfies it.
         /// </summary>
         /// <param name="goal">The goal to check.</param>
         /// <returns>An enumerable of substitutions that satisfy the goal.</returns>

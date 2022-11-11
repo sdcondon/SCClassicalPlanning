@@ -58,7 +58,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 getEdgeCost: e => getActionCost(e.Action),
                 getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
 
-            await search.CompleteAsync(1, cancellationToken);
+            await search.CompleteAsync(cancellationToken);
             ////var exploredEdges = new HashSet<StateSpaceEdge>();
             ////while (!search.IsConcluded)
             ////{
@@ -75,7 +75,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             ////    }
             ////}
 
-            if (search.IsSucceeded())
+            if (search.IsSucceeded)
             {
                 return new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
             }

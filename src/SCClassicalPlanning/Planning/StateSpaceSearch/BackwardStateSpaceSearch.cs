@@ -54,11 +54,12 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         {
             var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.Goal),
-                isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
+                isTarget: n => problem.InitialState.Satisfies(n.Goal),
                 getEdgeCost: e => getActionCost(e.Action),
                 getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
 
-            await search.CompleteAsync(1, cancellationToken);
+            await search.CompleteAsync(cancellationToken);
+
             // TODO: support interrogable plans
             ////var exploredEdges = new HashSet<StateSpaceEdge>();
             ////while (!search.IsConcluded)
@@ -76,7 +77,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             ////    }
             ////}
 
-            if (search.IsSucceeded())
+            if (search.IsSucceeded)
             {
                 return new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
             }
