@@ -44,6 +44,10 @@ namespace SCClassicalPlanning
         /// <param name="sentence">The sentence that expresses the goal.</param>
         public Goal(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
 
+        // NB: uses argument directly, unlike public ctors. This is to slightly reduce GC pressure.
+        // Also opens the way to add more validation to the public ctors at some point.
+        private Goal(ImmutableHashSet<Literal> elements) => Elements = elements;
+
         /// <summary>
         /// Gets a singleton <see cref="Goal"/> instance that is empty.
         /// </summary>
@@ -94,6 +98,21 @@ namespace SCClassicalPlanning
         public bool IsSatisfiedBy(State state) => state.Satisfies(this);
 
         /// <summary>
+        /// Returns the goal that must be satisfied prior to performing a given action, in order to ensure that this goal is satisfied after the action is performed. 
+        /// <para/>
+        /// NB: AIaMA gets regression a bit.. err.. wrong, because it gets a little confused between states (which, under the
+        /// closed-world assumption, need include only positive fluents) and goals (which can include both positive and negative fluents).
+        /// It treats add lists and delete lists fundamentally differently, but shouldn't.
+        /// <para/>
+        /// A sound way to reason about regression is to first note that it operates on a goal to give a goal - that is, both positive and negative fluents appear can
+        /// occur in both the argument and the return value. Then note that any element of the given goal (positive or negative) that is applied by the action doesn't
+        /// have to hold in the returned goal (because it'll be applied by the action) - so is removed. However, all preconditions do have to hold - so they are added.
+        /// </summary>
+        /// <param name="action">The action to regress over.</param>
+        /// <returns>The goal that must be satisfied prior to performing the given action.</returns>
+        public Goal Regress(Action action) => new(Elements.Except(action.Effect.Elements).Union(action.Precondition.Elements));
+
+        /// <summary>
         /// Determines whether the specified object is equal to the current object.
         /// <para/>
         /// Goals implement value semantics for equality - two Goals are equal if they share the same Elements.
@@ -132,7 +151,7 @@ namespace SCClassicalPlanning
         /// </summary>
         private class ConstructionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
         {
-            private static readonly ConstructionVisitor Instance = new ConstructionVisitor();
+            private static readonly ConstructionVisitor Instance = new();
 
             public static HashSet<Literal> Visit(Sentence sentence)
             {
@@ -151,9 +170,7 @@ namespace SCClassicalPlanning
                 }
                 else
                 {
-                    // Assume we've hit a literal. NB will throw if its not actually a literal.
-                    // Afterwards, we don't need to look any further down the tree for the purposes of this class (though the Literal ctor that
-                    // we invoke here does so to figure out the details of the literal). So we can just return rather than invoking base.Visit.
+                    // Assume we've hit a literal - literal ctor will throw if its not.
                     literals.Add(new Literal(sentence));
                 }
             }

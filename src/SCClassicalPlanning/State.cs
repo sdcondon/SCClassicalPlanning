@@ -48,6 +48,10 @@ namespace SCClassicalPlanning
         /// <param name="sentence">The sentence that expresses the state.</param>
         public State(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
 
+        // NB: uses argument directly, unlike public ctors. This is to slightly reduce GC pressure.
+        // Also opens the way to add more validation to the public ctors at some point.
+        private State(ImmutableHashSet<Predicate> elements) => Elements = elements;
+
         /// <summary>
         /// Gets a singleton <see cref="State"/> instance that is empty.
         /// </summary>
@@ -64,7 +68,7 @@ namespace SCClassicalPlanning
         /// <param name="effect">The effect to apply.</param>
         /// <returns>The new state.</returns>
         // TODO: at some point look at (test me!) efficiency here. ImmutableHashSet builder stuff might be of use?
-        public State Apply(Effect effect) => new State(Elements.Except(effect.DeleteList).Union(effect.AddList));
+        public State Apply(Effect effect) => new(Elements.Except(effect.DeleteList).Union(effect.AddList));
 
         /// <summary>
         /// Gets a value indicating whether this state satisfies a given goal.

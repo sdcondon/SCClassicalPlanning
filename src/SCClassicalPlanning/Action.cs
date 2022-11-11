@@ -76,18 +76,10 @@ namespace SCClassicalPlanning
 
         /// <summary>
         /// Returns the goal that must be satisfied prior to performing this action, in order to ensure that a given goal is satisfied after the action is performed. 
-        /// <para/>
-        /// NB: AIaMA gets regression a bit.. err.. wrong, because it gets a little confused between states (which, under the
-        /// closed-world assumption, need include only positive fluents) and goals (which can include both positive and negative fluents).
-        /// It treats add lists and delete lists fundamentally differently, but shouldn't.
-        /// <para/>
-        /// A sound way to reason about regression is to first note that it operates on a goal to give a goal - that is, both positive and negative fluents appear can
-        /// occur in both the argument and the return value. Then note that any element of the given goal (positive or negative) that is applied by the action doesn't
-        /// have to hold in the returned goal (because it'll be applied by the action) - so is removed. However, all preconditions do have to hold - so they are added.
         /// </summary>
         /// <param name="goal">The goal that must be satisfied after performing this action.</param>
         /// <returns>The goal that must be satisfied prior to performing this action.</returns>
-        public Goal Regress(Goal goal) => new Goal(goal.Elements.Except(Effect.Elements).Union(Precondition.Elements));
+        public Goal Regress(Goal goal) => goal.Regress(this);
 
         /// <summary>
         /// Determines whether the specified object is equal to the current object.
