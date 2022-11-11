@@ -44,8 +44,8 @@ namespace SCClassicalPlanning
         /// <param name="sentence">The sentence that expresses the goal.</param>
         public Goal(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
 
-        // NB: uses argument directly, unlike public ctors. This is to slightly reduce GC pressure.
-        // Also opens the way to add more validation to the public ctors at some point.
+        // NB: uses argument directly, unlike public ctors. This is to avoid unnecessary GC pressure.
+        // Also allows the public ctors apply validation, without forcing said validation to occur at every step of a planning process.
         private Goal(ImmutableHashSet<Literal> elements) => Elements = elements;
 
         /// <summary>
@@ -96,6 +96,16 @@ namespace SCClassicalPlanning
         /// <returns></returns>
         // TODO: Will need to decide the above when adding support variables in goals
         public bool IsSatisfiedBy(State state) => state.Satisfies(this);
+
+        /// <summary>
+        /// Returns a value indicating whether a given effect is conceivably a useful final step in achieving this goal.
+        /// <para/>
+        /// Specifically, an effect is relevant to a goal if it accomplishes at least one element of the goal, and does not undo anything.
+        /// That is, the effect's elements overlap with the goals elements, and the set comprised of the negation of each of the effect's elements does not.
+        /// </summary>
+        /// <param name="effect">The effect to determine relevancy of.</param>
+        /// <returns>A value indicating whether the given effect is relevant to this goal.</returns>
+        public bool IsRelevant(Effect effect) => Elements.Overlaps(effect.Elements) && !Elements.Overlaps(effect.Elements.Select(l => l.Negate()));
 
         /// <summary>
         /// Returns the goal that must be satisfied prior to performing a given action, in order to ensure that this goal is satisfied after the action is performed. 

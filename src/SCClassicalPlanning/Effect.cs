@@ -69,17 +69,14 @@ namespace SCClassicalPlanning
         public IEnumerable<Predicate> DeleteList => Elements.Where(a => a.IsNegated).Select(l => l.Predicate);
 
         /// <summary>
-        /// Gets a value indicating whether this effect is relevant to a given goal.
+        /// Returns a value indicating whether this effect is conceivably a useful final step in achieving a given goal.
         /// <para/>
         /// An effect is relevant to a goal if it accomplishes at least one element of the goal, and does not undo anything.
         /// That is, the effect's elements overlap with the goals elements, and the set comprised of the negation of each of the effect's elements does not.
         /// </summary>
         /// <param name="goal">The goal to determine relevancy to.</param>
         /// <returns>A value indicating whether this effect is relevant to a given goal.</returns>
-        public bool IsRelevantTo(Goal goal)
-        {
-            return goal.Elements.Overlaps(Elements) && !goal.Elements.Overlaps(Elements.Select(l => l.Negate()));
-        }
+        public bool IsRelevantTo(Goal goal) => goal.IsRelevant(this);
 
         /// <summary>
         /// Applies this action to a given state, producing a new state.

@@ -24,6 +24,8 @@ namespace SCClassicalPlanning
     /// A state is essentially just a set of ground (i.e. variable-free) <see cref="Predicate"/>s. State instances occur as the initial state of <see cref="Problem"/>
     /// instances - and are also used by some planning algorithms to track intermediate states while looking for a solution to a problem.
     /// <para/>
+    /// TODO: Of all the model classes, states are most at risk of being large - to the extent that abstracting them and allowing for IO would almost certainly be useful. Watch this space.
+    /// <para/>
     /// TODO: probably should add some verification in ctor that all elements are ground. Or.. not - don't want to sap performance by validating on
     /// every step in plan creation.. Best of both worlds would be nice (internal vs public..?).
     /// </summary>
@@ -48,8 +50,8 @@ namespace SCClassicalPlanning
         /// <param name="sentence">The sentence that expresses the state.</param>
         public State(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
 
-        // NB: uses argument directly, unlike public ctors. This is to slightly reduce GC pressure.
-        // Also opens the way to add more validation to the public ctors at some point.
+        // NB: uses argument directly, unlike public ctors. This is to avoid unnecessary GC pressure.
+        // Also allows the public ctors apply validation, without forcing said validation to occur at every step of a planning process.
         private State(ImmutableHashSet<Predicate> elements) => Elements = elements;
 
         /// <summary>

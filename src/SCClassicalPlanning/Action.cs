@@ -72,7 +72,7 @@ namespace SCClassicalPlanning
         /// </summary>
         /// <param name="goal"></param>
         /// <returns></returns>
-        public bool IsRelevantTo(Goal goal) => Effect.IsRelevantTo(goal);
+        public bool IsRelevantTo(Goal goal) => goal.IsRelevant(Effect);
 
         /// <summary>
         /// Returns the goal that must be satisfied prior to performing this action, in order to ensure that a given goal is satisfied after the action is performed. 
