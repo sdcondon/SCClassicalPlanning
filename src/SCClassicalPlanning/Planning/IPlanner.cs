@@ -19,11 +19,10 @@ namespace SCClassicalPlanning.Planning
     public interface IPlanner
     {
         /// <summary>
-        /// Creates a plan to solve a given problem.
+        /// Creates a planning task to work on solving a given problem.
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
-        /// <param name="cancellationToken">A cancellation token for the planning process.</param>
-        /// <returns>A <see cref="Task"/> representing the process of creating a plan that solves the problem.</returns>
-        Task<Plan> CreatePlanAsync(Problem problem, CancellationToken cancellationToken = default);
+        /// <returns>An <see cref="IPlanningTask"/> representing the process of creating a plan that solves the problem.</returns>
+        IPlanningTask CreatePlanningTask(Problem problem);
     }
 }

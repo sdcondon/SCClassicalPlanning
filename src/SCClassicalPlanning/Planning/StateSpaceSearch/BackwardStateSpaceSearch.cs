@@ -87,6 +87,49 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             }
         }
 
+        public class PlanningTask : SteppablePlanningTask<Action>
+        {
+            private readonly AStarSearch<StateSpaceNode, StateSpaceEdge> search;
+
+            private bool isComplete;
+            private Plan result;
+
+            public PlanningTask(Problem problem)
+            {
+                search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
+                    source: new StateSpaceNode(problem, problem.Goal),
+                    isTarget: n => problem.InitialState.Satisfies(n.Goal),
+                    getEdgeCost: e => getActionCost(e.Action),
+                    getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
+            }
+
+            public override bool IsComplete => isComplete;
+
+            public override Plan Result => result;
+
+            public override void Dispose()
+            {
+                //// Nothing to do
+            }
+
+            public override Task<(Goal, Action)> NextStepAsync(CancellationToken cancellationToken = default)
+            {
+                var edge = search.NextStep();
+
+                if (search.IsSucceeded)
+                {
+                    result = new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
+                    isComplete = true;
+                }
+                else if (search.IsConcluded)
+                {
+                    throw new ArgumentException("Problem is unsolvable", nameof(problem));
+                }
+
+                return (edge.To.Goal, edge.Action);
+            }
+        }
+
         private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
         {
             private readonly Problem problem;
