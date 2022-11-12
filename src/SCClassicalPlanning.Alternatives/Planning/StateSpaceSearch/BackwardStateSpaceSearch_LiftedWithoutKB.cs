@@ -28,9 +28,9 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     {
         private readonly IHeuristic heuristic;
         private readonly Func<Action, float> getActionCost;
-        
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the number of actions in the resulting plan.
+        /// Initializes a new instance of the <see cref="BackwardStateSpaceSearch_LiftedWithoutKB"/> class that attempts to minimise the number of actions in the resulting plan.
         /// </summary>
         /// <param name="heuristic">The heuristic to use - the returned cost will be interpreted as the estimated number of actions that need to be performed.</param>
         public BackwardStateSpaceSearch_LiftedWithoutKB(IHeuristic heuristic)
@@ -39,7 +39,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForwardStateSpaceSearch"/> class that attempts to minimise the total "cost" of actions in the resulting plan.
+        /// Initializes a new instance of the <see cref="BackwardStateSpaceSearch_LiftedWithoutKB"/> class that attempts to minimise the total "cost" of actions in the resulting plan.
         /// </summary>
         /// <param name="heuristic">The heuristic to use - with the returned cost will be interpreted as the estimated total cost of the actions that need to be performed.</param>
         /// <param name="getActionCost">A delegate to retrieve the cost of an action.</param>
@@ -60,9 +60,9 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
 
         /// <summary>
-        /// The implementation of <see cref="IPlanningTask"/> used by <see cref="BackwardStateSpaceSearch"/>.
+        /// The implementation of <see cref="IPlanningTask"/> used by <see cref="BackwardStateSpaceSearch_LiftedWithoutKB"/>.
         /// </summary>
-        public sealed class PlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
+        public class PlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
         {
             private readonly AStarSearch<StateSpaceNode, StateSpaceEdge> search;
 
@@ -126,7 +126,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             /// <inheritdoc />
             public override void Dispose()
             {
-                //// Nothing to do
+                // Nothing to do
+                GC.SuppressFinalize(this);
             }
         }
 

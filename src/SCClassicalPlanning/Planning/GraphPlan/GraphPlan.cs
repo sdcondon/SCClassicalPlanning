@@ -38,7 +38,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <summary>
         /// The implementation of <see cref="IPlanningTask"/> used by <see cref="GraphPlan"/>.
         /// </summary>
-        public sealed class PlanningTask : IPlanningTask
+        public class PlanningTask : IPlanningTask
         {
             private readonly Problem problem;
 
@@ -163,7 +163,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             /// <inheritdoc />
             public void Dispose()
             {
-                //// Nothing to do
+                // Nothing to do
+                GC.SuppressFinalize(this);
             }
         }
 

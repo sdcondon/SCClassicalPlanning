@@ -65,7 +65,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         /// <summary>
         /// The implementation of <see cref="IPlanningTask"/> used by <see cref="BackwardStateSpaceSearch"/>.
         /// </summary>
-        public sealed class PlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
+        public class PlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
         {
             private readonly AStarSearch<StateSpaceNode, StateSpaceEdge> search;
 
@@ -129,7 +129,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             /// <inheritdoc />
             public override void Dispose()
             {
-                //// Nothing to do
+                // Nothing to do
+                GC.SuppressFinalize(this);
             }
         }
 

@@ -129,7 +129,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             /// <inheritdoc />
             public override void Dispose()
             {
-                //// Nothing to do
+                // Nothing to do
                 GC.SuppressFinalize(this);
             }
         }
