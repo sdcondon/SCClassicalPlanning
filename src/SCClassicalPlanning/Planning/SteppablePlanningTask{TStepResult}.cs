@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SCGraphTheory.Search.Classic;
+using SCGraphTheory;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,12 +16,15 @@ namespace SCClassicalPlanning.Planning
         public abstract bool IsComplete { get; }
 
         /// <inheritdoc />
+        public abstract bool IsSucceeded { get; }
+
+        /// <inheritdoc />
         public abstract Plan Result { get; }
 
         /// <summary>
         /// Executes the next step of the planning task.
         /// <para/>
-        /// Calling <see cref="NextStepAsync"/> on a completed planning task should result in an <see cref="InvalidOperationException"/>.
+        /// Calling <see cref="NextStep"/> on a completed planning task should result in an <see cref="InvalidOperationException"/>.
         /// </summary>
         /// <param name="cancellationToken">A cancellation token for the operation.</param>
         /// <returns>A container for information on what happened during the step.</returns>
@@ -33,7 +38,9 @@ namespace SCClassicalPlanning.Planning
             // TODO: decide on re-entry handling, if any
             while (!IsComplete)
             {
-                NextStep(cancellationToken);
+                NextStep();
+                cancellationToken.ThrowIfCancellationRequested();
+                await Task.Yield();
             }
 
             return Result;

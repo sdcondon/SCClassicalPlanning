@@ -4,23 +4,26 @@
     /// An interface for encapsulations of an attempt to create a <see cref="Plan"/>. 
     /// <para/>
     /// We define our own interface (instead of just using <see cref="Task{Plan}"/>) so that it is
-    /// easy for implementations to add additional behaviours - such as step-by-step execution 
-    /// (see <see cref="SteppablePlanningTask{TStepResult}"/>) - and result explanations. However, note the existence
-    /// of the <see cref="IPlanningTaskExtensions.GetAwaiter(IPlanningTask)"/> extension method, so that instances
-    /// can be awaited directly.
+    /// easy for implementations to add additional behaviours such as step-by-step execution 
+    /// (see <see cref="SteppablePlanningTask{TStepResult}"/>) and result explanations.
     /// </summary>
     public interface IPlanningTask : IDisposable
     {
         /// <summary>
-        /// Gets a value indicating whether the planning task is complete.
-        /// The result of completed queries is available via the <see cref="Result"/> property.
+        /// Gets a value indicating whether the planning task is complete - irrespective of whether a plan was successfully created or not.
         /// </summary>
         bool IsComplete { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the planning task is complete and managed to create a plan.
+        /// The result of successful queries is available via the <see cref="Result"/> property.
+        /// </summary>
+        bool IsSucceeded { get; }
+
+        /// <summary>
         /// Gets a value indicating the result of the task.
         /// </summary>
-        /// <exception cref="InvalidOperationException">The task is not yet complete.</exception>
+        /// <exception cref="InvalidOperationException">The task is not yet complete or failed to create a plan.</exception>
         Plan Result { get; }
 
         /// <summary>

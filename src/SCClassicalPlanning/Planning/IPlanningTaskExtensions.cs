@@ -8,17 +8,6 @@ namespace SCClassicalPlanning.Planning
     public static class IPlanningTaskExtensions
     {
         /// <summary>
-        /// Gets an awaiter used to await a given <see cref="IPlanningTask"/>
-        /// </summary>
-        /// <param name="planningTask">The planning task to get an awaiter for.</param>
-        /// <returns>An awaiter instance.</returns>
-        public static TaskAwaiter<Plan> GetAwaiter(this IPlanningTask planningTask)
-        {
-            return planningTask.ExecuteAsync().GetAwaiter();
-
-        }
-
-        /// <summary>
         /// Executes a planning task to completion.
         /// </summary>
         /// <param name="planningTask">The planning task to execute.</param>

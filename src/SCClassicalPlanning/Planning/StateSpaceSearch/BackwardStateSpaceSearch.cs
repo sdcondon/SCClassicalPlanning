@@ -22,6 +22,9 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
     /// A simple implementation of <see cref="IPlanner"/> that carries out a backward (A-star) search of
     /// the state space to create plans.
     /// <para/>
+    /// Aside: I do wonder why this isn't more generally referred to as a goal space search (which would be
+    /// a shorter name) - but meh, never mind, lets leave it as-is for the moment at least.
+    /// <para/>
     /// See section 10.2.2 of "Artificial Intelligence: A Modern Approach" for more on this.
     /// </summary>
     public class BackwardStateSpaceSearch : IPlanner
@@ -49,52 +52,27 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             this.getActionCost = getActionCost;
         }
 
+        /// <summary>
+        /// Creates a (concretely-typed) planning task to work on solving a given problem.
+        /// </summary>
+        /// <param name="problem">The problem to create a plan for.</param>
+        /// <returns></returns>
+        public PlanningTask CreatePlanningTask(Problem problem) => new(problem, heuristic, getActionCost);
+
         /// <inheritdoc />
-        public async Task<Plan> CreatePlanAsync(Problem problem, CancellationToken cancellationToken = default)
-        {
-            var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
-                source: new StateSpaceNode(problem, problem.Goal),
-                isTarget: n => problem.InitialState.Satisfies(n.Goal),
-                getEdgeCost: e => getActionCost(e.Action),
-                getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
+        IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
 
-            await search.CompleteAsync(cancellationToken);
-
-            // TODO: support interrogable plans
-            ////var exploredEdges = new HashSet<StateSpaceEdge>();
-            ////while (!search.IsConcluded)
-            ////{
-            ////    search.NextStep();
-
-            ////    var newEdges = search.Visited.Values.Where(i => !i.IsOnFrontier).Select(i => i.Edge);
-            ////    foreach (var edge in newEdges)
-            ////    {
-            ////        if (!object.Equals(edge, default(StateSpaceEdge)) && !exploredEdges.Contains(edge))
-            ////        {
-            ////            var h = heuristic.EstimateCost(problem.InitialState, edge.To.Goal);
-            ////            exploredEdges.Add(edge);
-            ////        }
-            ////    }
-            ////}
-
-            if (search.IsSucceeded)
-            {
-                return new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
-            }
-            else
-            {
-                throw new ArgumentException("Problem is unsolvable", nameof(problem));
-            }
-        }
-
-        public class PlanningTask : SteppablePlanningTask<Action>
+        /// <summary>
+        /// The implementation of <see cref="IPlanningTask"/> used by <see cref="BackwardStateSpaceSearch"/>.
+        /// </summary>
+        public sealed class PlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
         {
             private readonly AStarSearch<StateSpaceNode, StateSpaceEdge> search;
 
             private bool isComplete;
-            private Plan result;
+            private Plan? result;
 
-            public PlanningTask(Problem problem)
+            internal PlanningTask(Problem problem, IHeuristic heuristic, Func<Action, float> getActionCost)
             {
                 search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                     source: new StateSpaceNode(problem, problem.Goal),
@@ -103,16 +81,34 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                     getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
             }
 
+            /// <inheritdoc />
             public override bool IsComplete => isComplete;
 
-            public override Plan Result => result;
+            /// <inheritdoc />
+            public override bool IsSucceeded => result != null;
 
-            public override void Dispose()
+            /// <inheritdoc />
+            public override Plan Result
             {
-                //// Nothing to do
+                get
+                {
+                    if (!IsComplete)
+                    {
+                        throw new InvalidOperationException("Task is not yet complete");
+                    }
+                    else if (result == null)
+                    {
+                        throw new InvalidOperationException("Plan creation failed");
+                    }
+                    else
+                    {
+                        return result;
+                    }
+                }
             }
 
-            public override Task<(Goal, Action)> NextStepAsync(CancellationToken cancellationToken = default)
+            /// <inheritdoc />
+            public override (Goal, Action, Goal) NextStep(CancellationToken cancellationToken = default)
             {
                 var edge = search.NextStep();
 
@@ -123,14 +119,21 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 }
                 else if (search.IsConcluded)
                 {
-                    throw new ArgumentException("Problem is unsolvable", nameof(problem));
+                    result = null;
+                    isComplete = true;
                 }
 
-                return (edge.To.Goal, edge.Action);
+                return (edge.From.Goal, edge.Action, edge.To.Goal);
+            }
+
+            /// <inheritdoc />
+            public override void Dispose()
+            {
+                //// Nothing to do
             }
         }
 
-        private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
+        private readonly struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
         {
             private readonly Problem problem;
 
@@ -158,7 +161,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public override string ToString() => Goal.ToString();
         }
 
-        private struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
+        private readonly struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
         {
             private readonly Problem problem;
             private readonly Goal goal;
@@ -181,7 +184,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        private struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
+        private readonly struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
         {
             private readonly Problem problem;
             private readonly Goal fromGoal;

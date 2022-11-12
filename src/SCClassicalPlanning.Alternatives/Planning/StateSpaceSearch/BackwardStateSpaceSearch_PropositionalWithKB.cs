@@ -52,47 +52,96 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             this.invariantInspector = invariantsKB != null ? new InvariantInspector(invariantsKB) : null;
         }
 
+        /// <summary>
+        /// Creates a (concretely-typed) planning task to work on solving a given problem.
+        /// </summary>
+        /// <param name="problem">The problem to create a plan for.</param>
+        /// <returns></returns>
+        public PlanningTask CreatePlanningTask(Problem problem) => new(problem, heuristic, getActionCost, invariantInspector);
+
         /// <inheritdoc />
-        public async Task<Plan> CreatePlanAsync(Problem problem, CancellationToken cancellationToken = default)
+        IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
+
+        /// <summary>
+        /// The implementation of <see cref="IPlanningTask"/> used by <see cref="BackwardStateSpaceSearch_PropositionalWithKB"/>.
+        /// </summary>
+        public class PlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
         {
-            var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
-                source: new StateSpaceNode(new PlanningTask(problem, invariantInspector), problem.Goal),
-                isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
-                getEdgeCost: e => getActionCost(e.Action),
-                getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
+            private readonly AStarSearch<StateSpaceNode, StateSpaceEdge> search;
 
-            await search.CompleteAsync(cancellationToken);
-            //TODO: support interrogable plans
-            ////var exploredEdges = new HashSet<StateSpaceEdge>();
-            ////while (!search.IsConcluded)
-            ////{
-            ////    search.NextStep();
+            private bool isComplete;
+            private Plan? result;
 
-            ////    var newEdges = search.Visited.Values.Where(i => !i.IsOnFrontier).Select(i => i.Edge);
-            ////    foreach (var edge in newEdges)
-            ////    {
-            ////        if (!object.Equals(edge, default(StateSpaceEdge)) && !exploredEdges.Contains(edge))
-            ////        {
-            ////            var h = heuristic.EstimateCost(problem.InitialState, edge.To.Goal);
-            ////            exploredEdges.Add(edge);
-            ////        }
-            ////    }
-            ////}
-
-            if (search.IsSucceeded)
+            internal PlanningTask(Problem problem, IHeuristic heuristic, Func<Action, float> getActionCost, InvariantInspector? invariantInspector)
             {
-                return new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
+                Problem = problem;
+                InvariantInspector = invariantInspector;
+
+                search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
+                    source: new StateSpaceNode(this, problem.Goal),
+                    isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
+                    getEdgeCost: e => getActionCost(e.Action),
+                    getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
             }
-            else
+
+            public Problem Problem { get; }
+
+            public InvariantInspector? InvariantInspector { get; }
+
+            /// <inheritdoc />
+            public override bool IsComplete => isComplete;
+
+            /// <inheritdoc />
+            public override bool IsSucceeded => result != null;
+
+            /// <inheritdoc />
+            public override Plan Result
             {
-                throw new ArgumentException("Problem is unsolvable", nameof(problem));
+                get
+                {
+                    if (!IsComplete)
+                    {
+                        throw new InvalidOperationException("Task is not yet complete");
+                    }
+                    else if (result == null)
+                    {
+                        throw new InvalidOperationException("Plan creation failed");
+                    }
+                    else
+                    {
+                        return result;
+                    }
+                }
+            }
+
+            /// <inheritdoc />
+            public override (Goal, Action, Goal) NextStep(CancellationToken cancellationToken = default)
+            {
+                var edge = search.NextStep();
+
+                if (search.IsSucceeded)
+                {
+                    result = new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
+                    isComplete = true;
+                }
+                else if (search.IsConcluded)
+                {
+                    result = null;
+                    isComplete = true;
+                }
+
+                return (edge.From.Goal, edge.Action, edge.To.Goal);
+            }
+
+            /// <inheritdoc />
+            public override void Dispose()
+            {
+                // Nothing to do
+                GC.SuppressFinalize(this);
             }
         }
 
-        // mostly just to keep the structs small at this point
-        private record PlanningTask(Problem Problem, InvariantInspector? InvariantInspector);
-
-        private struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
+        private readonly struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
         {
             private readonly PlanningTask planningTask;
 
@@ -120,7 +169,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public override string ToString() => Goal.ToString();
         }
 
-        private struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
+        private readonly struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
         {
             private readonly PlanningTask planningTask;
             private readonly Goal goal;
@@ -161,7 +210,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        private struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
+        private readonly struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
         {
             private readonly PlanningTask planningTask;
             private readonly Goal fromGoal;
