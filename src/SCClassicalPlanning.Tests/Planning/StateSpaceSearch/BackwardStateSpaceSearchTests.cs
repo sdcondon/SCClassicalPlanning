@@ -98,11 +98,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
         public static Test CreatedPlanValidity_AlternativeImplementations => TestThat
             .GivenTestContext()
-            .AndEachOf(() => new Func<IHeuristic, IPlanner>[]
+            .AndEachOf(() => new Func<IHeuristic, IKnowledgeBase, IPlanner>[]
             {
-                // h => new BackwardStateSpaceSearch_LiftedWithoutKB(h), // too slow to be workable
-                h => new BackwardStateSpaceSearch_PropositionalWithoutKB(h),
-                h => new BackwardStateSpaceSearch_PropositionalWithKB(h), // Why is this so slow - it should be faster? Interrogable planning processes will help diagnose. 
+                //(h, kb) => new BackwardStateSpaceSearch_LiftedWithoutKB(h), // too slow to be workable
+                (h, kb) => new BackwardStateSpaceSearch_PropositionalWithoutKB(h),
+                (h, kb) => new BackwardStateSpaceSearch_PropositionalWithKB(h, kb), // Why is this so slow - it should be faster? Interrogable planning processes will help diagnose. 
             })
             .AndEachOf(() => new TestCase[]
             {
@@ -121,14 +121,21 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                         Equal(new Constant("blockA"), new Constant("blockA")),
                         !Equal(new Constant("blockA"), new Constant("blockB")),
                         !Equal(new Constant("blockA"), new Constant("blockC")),
+                        !Equal(new Constant("blockA"), Table),
                         Block(new Constant("blockB")),
                         !Equal(new Constant("blockB"), new Constant("blockA")),
                         Equal(new Constant("blockB"), new Constant("blockB")),
                         !Equal(new Constant("blockB"), new Constant("blockC")),
+                        !Equal(new Constant("blockB"), Table),
                         Block(new Constant("blockC")),
                         !Equal(new Constant("blockC"), new Constant("blockA")),
                         !Equal(new Constant("blockC"), new Constant("blockB")),
                         Equal(new Constant("blockC"), new Constant("blockC")),
+                        !Equal(new Constant("blockC"), Table),
+                        !Equal(Table, new Constant("blockA")),
+                        !Equal(Table, new Constant("blockB")),
+                        !Equal(Table, new Constant("blockC")),
+                        !Equal(Table, new Constant("blockD")),
                         ForAll(A, B, If(On(A, B), !Clear(B))),
                     })),
 
@@ -175,7 +182,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                         ForAll(A, B, If(On(A, B), !Clear(B))),
                     })),
             })
-            .When((_, makePlanner, tc) => makePlanner(tc.Heuristic).CreatePlan(tc.Problem))
+            .When((_, makePlanner, tc) => makePlanner(tc.Heuristic, tc.InvariantsKB).CreatePlan(tc.Problem))
             .ThenReturns()
             .And((_, _, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
             .And((cxt, _, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
