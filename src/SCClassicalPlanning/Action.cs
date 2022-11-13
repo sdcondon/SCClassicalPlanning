@@ -59,7 +59,7 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Applies this action to a given state, producing a new state.
         /// <para/>
-        /// TODO-NEEDED?: NB: Does NOT validate preconditions - to be of use with particular planning heuristics.
+        /// NB: Does NOT validate preconditions - to be of use with particular planning heuristics.
         /// </summary>
         /// <param name="state">The state to apply the action to.</param>
         /// <returns>The new state.</returns>

@@ -1,8 +1,4 @@
-﻿using SCGraphTheory.Search.Classic;
-using SCGraphTheory;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 
 namespace SCClassicalPlanning.Planning
 {
@@ -38,7 +34,7 @@ namespace SCClassicalPlanning.Planning
             // TODO: decide on re-entry handling, if any
             while (!IsComplete)
             {
-                NextStep();
+                var step = NextStep();
                 cancellationToken.ThrowIfCancellationRequested();
                 await Task.Yield();
             }

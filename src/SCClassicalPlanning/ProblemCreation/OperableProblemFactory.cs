@@ -206,8 +206,6 @@ namespace SCClassicalPlanning.ProblemCreation
                 }
                 else if (sentence is Predicate predicate)
                 {
-                    // TODO: check for functions and throw..?
-
                     if (predicate.Arguments.Any(a => !a.IsGroundTerm))
                     {
                         throw new ArgumentException("States cannot include non-ground terms");
