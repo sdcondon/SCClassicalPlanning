@@ -76,6 +76,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                     isTarget: n => problem.InitialState.GetSatisfyingSubstitutions(n.Goal).Any(),
                     getEdgeCost: e => getActionCost(e.Action),
                     getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
+
+                CheckForSearchCompletion();
             }
 
             /// <inheritdoc />
@@ -105,20 +107,15 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             }
 
             /// <inheritdoc />
-            public override (Goal, Action, Goal) NextStep(CancellationToken cancellationToken = default)
+            public override (Goal, Action, Goal) NextStep()
             {
-                var edge = search.NextStep();
+                if (IsComplete)
+                {
+                    throw new InvalidOperationException("Task is complete");
+                }
 
-                if (search.IsSucceeded)
-                {
-                    result = new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
-                    isComplete = true;
-                }
-                else if (search.IsConcluded)
-                {
-                    result = null;
-                    isComplete = true;
-                }
+                var edge = search.NextStep();
+                CheckForSearchCompletion();
 
                 return (edge.From.Goal, edge.Action, edge.To.Goal);
             }
@@ -128,6 +125,19 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 // Nothing to do
                 GC.SuppressFinalize(this);
+            }
+
+            private void CheckForSearchCompletion()
+            {
+                if (search.IsConcluded)
+                {
+                    if (search.IsSucceeded)
+                    {
+                        result = new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
+                    }
+
+                    isComplete = true;
+                }
             }
         }
 

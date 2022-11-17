@@ -22,11 +22,10 @@ namespace SCClassicalPlanning.Planning
         /// <para/>
         /// Calling <see cref="NextStep"/> on a completed planning task should result in an <see cref="InvalidOperationException"/>.
         /// </summary>
-        /// <param name="cancellationToken">A cancellation token for the operation.</param>
         /// <returns>A container for information on what happened during the step.</returns>
         // TODO: Should this use ValueTask? Investigate me. Yeah, high-perf isn't the point of this package,
         // but given that this is an abstraction, its constraining what people *could* achieve with it. So worth a look at least.
-        public abstract TStepResult NextStep(CancellationToken cancellationToken = default);
+        public abstract TStepResult NextStep();
 
         /// <inheritdoc />
         public async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)

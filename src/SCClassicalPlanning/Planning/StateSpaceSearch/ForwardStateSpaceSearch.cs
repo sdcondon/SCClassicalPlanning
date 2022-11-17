@@ -76,6 +76,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                     isTarget: n => n.State.Satisfies(problem.Goal),
                     getEdgeCost: e => getActionCost(e.Action),
                     getEstimatedCostToTarget: n => heuristic.EstimateCost(n.State, problem.Goal));
+
+                CheckForSearchCompletion();
             }
 
             /// <inheritdoc />
@@ -105,20 +107,15 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             }
 
             /// <inheritdoc />
-            public override (State, Action, State) NextStep(CancellationToken cancellationToken = default)
+            public override (State, Action, State) NextStep()
             {
-                var edge = search.NextStep();
+                if (IsComplete)
+                {
+                    throw new InvalidOperationException("Task is complete");
+                }
 
-                if (search.IsSucceeded)
-                {
-                    result = new Plan(search.PathToTarget().Select(e => e.Action).ToList());
-                    isComplete = true;
-                }
-                else if (search.IsConcluded)
-                {
-                    result = null;
-                    isComplete = true;
-                }
+                var edge = search.NextStep();
+                CheckForSearchCompletion();
 
                 return (edge.From.State, edge.Action, edge.To.State);
             }
@@ -128,6 +125,19 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 // Nothing to do
                 GC.SuppressFinalize(this);
+            }
+
+            private void CheckForSearchCompletion()
+            {
+                if (search.IsConcluded)
+                {
+                    if (search.IsSucceeded)
+                    {
+                        result = new Plan(search.PathToTarget().Select(e => e.Action).ToList());
+                    }
+
+                    isComplete = true;
+                }
             }
         }
 

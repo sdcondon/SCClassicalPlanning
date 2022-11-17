@@ -5,6 +5,8 @@ using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
+using System.Numerics;
+using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
@@ -21,26 +23,31 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                 new(
                     Problem: AirCargo.ExampleProblem,
                     Heuristic: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
-                    InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
+                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    {
+                        Cargo(new Constant("cargo1")),
+                        Cargo(new Constant("cargo2")),
+                        Plane(new Constant("plane1")),
+                        Plane(new Constant("plane2")),
+                        Airport(new Constant("airport1")),
+                        Airport(new Constant("airport2")),
+                        ForAll(A, If(Cargo(A), !Plane(A))),
+                        ForAll(A, If(Cargo(A), !Airport(A))),
+                        ForAll(A, If(Plane(A), !Cargo(A))),
+                        ForAll(A, If(Plane(A), !Airport(A))),
+                        ForAll(A, If(Airport(A), !Cargo(A))),
+                        ForAll(A, If(Airport(A), !Plane(A))),
+                    })),
 
                 new(
                     Problem: BlocksWorld.ExampleProblem,
                     Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
                     InvariantsKB: MakeInvariantsKB(new Sentence[]
                     {
-                        // TODO: slicker support for unique names assumption worth looking into at some point.. 
                         Block(new Constant("blockA")),
-                        Equal(new Constant("blockA"), new Constant("blockA")),
-                        !Equal(new Constant("blockA"), new Constant("blockB")),
-                        !Equal(new Constant("blockA"), new Constant("blockC")),
                         Block(new Constant("blockB")),
-                        !Equal(new Constant("blockB"), new Constant("blockA")),
-                        Equal(new Constant("blockB"), new Constant("blockB")),
-                        !Equal(new Constant("blockB"), new Constant("blockC")),
                         Block(new Constant("blockC")),
-                        !Equal(new Constant("blockC"), new Constant("blockA")),
-                        !Equal(new Constant("blockC"), new Constant("blockB")),
-                        Equal(new Constant("blockC"), new Constant("blockC")),
+                        !Block(Table),
                         ForAll(A, B, If(On(A, B), !Clear(B))),
                     })),
 
@@ -55,35 +62,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                     InvariantsKB: MakeInvariantsKB(new Sentence[]
                     {
                         Block(new Constant("blockA")),
-                        Equal(new Constant("blockA"), new Constant("blockA")),
-                        !Equal(new Constant("blockA"), new Constant("blockB")),
-                        !Equal(new Constant("blockA"), new Constant("blockC")),
-                        !Equal(new Constant("blockA"), new Constant("blockD")),
-                        !Equal(new Constant("blockA"), new Constant("blockE")),
                         Block(new Constant("blockB")),
-                        !Equal(new Constant("blockB"), new Constant("blockA")),
-                        Equal(new Constant("blockB"), new Constant("blockB")),
-                        !Equal(new Constant("blockB"), new Constant("blockC")),
-                        !Equal(new Constant("blockB"), new Constant("blockD")),
-                        !Equal(new Constant("blockB"), new Constant("blockE")),
                         Block(new Constant("blockC")),
-                        !Equal(new Constant("blockC"), new Constant("blockA")),
-                        !Equal(new Constant("blockC"), new Constant("blockB")),
-                        Equal(new Constant("blockC"), new Constant("blockC")),
-                        !Equal(new Constant("blockC"), new Constant("blockD")),
-                        !Equal(new Constant("blockC"), new Constant("blockE")),
                         Block(new Constant("blockD")),
-                        !Equal(new Constant("blockD"), new Constant("blockA")),
-                        !Equal(new Constant("blockD"), new Constant("blockB")),
-                        !Equal(new Constant("blockD"), new Constant("blockC")),
-                        Equal(new Constant("blockD"), new Constant("blockD")),
-                        !Equal(new Constant("blockD"), new Constant("blockE")),
                         Block(new Constant("blockE")),
-                        !Equal(new Constant("blockE"), new Constant("blockA")),
-                        !Equal(new Constant("blockE"), new Constant("blockB")),
-                        !Equal(new Constant("blockE"), new Constant("blockC")),
-                        !Equal(new Constant("blockE"), new Constant("blockD")),
-                        Equal(new Constant("blockE"), new Constant("blockE")),
+                        !Block(Table),
                         ForAll(A, B, If(On(A, B), !Clear(B))),
                     })),
             })
@@ -100,42 +83,41 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .GivenTestContext()
             .AndEachOf(() => new Func<IHeuristic, IKnowledgeBase, IPlanner>[]
             {
-                //(h, kb) => new BackwardStateSpaceSearch_LiftedWithoutKB(h), // too slow to be workable
-                (h, kb) => new BackwardStateSpaceSearch_PropositionalWithoutKB(h),
-                (h, kb) => new BackwardStateSpaceSearch_PropositionalWithKB(h, kb), // Why is this so slow - it should be faster? Interrogable planning processes will help diagnose. 
+                //(h, kb) => new BackwardStateSpaceSearch_LiftedWithKB(h, kb), // doesnt work yet
+                //(h, kb) => new BackwardStateSpaceSearch_LiftedWithoutKB(h), // doesnt work yet
+                //(h, kb) => new BackwardStateSpaceSearch_PropositionalWithoutKB(h),
+                (h, kb) => new BackwardStateSpaceSearch_PropositionalWithKB(h, kb),
             })
             .AndEachOf(() => new TestCase[]
             {
                 new(
                     Problem: AirCargo.ExampleProblem,
                     Heuristic: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
-                    InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
+                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    {
+                        Cargo(new Constant("cargo1")),
+                        Cargo(new Constant("cargo2")),
+                        Plane(new Constant("plane1")),
+                        Plane(new Constant("plane2")),
+                        Airport(new Constant("airport1")),
+                        Airport(new Constant("airport2")),
+                        ForAll(A, If(Cargo(A), !Plane(A))),
+                        ForAll(A, If(Cargo(A), !Airport(A))),
+                        ForAll(A, If(Plane(A), !Cargo(A))),
+                        ForAll(A, If(Plane(A), !Airport(A))),
+                        ForAll(A, If(Airport(A), !Cargo(A))),
+                        ForAll(A, If(Airport(A), !Plane(A))),
+                    })),
 
                 new(
                     Problem: BlocksWorld.ExampleProblem,
                     Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
                     InvariantsKB: MakeInvariantsKB(new Sentence[]
                     {
-                        // TODO: slicker support for unique names assumption worth looking into at some point.. 
                         Block(new Constant("blockA")),
-                        Equal(new Constant("blockA"), new Constant("blockA")),
-                        !Equal(new Constant("blockA"), new Constant("blockB")),
-                        !Equal(new Constant("blockA"), new Constant("blockC")),
-                        !Equal(new Constant("blockA"), Table),
                         Block(new Constant("blockB")),
-                        !Equal(new Constant("blockB"), new Constant("blockA")),
-                        Equal(new Constant("blockB"), new Constant("blockB")),
-                        !Equal(new Constant("blockB"), new Constant("blockC")),
-                        !Equal(new Constant("blockB"), Table),
                         Block(new Constant("blockC")),
-                        !Equal(new Constant("blockC"), new Constant("blockA")),
-                        !Equal(new Constant("blockC"), new Constant("blockB")),
-                        Equal(new Constant("blockC"), new Constant("blockC")),
-                        !Equal(new Constant("blockC"), Table),
-                        !Equal(Table, new Constant("blockA")),
-                        !Equal(Table, new Constant("blockB")),
-                        !Equal(Table, new Constant("blockC")),
-                        !Equal(Table, new Constant("blockD")),
+                        !Block(Table),
                         ForAll(A, B, If(On(A, B), !Clear(B))),
                     })),
 
@@ -150,35 +132,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
                     InvariantsKB: MakeInvariantsKB(new Sentence[]
                     {
                         Block(new Constant("blockA")),
-                        Equal(new Constant("blockA"), new Constant("blockA")),
-                        !Equal(new Constant("blockA"), new Constant("blockB")),
-                        !Equal(new Constant("blockA"), new Constant("blockC")),
-                        !Equal(new Constant("blockA"), new Constant("blockD")),
-                        !Equal(new Constant("blockA"), new Constant("blockE")),
                         Block(new Constant("blockB")),
-                        !Equal(new Constant("blockB"), new Constant("blockA")),
-                        Equal(new Constant("blockB"), new Constant("blockB")),
-                        !Equal(new Constant("blockB"), new Constant("blockC")),
-                        !Equal(new Constant("blockB"), new Constant("blockD")),
-                        !Equal(new Constant("blockB"), new Constant("blockE")),
                         Block(new Constant("blockC")),
-                        !Equal(new Constant("blockC"), new Constant("blockA")),
-                        !Equal(new Constant("blockC"), new Constant("blockB")),
-                        Equal(new Constant("blockC"), new Constant("blockC")),
-                        !Equal(new Constant("blockC"), new Constant("blockD")),
-                        !Equal(new Constant("blockC"), new Constant("blockE")),
                         Block(new Constant("blockD")),
-                        !Equal(new Constant("blockD"), new Constant("blockA")),
-                        !Equal(new Constant("blockD"), new Constant("blockB")),
-                        !Equal(new Constant("blockD"), new Constant("blockC")),
-                        Equal(new Constant("blockD"), new Constant("blockD")),
-                        !Equal(new Constant("blockD"), new Constant("blockE")),
                         Block(new Constant("blockE")),
-                        !Equal(new Constant("blockE"), new Constant("blockA")),
-                        !Equal(new Constant("blockE"), new Constant("blockB")),
-                        !Equal(new Constant("blockE"), new Constant("blockC")),
-                        !Equal(new Constant("blockE"), new Constant("blockD")),
-                        Equal(new Constant("blockE"), new Constant("blockE")),
+                        !Block(Table),
                         ForAll(A, B, If(On(A, B), !Clear(B))),
                     })),
             })
@@ -189,10 +147,12 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
 
         private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)
         {
-            var invariantKb = new SimpleResolutionKnowledgeBase(
+            var resolutionKb = new SimpleResolutionKnowledgeBase(
                 new SimpleClauseStore(),
                 SimpleResolutionKnowledgeBase.Filters.None,
                 SimpleResolutionKnowledgeBase.PriorityComparisons.UnitPreference);
+
+            var invariantKb = new UniqueNamesAxiomisingKnowledgeBase(EqualityAxiomisingKnowledgeBase.CreateAsync(resolutionKb).GetAwaiter().GetResult());
             invariantKb.Tell(invariants);
 
             return invariantKb;

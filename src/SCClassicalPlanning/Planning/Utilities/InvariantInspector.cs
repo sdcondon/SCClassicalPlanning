@@ -1,6 +1,8 @@
 ﻿using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
+using SCFirstOrderLogic.Inference.Resolution;
+using System.Diagnostics;
 
 namespace SCClassicalPlanning.Planning.Utilities
 {
@@ -35,6 +37,8 @@ namespace SCClassicalPlanning.Planning.Utilities
                 var variables = new HashSet<VariableDeclaration>();
                 GoalVariableFinder.Instance.Visit(goal, variables);
 
+                // NB: can safely skip here because otherwise the goal is empty, and we initialise
+                // the result cache with the empty goal, so the trygetvalue above with succeed.
                 // TODO-SCFIRSTORDERLOGIC-MAYBE: Annoying performance hit - goals are essentially already in CNF, but our knowledge bases want to do the conversion themselves.. Meh, never mind.
                 // TODO: Perhaps a ToSentence in Goal? (and others..)
                 var goalSentence = goal.Elements.Skip(1).Aggregate(goal.Elements.First().ToSentence(), (c, e) => new Conjunction(c, e.ToSentence()));
@@ -79,6 +83,14 @@ namespace SCClassicalPlanning.Planning.Utilities
             {
                 if (!isTrivialElementResultCache.TryGetValue(element, out bool isTrivialElement))
                 {
+                    var q = invariantsKB.CreateQuery(element.ToSentence());
+                    q.Execute();
+                    if (q.Result)
+                    {
+                        var e = ((SimpleResolutionQuery)q).ResultExplanation;
+                        Debug.WriteLine(e);
+                    }
+
                     isTrivialElement = isTrivialElementResultCache[element] = await invariantsKB.AskAsync(element.ToSentence(), cancellationToken);
                 }
 
