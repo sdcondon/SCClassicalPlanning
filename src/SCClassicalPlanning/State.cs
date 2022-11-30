@@ -81,7 +81,7 @@ namespace SCClassicalPlanning
         /// </summary>
         /// <param name="goal">The goal to check.</param>
         /// <returns>A value indicating whether this state satisfies a given goal.</returns>
-        public bool Satisfies(Goal goal) => Elements.IsSupersetOf(goal.PositivePredicates) && !Elements.Overlaps(goal.NegativePredicates);
+        public bool Satisfies(Goal goal) => Elements.IsSupersetOf(goal.RequiredPredicates) && !Elements.Overlaps(goal.ForbiddenPredicates);
 
         /// <summary>
         /// Gets the substitutions (if any) that can be applied to a given goal so that this state satisfies it.
@@ -94,7 +94,7 @@ namespace SCClassicalPlanning
             {
                 List<Literal> constraintElements = new();
 
-                foreach (var goalElement in goal.NegativePredicates)
+                foreach (var goalElement in goal.ForbiddenPredicates)
                 {
                     if (Elements.Contains((Predicate)substitution.ApplyTo(goalElement).ToSentence()))
                     {
@@ -131,7 +131,7 @@ namespace SCClassicalPlanning
                 }
             }
 
-            foreach (var substitution in GetPositiveGoalElementUnifiers(goal.PositivePredicates, new VariableSubstitution()).Distinct())
+            foreach (var substitution in GetPositiveGoalElementUnifiers(goal.RequiredPredicates, new VariableSubstitution()).Distinct())
             {
                 if (!UnifiesNegativeGoalElement(substitution))
                 {

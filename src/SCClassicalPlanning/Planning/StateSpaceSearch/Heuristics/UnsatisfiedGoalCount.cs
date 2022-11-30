@@ -28,8 +28,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
         /// <inheritdoc/>
         public float EstimateCost(State state, Goal goal)
         {
-            return goal.PositivePredicates.Except(state.Elements).Count()
-                + goal.NegativePredicates.Intersect(state.Elements).Count();
+            return goal.RequiredPredicates.Except(state.Elements).Count()
+                + goal.ForbiddenPredicates.Intersect(state.Elements).Count();
         }
     }
 }

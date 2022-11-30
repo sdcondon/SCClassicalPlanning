@@ -75,14 +75,14 @@ namespace SCClassicalPlanning
         public IEnumerable<Literal> NegativeElements => Elements.Where(l => l.IsNegated);
 
         /// <summary>
-        /// Gets the positive predicates of the goal - those that must exist in a <see cref="State"/> in order for this goal to be satisfied.
+        /// Gets the required predicates of the goal - those that must exist in a <see cref="State"/> in order for this goal to be satisfied.
         /// </summary>
-        public IEnumerable<Predicate> PositivePredicates => PositiveElements.Select(l => l.Predicate);
+        public IEnumerable<Predicate> RequiredPredicates => PositiveElements.Select(l => l.Predicate);
 
         /// <summary>
-        /// Gets the negative predicates of the goal - those that must NOT exist in a <see cref="State"/> in order for this goal to be satisfied.
+        /// Gets the forbidden predicates of the goal - those that must NOT exist in a <see cref="State"/> in order for this goal to be satisfied.
         /// </summary>
-        public IEnumerable<Predicate> NegativePredicates => NegativeElements.Select(l => l.Predicate);
+        public IEnumerable<Predicate> ForbiddenPredicates => NegativeElements.Select(l => l.Predicate);
 
         /// <summary>
         /// Gets a value indicating whether this goal is satisfied by a particular state.
