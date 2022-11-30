@@ -41,7 +41,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             // Planning graphs only work with propositions - no variables allowed.
             // So here we iterate every possible ground predicate (by substituting every combination of known constants
-            // for its arguments - add positive if it's in the initial state, otherwise negative
+            // for its arguments - add positive if it's in the initial state, otherwise negative)
             var propositionLevel0 = new Dictionary<Literal, PropositionNode>();
             foreach (var predicateTemplate in problem.Domain.Predicates)
             {
@@ -290,7 +290,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
         }
 
-        // TODO: strictly speaking, this identifier is not guaranteed to be unique.
+        // TODO: this identifier is not guaranteed to be unique.
         // NB: while an EMPTY goal and effect would at first glance seem to be intuitive - it is
         // defined like this to assist with mutex creation. Feels hacky to me, but this is
         // apparently what is done..

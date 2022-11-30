@@ -27,7 +27,7 @@ namespace SCClassicalPlanning.Planning.Utilities
         /// <summary>
         /// Gets a value indicating whether the invariants mean that a given goal is impossible to achieve.
         /// </summary>
-        /// <param name="goal">the goal to check.</param>
+        /// <param name="goal">The goal to check.</param>
         /// <param name="cancellationToken">A cancellation token for the operation.</param>
         /// <returns>A (task that returns a) value indicating whether the invariants mean that the given goal is impossible to achieve.</returns>
         public async Task<bool> IsGoalPrecludedByInvariantsAsync(Goal goal, CancellationToken cancellationToken = default)
@@ -37,8 +37,8 @@ namespace SCClassicalPlanning.Planning.Utilities
                 var variables = new HashSet<VariableDeclaration>();
                 GoalVariableFinder.Instance.Visit(goal, variables);
 
-                // NB: can safely skip here because otherwise the goal is empty, and we initialise
-                // the result cache with the empty goal, so the trygetvalue above with succeed.
+                // NB: can safely skip here because otherwise the goal is empty - and we initialise
+                // the result cache with the empty goal - so the TryGetValue above would have succeeded.
                 // TODO-SCFIRSTORDERLOGIC-MAYBE: Annoying performance hit - goals are essentially already in CNF, but our knowledge bases want to do the conversion themselves.. Meh, never mind.
                 // TODO: Perhaps a ToSentence in Goal? (and others..)
                 var goalSentence = goal.Elements.Skip(1).Aggregate(goal.Elements.First().ToSentence(), (c, e) => new Conjunction(c, e.ToSentence()));
