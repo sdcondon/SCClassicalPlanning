@@ -23,8 +23,6 @@ namespace SCClassicalPlanning.Planning
         /// Calling <see cref="NextStep"/> on a completed planning task should result in an <see cref="InvalidOperationException"/>.
         /// </summary>
         /// <returns>A container for information on what happened during the step.</returns>
-        // TODO: Should this use ValueTask? Investigate me. Yeah, high-perf isn't the point of this package,
-        // but given that this is an abstraction, its constraining what people *could* achieve with it. So worth a look at least.
         public abstract TStepResult NextStep();
 
         /// <inheritdoc />
@@ -33,7 +31,7 @@ namespace SCClassicalPlanning.Planning
             // TODO: decide on re-entry handling, if any
             while (!IsComplete)
             {
-                var step = NextStep();
+                NextStep();
                 cancellationToken.ThrowIfCancellationRequested();
                 await Task.Yield();
             }

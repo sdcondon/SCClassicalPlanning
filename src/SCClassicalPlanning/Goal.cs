@@ -87,8 +87,8 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Gets a value indicating whether this goal is satisfied by a particular state.
         /// </summary>
-        /// <param name="state"></param>
-        /// <returns></returns>
+        /// <param name="state">The state to check.</param>
+        /// <returns>True if this goal is satisifed by the given state; otherwise false.</returns>
         public bool IsSatisfiedBy(State state) => state.Satisfies(this);
 
         /// <summary>

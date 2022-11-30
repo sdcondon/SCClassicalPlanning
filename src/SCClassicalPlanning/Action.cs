@@ -17,8 +17,8 @@ namespace SCClassicalPlanning
     /// Container for information about an action.
     /// <para/>
     /// Actions can be applied to <see cref="State"/>s to create new states (via the action's Effect),
-    /// provided that the action's Precondition (which is a <see cref="Goal"/>) is met. <see cref="Domain"/>s include a description of all
-    /// actions that are valid in the domain.
+    /// provided that the action's Precondition (which is a <see cref="Goal"/>) is satisfied by the current state.
+    /// <see cref="Domain"/>s include a description of all actions that are valid in the domain.
     /// </summary>
     public class Action
     {
