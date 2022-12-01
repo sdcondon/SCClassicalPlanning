@@ -50,9 +50,8 @@ namespace SCClassicalPlanning
         /// variables don't need to know about such objects, but e.g. GraphPlan needs to know.
         /// </param>
         // TODO-EXTENSIBILITY: Problematic.. Large state? IO? Fairly big deal because could have significant impact.
-        // Should initialState and additionalConstants ctor params be replaced/accompanied with something like an 'IStateStore' (and 'IConstantStore')?
-        // These two then provide lookup functionality needed by planners - thus allowing for the use of appropriate indices?
-        // Perhaps also leave existing ctor that implicitly uses e.g. HashSetStateStore.
+        // Would just making State abstract or interface suffice?
+        // Or would we want state and state storage separately?
         // Explore this. Later (prob last thing before v1 - want a 'complete' solution before looking at refactoring and abstractions).
         public Problem(Domain domain, State initialState, Goal goal, IEnumerable<Constant> additionalConstants)
         {
