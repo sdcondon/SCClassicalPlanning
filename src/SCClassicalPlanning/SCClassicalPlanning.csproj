@@ -36,8 +36,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\SCClassicalPlanning-128.png" Pack="true" PackagePath="\" Link="_PackageContent\SCClassicalPlanning-128.png" />
-    <None Update="_PackageContent\SCClassicalPlanning.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\SCClassicalPlanning-128.png" Pack="true" PackagePath="\" Link="_PackageFiles\SCClassicalPlanning-128.png" />
+    <None Update="_PackageFiles\SCClassicalPlanning.md" Pack="true" PackagePath="README.md" />
   </ItemGroup>
 
 </Project>
