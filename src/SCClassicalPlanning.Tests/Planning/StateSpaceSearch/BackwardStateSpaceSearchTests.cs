@@ -85,8 +85,8 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 //(h, kb) => new BackwardStateSpaceSearch_LiftedWithKB(h, kb), // doesnt work yet
                 //(h, kb) => new BackwardStateSpaceSearch_LiftedWithoutKB(h), // doesnt work yet
-                //(h, kb) => new BackwardStateSpaceSearch_PropositionalWithoutKB(h),
-                (h, kb) => new BackwardStateSpaceSearch_PropositionalWithKB(h, kb),
+                (h, kb) => new BackwardStateSpaceSearch_PropositionalWithoutKB(h),
+                //(h, kb) => new BackwardStateSpaceSearch_PropositionalWithKB(h, kb),
             })
             .AndEachOf(() => new TestCase[]
             {
