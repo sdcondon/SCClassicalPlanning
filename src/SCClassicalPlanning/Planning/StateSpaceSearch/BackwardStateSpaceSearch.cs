@@ -67,15 +67,15 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
         /// </summary>
         public class PlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
         {
-            private readonly AStarSearch<StateSpaceNode, StateSpaceEdge> search;
+            private readonly AStarSearch<GoalSpaceNode, GoalSpaceEdge> search;
 
             private bool isComplete;
             private Plan? result;
 
             internal PlanningTask(Problem problem, IHeuristic heuristic, Func<Action, float> getActionCost)
             {
-                search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
-                    source: new StateSpaceNode(problem, problem.Goal),
+                search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
+                    source: new GoalSpaceNode(problem, problem.Goal),
                     isTarget: n => problem.InitialState.Satisfies(n.Goal),
                     getEdgeCost: e => getActionCost(e.Action),
                     getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
@@ -144,11 +144,11 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             }
         }
 
-        private readonly struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
+        private readonly struct GoalSpaceNode : INode<GoalSpaceNode, GoalSpaceEdge>, IEquatable<GoalSpaceNode>
         {
             private readonly Problem problem;
 
-            public StateSpaceNode(Problem problem, Goal goal) => (this.problem, Goal) = (problem, goal);
+            public GoalSpaceNode(Problem problem, Goal goal) => (this.problem, Goal) = (problem, goal);
 
             /// <summary>
             /// Gets the goal represented by this node.
@@ -156,14 +156,14 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public Goal Goal { get; }
 
             /// <inheritdoc />
-            public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(problem, Goal);
+            public IReadOnlyCollection<GoalSpaceEdge> Edges => new GoalSpaceNodeEdges(problem, Goal);
 
             /// <inheritdoc />
-            public override bool Equals(object? obj) => obj is StateSpaceNode node && Equals(node);
+            public override bool Equals(object? obj) => obj is GoalSpaceNode node && Equals(node);
 
             /// <inheritdoc />
             // NB: this struct is private - so we don't need to look at the problem, since it'll always match
-            public bool Equals(StateSpaceNode node) => Equals(Goal, node.Goal);
+            public bool Equals(GoalSpaceNode node) => Equals(Goal, node.Goal);
 
             /// <inheritdoc />
             public override int GetHashCode() => HashCode.Combine(Goal);
@@ -172,22 +172,22 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             public override string ToString() => Goal.ToString();
         }
 
-        private readonly struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
+        private readonly struct GoalSpaceNodeEdges : IReadOnlyCollection<GoalSpaceEdge>
         {
             private readonly Problem problem;
             private readonly Goal goal;
 
-            public StateSpaceNodeEdges(Problem problem, Goal goal) => (this.problem, this.goal) = (problem, goal);
+            public GoalSpaceNodeEdges(Problem problem, Goal goal) => (this.problem, this.goal) = (problem, goal);
 
             /// <inheritdoc />
             public int Count => ProblemInspector.GetRelevantActions(problem, goal).Count();
 
             /// <inheritdoc />
-            public IEnumerator<StateSpaceEdge> GetEnumerator()
+            public IEnumerator<GoalSpaceEdge> GetEnumerator()
             {
                 foreach (var action in ProblemInspector.GetRelevantActions(problem, goal))
                 {
-                    yield return new StateSpaceEdge(problem, goal, action);
+                    yield return new GoalSpaceEdge(problem, goal, action);
                 }
             }
 
@@ -195,12 +195,12 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        private readonly struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
+        private readonly struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
         {
             private readonly Problem problem;
             private readonly Goal fromGoal;
 
-            public StateSpaceEdge(Problem problem, Goal fromGoal, Action action)
+            public GoalSpaceEdge(Problem problem, Goal fromGoal, Action action)
             {
                 this.problem = problem;
                 this.fromGoal = fromGoal;
@@ -208,10 +208,10 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             }
 
             /// <inheritdoc />
-            public StateSpaceNode From => new(problem, fromGoal);
+            public GoalSpaceNode From => new(problem, fromGoal);
 
             /// <inheritdoc />
-            public StateSpaceNode To => new(problem, Action.Regress(fromGoal));
+            public GoalSpaceNode To => new(problem, Action.Regress(fromGoal));
 
             /// <summary>
             /// Gets the action that is regressed over to achieve this goal transition.
