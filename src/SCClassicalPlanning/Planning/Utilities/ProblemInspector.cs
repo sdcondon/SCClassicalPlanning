@@ -227,6 +227,8 @@ namespace SCClassicalPlanning.Planning.Utilities
 
         /// <summary>
         /// Gets all possible variable substitutions that populate each of the arguments of a given predicate with a constant. Uses all constants of a given problem, and uses an existing substitution as a constraint.
+        /// <para/>
+        /// NB: be careful - the risk of combinatorial explosion is significant here.
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="predicate">The predicate to create all possible substitutions for.</param>

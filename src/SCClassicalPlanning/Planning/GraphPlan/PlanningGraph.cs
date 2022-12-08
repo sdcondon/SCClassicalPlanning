@@ -91,13 +91,13 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         }
 
         /// <summary>
-        /// Gets the level at which all of a set of propositions first occurs, with no pair being mutually exclusive.
+        /// Gets the "set level" of a set of propositions. That is, the first level at which all of the propositions occur, with no pair being mutually exclusive.
         /// </summary>
         /// <param name="propositions">The set of propositions to look for.</param>
         /// <returns>The level at which all of a set of propositions first occurs, with no pair being mutually exclusive.</returns>
         public int GetSetLevel(IEnumerable<Literal> propositions)
         {
-            // Meh, will do for now - yes its a loop, but each iteration is a dictionary key lookup
+            // Meh, will do for now - yes its a loop, but.. meh.
             var level = 0;
             while (!GetLevel(level).ContainsNonMutex(propositions))
             {
@@ -113,7 +113,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         }
 
         /// <summary>
-        /// Retrieves an object representing a particular (proposition) level within the graph. Expands the graph if necessary.
+        /// Retrieves an object representing a particular (proposition) level within the graph. Expands the graph to this level if necessary.
         /// </summary>
         /// <param name="index">The index of the level to retrieve.</param>
         /// <returns>An object representing the level.</returns>
@@ -309,7 +309,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
 
             /// <summary>
-            /// Gets the previous level of the graph - or null if this is the level that represents the initial state of the problem.
+            /// Gets the previous level of the graph - or null if this level represents the initial state of the problem.
             /// </summary>
             public Level? PreviousLevel { get; }
 

@@ -70,8 +70,8 @@ namespace SCClassicalPlanning
         /// <para/>
         /// An action is relevant to a goal if its effect is relevant to the goal.
         /// </summary>
-        /// <param name="goal"></param>
-        /// <returns></returns>
+        /// <param name="goal">The goal to examine.</param>
+        /// <returns>A value indicating whether this action is conceivably a useful final step in achieving the given goal.</returns>
         public bool IsRelevantTo(Goal goal) => goal.IsRelevant(Effect);
 
         /// <summary>

@@ -23,6 +23,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// <para/>
     /// Extracts solutions via a backward search.
     /// </summary>
+    // Turns out that AIaMA isn't a great resource for GraphPlan - too many omissions.
+    // Other resources include those created by one of its creators:
+    // https://www.cs.cmu.edu/~avrim/graphplan.html
+    // 
     public class GraphPlan : IPlanner
     {
         /// <summary>
@@ -77,13 +81,16 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             public async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
             {
                 var graph = new PlanningGraph(problem);
-                (int, Goal)? noGood = null, lastNoGood = null;
+                HashSet<(int Level, Goal Goal)> noGoods = new();
+                bool goalElementsPresentAndNonMutex = false;
 
                 for (int i = 0; ; i++)
                 {
+                    var noGoodsLevelledOff = false;
                     var graphLevel = graph.GetLevel(i);
 
-                    if (graphLevel.ContainsNonMutex(problem.Goal.Elements))
+                    // NB: below, we don't need to keep checking once its true for a level - because mutexes decrease monotonically.
+                    if (goalElementsPresentAndNonMutex |= graphLevel.ContainsNonMutex(problem.Goal.Elements))
                     {
                         var solutionExtractionResult = await TryExtractSolutionAsync(problem.InitialState, problem.Goal, graphLevel, cancellationToken);
 
@@ -93,19 +100,17 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                             isComplete = true;
                             return result;
                         }
-                        else
+                        else if (!noGoods.Add(solutionExtractionResult.NoGood.Value))
                         {
-                            noGood = solutionExtractionResult.NoGood;
+                            noGoodsLevelledOff = true;
                         }
                     }
 
-                    if (graph.LevelledOff && noGood.Equals(lastNoGood))
+                    if (graph.LevelledOff && noGoodsLevelledOff)
                     {
                         result = null;
                         isComplete = true;
                     }
-
-                    lastNoGood = noGood;
                 }
             }
 

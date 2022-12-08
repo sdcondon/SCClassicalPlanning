@@ -83,14 +83,6 @@ namespace SCClassicalPlanning.Planning.Utilities
             {
                 if (!isTrivialElementResultCache.TryGetValue(element, out bool isTrivialElement))
                 {
-                    var q = invariantsKB.CreateQuery(element.ToSentence());
-                    q.Execute();
-                    if (q.Result)
-                    {
-                        var e = ((SimpleResolutionQuery)q).ResultExplanation;
-                        Debug.WriteLine(e);
-                    }
-
                     isTrivialElement = isTrivialElementResultCache[element] = await invariantsKB.AskAsync(element.ToSentence(), cancellationToken);
                 }
 
