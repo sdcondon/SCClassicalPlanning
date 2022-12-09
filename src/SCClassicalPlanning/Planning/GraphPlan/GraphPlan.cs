@@ -80,22 +80,30 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             /// <inheritdoc />
             public async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
             {
-                var graph = new PlanningGraph(problem);
                 HashSet<(int Level, Goal Goal)> noGoods = new();
-                bool goalElementsPresentAndNonMutex = false;
+                var goalElementsPresentAndNonMutex = false;
+                var noGoodsLevelledOff = false;
 
+                // First, create a planning graph.
+                var graph = new PlanningGraph(problem);
+
+                // Iterate through the levels of the planning graph, and for each..
                 for (int i = 0; ; i++)
                 {
-                    var noGoodsLevelledOff = false;
                     var graphLevel = graph.GetLevel(i);
 
-                    // NB: we don't need to keep checking this once its true for a level - because mutexes decrease monotonically.
+                    // ..check if all of the goal's elements occur at this level, with no pair mutually exclusive. If so..
+                    // (NB: we don't need to keep checking this once its true for a level - because mutexes decrease monotonically)
                     if (goalElementsPresentAndNonMutex || (goalElementsPresentAndNonMutex = graphLevel.ContainsNonMutex(problem.Goal.Elements)))
                     {
+                        // ..try to extract a solution:
                         var solutionExtractionResult = await Task.Run(() => TryExtractSolution(problem.InitialState, problem.Goal, graphLevel, cancellationToken), cancellationToken);
 
+                        // If we managed to extract a solution, we're done. Return it.
+                        // Otherwise, add the no-good to the no-goods hashset, and make a note if we've already seen it.
                         if (solutionExtractionResult.Success)
                         {
+                            
                             result = solutionExtractionResult.Plan!;
                             isComplete = true;
                             return result;
@@ -106,10 +114,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                         }
                     }
 
+                    // If we haven't managed to extract a solution, and both the graph and no-goods have levelled off, we fail.
                     if (graph.LevelledOff && noGoodsLevelledOff)
                     {
                         result = null;
                         isComplete = true;
+                        throw new InvalidOperationException("Plan creation failed");
                     }
                 }
             }
@@ -120,8 +130,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // don't actually need to look for level being zero. If we satisfy the goal at level n > 0, we can just
                 // use no-op actions to get to that level then execute the plan. in practice i dont think
                 // this'll happen because we'll find the solution on an earlier step anyway
-                var search = new RecursiveDFS<StateSpaceNode, StateSpaceEdge>(
-                    source: new StateSpaceNode(graphLevel, goal),
+                var search = new RecursiveDFS<SearchNode, SearchEdge>(
+                    source: new SearchNode(graphLevel, goal),
                     isTarget: n => initialState.Satisfies(n.Goal)); // todo: nogoods - record level and goals here, or..?
 
                 search.Complete(cancellationToken);
@@ -155,11 +165,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private record struct SolutionExtractionResult(bool Success, Plan? Plan, (int Level, Goal Goal)? NoGood);
 
-        private readonly struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, IEquatable<StateSpaceNode>
+        private readonly struct SearchNode : INode<SearchNode, SearchEdge>, IEquatable<SearchNode>
         {
             private readonly PlanningGraph.Level graphLevel;
 
-            public StateSpaceNode(PlanningGraph.Level graphLevel, Goal goal)
+            public SearchNode(PlanningGraph.Level graphLevel, Goal goal)
             {
                 this.graphLevel = graphLevel;
                 this.Goal = goal;
@@ -167,24 +177,24 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             public readonly Goal Goal { get; }
 
-            public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(graphLevel, Goal);
+            public IReadOnlyCollection<SearchEdge> Edges => new SearchNodeEdges(graphLevel, Goal);
 
-            public override bool Equals(object? obj) => obj is StateSpaceNode node && Equals(node);
+            public override bool Equals(object? obj) => obj is SearchNode node && Equals(node);
 
             // NB: this struct is private - so we don't need to look at the planning graph, since it'll always match
-            public bool Equals(StateSpaceNode node) => Equals(Goal, node.Goal);
+            public bool Equals(SearchNode node) => Equals(Goal, node.Goal);
 
             public override int GetHashCode() => HashCode.Combine(Goal);
 
             public override string ToString() => Goal.ToString(); // mebbe add info about the level (e.g. the index)
         }
 
-        private readonly struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
+        private readonly struct SearchNodeEdges : IReadOnlyCollection<SearchEdge>
         {
             private readonly PlanningGraph.Level graphLevel;
             private readonly Goal goal;
 
-            public StateSpaceNodeEdges(PlanningGraph.Level graphLevel, Goal goal)
+            public SearchNodeEdges(PlanningGraph.Level graphLevel, Goal goal)
             {
                 this.graphLevel = graphLevel;
                 this.goal = goal;
@@ -194,7 +204,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             public int Count => this.Count();
 
             /// <inheritdoc />
-            public IEnumerator<StateSpaceEdge> GetEnumerator()
+            public IEnumerator<SearchEdge> GetEnumerator()
             {
                 var possibleActions = graphLevel.Nodes.SelectMany(n => n.Causes).Select(n => n.Action);
                 return Recurse(goal, possibleActions.ToImmutableHashSet(), ImmutableHashSet<Action>.Empty).GetEnumerator();
@@ -217,14 +227,14 @@ namespace SCClassicalPlanning.Planning.GraphPlan
              * 1. Pick first the literal with the highest level cost.
              * 2. To achieve that literal, prefer actions with easier preconditions.That is, choose an action such that the sum (or maximum) of the level costs of its preconditions is smallest." */      
             // (recursively, yeurch) iterates the available sets of actions in A[i-1] that cover the goal.
-            private IEnumerable<StateSpaceEdge> Recurse(Goal goal, ImmutableHashSet<Action> unselectedActions, ImmutableHashSet<Action> selectedActions)
+            private IEnumerable<SearchEdge> Recurse(Goal goal, ImmutableHashSet<Action> unselectedActions, ImmutableHashSet<Action> selectedActions)
             {
                 // NB-PERFORMANCE: a lot of GC pressure here, what with all the immutable hash sets.
                 // could eliminate the duplication by creating a tree instead (or use a struct - BitVector32? - to indicate selection).
                 // meh, lets get it working first.
                 if (goal.Equals(Goal.Empty))
                 {
-                    yield return new StateSpaceEdge(graphLevel, selectedActions);
+                    yield return new SearchEdge(graphLevel, selectedActions);
                 }
                 else
                 {
@@ -254,11 +264,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
         }
 
-        private readonly struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
+        private readonly struct SearchEdge : IEdge<SearchNode, SearchEdge>
         {
             private readonly PlanningGraph.Level graphLevel;
 
-            public StateSpaceEdge(PlanningGraph.Level graphLevel, IEnumerable<Action> actions)
+            public SearchEdge(PlanningGraph.Level graphLevel, IEnumerable<Action> actions)
             {
                 this.graphLevel = graphLevel;
                 this.Actions = actions;
@@ -268,10 +278,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             /// <inheritdoc />
             // could be new StateSpaceNode(planningGraph, fromGoal); - but we'd need fromGoal, which is a waste. Private struct and unused, so just ignore it
-            public StateSpaceNode From => throw new NotImplementedException(); 
+            public SearchNode From => throw new NotImplementedException(); 
 
             /// <inheritdoc />
-            public StateSpaceNode To => new(graphLevel.PreviousLevel!, new Goal(Actions.SelectMany(a => a.Precondition.Elements)));
+            public SearchNode To => new(graphLevel.PreviousLevel!, new Goal(Actions.SelectMany(a => a.Precondition.Elements)));
 
             /////// <inheritdoc />
             ////public override string ToString() => new PlanFormatter(problem.Domain).Format(Action);
