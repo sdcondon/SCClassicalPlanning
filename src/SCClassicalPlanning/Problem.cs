@@ -21,7 +21,7 @@ namespace SCClassicalPlanning
     /// Encapsulates a planning problem.
     /// <para/>
     /// Problems exist within a <see cref="SCClassicalPlanning.Domain"/>, and consist of an initial <see cref="State"/>, an end <see cref="SCClassicalPlanning.Goal"/>,
-    /// and a set of objects (represented by <see cref="Constant"/>s from the SCFirstOrderLogic library) that exist within the scope of the problem.
+    /// and a set of domain elements (represented by <see cref="Constant"/>s from the SCFirstOrderLogic library) that exist within the scope of the problem.
     /// </summary>
     public class Problem
     {

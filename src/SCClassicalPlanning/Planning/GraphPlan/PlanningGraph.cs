@@ -114,6 +114,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         /// <summary>
         /// Retrieves an object representing a particular (proposition) level within the graph. Expands the graph to this level if necessary.
+        /// If the graph levels off before the requested level, returns the level at which the graph levels off.
         /// </summary>
         /// <param name="index">The index of the level to retrieve.</param>
         /// <returns>An object representing the level.</returns>
