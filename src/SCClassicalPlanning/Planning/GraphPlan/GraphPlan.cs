@@ -34,7 +34,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
         /// <returns></returns>
-        public PlanningTask CreatePlanningTask(Problem problem) => new(problem);
+        public static PlanningTask CreatePlanningTask(Problem problem) => new(problem);
 
         /// <inheritdoc />
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
@@ -89,8 +89,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     var noGoodsLevelledOff = false;
                     var graphLevel = graph.GetLevel(i);
 
-                    // NB: below, we don't need to keep checking once its true for a level - because mutexes decrease monotonically.
-                    if (goalElementsPresentAndNonMutex |= graphLevel.ContainsNonMutex(problem.Goal.Elements))
+                    // NB: we don't need to keep checking this once its true for a level - because mutexes decrease monotonically.
+                    if (goalElementsPresentAndNonMutex || (goalElementsPresentAndNonMutex = graphLevel.ContainsNonMutex(problem.Goal.Elements)))
                     {
                         var solutionExtractionResult = await TryExtractSolutionAsync(problem.InitialState, problem.Goal, graphLevel, cancellationToken);
 
@@ -120,16 +120,14 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // don't actually need to look for level being zero. If we satisfy the goal at level n > 0, we can just
                 // use no-op actions to get to that level then execute the plan. in practice i dont think
                 // this'll happen because we'll find the solution on an earlier step anyway
-                var search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
+                var search = new DepthFirstSearch<StateSpaceNode, StateSpaceEdge>(
                     source: new StateSpaceNode(graphLevel, goal),
-                    isTarget: n => initialState.Satisfies(n.Goal), // todo: nogoods - record level and goals here, or..?
-                    getEdgeCost: e => 1,
-                    getEstimatedCostToTarget: EstimateCost);
+                    isTarget: n => initialState.Satisfies(n.Goal)); // todo: nogoods - record level and goals here, or..?
 
                 await search.CompleteAsync(cancellationToken);
 
                 // todo: nogoods - ..or query search tree for nogoods here?
-                // otherwise going to have to open things up and not use this a* implementation.
+                // otherwise going to have to open things up and not use this dfs implementation.
 
                 if (search.IsSucceeded)
                 {
@@ -145,24 +143,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                         NoGood: (0, Goal.Empty), // todo
                         Plan: null);
                 }
-            }
-
-            /*
-             * "We need some heuristic guidance for choosing among actions during the backward search
-             * One approach that works well in practice is a greedy algorithm based on the level cost of the literals.
-             * For any set of goals, we proceed in the following order:
-             * 1. Pick first the literal with the highest level cost.
-             * 2. To achieve that literal, prefer actions with easier preconditions. That is, choose an action such that the sum (or maximum) of the level costs of its preconditions is smallest." 
-             * Russell, Stuart; Norvig, Peter. Artificial Intelligence: A Modern Approach, Global Edition (p. 385). Pearson Education Limited. Kindle Edition.
-             * 
-             * :/ Implies not using A* I think - and also doesn't explain how to compromise if first choice doesn't work.
-             * The implication is using some kind of cost-aware algorithm, though, because of the earlier comment
-             * about all actions have cost 1. All in all, not very helpful..
-             */
-            private float EstimateCost(StateSpaceNode node)
-            {
-                // todo
-                throw new NotImplementedException();
             }
 
             /// <inheritdoc />
@@ -228,12 +208,20 @@ namespace SCClassicalPlanning.Planning.GraphPlan
              * whose effects cover the goals in the state. The resulting state has level S[i−1] and has as its set of goals
              * the preconditions for the selected set of actions. By “conflict free,” we mean a set of actions such that
              * no two of them are mutex and no two of their preconditions are mutex."
-             */
+             *
+             * and, to establish ordering (NB need to add low pri first because a DFS - thus uses a stack.. might just not use DFS - don't need step-by-step):
+             *
+             * "We need some heuristic guidance for choosing among actions during the backward search
+             * One approach that works well in practice is a greedy algorithm based on the level cost of the literals.
+             * For any set of goals, we proceed in the following order:
+             * 1. Pick first the literal with the highest level cost.
+             * 2. To achieve that literal, prefer actions with easier preconditions.That is, choose an action such that the sum (or maximum) of the level costs of its preconditions is smallest." */      
             // (recursively, yeurch) iterates the available sets of actions in A[i-1] that cover the goal.
             private IEnumerable<StateSpaceEdge> Recurse(Goal goal, ImmutableHashSet<Action> unselectedActions, ImmutableHashSet<Action> selectedActions)
             {
                 // NB-PERFORMANCE: a lot of GC pressure here, what with all the immutable hash sets.
-                // could eliminate the duplication by creating a tree instead. meh, not worth it right now.
+                // could eliminate the duplication by creating a tree instead (or use a struct - BitVector32? - to indicate selection).
+                // meh, lets get it working first.
                 if (goal.Equals(Goal.Empty))
                 {
                     yield return new StateSpaceEdge(graphLevel, selectedActions);
