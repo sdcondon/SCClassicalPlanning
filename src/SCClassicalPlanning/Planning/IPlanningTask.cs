@@ -30,6 +30,8 @@
         /// Executes the task to completion.
         /// <para/>
         /// NB: This is an asynchronous method ultimately because "real" planners will often need to do IO to create plans.
+        /// (While not true at the time of writing, ultimately <see cref="State"/> access is likely to become async, to facilitate
+        /// states that are large enough to warrant secondary storage - so anything using states would also benefit from being async).
         /// </summary>
         /// <param name="cancellationToken">A cancellation token for the operation.</param>
         /// <returns>A task, the result of which is the plan.</returns>

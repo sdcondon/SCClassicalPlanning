@@ -92,7 +92,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     // NB: we don't need to keep checking this once its true for a level - because mutexes decrease monotonically.
                     if (goalElementsPresentAndNonMutex || (goalElementsPresentAndNonMutex = graphLevel.ContainsNonMutex(problem.Goal.Elements)))
                     {
-                        var solutionExtractionResult = await TryExtractSolutionAsync(problem.InitialState, problem.Goal, graphLevel, cancellationToken);
+                        var solutionExtractionResult = await Task.Run(() => TryExtractSolution(problem.InitialState, problem.Goal, graphLevel, cancellationToken), cancellationToken);
 
                         if (solutionExtractionResult.Success)
                         {
@@ -114,17 +114,17 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
             }
 
-            private async Task<SolutionExtractionResult> TryExtractSolutionAsync(State initialState, Goal goal, PlanningGraph.Level graphLevel, CancellationToken cancellationToken)
+            private async Task<SolutionExtractionResult> TryExtractSolution(State initialState, Goal goal, PlanningGraph.Level graphLevel, CancellationToken cancellationToken)
             {
                 // NB: the book says that the target is *level is zero* and initial state matches goal.
                 // don't actually need to look for level being zero. If we satisfy the goal at level n > 0, we can just
                 // use no-op actions to get to that level then execute the plan. in practice i dont think
                 // this'll happen because we'll find the solution on an earlier step anyway
-                var search = new DepthFirstSearch<StateSpaceNode, StateSpaceEdge>(
+                var search = new RecursiveDFS<StateSpaceNode, StateSpaceEdge>(
                     source: new StateSpaceNode(graphLevel, goal),
                     isTarget: n => initialState.Satisfies(n.Goal)); // todo: nogoods - record level and goals here, or..?
 
-                await search.CompleteAsync(cancellationToken);
+                search.Complete(cancellationToken);
 
                 // todo: nogoods - ..or query search tree for nogoods here?
                 // otherwise going to have to open things up and not use this dfs implementation.
@@ -209,7 +209,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
              * the preconditions for the selected set of actions. By “conflict free,” we mean a set of actions such that
              * no two of them are mutex and no two of their preconditions are mutex."
              *
-             * and, to establish ordering (NB need to add low pri first because a DFS - thus uses a stack.. might just not use DFS - don't need step-by-step):
+             * and, to establish edge ordering:
              *
              * "We need some heuristic guidance for choosing among actions during the backward search
              * One approach that works well in practice is a greedy algorithm based on the level cost of the literals.
