@@ -114,7 +114,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
             }
 
-            private async Task<SolutionExtractionResult> TryExtractSolution(State initialState, Goal goal, PlanningGraph.Level graphLevel, CancellationToken cancellationToken)
+            private SolutionExtractionResult TryExtractSolution(State initialState, Goal goal, PlanningGraph.Level graphLevel, CancellationToken cancellationToken)
             {
                 // NB: the book says that the target is *level is zero* and initial state matches goal.
                 // don't actually need to look for level being zero. If we satisfy the goal at level n > 0, we can just
