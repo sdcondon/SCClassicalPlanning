@@ -5,7 +5,7 @@ using SCFirstOrderLogic.SentenceManipulation.Unification;
 namespace SCClassicalPlanning.Alternatives.Planning.Utilities
 {
     /// <summary>
-    /// Just includes a version of ProblemInspector.GetRelevantActionSchemas that attempts to be more efficient,
+    /// Just includes a version of ProblemInspector.GetRelevantSchemaSubstitutions that attempts to be more efficient,
     /// but unfortunately doesn't quite do the job. Worth keeping around for pondering, though.
     /// </summary>
     public static class ProblemInspector_MergedUnmatchLogic

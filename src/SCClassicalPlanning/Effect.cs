@@ -51,8 +51,10 @@ namespace SCClassicalPlanning
         /// <summary>
         /// Gets the set of literals that comprise this effect.
         /// </summary>
-        // TODO-PERFORMANCE: Should perhaps store add and delete lists separately, for performance. Application and Regression are going to be far more common than wanting to get all elements.
-        // Then again, if and this is expanded to richer PDDL functionality (or if we want to allow extension.. - unlikely given the motivator for the project, but..).
+        // TODO-PERFORMANCE: Should perhaps store add and delete lists separately, for performance.
+        // Application and Regression are going to be far more common than wanting to get all elements.
+        // Then again, that would be problematic if this is ever expanded to richer PDDL functionality
+        // (or if we want to allow extension.. - unlikely given the motivator for the project, but..).
         // In any case, add some benchmarks before making any changes.
         public ImmutableHashSet<Literal> Elements { get; }
 

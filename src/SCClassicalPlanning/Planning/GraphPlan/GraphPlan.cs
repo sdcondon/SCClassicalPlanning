@@ -24,7 +24,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// <para/>
     /// Extracts solutions via a backward search.
     /// </summary>
-    public class GraphPlan : IPlanner
+    internal class GraphPlan : IPlanner
     {
         /// <summary>
         /// Creates a (concretely-typed) planning task to work on solving a given problem.
