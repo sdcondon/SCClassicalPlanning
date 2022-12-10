@@ -24,10 +24,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// <para/>
     /// Extracts solutions via a backward search.
     /// </summary>
-    // Turns out that AIaMA isn't a great resource for GraphPlan - too many omissions.
-    // Other resources include those created by one of its creators:
-    // https://www.cs.cmu.edu/~avrim/graphplan.html
-    // 
     public class GraphPlan : IPlanner
     {
         /// <summary>
@@ -105,9 +101,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                             return result!;
                         }
                         // todo - establish whether nogoods have levelled off..
-                        //// else if ()
+                        ////else if ()
                         ////{
-                        //// ...
+                        ////    noGoodsLevelledOff = true;
                         ////}
                     }
 
@@ -127,10 +123,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 [MaybeNullWhen(false)] out Plan plan,
                 CancellationToken cancellationToken)
             {
-                // NB: the book says that the target is *level is zero* and initial state satisfies the goal.
-                // don't actually need to look for level being zero. If we satisfy the goal at level n > 0, we can just
-                // use no-op actions to get to that level then execute the plan. In practice I dont think
-                // this'll happen because we'll find the solution on an earlier step anyway
+                // NB: AIaMA says that the target is *level is zero* and initial state satisfies the goal.
+                // Don't actually need to look for level being zero. If we satisfy the goal at level n > 0, we can just
+                // use no-op actions to get to that level then execute the plan.
+                // In practice I dont think this'll happen because we'd have found the target at an earlier step anyway - 
+                // so what the book is trying (fairly badly..) to say is that when we first find the target, it'll be
+                // at level zero..
                 var search = new RecursiveDFS<SearchNode, SearchEdge>(
                     source: new SearchNode(graphLevel, problem.Goal),
                     isTarget: n => problem.InitialState.Satisfies(n.Goal));
