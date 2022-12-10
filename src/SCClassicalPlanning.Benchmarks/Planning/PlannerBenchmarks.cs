@@ -1,8 +1,8 @@
 ﻿using BenchmarkDotNet.Attributes;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using SCClassicalPlanning.Planning;
-using SCClassicalPlanning.Planning.StateSpaceSearch;
-using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics;
+using SCClassicalPlanning.Planning.Search;
+using SCClassicalPlanning.Planning.Search.Heuristics;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
@@ -100,27 +100,27 @@ namespace SCClassicalPlanning.Benchmarks.Planning
         public TestCase? CurrentTestCase { get; set; }
 
         [Benchmark]
-        public Plan ForwardStateSpaceSearch()
+        public Plan StateSpaceSearch()
         {
-            return new ForwardStateSpaceSearch(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
+            return new StateSpaceSearch(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
-        public Plan BackwardStateSpaceSearch()
+        public Plan GoalSpaceSearch()
         {
-            return new BackwardStateSpaceSearch(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceSearch(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
-        public Plan BackwardStateSpaceSearch_PropositionalWithoutKB()
+        public Plan GoalSpaceSearch_PropositionalWithoutKB()
         {
-            return new BackwardStateSpaceSearch_PropositionalWithoutKB(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceSearch_PropositionalWithoutKB(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
-        public Plan BackwardStateSpaceSearch_PropositionalWithKB()
+        public Plan GoalSpaceSearch_PropositionalWithKB()
         {
-            return new BackwardStateSpaceSearch_PropositionalWithKB(CurrentTestCase!.Heuristic, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceSearch_PropositionalWithKB(CurrentTestCase!.Heuristic, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
         }
 
         private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)

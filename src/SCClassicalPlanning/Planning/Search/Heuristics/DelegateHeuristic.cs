@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
+namespace SCClassicalPlanning.Planning.Search.Heuristics
 {
     /// <summary>
     /// Heuristic implementation that just invokes a given delegate.

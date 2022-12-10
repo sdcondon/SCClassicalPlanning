@@ -17,7 +17,7 @@ using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
 using System.Diagnostics;
 
-namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
+namespace SCClassicalPlanning.Planning.Search.Heuristics
 {
     /// <summary>
     /// State space search heuristic that ignores preconditions and uses a greedy set cover algorithm

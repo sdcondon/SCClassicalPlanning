@@ -11,10 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace SCClassicalPlanning.Planning.StateSpaceSearch
+namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
-    /// Interface for state space search heuristic implementations. That is, types that can estimate the
+    /// Interface for state/goal space search heuristic implementations. That is, types that can estimate the
     /// "cost" (whatever that means in the context of the problem being solved) of getting from a given
     /// state to a state that satisfies a given goal.
     /// </summary>

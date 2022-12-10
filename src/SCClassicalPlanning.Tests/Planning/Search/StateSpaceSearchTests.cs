@@ -1,11 +1,11 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
-using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics;
+using SCClassicalPlanning.Planning.Search.Heuristics;
 
-namespace SCClassicalPlanning.Planning.StateSpaceSearch
+namespace SCClassicalPlanning.Planning.Search
 {
-    public static class ForwardStateSpaceSearchTests
+    public static class StateSpaceSearchTests
     {
         public static Test CreatedPlanValidity => TestThat
             .GivenTestContext()
@@ -19,7 +19,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             .When((_, problem) =>
             {
                 var heuristic = new IgnorePreconditionsGreedySetCover(problem.Domain);
-                var planner = new ForwardStateSpaceSearch(heuristic);
+                var planner = new StateSpaceSearch(heuristic);
                 return planner.CreatePlan(problem);
             })
             .ThenReturns()

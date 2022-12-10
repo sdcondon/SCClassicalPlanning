@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
-using SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics;
+using SCClassicalPlanning.Planning.Search.Heuristics;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
@@ -10,9 +10,9 @@ using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
-namespace SCClassicalPlanning.Planning.StateSpaceSearch
+namespace SCClassicalPlanning.Planning.Search
 {
-    public static class BackwardStateSpaceSearchTests
+    public static class GoalSpaceSearchTests
     {
         private record TestCase(Problem Problem, IHeuristic Heuristic, IKnowledgeBase InvariantsKB);
 
@@ -72,7 +72,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             })
             .When((_, tc) =>
             {
-                var planner = new BackwardStateSpaceSearch(tc.Heuristic);
+                var planner = new GoalSpaceSearch(tc.Heuristic);
                 return planner.CreatePlanAsync(tc.Problem).GetAwaiter().GetResult();
             })
             .ThenReturns()
@@ -85,7 +85,7 @@ namespace SCClassicalPlanning.Planning.StateSpaceSearch
             {
                 //(h, kb) => new BackwardStateSpaceSearch_LiftedWithKB(h, kb), // doesnt work yet
                 //(h, kb) => new BackwardStateSpaceSearch_LiftedWithoutKB(h), // doesnt work yet
-                (h, kb) => new BackwardStateSpaceSearch_PropositionalWithoutKB(h),
+                (h, kb) => new GoalSpaceSearch_PropositionalWithoutKB(h),
                 //(h, kb) => new BackwardStateSpaceSearch_PropositionalWithKB(h, kb),
             })
             .AndEachOf(() => new TestCase[]

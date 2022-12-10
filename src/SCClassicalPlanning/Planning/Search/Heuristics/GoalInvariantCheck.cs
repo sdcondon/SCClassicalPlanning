@@ -14,7 +14,7 @@
 using SCClassicalPlanning.Planning.Utilities;
 using SCFirstOrderLogic.Inference;
 
-namespace SCClassicalPlanning.Planning.StateSpaceSearch.Heuristics
+namespace SCClassicalPlanning.Planning.Search.Heuristics
 {
     /// <summary>
     /// A decorator heuristic that checks whether the goal violates any known invariants
