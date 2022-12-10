@@ -52,7 +52,7 @@ namespace SCClassicalPlanning
 
         // NB: uses argument directly, unlike public ctors. This is to avoid unnecessary GC pressure.
         // Also allows the public ctors apply validation, without forcing said validation to occur at every step of a planning process.
-        private State(ImmutableHashSet<Predicate> elements) => Elements = elements;
+        internal State(ImmutableHashSet<Predicate> elements) => Elements = elements;
 
         /// <summary>
         /// Gets a singleton <see cref="State"/> instance that is empty.

@@ -46,7 +46,7 @@ namespace SCClassicalPlanning
 
         // NB: uses argument directly, unlike public ctors. This is to avoid unnecessary GC pressure.
         // Also allows the public ctors apply validation, without forcing said validation to occur at every step of a planning process.
-        private Goal(ImmutableHashSet<Literal> elements) => Elements = elements;
+        internal Goal(ImmutableHashSet<Literal> elements) => Elements = elements;
 
         /// <summary>
         /// Gets a singleton <see cref="Goal"/> instance that is empty.
@@ -60,7 +60,8 @@ namespace SCClassicalPlanning
         /// </summary>
         // TODO-PERFORMANCE: Should perhaps store positive and negative elements separately, for performance.
         // Application and Regression are going to be far more common than wanting to get all elements.
-        // Then again, if and this is expanded to richer PDDL functionality (or if we want to allow extension.. - unlikely given the motivator for the project, but..).
+        // Then again, that would be problematic if this is ever expanded to richer PDDL functionality
+        // (or if we want to allow extension - unlikely given the motivator for the project, but..).
         // In any case, add some benchmarks before making any changes.
         public ImmutableHashSet<Literal> Elements { get; }
 
