@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using SCFirstOrderLogic;
 using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
 using System.Collections;
@@ -185,12 +186,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private readonly struct SearchNodeEdges : IReadOnlyCollection<SearchEdge>
         {
-            private readonly PlanningGraph.Level graphLevel;
+            private readonly PlanningGraph.Level level;
             private readonly Goal goal;
 
-            public SearchNodeEdges(PlanningGraph.Level graphLevel, Goal goal)
+            public SearchNodeEdges(PlanningGraph.Level level, Goal goal)
             {
-                this.graphLevel = graphLevel;
+                this.level = level;
                 this.goal = goal;
             }
 
@@ -200,60 +201,80 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             /// <inheritdoc />
             public IEnumerator<SearchEdge> GetEnumerator()
             {
-                var possibleActions = graphLevel.Nodes.SelectMany(n => n.Causes).Select(n => n.Action);
-                return Recurse(goal, possibleActions.ToImmutableHashSet(), ImmutableHashSet<Action>.Empty).GetEnumerator();
+                /*
+                 * "The actions available in a state at level S[i] are to select any conflict-free subset of the actions in A[i−1]
+                 * whose effects cover the goals in the state. The resulting state has level S[i−1] and has as its set of goals
+                 * the preconditions for the selected set of actions. By “conflict free,” we mean a set of actions such that
+                 * no two of them are mutex and no two of their preconditions are mutex."
+                 * 
+                 * NB: in the above, why the authors chose to use "action" and "state" to refer to the edges and vertices *of the
+                 * search graph* is beyond me - there's obviously huge scope for confusion here..
+                 *
+                 * and, to establish edge ordering:
+                 *
+                 * "We need some heuristic guidance for choosing among actions during the backward search
+                 * One approach that works well in practice is a greedy algorithm based on the level cost of the literals.
+                 * For any set of goals, we proceed in the following order:
+                 * 1. Pick first the literal with the highest level cost.
+                 * 2. To achieve that literal, prefer actions with easier preconditions.That is, choose an action such that the sum (or maximum) of the level costs of its preconditions is smallest."
+                 */
+
+                var level = this.level; // copy level because we can't access struct instance field in lambda
+
+                // Order the goal elements by descending level cost:
+                var goalElements = goal.Elements
+                    .OrderByDescending(e => level.Graph.GetLevelCost(e));
+
+                // Find all of the actions that satisfy at least one element of the goal and order by sum of precondition level costs:
+                // NB: While we use the term "relevant" here, note that we're not discounting those that clash with the goal - that will 
+                // be dealt with by mutex checks.
+                var relevantActions = goal.Elements
+                    .SelectMany(e => level.NodesByProposition[e].Causes)
+                    .OrderBy(n => n.Preconditions.Sum(p => level.Graph.GetLevelCost(p.Proposition)))
+                    .Select(n => n.Action)
+                    .Distinct(); // todo: can probably do this before order by? ref equality, but we take action to avoid dups.
+
+                // Now (recursively) attempt to cover all elements of the goal, with no mutexes:
+                return Recurse(goalElements, relevantActions.ToImmutableHashSet(), ImmutableHashSet<Action>.Empty).GetEnumerator();
             }
 
             /// <inheritdoc />
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-            /*
-             * "The actions available in a state at level S[i] are to select any conflict-free subset of the actions in A[i−1]
-             * whose effects cover the goals in the state. The resulting state has level S[i−1] and has as its set of goals
-             * the preconditions for the selected set of actions. By “conflict free,” we mean a set of actions such that
-             * no two of them are mutex and no two of their preconditions are mutex."
-             *
-             * and, to establish edge ordering:
-             *
-             * "We need some heuristic guidance for choosing among actions during the backward search
-             * One approach that works well in practice is a greedy algorithm based on the level cost of the literals.
-             * For any set of goals, we proceed in the following order:
-             * 1. Pick first the literal with the highest level cost.
-             * 2. To achieve that literal, prefer actions with easier preconditions.That is, choose an action such that the sum (or maximum) of the level costs of its preconditions is smallest." */      
-            // (recursively, yeurch) iterates the available sets of actions in A[i-1] that cover the goal.
-            private IEnumerable<SearchEdge> Recurse(Goal goal, ImmutableHashSet<Action> unselectedActions, ImmutableHashSet<Action> selectedActions)
+            private IEnumerable<SearchEdge> Recurse(IEnumerable<Literal> goalElements, ImmutableHashSet<Action> unselectedActions, ImmutableHashSet<Action> selectedActions)
             {
                 // NB-PERFORMANCE: a lot of GC pressure here, what with all the immutable hash sets.
-                // could eliminate the duplication by creating a tree instead (or use a struct - BitVector32? - to indicate selection).
+                // could eliminate the duplication by creating a tree instead (or a BitArray/BitVector32 to indicate selection).
                 // meh, lets get it working first.
-                if (goal.Equals(Goal.Empty))
+                if (!goalElements.Any())
                 {
-                    yield return new SearchEdge(graphLevel, selectedActions);
+                    yield return new SearchEdge(level, selectedActions);
                 }
                 else
                 {
-                    foreach (var action in unselectedActions)
-                    {
-                        var unsatisfiedGoalElements = goal.Elements.Except(action.Effect.Elements);
+                    throw new NotImplementedException();
+                    // below is nonsense - we should be looking at the first element of the goal only (any others covered are 
+                    // a bonus) - then recurse for the rest..
+                    ////foreach (var action in unselectedActions)
+                    ////{
+                    ////    var unsatisfiedGoalElements = goal.Elements.Except(action.Effect.Elements);
 
-                        if (unsatisfiedGoalElements.Count < goal.Elements.Count)
-                        {
-                            throw new NotImplementedException();
-                            
-                            var isNonMutexWithSelectedActions = true; // todo
+                    ////    if (unsatisfiedGoalElements.Count < goal.Elements.Count)
+                    ////    {
+                    ////        var isNonMutexWithSelectedActions = true; // todo
 
-                            if (isNonMutexWithSelectedActions)
-                            {
-                                foreach (var edge in Recurse(
-                                    new Goal(unsatisfiedGoalElements),
-                                    unselectedActions.Remove(action),
-                                    selectedActions.Add(action)))
-                                {
-                                    yield return edge;
-                                }
-                            }
-                        }
-                    }
+                    ////        if (isNonMutexWithSelectedActions)
+                    ////        {
+                    ////            foreach (var edge in Recurse(
+                    ////                unsatisfiedGoalElements,
+                    ////                unselectedActions.Remove(action),
+                    ////                selectedActions.Add(action)))
+                    ////            {
+                    ////                yield return edge;
+                    ////            }
+                    ////        }
+                    ////    }
+                    ////}
                 }
             }
         }
@@ -271,7 +292,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             public IEnumerable<Action> Actions { get; }
 
             /// <inheritdoc />
-            // could be new StateSpaceNode(planningGraph, fromGoal); - but we'd need fromGoal, which is a waste. Private struct and unused, so just ignore it
+            // Could implement as new(planningGraph, fromGoal); - but we'd need fromGoal, which is a waste.
+            // Private struct and unused property, so just ignore it.
             public SearchNode From => throw new NotImplementedException(); 
 
             /// <inheritdoc />

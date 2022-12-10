@@ -55,7 +55,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
             }
 
-            propositionLevels.Add(new(0, propositionLevel0, null));
+            propositionLevels.Add(new(this, 0, propositionLevel0, null));
         }
 
         /// <summary>
@@ -290,7 +290,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             else
             {
                 actionLevels.Add(newActionLevel);
-                propositionLevels.Add(new(expandedToLevel, newPropositionLevel, propositionLevels[expandedToLevel]));
+                propositionLevels.Add(new(this, expandedToLevel, newPropositionLevel, propositionLevels[expandedToLevel]));
                 expandedToLevel++;
             }
         }
@@ -306,12 +306,18 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// </summary>
         public class Level
         {
-            internal Level(int index, IReadOnlyDictionary<Literal, PropositionNode> nodesByProposition, Level? previousLevel)
+            internal Level(PlanningGraph graph, int index, IReadOnlyDictionary<Literal, PropositionNode> nodesByProposition, Level? previousLevel)
             {
+                Graph = graph;
                 Index = index;
                 NodesByProposition = nodesByProposition;
                 PreviousLevel = previousLevel;
             }
+
+            /// <summary>
+            /// Gets the planning graph in which this level resides.
+            /// </summary>
+            public PlanningGraph Graph { get; }
 
             /// <summary>
             /// Gets the previous level of the graph - or null if this level represents the initial state of the problem.
