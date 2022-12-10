@@ -10,12 +10,12 @@ There is of course potential for this to conflict with the main goal - by abstra
 
 Stuff I want to do before ticking the major version number to 1:
 
-- [x] Forward search 'works':
+- [x] State space search 'works':
   - [x] the tests pass in a timely fashion with the example domains.
-- [ ] Backward search 'works':
+- [ ] Goal space search 'works':
   - [x] The tests pass in a timely fashion with the example domains.
-  - [ ] Backward search can work with goals with variables in them.
-- [ ] We have simple implementations of state space search heuristics:
+  - [ ] Goal space search can work with goals with variables in them.
+- [ ] We have simple implementations of search heuristics:
     - [x] one that could be described as using "ignore preconditions"
     - [ ] one that could be described as using "ignore delete lists"
     - [x] perhaps some others
