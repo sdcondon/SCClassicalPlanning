@@ -15,6 +15,7 @@ using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
 using System.Collections;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
@@ -80,7 +81,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             /// <inheritdoc />
             public async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
             {
-                HashSet<(int Level, Goal Goal)> noGoods = new();
+                HashSet<NoGood> noGoods = new();
                 var goalElementsPresentAndNonMutex = false;
                 var noGoodsLevelledOff = false;
 
@@ -97,21 +98,17 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     if (goalElementsPresentAndNonMutex || (goalElementsPresentAndNonMutex = graphLevel.ContainsNonMutex(problem.Goal.Elements)))
                     {
                         // ..try to extract a solution:
-                        var solutionExtractionResult = await Task.Run(() => TryExtractSolution(problem.InitialState, problem.Goal, graphLevel, cancellationToken), cancellationToken);
-
-                        // If we managed to extract a solution, we're done. Return it.
-                        // Otherwise, add the no-good to the no-goods hashset, and make a note if we've already seen it.
-                        if (solutionExtractionResult.Success)
+                        if (await Task.Run(() => TryExtractSolution(graphLevel, noGoods, out result, cancellationToken), cancellationToken))
                         {
-                            
-                            result = solutionExtractionResult.Plan!;
+                            // If we managed to extract a solution, we're done. Return it.
                             isComplete = true;
-                            return result;
+                            return result!;
                         }
-                        else if (!noGoods.Add(solutionExtractionResult.NoGood.Value))
-                        {
-                            noGoodsLevelledOff = true;
-                        }
+                        // todo - establish whether nogoods have levelled off..
+                        //// else if ()
+                        ////{
+                        //// ...
+                        ////}
                     }
 
                     // If we haven't managed to extract a solution, and both the graph and no-goods have levelled off, we fail.
@@ -124,34 +121,33 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
             }
 
-            private SolutionExtractionResult TryExtractSolution(State initialState, Goal goal, PlanningGraph.Level graphLevel, CancellationToken cancellationToken)
+            private bool TryExtractSolution(
+                PlanningGraph.Level graphLevel,
+                HashSet<NoGood> noGoods,
+                [MaybeNullWhen(false)] out Plan plan,
+                CancellationToken cancellationToken)
             {
-                // NB: the book says that the target is *level is zero* and initial state matches goal.
+                // NB: the book says that the target is *level is zero* and initial state satisfies the goal.
                 // don't actually need to look for level being zero. If we satisfy the goal at level n > 0, we can just
-                // use no-op actions to get to that level then execute the plan. in practice i dont think
+                // use no-op actions to get to that level then execute the plan. In practice I dont think
                 // this'll happen because we'll find the solution on an earlier step anyway
                 var search = new RecursiveDFS<SearchNode, SearchEdge>(
-                    source: new SearchNode(graphLevel, goal),
-                    isTarget: n => initialState.Satisfies(n.Goal)); // todo: nogoods - record level and goals here, or..?
+                    source: new SearchNode(graphLevel, problem.Goal),
+                    isTarget: n => problem.InitialState.Satisfies(n.Goal));
 
                 search.Complete(cancellationToken);
 
-                // todo: nogoods - ..or query search tree for nogoods here?
-                // otherwise going to have to open things up and not use this dfs implementation.
+                // todo: nogoods - ..query search tree for nogoods here?
 
                 if (search.IsSucceeded)
                 {
-                    return new SolutionExtractionResult(
-                        Success: true,
-                        NoGood: null,
-                        Plan: new Plan(search.PathToTarget().Reverse().SelectMany(e => e.Actions).ToList()));
+                    plan = new Plan(search.PathToTarget().Reverse().SelectMany(e => e.Actions).ToList());
+                    return true;
                 }
                 else
                 {
-                    return new SolutionExtractionResult(
-                        Success: false,
-                        NoGood: (0, Goal.Empty), // todo
-                        Plan: null);
+                    plan = null;
+                    return false;
                 }
             }
 
@@ -163,7 +159,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
         }
 
-        private record struct SolutionExtractionResult(bool Success, Plan? Plan, (int Level, Goal Goal)? NoGood);
+        private record struct NoGood(int Level, Goal Goal);
 
         private readonly struct SearchNode : INode<SearchNode, SearchEdge>, IEquatable<SearchNode>
         {
