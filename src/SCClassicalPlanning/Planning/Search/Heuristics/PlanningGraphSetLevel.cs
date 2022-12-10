@@ -37,7 +37,7 @@ namespace SCClassicalPlanning.Planning.Search.Heuristics
         {
             var planningGraph = new PlanningGraph(new(domain, state, goal));
 
-            var level = planningGraph.GetSetLevel(goal.Elements);
+            var level = planningGraph.GetLevelCost(goal.Elements);
             if (level != -1)
             {
                 return level;

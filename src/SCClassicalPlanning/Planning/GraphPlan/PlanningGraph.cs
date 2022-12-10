@@ -21,7 +21,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// <summary>
     /// Planning graph representation. 
     /// <para/>
-    /// Lazily populated.
+    /// NB: Lazily populated - levels will be created as they are called for.
     /// </summary>
     public class PlanningGraph
     {
@@ -59,12 +59,16 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         }
 
         /// <summary>
-        /// Gets a value indicating whether the graph has levelled off.
+        /// Gets a value indicating whether the graph has levelled off
+        /// (that is, whether a <see cref="GetLevel"/> call has been made with an index that is at or past
+        /// the level at which the graph levels off - thus populating <see cref="LevelledOffAtLevel"/>).
         /// </summary>
-        public bool LevelledOff => LevelledOffAtLevel.HasValue;
+        public bool IsLevelledOff => LevelledOffAtLevel.HasValue;
 
         /// <summary>
-        /// Gets the level at which the graph levelled off - or null if the graph has not yet levelled off.
+        /// Gets the level at which the graph levelled off - or null if the graph has not yet levelled off
+        /// (that is, if no <see cref="GetLevel"/> call has yet been made with an index that is at or past
+        /// the level at which the graph levels off).
         /// </summary>
         public int? LevelledOffAtLevel { get; private set; } = null;
 
@@ -95,7 +99,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// </summary>
         /// <param name="propositions">The set of propositions to look for.</param>
         /// <returns>The level at which all of a set of propositions first occurs, with no pair being mutually exclusive.</returns>
-        public int GetSetLevel(IEnumerable<Literal> propositions)
+        public int GetLevelCost(IEnumerable<Literal> propositions)
         {
             // Meh, will do for now - yes its a loop, but.. meh.
             var level = 0;
@@ -120,7 +124,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <returns>An object representing the level.</returns>
         public Level GetLevel(int index)
         {
-            while (expandedToLevel < index && !LevelledOff)
+            while (expandedToLevel < index && !IsLevelledOff)
             {
                 MakeNextLevel();
             }

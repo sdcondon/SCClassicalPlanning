@@ -108,7 +108,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     }
 
                     // If we haven't managed to extract a solution, and both the graph and no-goods have levelled off, we fail.
-                    if (graph.LevelledOff && noGoodsLevelledOff)
+                    if (graph.IsLevelledOff && noGoodsLevelledOff)
                     {
                         result = null;
                         isComplete = true;
@@ -124,11 +124,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 CancellationToken cancellationToken)
             {
                 // NB: AIaMA says that the target is *level is zero* and initial state satisfies the goal.
-                // Don't actually need to look for level being zero. If we satisfy the goal at level n > 0, we can just
+                // Don't actually need to check for level being zero. If we satisfy the goal at level n > 0, we can just
                 // use no-op actions to get to that level then execute the plan.
-                // In practice I dont think this'll happen because we'd have found the target at an earlier step anyway - 
-                // so what the book is trying (fairly badly..) to say is that when we first find the target, it'll be
-                // at level zero..
+                // In practice this won't happen because we'd have found the target at an earlier step anyway. 
+                // So, what the book is trying (fairly badly..) to say is that when we first find the target, it'll be
+                // at level zero.
                 var search = new RecursiveDFS<SearchNode, SearchEdge>(
                     source: new SearchNode(graphLevel, problem.Goal),
                     isTarget: n => problem.InitialState.Satisfies(n.Goal));
