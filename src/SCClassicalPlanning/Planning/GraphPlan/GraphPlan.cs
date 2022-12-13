@@ -228,53 +228,62 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // Find all of the actions that satisfy at least one element of the goal and order by sum of precondition level costs:
                 // NB: While we use the term "relevant" here, note that we're not discounting those that clash with the goal - that will 
                 // be dealt with by mutex checks.
-                var relevantActions = goal.Elements
+                var relevantActionNodes = goal.Elements
                     .SelectMany(e => level.NodesByProposition[e].Causes)
                     .OrderBy(n => n.Preconditions.Sum(p => level.Graph.GetLevelCost(p.Proposition)))
-                    .Select(n => n.Action)
                     .Distinct(); // todo: can probably do this before order by? ref equality, but we take action to avoid dups.
 
                 // Now (recursively) attempt to cover all elements of the goal, with no mutexes:
-                return Recurse(goalElements, relevantActions.ToImmutableHashSet(), ImmutableHashSet<Action>.Empty).GetEnumerator();
+                // We go recursive to ultimately find all combos - this may be overkill..
+                return Recurse(goalElements, relevantActionNodes.ToImmutableHashSet(), ImmutableHashSet<PlanningGraph.ActionNode>.Empty).GetEnumerator();
             }
 
             /// <inheritdoc />
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-            private IEnumerable<SearchEdge> Recurse(IEnumerable<Literal> goalElements, ImmutableHashSet<Action> unselectedActions, ImmutableHashSet<Action> selectedActions)
+            private IEnumerable<SearchEdge> Recurse(
+                IEnumerable<Literal> goalElements,
+                ImmutableHashSet<PlanningGraph.ActionNode> unselectedActionNodes,
+                ImmutableHashSet<PlanningGraph.ActionNode> selectedActionNodes)
             {
-                // NB-PERFORMANCE: a lot of GC pressure here, what with all the immutable hash sets.
+                bool IsNonMutexWithSelectedActions(PlanningGraph.ActionNode actionNode)
+                {
+                    foreach (var selectedActionNode in selectedActionNodes)
+                    {
+                        if (actionNode.Mutexes.Any(m => m.Action.Equals(selectedActionNode.Action)))
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+
+                // TODO-PERFORMANCE: a lot of GC pressure here, what with all the immutable hash sets.
                 // could eliminate the duplication by creating a tree instead (or a BitArray/BitVector32 to indicate selection).
-                // meh, lets get it working first.
+                // meh, lets get it working first, then at least we have a baseline.
                 if (!goalElements.Any())
                 {
-                    yield return new SearchEdge(level, selectedActions);
+                    yield return new SearchEdge(level, selectedActionNodes.Select(n => n.Action));
                 }
                 else
                 {
-                    throw new NotImplementedException();
-                    // below is nonsense - we should be looking at the first element of the goal only (any others covered are 
-                    // a bonus) - then recurse for the rest..
-                    ////foreach (var action in unselectedActions)
-                    ////{
-                    ////    var unsatisfiedGoalElements = goal.Elements.Except(action.Effect.Elements);
+                    // Try to cover the first goal element (any others covered by the same action are a bonus)
+                    var firstGoalElement = goalElements.First();
 
-                    ////    if (unsatisfiedGoalElements.Count < goal.Elements.Count)
-                    ////    {
-                    ////        var isNonMutexWithSelectedActions = true; // todo
-
-                    ////        if (isNonMutexWithSelectedActions)
-                    ////        {
-                    ////            foreach (var edge in Recurse(
-                    ////                unsatisfiedGoalElements,
-                    ////                unselectedActions.Remove(action),
-                    ////                selectedActions.Add(action)))
-                    ////            {
-                    ////                yield return edge;
-                    ////            }
-                    ////        }
-                    ////    }
-                    ////}
+                    foreach (var actionNode in unselectedActionNodes)
+                    {
+                        if (actionNode.Action.Effect.Elements.Contains(firstGoalElement) && IsNonMutexWithSelectedActions(actionNode))
+                        {
+                            foreach (var edge in Recurse(
+                                goal.Elements.Except(actionNode.Action.Effect.Elements),
+                                unselectedActionNodes.Remove(actionNode),
+                                selectedActionNodes.Add(actionNode)))
+                            {
+                                yield return edge;
+                            }
+                        }
+                    }
                 }
             }
         }

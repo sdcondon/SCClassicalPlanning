@@ -79,7 +79,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <returns>The level at which the given proposition first occurs, or -1 if it does not occur.</returns>
         public int GetLevelCost(Literal proposition)
         {
-            // meh, will do for now - yes its a loop, but each iteration is a dictionary key lookup
+            // Meh, will do for now - yes its a loop, but each iteration is a dictionary key lookup
             var level = 0;
             while (!GetLevel(level).Contains(proposition))
             {
