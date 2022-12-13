@@ -4,6 +4,7 @@ using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.HaveCakeAndEatCakeToo;
+using static SCClassicalPlanning.ExampleDomains.FromAIaMA.SpareTire;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
@@ -71,6 +72,50 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             .When(tc => new PlanningGraph(tc.Problem))
             .ThenReturns()
             .And((tc, rv) => rv.GetLevel(0).Propositions.Should().BeEquivalentTo(tc.ExpectedLayer0Propositions.OfType<Literal>()));
+
+        public static Test SpareTireScenario => TestThat
+            .Given(() => new PlanningGraph(SpareTire.ExampleProblem))
+            .When(g =>
+            {
+                IEnumerable<Predicate> GetPositiveTireIsAtPropositions(PlanningGraph g, int level)
+                {
+                    return g.GetLevel(level).Propositions
+                        .Where(p =>
+                            p.IsPositive
+                            && p.Predicate.Symbol.Equals("IsAt")
+                            && (p.Predicate.Arguments[0].Equals(Spare) || p.Predicate.Arguments[0].Equals(Flat)))
+                        .Select(l => l.Predicate);
+                }
+
+                return new
+                {
+                    level0 = GetPositiveTireIsAtPropositions(g, 0),
+                    level1 = GetPositiveTireIsAtPropositions(g, 1),
+                    level2 = GetPositiveTireIsAtPropositions(g, 2),
+                };
+            })
+            .ThenReturns()
+            .And((_, rv) => rv.level0.Should().BeEquivalentTo(new Predicate[]
+            {
+                IsAt(Spare, Trunk),
+                IsAt(Flat, Axle),
+            }))
+            .And((_, rv) => rv.level1.Should().BeEquivalentTo(new Predicate[]
+            {
+                IsAt(Spare, Trunk),
+                IsAt(Spare, Ground),
+                IsAt(Flat, Axle),
+                IsAt(Flat, Ground),
+            }))
+            .And((_, rv) => rv.level2.Should().BeEquivalentTo(new Predicate[]
+            {
+                IsAt(Spare, Trunk),
+                IsAt(Spare, Axle),
+                IsAt(Spare, Ground),
+                IsAt(Flat, Axle),
+                IsAt(Flat, Ground),
+            }));
+
 
         // NB: yeah, pretty terrible coverage (testing large outputs is generally a PITA)
         // note that it gets indirectly tested via the PlanningGraph heuristics tests.
