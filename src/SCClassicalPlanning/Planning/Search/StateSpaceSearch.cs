@@ -53,7 +53,7 @@ namespace SCClassicalPlanning.Planning.Search
         /// Creates a (concretely-typed) planning task to work on solving a given problem.
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
-        /// <returns></returns>
+        /// <returns>A new <see cref="PlanningTask"/> instance.</returns>
         public PlanningTask CreatePlanningTask(Problem problem) => new(problem, heuristic, getActionCost);
 
         /// <inheritdoc />

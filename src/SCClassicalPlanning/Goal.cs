@@ -58,11 +58,11 @@ namespace SCClassicalPlanning
         /// The positive ones indicate predicates that must exist in a <see cref="State"/> in order for the goal to be satisfied.
         /// The negative ones indicate predicates that must NOT exist in a <see cref="State"/> in order for the goal to be satisfied.
         /// </summary>
-        // TODO-PERFORMANCE: Should perhaps store positive and negative elements separately, for performance.
-        // Application and Regression are going to be far more common than wanting to get all elements.
-        // Then again, that would be problematic if this is ever expanded to richer PDDL functionality
+        // One could perhaps argue that we should store positive and negative elements separately, for performance.
+        // After all, application and Regression are going to be far more common than wanting to get all elements.
+        // However, this would be problematic if this is ever expanded to richer PDDL functionality
         // (or if we want to allow extension - unlikely given the motivator for the project, but..).
-        // In any case, add some benchmarks before making any changes.
+        // So leaving it like this for the time being at least.
         public ImmutableHashSet<Literal> Elements { get; }
 
         /// <summary>

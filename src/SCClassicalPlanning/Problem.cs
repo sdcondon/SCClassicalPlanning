@@ -26,7 +26,7 @@ namespace SCClassicalPlanning
     public class Problem
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Problem"/> class, in which the objects that exist are inferred from the constants that are present in the initial state and the goal.
+        /// Initializes a new instance of the <see cref="Problem"/> class, in which the domain elements that exist are inferred from the constants that are present in the domain, the initial state and the goal.
         /// </summary>
         /// <param name="domain">The domain in which this problem resides.</param>
         /// <param name="initialState">The initial state of the problem.</param>
@@ -60,6 +60,7 @@ namespace SCClassicalPlanning
             Goal = goal;
 
             var constants = new HashSet<Constant>(additionalConstants);
+            constants.UnionWith(domain.Constants);
             StateConstantFinder.Instance.Visit(initialState, constants);
             GoalConstantFinder.Instance.Visit(goal, constants);
             Constants = constants.ToImmutableHashSet();

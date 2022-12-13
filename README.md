@@ -10,9 +10,9 @@ This repository contains the source code for the SCClassicalPlanning NuGet packa
 
 For documentation of the package itself, see https://sdcondon.net/SCClassicalPlanning/.
 
-## Developer Documentation
+## Source Documentation
 
-I've not bothered writing up any documentation for developers - and likely won't unless someone else expresses an interest in contributing.
+I've not bothered writing up any documentation of the source - and likely won't unless someone else expresses an interest in contributing.
 I use Visual Studio, and once cloned, it should "just work" as far as compiling is concerned.
 
 ## Issues and Contributions
