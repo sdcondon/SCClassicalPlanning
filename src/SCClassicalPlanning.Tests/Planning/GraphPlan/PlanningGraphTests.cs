@@ -77,7 +77,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             .Given(() => new PlanningGraph(SpareTire.ExampleProblem))
             .When(g =>
             {
-                IEnumerable<Predicate> GetPositiveTireIsAtPropositions(PlanningGraph g, int level)
+                static IEnumerable<Predicate> GetPositiveTireIsAtPropositions(PlanningGraph g, int level)
                 {
                     return g.GetLevel(level).Propositions
                         .Where(p =>
@@ -102,6 +102,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }))
             .And((_, rv) => rv.level1.Should().BeEquivalentTo(new Predicate[]
             {
+                // Can put either tire on the ground as first action:
                 IsAt(Spare, Trunk),
                 IsAt(Spare, Ground),
                 IsAt(Flat, Axle),
@@ -109,6 +110,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }))
             .And((_, rv) => rv.level2.Should().BeEquivalentTo(new Predicate[]
             {
+                // Spare can be on the axle after two actions:
                 IsAt(Spare, Trunk),
                 IsAt(Spare, Axle),
                 IsAt(Spare, Ground),

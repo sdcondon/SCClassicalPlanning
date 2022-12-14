@@ -157,6 +157,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             // First we need to get all applicable actions from the "state" defined by the current layer.
             // indexing support? somehow keying positive versus negative feels useful? Meh, slow anyway..
+            // TODO-BUG-CRITICAL: this is OBVIOUSLY nonsense! What were you thinking?!
             var currentState = new State(currentPropositionLevel.Propositions.Where(p => p.IsPositive).Select(p => p.Predicate));
 
             // Now we iterate all those applicable actions - ultimately to build the next action and proposition layers.
