@@ -333,7 +333,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             else
             {
                 actionLevels.Add(newActionLevel);
-                propositionLevels.Add(new(this, expandedToLevel, newPropositionLevel, propositionLevels[expandedToLevel]));
+                propositionLevels.Add(new(this, expandedToLevel + 1, newPropositionLevel, propositionLevels[expandedToLevel]));
                 expandedToLevel++;
             }
         }
