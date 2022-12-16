@@ -117,12 +117,5 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 IsAt(Flat, Axle),
                 IsAt(Flat, Ground),
             }));
-
-
-        // NB: yeah, pretty terrible coverage (testing large outputs is generally a PITA)
-        // note that it gets indirectly tested via the PlanningGraph heuristics tests.
-        // and will be futher tests via graphplan, when that's done.
-        // Will also extend at some point - should at least completely cover the cake example -
-        // which i think has only 2 levels..
     }
 }

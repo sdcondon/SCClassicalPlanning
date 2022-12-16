@@ -17,6 +17,7 @@ using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
@@ -429,6 +430,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
         /// should we ever want to do that (probably just by layering some structs over the top of these existing classes).
         /// </summary>
+        [DebuggerDisplay("{Proposition}")]
         public class PropositionNode
         {
             internal PropositionNode(Literal proposition) => Proposition = proposition;
@@ -452,6 +454,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
         /// should we ever want to do that (probably just by layering some structs over the top of these existing classes).
         /// </summary>
+        [DebuggerDisplay("{Action.Identifier}: {Action.Effect}")]
         public class ActionNode
         {
             internal ActionNode(Action action) => Action = action;

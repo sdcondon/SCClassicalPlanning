@@ -41,11 +41,6 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         public static Constant Axle { get; } = new(nameof(Axle));
         public static Constant Trunk { get; } = new(nameof(Trunk));
 
-        /// <summary>
-        /// Gets the implicit state of the world, that will never change as the result of actions.
-        /// </summary>
-        public static OperableSentence ImplicitState => IsTire(Spare) & IsTire(Flat);
-
         public static OperablePredicate IsTire(Term tire) => new Predicate(nameof(IsTire), tire);
 
         public static OperablePredicate IsAt(Term item, Term location) => new Predicate(nameof(IsAt), item, location);

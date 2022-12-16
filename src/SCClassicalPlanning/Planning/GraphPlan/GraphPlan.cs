@@ -140,7 +140,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
                 if (search.IsSucceeded)
                 {
-                    plan = new Plan(search.PathToTarget().Reverse().SelectMany(e => e.Actions).ToList());
+                    // TODO: eliminate magic string
+                    plan = new Plan(search.PathToTarget().Reverse().SelectMany(e => e.Actions).Where(a => !a.Identifier.Equals("NOOP")).ToList());
                     return true;
                 }
                 else
@@ -186,12 +187,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private readonly struct SearchNodeEdges : IReadOnlyCollection<SearchEdge>
         {
-            private readonly PlanningGraph.Level level;
+            private readonly PlanningGraph.Level graphLevel;
             private readonly Goal goal;
 
-            public SearchNodeEdges(PlanningGraph.Level level, Goal goal)
+            public SearchNodeEdges(PlanningGraph.Level graphLevel, Goal goal)
             {
-                this.level = level;
+                this.graphLevel = graphLevel;
                 this.goal = goal;
             }
 
@@ -219,18 +220,18 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                  * 2. To achieve that literal, prefer actions with easier preconditions.That is, choose an action such that the sum (or maximum) of the level costs of its preconditions is smallest."
                  */
 
-                var level = this.level; // copy level because we can't access struct instance field in lambda
+                var graphLevel = this.graphLevel; // copy level variable because we can't access struct instance field in lambda
 
                 // Order the goal elements by descending level cost:
                 var goalElements = goal.Elements
-                    .OrderByDescending(e => level.Graph.GetLevelCost(e));
+                    .OrderByDescending(e => graphLevel.Graph.GetLevelCost(e));
 
                 // Find all of the actions that satisfy at least one element of the goal and order by sum of precondition level costs:
                 // NB: While we use the term "relevant" here, note that we're not discounting those that clash with the goal - that will 
                 // be dealt with by mutex checks.
                 var relevantActionNodes = goal.Elements
-                    .SelectMany(e => level.NodesByProposition[e].Causes)
-                    .OrderBy(n => n.Preconditions.Sum(p => level.Graph.GetLevelCost(p.Proposition)))
+                    .SelectMany(e => graphLevel.NodesByProposition[e].Causes)
+                    .OrderBy(n => n.Preconditions.Sum(p => graphLevel.Graph.GetLevelCost(p.Proposition)))
                     .Distinct(); // todo: can probably do this before order by? ref equality, but we take action to avoid dups.
 
                 // Now (recursively) attempt to cover all elements of the goal, with no mutexes:
@@ -242,7 +243,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             private IEnumerable<SearchEdge> Recurse(
-                IEnumerable<Literal> goalElements,
+                IEnumerable<Literal> unsatisfiedGoalElements,
                 ImmutableHashSet<PlanningGraph.ActionNode> unselectedActionNodes,
                 ImmutableHashSet<PlanningGraph.ActionNode> selectedActionNodes)
             {
@@ -260,23 +261,23 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
 
                 // TODO-PERFORMANCE: a lot of GC pressure here, what with all the immutable hash sets.
-                // could eliminate the duplication by creating a tree instead (or a BitArray/BitVector32 to indicate selection).
+                // could eliminate the duplication by creating a tree instead, or just some bit vector struct to indicate selection.
                 // meh, lets get it working first, then at least we have a baseline.
-                if (!goalElements.Any())
+                if (!unsatisfiedGoalElements.Any())
                 {
-                    yield return new SearchEdge(level, selectedActionNodes.Select(n => n.Action));
+                    yield return new SearchEdge(graphLevel, goal, selectedActionNodes.Select(n => n.Action));
                 }
                 else
                 {
                     // Try to cover the first goal element (any others covered by the same action are a bonus)
-                    var firstGoalElement = goalElements.First();
+                    var firstGoalElement = unsatisfiedGoalElements.First();
 
                     foreach (var actionNode in unselectedActionNodes)
                     {
                         if (actionNode.Action.Effect.Elements.Contains(firstGoalElement) && IsNonMutexWithSelectedActions(actionNode))
                         {
                             foreach (var edge in Recurse(
-                                goal.Elements.Except(actionNode.Action.Effect.Elements),
+                                unsatisfiedGoalElements.Except(actionNode.Action.Effect.Elements),
                                 unselectedActionNodes.Remove(actionNode),
                                 selectedActionNodes.Add(actionNode)))
                             {
@@ -291,19 +292,19 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         private readonly struct SearchEdge : IEdge<SearchNode, SearchEdge>
         {
             private readonly PlanningGraph.Level graphLevel;
+            private readonly Goal goal;
 
-            public SearchEdge(PlanningGraph.Level graphLevel, IEnumerable<Action> actions)
+            public SearchEdge(PlanningGraph.Level graphLevel, Goal goal, IEnumerable<Action> actions)
             {
                 this.graphLevel = graphLevel;
+                this.goal = goal;
                 this.Actions = actions;
             }
 
             public IEnumerable<Action> Actions { get; }
 
             /// <inheritdoc />
-            // Could implement as new(planningGraph, fromGoal); - but we'd need fromGoal, which is a waste.
-            // Private struct and unused property, so just ignore it.
-            public SearchNode From => throw new NotImplementedException(); 
+            public SearchNode From => new(graphLevel, goal);
 
             /// <inheritdoc />
             public SearchNode To => new(graphLevel.PreviousLevel!, new Goal(Actions.SelectMany(a => a.Precondition.Elements)));
