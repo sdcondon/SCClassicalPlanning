@@ -13,7 +13,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             .AndEachOf(() => new Problem[]
             {
                 SpareTire.ExampleProblem,
-                //AirCargo.ExampleProblem,
+                AirCargo.ExampleProblem,
                 BlocksWorld.ExampleProblem,
                 //BlocksWorld.LargeExampleProblem,
             })

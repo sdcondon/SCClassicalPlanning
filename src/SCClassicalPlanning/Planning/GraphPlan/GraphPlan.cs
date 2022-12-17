@@ -178,7 +178,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             public override bool Equals(object? obj) => obj is SearchNode node && Equals(node);
 
             // NB: this struct is private - so we don't need to look at the planning graph, since it'll always match
-            public bool Equals(SearchNode node) => Equals(Goal, node.Goal);
+            public bool Equals(SearchNode node) => graphLevel.Index == node.graphLevel.Index && Equals(Goal, node.Goal);
 
             public override int GetHashCode() => HashCode.Combine(Goal);
 

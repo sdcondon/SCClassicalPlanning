@@ -429,8 +429,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// Representation of a proposition node in a planning graph.
         /// <para/>
         /// NB: We don't make use of the SCGraphTheory abstraction for the planning graph because none of the algorithms that use 
-        /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
-        /// should we ever want to do that (probably just by layering some structs over the top of these existing classes).
+        /// it query it via graph theoretical algorithms - so it would be needless complexity.
         /// </summary>
         [DebuggerDisplay("{Proposition}")]
         public class PropositionNode
@@ -453,8 +452,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// Representation of an action node in a planning graph.
         /// <para/>
         /// NB: We don't make use of SCGraphTheory abstraction for the planning graph because none of the algorithms that use 
-        /// it query it via graph theoretical algorithms - so it would be needless complexity. Easy enough to change
-        /// should we ever want to do that (probably just by layering some structs over the top of these existing classes).
+        /// it query it via graph theoretical algorithms - so it would be needless complexity.
         /// </summary>
         [DebuggerDisplay("{Action.Identifier}: {Action.Effect}")]
         public class ActionNode
