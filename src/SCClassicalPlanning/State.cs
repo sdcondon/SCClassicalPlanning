@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using SCClassicalPlanning.InternalUtilities;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
@@ -146,7 +147,7 @@ namespace SCClassicalPlanning
             // Obviously unworkable if the state is large. However, if the state is large then this isn't
             // the only problematic thing. So let's revisit this when we look at abstracting state to allow 
             // for secondary storage and indexing. It may be that for the "in-mem" version, this is fine..
-            return obj is State state && state.Elements.SetEquals(Elements);
+            return obj is State state && state.Elements.SetEquals<Predicate>(Elements);
         }
 
         /// <inheritdoc />

@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using SCClassicalPlanning.InternalUtilities;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using System.Collections.Immutable;
@@ -96,7 +97,7 @@ namespace SCClassicalPlanning
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
         public override bool Equals(object? obj)
         {
-            return obj is Effect effect && effect.Elements.SetEquals(Elements);
+            return obj is Effect effect && effect.Elements.SetEquals<Literal>(Elements);
         }
 
         /// <inheritdoc />

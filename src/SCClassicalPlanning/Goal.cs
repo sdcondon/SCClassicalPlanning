@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCFirstOrderLogic;
+using SCClassicalPlanning.InternalUtilities;
 using SCFirstOrderLogic.SentenceManipulation;
 using System.Collections.Immutable;
 
@@ -121,7 +122,7 @@ namespace SCClassicalPlanning
             // Goals should be small-ish, so I'm not too worried by the inefficiency here.
             // Otherwise could think about sorting the set of elements (e.g. using ImmutableSortedSet sorted by hash code), maybe?
             // Would need testing whether the benefit is outweighed by constructing the ordered set in first place.
-            return obj is Goal goal && goal.Elements.SetEquals(Elements);
+            return obj is Goal goal && goal.Elements.SetEquals<Literal>(Elements);
         }
 
         /// <inheritdoc />

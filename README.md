@@ -12,7 +12,7 @@ For documentation of the package itself, see https://sdcondon.net/SCClassicalPla
 
 ## Source Documentation
 
-I've not bothered writing up any documentation of the source - and likely won't unless someone else expresses an interest in contributing.
+I haven't written up any documentation of the source (e.g. repo overview, design discussion, compilation guidance…) - and likely won't unless someone else expresses an interest in contributing.
 I use Visual Studio, and once cloned, it should "just work" as far as compiling is concerned.
 
 ## Issues and Contributions
