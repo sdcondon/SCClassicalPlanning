@@ -14,7 +14,7 @@ Stuff I want to do before ticking the major version number to 1:
   - [x] the tests pass in a timely fashion with the example domains.
 - [ ] Goal space search 'works':
   - [x] The tests pass in a timely fashion with the example domains.
-  - [ ] Goal space search can work with goals with variables in them.
+  - [ ] Goal space search works in a 'lifted' fashion - retaining variables for as long as it can.
 - [ ] We have simple implementations of search heuristics:
     - [x] one that could be described as using "ignore preconditions"
     - [ ] one that could be described as using "ignore delete lists"

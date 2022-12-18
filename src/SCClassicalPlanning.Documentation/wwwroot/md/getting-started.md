@@ -84,7 +84,9 @@ Action moveToTable = new(
 var domain = new Domain(moveToBlock, moveToTable);
 
 // Finally, we can declare our problem.
-// Problems exist in a given domain, and consist of an initial state, an end goal, and a collection of objects that exist.
+// Problems exist in a given domain, and consist of an initial state, an end goal,
+// and a collection available domain elements (though NB the domain elements *can*
+// be implicit based on what constants appear in the initial state and end goal).
 Constant blockA = new(nameof(blockA));
 Constant blockB = new(nameof(blockB));
 Constant blockC = new(nameof(blockC));
