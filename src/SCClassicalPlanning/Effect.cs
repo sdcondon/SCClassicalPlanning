@@ -96,10 +96,7 @@ namespace SCClassicalPlanning
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
         public override bool Equals(object? obj)
         {
-            // Effects should be small-ish, so I'm not too worried by the inefficiency here.
-            // Otherwise could think about sorting the set of elements (e.g. using ImmutableSortedSet sorted by hash code), maybe?
-            // Would need testing whether benefit is outweighed by constructing the ordered set in first place..
-            return obj is Effect effect && effect.Elements.IsSubsetOf(Elements) && Elements.IsSubsetOf(effect.Elements);
+            return obj is Effect effect && effect.Elements.SetEquals(Elements);
         }
 
         /// <inheritdoc />

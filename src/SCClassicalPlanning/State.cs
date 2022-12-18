@@ -146,7 +146,7 @@ namespace SCClassicalPlanning
             // Obviously unworkable if the state is large. However, if the state is large then this isn't
             // the only problematic thing. So let's revisit this when we look at abstracting state to allow 
             // for secondary storage and indexing. It may be that for the "in-mem" version, this is fine..
-            return obj is State state && state.Elements.IsSubsetOf(Elements) && Elements.IsSubsetOf(state.Elements);
+            return obj is State state && state.Elements.SetEquals(Elements);
         }
 
         /// <inheritdoc />
