@@ -74,7 +74,7 @@ namespace SCClassicalPlanning
         /// Returns a value indicating whether this effect is conceivably a useful final step in achieving a given goal.
         /// <para/>
         /// An effect is relevant to a goal if it accomplishes at least one element of the goal, and does not undo anything.
-        /// That is, the effect's elements overlap with the goals elements, and the set comprised of the negation of each of the effect's elements does not.
+        /// That is, if the effect's elements overlap with the goals elements, but the set of the negation of each of the effect's elements does not.
         /// </summary>
         /// <param name="goal">The goal to determine relevancy to.</param>
         /// <returns>A value indicating whether this effect is relevant to a given goal.</returns>
