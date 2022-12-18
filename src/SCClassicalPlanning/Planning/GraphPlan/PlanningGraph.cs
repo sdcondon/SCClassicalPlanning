@@ -282,11 +282,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             {
                 foreach (var (otherAction, otherActionNode) in newActionLevel.Take(actionIndex))
                 {
-                    // todo-performance: at first glance looks like we can do with with just one check (union effect and precond..)?
                     if (otherAction.Effect.Elements.Overlaps(action.Effect.Elements.Select(l => l.Negate())) // inconsistent effects
                         || otherAction.Effect.Elements.Overlaps(action.Precondition.Elements.Select(l => l.Negate())) // interference
                         || otherAction.Precondition.Elements.Overlaps(action.Effect.Elements.Select(l => l.Negate())) // interference the other way around
-                        || otherAction.Precondition.Elements.Overlaps(action.Precondition.Elements.Select(l => l.Negate()))) // competing needs
+                        || otherActionNode.Preconditions.Any(p => p.Mutexes.Any(m => actionNode.Preconditions.Contains(m)))) // competing needs - nb ref equality on node - fine cos no dupes
                     {
                         actionNode.Mutexes.Add(otherActionNode);
                         otherActionNode.Mutexes.Add(actionNode);
