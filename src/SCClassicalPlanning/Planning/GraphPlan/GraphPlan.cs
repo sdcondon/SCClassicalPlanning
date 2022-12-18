@@ -16,6 +16,7 @@ using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
 using System.Collections;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
@@ -161,6 +162,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private record struct NoGood(int Level, Goal Goal);
 
+        // A node in the solution extraction search represents having a particular goal at a particular
+        // level of the planning graph. The outbound edges of this node each represent sets of actions
+        // applicable to the previous level (no pair of which are mutually exclusive) that collectively
+        // satisfy the goal.
+        [DebuggerDisplay("{Goal} @ L{graphLevel.Index}")]
         private readonly struct SearchNode : INode<SearchNode, SearchEdge>, IEquatable<SearchNode>
         {
             private readonly PlanningGraph.Level graphLevel;
@@ -180,9 +186,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             // NB: this struct is private - so we don't need to look at the planning graph, since it'll always match
             public bool Equals(SearchNode node) => graphLevel.Index == node.graphLevel.Index && Equals(Goal, node.Goal);
 
-            public override int GetHashCode() => HashCode.Combine(Goal);
-
-            public override string ToString() => Goal.ToString(); // mebbe add info about the level (e.g. the index)
+            public override int GetHashCode() => HashCode.Combine(graphLevel.Index, Goal);
         }
 
         private readonly struct SearchNodeEdges : IReadOnlyCollection<SearchEdge>
@@ -235,7 +239,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     .Distinct(); // todo: can probably do this before order by? ref equality, but we take action to avoid dups.
 
                 // Now (recursively) attempt to cover all elements of the goal, with no mutexes:
-                // We go recursive to ultimately find all combos - this may be overkill..
+                // We go recursive to ensure that we ultimately find all combinations.
                 return Recurse(goalElements, relevantActionNodes.ToImmutableHashSet(), ImmutableHashSet<PlanningGraph.ActionNode>.Empty).GetEnumerator();
             }
 

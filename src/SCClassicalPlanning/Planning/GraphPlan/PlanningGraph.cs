@@ -250,11 +250,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
             }
 
-            // Now we need to add the maintenance/no-op actions:
+            // Now we need to add the persistence ("no-op") actions:
             foreach (var (proposition, propositionNode) in currentPropositionLevel.NodesByProposition)
             {
-                // Add a no-op action & link its precondition
-                var action = MakeNoOp(proposition);
+                // Add a persistence action & link its precondition
+                var action = MakePersistenceAction(proposition);
                 var actionNode = newActionLevel[action] = new ActionNode(action);
                 propositionNode.Actions.Add(actionNode);
 
@@ -342,9 +342,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         // TODO: this identifier is not guaranteed to be unique.
         // NB: while an EMPTY goal and effect would at first glance seem to be intuitive - it is
-        // defined like this to assist with mutex creation. Feels hacky to me, but this is
-        // apparently what is done..
-        internal static Action MakeNoOp(Literal proposition) => new("NOOP", new(proposition), new(proposition));
+        // defined like this to assist with mutex creation, and because of the idiosyncracies of
+        // plan extraction in GraphPlan. Still feels awkward to me, but meh, never mind.
+        internal static Action MakePersistenceAction(Literal proposition) => new("NOOP", new(proposition), new(proposition));
 
         /// <summary>
         /// Representation of a (proposition) level within a planning graph.

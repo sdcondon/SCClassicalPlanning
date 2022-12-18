@@ -1,8 +1,6 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
-using SCFirstOrderLogic;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
