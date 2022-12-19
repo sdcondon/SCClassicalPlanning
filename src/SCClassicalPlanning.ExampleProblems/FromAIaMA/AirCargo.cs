@@ -55,7 +55,6 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         public static OperablePredicate Airport(Term airport) => new Predicate(nameof(Airport), airport);
         public static OperablePredicate At(Term @object, Term location) => new Predicate(nameof(At), @object, location);
         public static OperablePredicate In(Term @object, Term container) => new Predicate(nameof(In), @object, container);
-        ////public static OperablePredicate Equal(Term x, Term y) => new Predicate(EqualitySymbol.Instance, x, y);
 
         public static Action Load(Term cargo, Term plane, Term airport) => new OperableAction(
             identifier: nameof(Load),
@@ -88,7 +87,7 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                 & Plane(plane)
                 & Airport(from)
                 & Airport(to),
-                ////& !Equal(from, to),
+                //& !AreEqual(from, to),
             effect:
                 !At(plane, from)
                 & At(plane, to));

@@ -7,7 +7,7 @@
 
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Basic but fully functional and documented classical planning implementations. Somewhat influenced by "Artificial Intelligence: A Modern Approach" (Russell &amp; Norvig). Includes state- snd goal-space search for now, GraphPlan will be added prior to v1.</Description>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>classical planning ai state space search</PackageTags>
     <Product>SCClassicalPlanning</Product>
     <PackageId>SCClassicalPlanning</PackageId>
