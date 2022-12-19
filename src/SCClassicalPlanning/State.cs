@@ -26,9 +26,6 @@ namespace SCClassicalPlanning
     /// instances - and are also used by some planning algorithms to track intermediate states while looking for a solution to a problem.
     /// <para/>
     /// TODO: Of all the model classes, states are most at risk of being large - to the extent that abstracting them and allowing for IO would almost certainly be useful. Watch this space.
-    /// <para/>
-    /// TODO: probably should add some verification in ctor that all elements are ground. Or.. not - don't want to sap performance by validating on
-    /// every step in plan creation.. Best of both worlds would be nice (internal vs public..?).
     /// </summary>
     public class State
     {
@@ -36,7 +33,15 @@ namespace SCClassicalPlanning
         /// Initializes a new instance of the <see cref="State"/> class from an enumerable of the predicates that comprise it.
         /// </summary>
         /// <param name="elements">The predicates that comprise the state.</param>
-        public State(IEnumerable<Predicate> elements) => Elements = elements.ToImmutableHashSet();
+        public State(IEnumerable<Predicate> elements)
+        {
+            if (elements.SelectMany(e => e.Arguments).Any(a => !a.IsGroundTerm))
+            {
+                throw new ArgumentException("States cannot include non-ground terms");
+            }
+
+            Elements = elements.ToImmutableHashSet();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="State"/> class from a (params) array of the predicates that comprise it.
@@ -190,11 +195,6 @@ namespace SCClassicalPlanning
                 }
                 else if (sentence is Predicate predicate)
                 {
-                    if (predicate.Arguments.Any(a => !a.IsGroundTerm))
-                    {
-                        throw new ArgumentException("States cannot include non-ground terms");
-                    }
-
                     predicates.Add(predicate);
                 }
                 else
