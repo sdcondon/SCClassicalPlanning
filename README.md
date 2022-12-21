@@ -17,14 +17,13 @@ I use Visual Studio, and once cloned, it should "just work" as far as compiling 
 
 ## Issues and Contributions
 
-I'm not really expecting anyone to want to get involved at this stage (or indeed ever), but please feel free to do so.
-I do keep a vague eye on the [issues](https://github.com/sdcondon/SCClassicalPlanning/issues) tab, and will add a CONTRIBUTING.md if anyone drops me a message expressing interest.
-Do bear in mind that I have a very particular scope in mind for the library, though.
-When we reach the point where I feel that it does a good job of its "learning and experimenting" remit and offers sufficient means of extension, I'll view it as done (and suggest that any extensions belong in their own packages).
+I'm not really expecting anyone to want to get involved at this stage, but please feel free to do so.
+I do keep an eye on the [issues](https://github.com/sdcondon/SCClassicalPlanning/issues) tab, and will add a CONTRIBUTING.md if anyone drops me a message expressing interest.
+Do bear in mind that I have a very particular scope in mind for the library, though - see the [roadmap](https://sdcondon.net/SCClassicalPlanning/roadmap.md) for details.
 
 ## See Also
 
-Like this? If so, it might also be worth taking a look at:
+Like this? If so, you might also be interested in these:
 
 * [SCFirstOrderLogic](https://github.com/sdcondon/SCFirstOrderLogic): Basic first-order logic implementations. Based on chapters 8 and 9 of "Artificial Intelligence: A Modern Approach". Depended on by this package (for its first-order logic model).
 * [SCGraphTheory.Search](https://github.com/sdcondon/SCGraphTheory.Search): Graph theory search algorithms. Depended on by this package (for state space search).

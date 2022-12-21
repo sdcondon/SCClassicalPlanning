@@ -9,3 +9,5 @@ Here is a quick overview of the namespaces found within this library. Reading th
       * **`Heuristics`:** contains heuristic implementations for use by search planners.
   * **`ProblemCreation`:** contains types that assist with the creation of problems and their constituent elements.
   * **`ProblemManipulation`:** contains types to assist with the manipulation of problems and their consituent elements.
+
+  For a full type and member listing, the recommendation is to use the awesome [FuGet package explorer](https://www.fuget.org/packages/SCClassicalPlanning/) tool - though going through [getting started](getting-started.md) first is probably a good idea, if you haven't already.
