@@ -9,7 +9,7 @@
     <PackageProjectUrl>https://sdcondon.net/SCClassicalPlanning/</PackageProjectUrl>
     <PackageReleaseNotes>See https://github.com/sdcondon/SCClassicalPlanning/releases.</PackageReleaseNotes>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Copyright>2022 Simon Condon</Copyright>
+    <Copyright>2022-2023 Simon Condon</Copyright>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>

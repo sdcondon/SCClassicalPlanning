@@ -3,7 +3,7 @@
     /// <summary>
     /// An interface for encapsulations of an attempt to create a <see cref="Plan"/>. 
     /// <para/>
-    /// We define our own interface (instead of just using <see cref="Task{Plan}"/>) so that it is
+    /// We define our own interface (instead of, say, just using <see cref="Task{Plan}"/>) so that it is
     /// easy for implementations to add additional behaviours such as step-by-step execution 
     /// (see <see cref="SteppablePlanningTask{TStepResult}"/>) and result explanations.
     /// </summary>

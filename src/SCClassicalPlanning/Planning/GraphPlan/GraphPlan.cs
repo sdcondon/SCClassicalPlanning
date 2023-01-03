@@ -266,19 +266,18 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
                 // TODO-PERFORMANCE: a lot of GC pressure here, what with all the immutable hash sets.
                 // could eliminate the duplication by creating a tree instead, or just some bit vector struct to indicate selection.
-                // meh, lets get it working first, then at least we have a baseline.
+                // Meh, lets get it working first, then at least we have a baseline.
                 if (!unsatisfiedGoalElements.Any())
                 {
                     yield return new SearchEdge(graphLevel, goal, selectedActionNodes.Select(n => n.Action));
                 }
                 else
                 {
-                    // Try to cover the first goal element (any others covered by the same action are a bonus)
-                    var firstGoalElement = unsatisfiedGoalElements.First();
-
+                    // Try to cover the first goal element (any others covered by the same action are a bonus),
+                    // then recurse for the other actions and remaining uncovered goal elements.
                     foreach (var actionNode in unselectedActionNodes)
                     {
-                        if (actionNode.Action.Effect.Elements.Contains(firstGoalElement) && IsNonMutexWithSelectedActions(actionNode))
+                        if (actionNode.Action.Effect.Elements.Contains(unsatisfiedGoalElements.First()) && IsNonMutexWithSelectedActions(actionNode))
                         {
                             foreach (var edge in Recurse(
                                 unsatisfiedGoalElements.Except(actionNode.Action.Effect.Elements),
@@ -312,9 +311,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             /// <inheritdoc />
             public SearchNode To => new(graphLevel.PreviousLevel!, new Goal(Actions.SelectMany(a => a.Precondition.Elements)));
-
-            /////// <inheritdoc />
-            ////public override string ToString() => new PlanFormatter(problem.Domain).Format(Action);
         }
     }
 }
