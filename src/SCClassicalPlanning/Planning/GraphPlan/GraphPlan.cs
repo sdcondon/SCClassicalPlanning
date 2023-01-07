@@ -331,6 +331,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             public SolutionExtractionDFS(Problem problem, PlanningGraph.Level graphLevel, HashSet<SearchState> noGoods)
             {
+                this.problem = problem;
                 this.source = new SearchNode(graphLevel, problem.Goal);
                 this.noGoods = noGoods;
 
