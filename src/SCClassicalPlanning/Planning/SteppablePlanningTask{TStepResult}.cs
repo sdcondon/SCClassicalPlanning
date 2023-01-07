@@ -22,7 +22,7 @@ namespace SCClassicalPlanning.Planning
         /// <para/>
         /// Calling <see cref="NextStep"/> on a completed planning task should result in an <see cref="InvalidOperationException"/>.
         /// </summary>
-        /// <returns>A container for information on what happened during the step.</returns>
+        /// <returns>A container for information about what happened during the step.</returns>
         public abstract TStepResult NextStep();
 
         /// <inheritdoc />

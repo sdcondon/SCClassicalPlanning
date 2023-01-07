@@ -222,6 +222,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                  * For any set of goals, we proceed in the following order:
                  * 1. Pick first the literal with the highest level cost.
                  * 2. To achieve that literal, prefer actions with easier preconditions.That is, choose an action such that the sum (or maximum) of the level costs of its preconditions is smallest."
+                 * 
+                 * Artificial Intelligence: A Modern Approach (Russel & Norvig)
                  */
 
                 var graphLevel = this.graphLevel; // copy level variable because we can't access struct instance field in lambda
@@ -239,14 +241,15 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     .Distinct(); // todo: can probably do this before order by? ref equality, but we take action to avoid dups.
 
                 // Now (recursively) attempt to cover all elements of the goal, with no mutexes:
-                // We go recursive to ensure that we ultimately find all combinations.
-                return Recurse(goalElements, relevantActionNodes.ToImmutableHashSet(), ImmutableHashSet<PlanningGraph.ActionNode>.Empty).GetEnumerator();
+                // We go recursive to ensure that we ultimately find all combinations - but this is of course potentially expensive.
+                // There's no way around this, unfortunately - the set cover problem is NP-complete, after all..
+                return FindCoveringActionSets(goalElements, relevantActionNodes.ToImmutableHashSet(), ImmutableHashSet<PlanningGraph.ActionNode>.Empty).GetEnumerator();
             }
 
             /// <inheritdoc />
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-            private IEnumerable<SearchEdge> Recurse(
+            private IEnumerable<SearchEdge> FindCoveringActionSets(
                 IEnumerable<Literal> unsatisfiedGoalElements,
                 ImmutableHashSet<PlanningGraph.ActionNode> unselectedActionNodes,
                 ImmutableHashSet<PlanningGraph.ActionNode> selectedActionNodes)
@@ -265,8 +268,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
 
                 // TODO-PERFORMANCE: a lot of GC pressure here, what with all the immutable hash sets.
-                // could eliminate the duplication by creating a tree instead, or just some bit vector struct to indicate selection.
-                // Meh, lets get it working first, then at least we have a baseline.
+                // We could eliminate the duplication by creating a tree instead, or even just some kind
+                // of bit-vector struct to indicate selection. Meh, lets get it working first, then at
+                // least we have a baseline for improvements.
                 if (!unsatisfiedGoalElements.Any())
                 {
                     yield return new SearchEdge(graphLevel, goal, selectedActionNodes.Select(n => n.Action));
@@ -279,7 +283,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     {
                         if (actionNode.Action.Effect.Elements.Contains(unsatisfiedGoalElements.First()) && IsNonMutexWithSelectedActions(actionNode))
                         {
-                            foreach (var edge in Recurse(
+                            foreach (var edge in FindCoveringActionSets(
                                 unsatisfiedGoalElements.Except(actionNode.Action.Effect.Elements),
                                 unselectedActionNodes.Remove(actionNode),
                                 selectedActionNodes.Add(actionNode)))
