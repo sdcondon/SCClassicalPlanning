@@ -16,8 +16,10 @@ using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
 using System.Collections;
 using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
@@ -79,7 +81,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             /// <inheritdoc />
             public async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
             {
-                HashSet<NoGood> noGoods = new();
+                HashSet<SearchState> noGoods = new();
                 var goalElementsPresentAndNonMutex = false;
                 var noGoodsLevelledOff = false;
 
@@ -95,6 +97,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     // (NB: we don't need to keep checking this once its true for a level - because mutexes decrease monotonically)
                     if (goalElementsPresentAndNonMutex || (goalElementsPresentAndNonMutex = graphLevel.ContainsNonMutex(problem.Goal.Elements)))
                     {
+                        var priorNoGoodsCount = noGoods.Count;
+
                         // ..try to extract a solution:
                         if (await Task.Run(() => TryExtractSolution(graphLevel, noGoods, out result, cancellationToken), cancellationToken))
                         {
@@ -102,11 +106,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                             isComplete = true;
                             return result!;
                         }
-                        // todo - establish whether nogoods have levelled off..
-                        ////else if ()
-                        ////{
-                        ////    noGoodsLevelledOff = true;
-                        ////}
+
+                        noGoodsLevelledOff = noGoods.Count == priorNoGoodsCount; 
                     }
 
                     // If we haven't managed to extract a solution, and both the graph and no-goods have levelled off, we fail.
@@ -121,7 +122,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             private bool TryExtractSolution(
                 PlanningGraph.Level graphLevel,
-                HashSet<NoGood> noGoods,
+                HashSet<SearchState> noGoods,
                 [MaybeNullWhen(false)] out Plan plan,
                 CancellationToken cancellationToken)
             {
@@ -131,20 +132,17 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // In practice this won't happen because we'd have found the target at an earlier step anyway. 
                 // So, what the book is trying (fairly badly..) to say is that when we first find the target, it'll be
                 // at level zero.
-                var search = new RecursiveDFS<SearchNode, SearchEdge>(
+                var search = new RecursiveDFS(
                     source: new SearchNode(graphLevel, problem.Goal),
-                    isTarget: n => problem.InitialState.Satisfies(n.Goal));
+                    isTarget: n => problem.InitialState.Satisfies(n.Goal),
+                    noGoods);
 
                 search.Complete(cancellationToken);
 
-                // todo: nogoods - ..query search tree for nogoods here?
-
                 if (search.IsSucceeded)
                 {
-                    // TODO-PERFORMANCE: we're un-reversing something thats already been reversed. Add PathFromTarget to SCGraphTheory?
                     var actions = search
-                        .PathToTarget()
-                        .Reverse() 
+                        .PathFromTarget()
                         .SelectMany(e => e.Actions)
                         .Where(a => !a.Identifier.Equals(PlanningGraph.PersistenceActionIdentifier))
                         .ToList();
@@ -167,7 +165,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
         }
 
-        private record struct NoGood(int Level, Goal Goal);
+        private record struct SearchState(int Level, Goal Goal);
 
         // A node in the solution extraction search represents having a particular goal at a particular
         // level of the planning graph. The outbound edges of this node each represent sets of actions
@@ -176,24 +174,24 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         [DebuggerDisplay("{Goal} @ L{graphLevel.Index}")]
         private readonly struct SearchNode : INode<SearchNode, SearchEdge>, IEquatable<SearchNode>
         {
-            private readonly PlanningGraph.Level graphLevel;
-
             public SearchNode(PlanningGraph.Level graphLevel, Goal goal)
             {
-                this.graphLevel = graphLevel;
+                this.GraphLevel = graphLevel;
                 this.Goal = goal;
             }
 
             public readonly Goal Goal { get; }
 
-            public IReadOnlyCollection<SearchEdge> Edges => new SearchNodeEdges(graphLevel, Goal);
+            public readonly PlanningGraph.Level GraphLevel { get; }
+
+            public IReadOnlyCollection<SearchEdge> Edges => new SearchNodeEdges(GraphLevel, Goal);
 
             public override bool Equals(object? obj) => obj is SearchNode node && Equals(node);
 
             // NB: this struct is private - so we don't need to look at the planning graph, since it'll always match
-            public bool Equals(SearchNode node) => graphLevel.Index == node.graphLevel.Index && Equals(Goal, node.Goal);
+            public bool Equals(SearchNode node) => GraphLevel.Index == node.GraphLevel.Index && Equals(Goal, node.Goal);
 
-            public override int GetHashCode() => HashCode.Combine(graphLevel.Index, Goal);
+            public override int GetHashCode() => HashCode.Combine(GraphLevel.Index, Goal);
         }
 
         private readonly struct SearchNodeEdges : IReadOnlyCollection<SearchEdge>
@@ -322,6 +320,94 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             /// <inheritdoc />
             public SearchNode To => new(graphLevel.PreviousLevel!, new Goal(Actions.SelectMany(a => a.Precondition.Elements)));
+        }
+
+        // Use our own search logic to gracefully keep note of no-goods.
+        // Raises questions of whether we should bother with SCGraphTheory's abstractions, but meh, 
+        // lets keep them for now.
+        private class RecursiveDFS
+        {
+            private readonly SearchNode source;
+            private readonly Predicate<SearchNode> isTarget;
+            private readonly HashSet<SearchState> noGoods;
+            private readonly Dictionary<SearchNode, SearchEdge> visited = new Dictionary<SearchNode, SearchEdge>();
+
+            public RecursiveDFS(SearchNode source, Predicate<SearchNode> isTarget, HashSet<SearchState> noGoods)
+            {
+                this.source = source;
+                this.isTarget = isTarget ?? throw new ArgumentNullException(nameof(isTarget));
+                this.noGoods = noGoods;
+
+                Visited = new ReadOnlyDictionary<SearchNode, SearchEdge>(visited);
+                visited[source] = default;
+            }
+
+            public bool IsConcluded { get; private set; } = false;
+
+            public bool IsSucceeded { get; private set; } = false;
+
+            public SearchNode Target { get; private set; }
+
+            public IReadOnlyDictionary<SearchNode, SearchEdge> Visited { get; }
+
+            public void Complete(CancellationToken cancellationToken = default)
+            {
+                Visit(source, cancellationToken);
+                IsConcluded = true;
+            }
+
+            public IEnumerable<SearchEdge> PathFromTarget()
+            {
+                if (!IsSucceeded)
+                {
+                    throw new InvalidOperationException("Search failed");
+                }
+
+                for (var node = Target; !object.Equals(Visited[node], default(SearchEdge)); node = Visited[node].From)
+                {
+                    yield return Visited[node];
+                }
+            }
+
+            private void Visit(SearchNode node, CancellationToken cancellationToken)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (isTarget(node))
+                {
+                    Target = node;
+                    IsSucceeded = true;
+                    return;
+                }
+
+                var enumerator = node.Edges.GetEnumerator();
+                try
+                {
+                    if (!enumerator.MoveNext())
+                    {
+                        noGoods.Add(new (node.GraphLevel.Index, node.Goal));
+                    }
+                    else
+                    {
+                        do
+                        {
+                            var nextEdge = enumerator.Current;
+                            var nextNode = nextEdge.To;
+
+                            if (!visited.ContainsKey(nextNode))
+                            {
+                                Visit(nextNode, cancellationToken);
+                                visited[nextNode] = nextEdge;
+                            }
+                        }
+                        while (!IsSucceeded && enumerator.MoveNext());
+                    }
+                }
+                finally
+                {
+                    enumerator.Dispose();
+                }
+            }
         }
     }
 }

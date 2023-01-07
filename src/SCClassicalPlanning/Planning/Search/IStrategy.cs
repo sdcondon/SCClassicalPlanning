@@ -22,12 +22,6 @@ namespace SCClassicalPlanning.Planning.Search
     /// problem being solved) of any given action, and can also estimate the total cost of getting from
     /// a given state to a state that satisfies a given goal.
     /// </summary>
-    /// <remarks>
-    /// NB: Instead of looking like this, this interface *could* have a single method that returns an
-    /// <see cref="ISearch{TNode,TEdge}"/>. More flexible but less easy to use (and would require
-    /// our search graph types to be public).. Just worth bearing in mind should greater flexibility
-    /// be required in the future.
-    /// </remarks>
     public interface IStrategy
     {
         /// <summary>
