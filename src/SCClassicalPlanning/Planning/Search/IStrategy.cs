@@ -16,9 +16,11 @@ using SCGraphTheory.Search.Classic;
 namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
-    /// Interface for state/goal space search strategy implementations. That is, types that provide
-    /// the "cost" (whatever that means in the context of the problem being solved) of any given action,
-    /// and can also estimate the total cost of getting from a given state to a state that satisfies a given goal.
+    /// Interface for state/goal-space search strategy implementations.
+    /// <para/>
+    /// Implementations of this interface provide the "cost" (whatever that means in the context of the
+    /// problem being solved) of any given action, and can also estimate the total cost of getting from
+    /// a given state to a state that satisfies a given goal.
     /// </summary>
     /// <remarks>
     /// NB: Instead of looking like this, this interface *could* have a single method that returns an

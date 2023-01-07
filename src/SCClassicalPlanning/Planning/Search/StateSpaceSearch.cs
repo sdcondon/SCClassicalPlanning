@@ -31,10 +31,7 @@ namespace SCClassicalPlanning.Planning.Search
         /// <summary>
         /// Initializes a new instance of the <see cref="StateSpaceSearch"/> class.
         /// </summary>
-        /// <param name="strategy">
-        /// The strategy to use - which provides the cost of actions as well as estimates of the total cost of
-        /// getting from a given state, to a state that satisfies a given goal.
-        /// </param>
+        /// <param name="strategy">The strategy to use.</param>
         public StateSpaceSearch(IStrategy strategy) => this.strategy = strategy;
 
         /// <summary>
