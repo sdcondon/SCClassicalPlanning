@@ -62,6 +62,25 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                     & On(blockB, blockC)
                     & On(blockC, blockD)
                     & On(blockD, blockE)));
+
+            UnsolvableExampleProblem = MakeProblem(
+                initialState: new(
+                    Block(blockA)
+                    & Equal(blockA, blockA)
+                    & Block(blockB)
+                    & Equal(blockB, blockB)
+                    & Block(blockC)
+                    & Equal(blockC, blockC)
+                    & On(blockA, Table)
+                    & On(blockB, Table)
+                    & On(blockC, Table)
+                    & Clear(blockA)
+                    & Clear(blockB)
+                    & Clear(blockC)),
+                goal: new(
+                    On(blockA, blockB)
+                    & On(blockB, blockC)
+                    & On(blockC, blockA)));
         }
 
         /// <summary>
@@ -77,6 +96,15 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         /// Consists of five blocks.
         /// </summary>
         public static Problem LargeExampleProblem { get; }
+
+        /// <summary>
+        /// Gets an instance of an example problem in this domain that is unsolvable.
+        /// Consists of three blocks.
+        /// In the initial state, all three blocks are on the table.
+        /// The goal is to get block A on top of block B, block B on top of block C, and block C on top of block A.
+        /// Which is of course impossible.
+        /// </summary>
+        public static Problem UnsolvableExampleProblem { get; }
 
         /// <summary>
         /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
