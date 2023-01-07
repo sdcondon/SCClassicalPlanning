@@ -124,20 +124,17 @@ Once you have a problem, the types in the `SCClassicalPlanning.Planning` namespa
 ```
 using SCClassicalPlanning.Planning; // for PlanFormatter and CreatePlan extension method (plan creation is async by default)
 using SCClassicalPlanning.Planning.Search; // for StateSpaceSearch
-using SCClassicalPlanning.Planning.Search.Heuristics; // for UnsatisfiedGoalCount
+using SCClassicalPlanning.Planning.Search.Strategies; // for UnsatisfiedGoalCount
 
-// First instantiate a StateSpaceSearch, specifying a heuristic to use (an object that
-// estimates the number of actions it will take to get from a given state to a state that satisfies
-// a given goal). You can create a heuristic specific to the domain, or you can use a
+// First instantiate a StateSpaceSearch, specifying a strategy to use (an object that gives
+// the cost of actions, and estimates the total cost of getting from a given state to a state
+// that satisfies a given goal). You can create a strategy specific to the domain, or you can use a
 // generic one provided by the library. Here we use one provided by the library.
-// NB #1: both the state and goal space search classes have constructor overloads
-// that also include a parameter for a delegate to compute the "cost" of an action. Potentially useful if 
-// it makes sense for a custom heuristic to consider some actions more costly than others.
-// NB #2: here we use the UnsatisfiedGoalCount heuristic - which just counts the number of elements of the
-// goal that are not satisfied in the current state. It's totally useless for goal space searches (because
-// it can't rule out unsatisfiable goals) and isn't that great for most state space searches either
-// (note it's not admissable, so can give non-optimal plans). However, it suffices for the very simple
-// problem we are trying to solve here:
+// NB: here we use the UnsatisfiedGoalCount strategy - which (gives all actions a cost of 1 and) just 
+// counts the number of elements of the goal that are not satisfied in the current state. It's totally
+// useless for goal space searches (because it can't rule out unsatisfiable goals) and isn't that great
+// for most state space searches either (note it's not admissable, so can give non-optimal plans). 
+// However, it suffices for the very simple problem we are trying to solve here:
 var planner = new StateSpaceSearch(new UnsatisfiedGoalCount());
 
 // Tell the planner to create a plan for our problem:
@@ -165,10 +162,9 @@ Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.Goal)}!");
 
 ### Using Goal Space Search
 
-As above, but using `var planner = new GoalSpaceSearch(heuristic);`, where heuristic is an `IHeuristic`.
+As above, but using `var planner = new GoalSpaceSearch(strategy);`, where strategy is an `IStrategy`.
 As mentioned above, UnsatisfiedGoalCount is useless for this. Either create one specifically for your
-domain, or wait until I implement some more generic ones (working on a precondition-ignoring greedy set cover at the time
-of writing).
+domain, or wait until I implement some better generic ones.
 
 ### Using Graphplan
 

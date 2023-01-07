@@ -2,7 +2,7 @@
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 
-namespace SCClassicalPlanning.Planning.Search.Heuristics
+namespace SCClassicalPlanning.Planning.Search.Strategies
 {
     public class PlanningGraphLevelSumTesrs
     {

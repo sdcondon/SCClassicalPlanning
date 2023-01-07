@@ -17,17 +17,17 @@ using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
 using System.Diagnostics;
 
-namespace SCClassicalPlanning.Planning.Search.Heuristics
+namespace SCClassicalPlanning.Planning.Search.Strategies
 {
     /// <summary>
-    /// State space search heuristic that ignores preconditions and uses a greedy set cover algorithm
-    /// to provide its estimate.
+    /// State space search strategy that (gives all actions a cost of 1 and) ignores preconditions
+    /// and uses a greedy set cover algorithm to provide cost estimates.
     /// <para/>
     /// Not "admissable" (mostly because greedy set cover can overestimate) - 
     /// so the plans discovered using it won't necessarily be optimal, but better than heuristics
     /// that don't examine the available actions at all..
     /// </summary>
-    public class IgnorePreconditionsGreedySetCover : IHeuristic
+    public class IgnorePreconditionsGreedySetCover : IStrategy
     {
         private readonly Domain domain;
 
@@ -37,12 +37,10 @@ namespace SCClassicalPlanning.Planning.Search.Heuristics
         /// <param name="domain">The domain of the problem being solved.</param>
         public IgnorePreconditionsGreedySetCover(Domain domain) => this.domain = domain;
 
-        /// <summary>
-        /// Estimates the cost of getting from the given state to a state that satisfies the given goal.
-        /// </summary>
-        /// <param name="state">The state.</param>
-        /// <param name="goal">The goal.</param>
-        /// <returns>An estimate of the cost of getting from the given state to a state that satisfies the given goal.</returns>
+        /// <inheritdoc/>
+        public float GetCost(Action action) => 1f;
+
+        /// <inheritdoc/>
         public float EstimateCost(State state, Goal goal)
         {
             var unsatisfiedGoalElements = GetUnsatisfiedGoalElements(state, goal);
@@ -158,7 +156,9 @@ namespace SCClassicalPlanning.Planning.Search.Heuristics
                 }
             }
 
-            return coveringActionCount;
+            // NB: We *could* allow non-unitary action costs (either by delegate or otherwise),
+            // and return the sum. But don't bother at least for now.
+            return coveringActionCount; 
         }
 
         /// <summary>

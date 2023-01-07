@@ -2,12 +2,12 @@
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using SCClassicalPlanning.Planning;
 using SCClassicalPlanning.Planning.Search;
-using SCClassicalPlanning.Planning.Search.Heuristics;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using SCFirstOrderLogic.Inference.Resolution;
+using SCClassicalPlanning.Planning.Search.Strategies;
 
 namespace SCClassicalPlanning.Benchmarks.Planning
 {
@@ -15,7 +15,7 @@ namespace SCClassicalPlanning.Benchmarks.Planning
     [InProcess]
     public class PlannerBenchmarks
     {
-        public record TestCase(string Label, Problem Problem, IHeuristic Heuristic, IKnowledgeBase InvariantsKB)
+        public record TestCase(string Label, Problem Problem, IStrategy Strategy, IKnowledgeBase InvariantsKB)
         {
             public override string ToString() => Label;
         }
@@ -25,13 +25,13 @@ namespace SCClassicalPlanning.Benchmarks.Planning
             new(
                 Label: "Air Cargo",
                 Problem: AirCargo.ExampleProblem,
-                Heuristic: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
+                Strategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
                 InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
             new(
                 Label: "Blocks - Small",
                 Problem: BlocksWorld.ExampleProblem,
-                Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
                 InvariantsKB: MakeInvariantsKB(new Sentence[]
                 {
                     // TODO: slicker support for unique names assumption worth looking into at some point.. 
@@ -53,13 +53,13 @@ namespace SCClassicalPlanning.Benchmarks.Planning
             new(
                 Label: "Spare Tire",
                 Problem: SpareTire.ExampleProblem,
-                Heuristic: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
+                Strategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
                 InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
             ////new(
             ////    Label: "Blocks - Large",
             ////    Problem: BlocksWorld.LargeExampleProblem,
-            ////    Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+            ////    Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
             ////    InvariantsKB: MakeInvariantsKB(new Sentence[]
             ////    {
             ////        Block(new Constant("blockA")),
@@ -102,25 +102,25 @@ namespace SCClassicalPlanning.Benchmarks.Planning
         [Benchmark]
         public Plan StateSpaceSearch()
         {
-            return new StateSpaceSearch(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
+            return new StateSpaceSearch(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
         public Plan GoalSpaceSearch()
         {
-            return new GoalSpaceSearch(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceSearch(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
         public Plan GoalSpaceSearch_PropositionalWithoutKB()
         {
-            return new GoalSpaceSearch_PropositionalWithoutKB(CurrentTestCase!.Heuristic).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceSearch_PropositionalWithoutKB(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
         public Plan GoalSpaceSearch_PropositionalWithKB()
         {
-            return new GoalSpaceSearch_PropositionalWithKB(CurrentTestCase!.Heuristic, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceSearch_PropositionalWithKB(CurrentTestCase!.Strategy, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
         }
 
         private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)

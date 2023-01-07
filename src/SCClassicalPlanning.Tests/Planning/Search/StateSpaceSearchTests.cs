@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
-using SCClassicalPlanning.Planning.Search.Heuristics;
+using SCClassicalPlanning.Planning.Search.Strategies;
 
 namespace SCClassicalPlanning.Planning.Search
 {
@@ -18,8 +18,8 @@ namespace SCClassicalPlanning.Planning.Search
             })
             .When((_, problem) =>
             {
-                var heuristic = new IgnorePreconditionsGreedySetCover(problem.Domain);
-                var planner = new StateSpaceSearch(heuristic);
+                var strategy = new IgnorePreconditionsGreedySetCover(problem.Domain);
+                var planner = new StateSpaceSearch(strategy);
                 return planner.CreatePlan(problem);
             })
             .ThenReturns()

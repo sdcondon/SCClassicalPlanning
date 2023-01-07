@@ -1,11 +1,10 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
-using SCClassicalPlanning.Planning.Search.Heuristics;
+using SCClassicalPlanning.Planning.Search.Strategies;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
-using System.Numerics;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
@@ -14,7 +13,7 @@ namespace SCClassicalPlanning.Planning.Search
 {
     public static class GoalSpaceSearchTests
     {
-        private record TestCase(Problem Problem, IHeuristic Heuristic, IKnowledgeBase InvariantsKB);
+        private record TestCase(Problem Problem, IStrategy Strategy, IKnowledgeBase InvariantsKB);
 
         public static Test CreatedPlanValidity => TestThat
             .GivenTestContext()
@@ -22,7 +21,7 @@ namespace SCClassicalPlanning.Planning.Search
             {
                 new(
                     Problem: AirCargo.ExampleProblem,
-                    Heuristic: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
+                    Strategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
                     InvariantsKB: MakeInvariantsKB(new Sentence[]
                     {
                         Cargo(new Constant("cargo1")),
@@ -41,7 +40,7 @@ namespace SCClassicalPlanning.Planning.Search
 
                 new(
                     Problem: BlocksWorld.ExampleProblem,
-                    Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                    Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
                     InvariantsKB: MakeInvariantsKB(new Sentence[]
                     {
                         Block(new Constant("blockA")),
@@ -53,12 +52,12 @@ namespace SCClassicalPlanning.Planning.Search
 
                 new(
                     Problem: SpareTire.ExampleProblem,
-                    Heuristic: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
+                    Strategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
                     InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
                 new(
                     Problem: BlocksWorld.LargeExampleProblem,
-                    Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                    Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
                     InvariantsKB: MakeInvariantsKB(new Sentence[]
                     {
                         Block(new Constant("blockA")),
@@ -72,7 +71,7 @@ namespace SCClassicalPlanning.Planning.Search
             })
             .When((_, tc) =>
             {
-                var planner = new GoalSpaceSearch(tc.Heuristic);
+                var planner = new GoalSpaceSearch(tc.Strategy);
                 return planner.CreatePlanAsync(tc.Problem).GetAwaiter().GetResult();
             })
             .ThenReturns()
@@ -81,7 +80,7 @@ namespace SCClassicalPlanning.Planning.Search
 
         public static Test CreatedPlanValidity_AlternativeImplementations => TestThat
             .GivenTestContext()
-            .AndEachOf(() => new Func<IHeuristic, IKnowledgeBase, IPlanner>[]
+            .AndEachOf(() => new Func<IStrategy, IKnowledgeBase, IPlanner>[]
             {
                 //(h, kb) => new BackwardStateSpaceSearch_LiftedWithKB(h, kb), // doesnt work yet
                 //(h, kb) => new BackwardStateSpaceSearch_LiftedWithoutKB(h), // doesnt work yet
@@ -92,7 +91,7 @@ namespace SCClassicalPlanning.Planning.Search
             {
                 new(
                     Problem: AirCargo.ExampleProblem,
-                    Heuristic: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
+                    Strategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
                     InvariantsKB: MakeInvariantsKB(new Sentence[]
                     {
                         Cargo(new Constant("cargo1")),
@@ -111,7 +110,7 @@ namespace SCClassicalPlanning.Planning.Search
 
                 new(
                     Problem: BlocksWorld.ExampleProblem,
-                    Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                    Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
                     InvariantsKB: MakeInvariantsKB(new Sentence[]
                     {
                         Block(new Constant("blockA")),
@@ -123,12 +122,12 @@ namespace SCClassicalPlanning.Planning.Search
 
                 new(
                     Problem: SpareTire.ExampleProblem,
-                    Heuristic: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
+                    Strategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
                     InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
                 new(
                     Problem: BlocksWorld.LargeExampleProblem,
-                    Heuristic: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                    Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
                     InvariantsKB: MakeInvariantsKB(new Sentence[]
                     {
                         Block(new Constant("blockA")),
@@ -140,7 +139,7 @@ namespace SCClassicalPlanning.Planning.Search
                         ForAll(A, B, If(On(A, B), !Clear(B))),
                     })),
             })
-            .When((_, makePlanner, tc) => makePlanner(tc.Heuristic, tc.InvariantsKB).CreatePlan(tc.Problem))
+            .When((_, makePlanner, tc) => makePlanner(tc.Strategy, tc.InvariantsKB).CreatePlan(tc.Problem))
             .ThenReturns()
             .And((_, _, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
             .And((cxt, _, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));

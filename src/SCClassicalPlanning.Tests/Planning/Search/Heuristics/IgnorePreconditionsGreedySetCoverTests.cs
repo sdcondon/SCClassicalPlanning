@@ -5,7 +5,7 @@ using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 
-namespace SCClassicalPlanning.Planning.Search.Heuristics
+namespace SCClassicalPlanning.Planning.Search.Strategies
 {
     public static class IgnorePreconditionsGreedySetCoverTests
     {

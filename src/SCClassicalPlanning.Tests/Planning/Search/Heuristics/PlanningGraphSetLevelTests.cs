@@ -3,7 +3,7 @@ using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 
-namespace SCClassicalPlanning.Planning.Search.Heuristics
+namespace SCClassicalPlanning.Planning.Search.Strategies
 {
     public class PlanningGraphSetLevelTests
     {

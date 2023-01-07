@@ -8,7 +8,7 @@ using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
-namespace SCClassicalPlanning.Planning.Search.Heuristics
+namespace SCClassicalPlanning.Planning.Search.Strategies
 {
     public static class GoalInvariantCheckTests
     {
@@ -58,7 +58,8 @@ namespace SCClassicalPlanning.Planning.Search.Heuristics
                     SimpleResolutionKnowledgeBase.PriorityComparisons.None); // No point in unitpreference, 'cos query is *all* unit clauses..
                 kb.Tell(tc.Invariants);
 
-                return new GoalInvariantCheck(kb, new DelegateHeuristic((s, g) => 0)).EstimateCost(tc.State, tc.Goal);
+                var nullStrategy = new DelegateStrategy(a => 0f, (s, g) => 0f);
+                return new GoalInvariantCheck(kb, nullStrategy).EstimateCost(tc.State, tc.Goal);
             })
             .ThenReturns()
             .And((tc, rv) => rv.Should().Be(tc.ExpectedCost));

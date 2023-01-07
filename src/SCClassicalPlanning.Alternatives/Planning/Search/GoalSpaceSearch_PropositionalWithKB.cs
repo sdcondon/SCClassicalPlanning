@@ -27,28 +27,16 @@ namespace SCClassicalPlanning.Planning.Search
     /// </summary>
     public class GoalSpaceSearch_PropositionalWithKB : IPlanner
     {
-        private readonly IHeuristic heuristic;
+        private readonly IStrategy strategy;
         private readonly InvariantInspector? invariantInspector;
-        private readonly Func<Action, float> getActionCost;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GoalSpaceSearch_PropositionalWithKB"/> class that attempts to minimise the number of actions in the resulting plan.
+        /// Initializes a new instance of the <see cref="GoalSpaceSearch_PropositionalWithKB"/> class.
         /// </summary>
-        /// <param name="heuristic">The heuristic to use - the returned cost will be interpreted as the estimated number of actions that need to be performed.</param>
-        public GoalSpaceSearch_PropositionalWithKB(IHeuristic heuristic, IKnowledgeBase? invariantsKB = null)
-            : this(heuristic, a => 1f, invariantsKB)
+        /// <param name="strategy">The strategy to use.</param>
+        public GoalSpaceSearch_PropositionalWithKB(IStrategy strategy, IKnowledgeBase? invariantsKB = null)
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GoalSpaceSearch_PropositionalWithKB"/> class that attempts to minimise the total "cost" of actions in the resulting plan.
-        /// </summary>
-        /// <param name="heuristic">The heuristic to use - with the returned cost will be interpreted as the estimated total cost of the actions that need to be performed.</param>
-        /// <param name="getActionCost">A delegate to retrieve the cost of an action.</param>
-        public GoalSpaceSearch_PropositionalWithKB(IHeuristic heuristic, Func<Action, float> getActionCost, IKnowledgeBase? invariantsKB = null)
-        {
-            this.heuristic = heuristic;
-            this.getActionCost = getActionCost;
+            this.strategy = strategy;
             this.invariantInspector = invariantsKB != null ? new InvariantInspector(invariantsKB) : null;
         }
 
@@ -57,7 +45,7 @@ namespace SCClassicalPlanning.Planning.Search
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
         /// <returns></returns>
-        public PlanningTask CreatePlanningTask(Problem problem) => new(problem, heuristic, getActionCost, invariantInspector);
+        public PlanningTask CreatePlanningTask(Problem problem) => new(problem, strategy, invariantInspector);
 
         /// <inheritdoc />
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
@@ -72,7 +60,7 @@ namespace SCClassicalPlanning.Planning.Search
             private bool isComplete;
             private Plan? result;
 
-            internal PlanningTask(Problem problem, IHeuristic heuristic, Func<Action, float> getActionCost, InvariantInspector? invariantInspector)
+            internal PlanningTask(Problem problem, IStrategy strategy, InvariantInspector? invariantInspector)
             {
                 Problem = problem;
                 InvariantInspector = invariantInspector;
@@ -80,8 +68,8 @@ namespace SCClassicalPlanning.Planning.Search
                 search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
                     source: new GoalSpaceNode(this, problem.Goal),
                     isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
-                    getEdgeCost: e => getActionCost(e.Action),
-                    getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
+                    getEdgeCost: e => strategy.GetCost(e.Action),
+                    getEstimatedCostToTarget: n => strategy.EstimateCost(problem.InitialState, n.Goal));
 
                 CheckForSearchCompletion();
             }

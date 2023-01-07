@@ -14,14 +14,14 @@
 using SCClassicalPlanning.Planning.Utilities;
 using SCFirstOrderLogic.Inference;
 
-namespace SCClassicalPlanning.Planning.Search.Heuristics
+namespace SCClassicalPlanning.Planning.Search.Strategies
 {
     /// <summary>
-    /// A decorator heuristic that checks whether the goal violates any known invariants
-    /// before invoking the inner heuristic. If any invariants are violated, returns <see cref="float.PositiveInfinity"/>.
+    /// A decorator strategy that checks whether the goal violates any known invariants
+    /// before invoking the inner strategy. If any invariants are violated, returns <see cref="float.PositiveInfinity"/>.
     /// Intended to be of use for early pruning of unreachable goals when backward searching.
     /// <para/>
-    /// NB #1: This heuristic isn't driven by any particular source material, but given that it's a fairly
+    /// NB #1: This strategy isn't driven by any particular source material, but given that it's a fairly
     /// obvious idea, there could well be some terminology that I'm not using - I may rename/refactor it as and when.
     /// <para/>
     /// NB #2: Checking invariants obviously comes at a performance cost (though fact that goals consist only of unit
@@ -40,28 +40,31 @@ namespace SCClassicalPlanning.Planning.Search.Heuristics
     /// are entailed by the invariants (e.g. IsBlock(BlockA)) - as we don't need to worry about things that
     /// will always be true.
     /// </summary>
-    public class GoalInvariantCheck : IHeuristic
+    public class GoalInvariantCheck : IStrategy
     {
         private readonly InvariantInspector invariantInspector;
-        private readonly IHeuristic innerHeuristic;
+        private readonly IStrategy innerStrategy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GoalInvariantCheck"/>.
         /// </summary>
         /// <param name="invariantsKB">A knowledge base containing all of the invariants of the problem.</param>
-        /// <param name="innerHeuristic">The inner heuristic to invoke if no invariants are violated by the goal.</param>
-        public GoalInvariantCheck(IKnowledgeBase invariantsKB, IHeuristic innerHeuristic)
+        /// <param name="innerStrategy">The inner strategy to invoke if no invariants are violated by the goal.</param>
+        public GoalInvariantCheck(IKnowledgeBase invariantsKB, IStrategy innerStrategy)
         {
             this.invariantInspector = new InvariantInspector(invariantsKB);
-            this.innerHeuristic = innerHeuristic;
+            this.innerStrategy = innerStrategy;
         }
+
+        /// <inheritdoc/>
+        public float GetCost(Action action) => innerStrategy.GetCost(action);
 
         /// <summary>
         /// Estimates the cost of getting from the given state to a state that satisfies the given goal.
         /// </summary>
         /// <param name="state">The state.</param>
         /// <param name="goal">The goal.</param>
-        /// <returns><see cref="float.PositiveInfinity"/> if any invariants are violated by the goal. Otherwise, the cost estimated by the inner heuristic.</returns>
+        /// <returns><see cref="float.PositiveInfinity"/> if any invariants are violated by the goal. Otherwise, the cost estimated by the inner strategy.</returns>
         public float EstimateCost(State state, Goal goal)
         {
             if (invariantInspector.IsGoalPrecludedByInvariants(goal))
@@ -69,7 +72,7 @@ namespace SCClassicalPlanning.Planning.Search.Heuristics
                 return float.PositiveInfinity;
             }
 
-            return innerHeuristic.EstimateCost(state, goal);
+            return innerStrategy.EstimateCost(state, goal);
         }
     }
 }

@@ -13,16 +13,17 @@
 // limitations under the License.
 using SCClassicalPlanning.Planning.GraphPlan;
 
-namespace SCClassicalPlanning.Planning.Search.Heuristics
+namespace SCClassicalPlanning.Planning.Search.Strategies
 {
     /// <summary>
-    /// Heuristic that uses a "max level" planning graph heuristic.
+    /// Strategy that (gives all actions a cost of 1 and) uses a "set level" planning graph heuristic
+    /// to provide cost estimates.
     /// <para/>
     /// To give an estimate, it first constructs a planning graph (yup, this is rather expensive..)
-    /// starting from the current state. The cost estimate is the maximum level cost of any of the goal's
-    /// elements.
+    /// starting from the current state. The cost estimate is the level at which each of the goals
+    /// elements appear and are all not mutually-exclusive with one another.
     /// </summary>
-    public class PlanningGraphMaxLevel : IHeuristic
+    public class PlanningGraphSetLevel : IStrategy
     {
         private readonly Domain domain;
 
@@ -30,25 +31,25 @@ namespace SCClassicalPlanning.Planning.Search.Heuristics
         /// Initialises a new instance of the <see cref="PlanningGraphMaxLevel"/> class.
         /// </summary>
         /// <param name="domain">The relevant domain.</param>
-        public PlanningGraphMaxLevel(Domain domain) => this.domain = domain;
+        public PlanningGraphSetLevel(Domain domain) => this.domain = domain;
+
+        /// <inheritdoc/>
+        public float GetCost(Action action) => 1f;
 
         /// <inheritdoc/>
         public float EstimateCost(State state, Goal goal)
         {
             var planningGraph = new PlanningGraph(new(domain, state, goal));
 
-            return goal.Elements.Max(e =>
+            var level = planningGraph.GetLevelCost(goal.Elements);
+            if (level != -1)
             {
-                var level = planningGraph.GetLevelCost(e);
-                if (level != -1)
-                {
-                    return level;
-                }
-                else
-                {
-                    return float.PositiveInfinity;
-                }
-            });
+                return level;
+            }
+            else
+            {
+                return float.PositiveInfinity;
+            }
         }
     }
 }

@@ -24,35 +24,23 @@ namespace SCClassicalPlanning.Planning.Search
     /// </summary>
     public class GoalSpaceSearch : IPlanner
     {
-        private readonly IHeuristic heuristic;
-        private readonly Func<Action, float> getActionCost;
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GoalSpaceSearch"/> class that attempts to minimise the number of actions in the resulting plan.
-        /// </summary>
-        /// <param name="heuristic">The heuristic to use - the returned cost will be interpreted as the estimated number of actions that need to be performed.</param>
-        public GoalSpaceSearch(IHeuristic heuristic)
-            : this(heuristic, a => 1f)
-        {
-        }
+        private readonly IStrategy strategy;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GoalSpaceSearch"/> class that attempts to minimise the total "cost" of actions in the resulting plan.
+        /// Initializes a new instance of the <see cref="GoalSpaceSearch"/> class.
         /// </summary>
-        /// <param name="heuristic">The heuristic to use - with the returned cost will be interpreted as the estimated total cost of the actions that need to be performed.</param>
-        /// <param name="getActionCost">A delegate to retrieve the cost of an action.</param>
-        public GoalSpaceSearch(IHeuristic heuristic, Func<Action, float> getActionCost)
-        {
-            this.heuristic = heuristic;
-            this.getActionCost = getActionCost;
-        }
+        /// <param name="strategy">
+        /// The strategy to use - which provides the cost of actions as well as estimates of the total cost of
+        /// getting from a given state, to a state that satisfies a given goal.
+        /// </param>
+        public GoalSpaceSearch(IStrategy strategy) => this.strategy = strategy;
 
         /// <summary>
         /// Creates a (concretely-typed) planning task to work on solving a given problem.
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
         /// <returns>A new <see cref="PlanningTask"/> instance.</returns>
-        public PlanningTask CreatePlanningTask(Problem problem) => new(problem, heuristic, getActionCost);
+        public PlanningTask CreatePlanningTask(Problem problem) => new(problem, strategy);
 
         /// <inheritdoc />
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
@@ -67,13 +55,13 @@ namespace SCClassicalPlanning.Planning.Search
             private bool isComplete;
             private Plan? result;
 
-            internal PlanningTask(Problem problem, IHeuristic heuristic, Func<Action, float> getActionCost)
+            internal PlanningTask(Problem problem, IStrategy strategy)
             {
                 search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
                     source: new GoalSpaceNode(problem, problem.Goal),
                     isTarget: n => problem.InitialState.Satisfies(n.Goal),
-                    getEdgeCost: e => getActionCost(e.Action),
-                    getEstimatedCostToTarget: n => heuristic.EstimateCost(problem.InitialState, n.Goal));
+                    getEdgeCost: e => strategy.GetCost(e.Action),
+                    getEstimatedCostToTarget: n => strategy.EstimateCost(problem.InitialState, n.Goal));
                 
                 CheckForSearchCompletion();
             }
