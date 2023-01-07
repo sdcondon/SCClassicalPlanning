@@ -132,11 +132,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // In practice this won't happen because we'd have found the target at an earlier step anyway. 
                 // So, what the book is trying (fairly badly..) to say is that when we first find the target, it'll be
                 // at level zero.
-                var search = new RecursiveDFS(
-                    source: new SearchNode(graphLevel, problem.Goal),
-                    isTarget: n => problem.InitialState.Satisfies(n.Goal),
-                    noGoods);
-
+                var search = new SolutionExtractionDFS(problem, graphLevel, noGoods);
                 search.Complete(cancellationToken);
 
                 if (search.IsSucceeded)
@@ -322,20 +318,20 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             public SearchNode To => new(graphLevel.PreviousLevel!, new Goal(Actions.SelectMany(a => a.Precondition.Elements)));
         }
 
-        // Use our own search logic to gracefully keep note of no-goods.
-        // Raises questions of whether we should bother with SCGraphTheory's abstractions, but meh, 
-        // lets keep them for now.
-        private class RecursiveDFS
+        // Use our own search logic rather than a generic recursive DFS to
+        // gracefully keep note of no-goods. Raises questions of whether we
+        // should bother with SCGraphTheory's abstractions, but meh, lets
+        // keep them for now.
+        private class SolutionExtractionDFS
         {
             private readonly SearchNode source;
-            private readonly Predicate<SearchNode> isTarget;
+            private readonly Problem problem;
             private readonly HashSet<SearchState> noGoods;
             private readonly Dictionary<SearchNode, SearchEdge> visited = new Dictionary<SearchNode, SearchEdge>();
 
-            public RecursiveDFS(SearchNode source, Predicate<SearchNode> isTarget, HashSet<SearchState> noGoods)
+            public SolutionExtractionDFS(Problem problem, PlanningGraph.Level graphLevel, HashSet<SearchState> noGoods)
             {
-                this.source = source;
-                this.isTarget = isTarget ?? throw new ArgumentNullException(nameof(isTarget));
+                this.source = new SearchNode(graphLevel, problem.Goal);
                 this.noGoods = noGoods;
 
                 Visited = new ReadOnlyDictionary<SearchNode, SearchEdge>(visited);
@@ -373,7 +369,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (isTarget(node))
+                if (problem.InitialState.Satisfies(node.Goal))
                 {
                     Target = node;
                     IsSucceeded = true;
