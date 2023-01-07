@@ -141,8 +141,15 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
                 if (search.IsSucceeded)
                 {
-                    // TODO: eliminate magic string
-                    plan = new Plan(search.PathToTarget().Reverse().SelectMany(e => e.Actions).Where(a => !a.Identifier.Equals("NOOP")).ToList());
+                    // TODO-PERFORMANCE: we're un-reversing something thats already been reversed. Add PathFromTarget to SCGraphTheory?
+                    var actions = search
+                        .PathToTarget()
+                        .Reverse() 
+                        .SelectMany(e => e.Actions)
+                        .Where(a => !a.Identifier.Equals(PlanningGraph.PersistenceActionIdentifier))
+                        .ToList();
+
+                    plan = new Plan(actions);
                     return true;
                 }
                 else

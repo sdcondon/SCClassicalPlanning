@@ -35,10 +35,7 @@ namespace SCClassicalPlanning.Planning.Search
         /// Initializes a new instance of the <see cref="GoalSpaceSearch_PropositionalWithoutKB"/> class.
         /// </summary>
         /// <param name="strategy">The strategy to use.</param>
-        public GoalSpaceSearch_PropositionalWithoutKB(IStrategy strategy)
-        {
-            this.strategy = strategy;
-        }
+        public GoalSpaceSearch_PropositionalWithoutKB(IStrategy strategy) => this.strategy = strategy;
 
         /// <summary>
         /// Creates a (concretely-typed) planning task to work on solving a given problem.

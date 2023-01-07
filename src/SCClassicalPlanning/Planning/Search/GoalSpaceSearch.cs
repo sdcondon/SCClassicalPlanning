@@ -19,7 +19,7 @@ using System.Collections;
 namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
-    /// A simple implementation of <see cref="IPlanner"/> that carries out an (A-star) search of
+    /// A simple implementation of <see cref="IPlanner"/> that carries out an A-star search of
     /// the goal space to create plans.
     /// </summary>
     public class GoalSpaceSearch : IPlanner
