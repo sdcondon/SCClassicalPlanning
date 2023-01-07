@@ -15,11 +15,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 BlocksWorld.ExampleProblem,
                 //BlocksWorld.LargeExampleProblem, // TODO: doesn't work (or indeed terminate). implement termination checks first, then fix this
             })
-            .When((_, tc) =>
-            {
-                var planner = new GraphPlan();
-                return planner.CreatePlan(tc);
-            })
+            .When((_, tc) => new GraphPlan().CreatePlan(tc))
             .ThenReturns()
             .And((_, tc, pl) => tc.Goal.IsSatisfiedBy(pl.ApplyTo(tc.InitialState)).Should().BeTrue())
             .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Domain).Format(pl)));
