@@ -34,7 +34,7 @@ namespace SCClassicalPlanning.Benchmarks.ProblemManipulation
         public Action CurrentImpl() => new VarTransform(CurrentTestCase!.DoSomething).ApplyTo(CurrentTestCase!.Action);
 
         [Benchmark]
-        public Action ToList() => new VarTransform_ToList(CurrentTestCase!.DoSomething).ApplyTo(CurrentTestCase!.Action);
+        public Action ToIHS() => new VarTransform_ToIHS(CurrentTestCase!.DoSomething).ApplyTo(CurrentTestCase!.Action);
 
         [Benchmark]
         public Action IterateTwice() => new VarTransform_IterateTwice(CurrentTestCase!.DoSomething).ApplyTo(CurrentTestCase!.Action);
@@ -51,11 +51,11 @@ namespace SCClassicalPlanning.Benchmarks.ProblemManipulation
             }
         }
 
-        private class VarTransform_ToList : RecursiveActionTransformation_ToIHS
+        private class VarTransform_ToIHS : RecursiveActionTransformation_ToIHS
         {
             private readonly bool doSomething;
 
-            public VarTransform_ToList(bool doSomething) => this.doSomething = doSomething;
+            public VarTransform_ToIHS(bool doSomething) => this.doSomething = doSomething;
 
             public override VariableDeclaration ApplyTo(VariableDeclaration variableDeclaration)
             {
