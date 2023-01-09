@@ -49,9 +49,21 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// <returns>The transformed <see cref="Goal"/>.</returns>
         public virtual Goal ApplyTo(Goal goal)
         {
-            var elements = goal.Elements.Select(a => ApplyTo(a)).ToList();
+            var isChanged = false;
 
-            if (elements.Zip(goal.Elements, (x, y) => (x, y)).Any(t => t.x != t.y))
+            var elements = goal.Elements.Select(a =>
+            {
+                var transformed = ApplyTo(a);
+
+                if (transformed != a)
+                {
+                    isChanged = true;
+                }
+
+                return transformed;
+            }).ToList();
+
+            if (isChanged)
             {
                 return new Goal(elements);
             }
@@ -68,9 +80,21 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// <returns>The transformed effect.</returns>
         public virtual Effect ApplyTo(Effect effect)
         {
-            var elements = effect.Elements.Select(a => ApplyTo(a)).ToList();
+            var isChanged = false;
 
-            if (elements.Zip(effect.Elements, (x, y) => (x, y)).Any(t => t.x != t.y))
+            var elements = effect.Elements.Select(a =>
+            {
+                var transformed = ApplyTo(a);
+
+                if (transformed != a)
+                {
+                    isChanged = true;
+                }
+
+                return transformed;
+            }).ToList();
+
+            if (isChanged)
             {
                 return new Effect(elements);
             }
@@ -103,9 +127,21 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// <returns>The transformed predicate.</returns>
         public virtual Predicate ApplyTo(Predicate predicate)
         {
-            var arguments = predicate.Arguments.Select(a => ApplyTo(a)).ToList();
+            var isChanged = false;
 
-            if (arguments.Zip(predicate.Arguments, (x, y) => (x, y)).Any(t => t.x != t.y))
+            var arguments = predicate.Arguments.Select(a =>
+            {
+                var transformed = ApplyTo(a);
+
+                if (transformed != a)
+                {
+                    isChanged = true;
+                }
+
+                return transformed;
+            }).ToList();
+
+            if (isChanged)
             {
                 return new Predicate(predicate.Symbol, arguments);
             }
@@ -166,9 +202,19 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// <returns>The transformed term.</returns>
         public virtual Term ApplyTo(Function function)
         {
-            var arguments = function.Arguments.Select(a => ApplyTo(a)).ToList();
+            var isChanged = false;
 
-            if (arguments.Zip(function.Arguments, (x, y) => (x, y)).Any(t => t.x != t.y))
+            var arguments = function.Arguments.Select(a =>
+            {
+                var transformed = ApplyTo(a);
+                if (transformed != a)
+                {
+                    isChanged = true;
+                }
+                return transformed;
+            }).ToList();
+
+            if (isChanged)
             {
                 return new Function(function.Symbol, arguments);
             }

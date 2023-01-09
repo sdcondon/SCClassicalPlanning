@@ -13,7 +13,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 SpareTire.ExampleProblem,
                 AirCargo.ExampleProblem,
                 BlocksWorld.ExampleProblem,
-                //BlocksWorld.LargeExampleProblem, // TODO: doesn't work (or indeed terminate). implement termination checks first, then fix this
+                // BlocksWorld.LargeExampleProblem, // TODO: doesn't work (or indeed terminate). implement termination checks first, then fix this
             })
             .When((_, tc) => new GraphPlan().CreatePlan(tc))
             .ThenReturns()

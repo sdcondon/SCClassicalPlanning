@@ -12,20 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCFirstOrderLogic;
+using System.Collections.Immutable;
 
 namespace SCClassicalPlanning.ProblemManipulation
 {
     /// <summary>
-    /// Base class for recursive transformations of <see cref="Goal"/> instances to other <see cref="Goal"/> instances.
+    /// Base class for recursive transformations of <see cref="Action"/> instances to other <see cref="Action"/> instances.
+    /// <para/>
+    /// ALTERNATIVE: Converts goal/effect elements immediately to ImmutableHashSets rather than via Lists. Quicker when the transform
+    /// doesn't actually change a particular goal/element (since lists are quicker to create than IHSs). Quicker approach
+    /// depends on how many goals/elements are changed, but some light testing indicates that going via Lists is probably a better call
+    /// (because creating IHSs is really quite expensive).
     /// </summary>
-    public abstract class RecursiveGoalTransformation
+    public abstract class RecursiveActionTransformation_ToIHS
     {
+        /// <summary>
+        /// Applies this transformation to a <see cref="Action"/> instance.
+        /// <para/>
+        /// The default implementation returns a <see cref="Action"/> with the same identifier, and with a goal and effect that is the result of applying the transformation to the action's goal and effect respectively.
+        /// </summary>
+        /// <param name="action">The action to transform.</param>
+        /// <returns>The transformed <see cref="Action"/>.</returns>
+        public virtual Action ApplyTo(Action action)
+        {
+            var precondition = ApplyTo(action.Precondition);
+            var effect = ApplyTo(action.Effect);
+
+            if (precondition != action.Precondition || effect != action.Effect)
+            {
+                return new(action.Identifier, precondition, effect);
+            }
+
+            return action;
+        }
+
         /// <summary>
         /// Applies this transformation to a <see cref="Goal"/> instance.
         /// <para/>
         /// The default implementation returns a <see cref="Goal"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
         /// </summary>
-        /// <param name="goal">The sentence to visit.</param>
+        /// <param name="goal">The goal to transform.</param>
         /// <returns>The transformed <see cref="Goal"/>.</returns>
         public virtual Goal ApplyTo(Goal goal)
         {
@@ -34,12 +60,14 @@ namespace SCClassicalPlanning.ProblemManipulation
             var elements = goal.Elements.Select(a =>
             {
                 var transformed = ApplyTo(a);
+
                 if (transformed != a)
                 {
                     isChanged = true;
                 }
+
                 return transformed;
-            }).ToList();
+            }).ToImmutableHashSet();
 
             if (isChanged)
             {
@@ -50,11 +78,42 @@ namespace SCClassicalPlanning.ProblemManipulation
         }
 
         /// <summary>
+        /// Applies this transformation to a <see cref="Effect"/> instance.
+        /// <para/>
+        /// The default implementation returns a <see cref="Effect"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
+        /// </summary>
+        /// <param name="effect">The effect to transform.</param>
+        /// <returns>The transformed effect.</returns>
+        public virtual Effect ApplyTo(Effect effect)
+        {
+            var isChanged = false;
+
+            var elements = effect.Elements.Select(a =>
+            {
+                var transformed = ApplyTo(a);
+
+                if (transformed != a)
+                {
+                    isChanged = true;
+                }
+
+                return transformed;
+            }).ToImmutableHashSet();
+
+            if (isChanged)
+            {
+                return new Effect(elements);
+            }
+
+            return effect;
+        }
+
+        /// <summary>
         /// Applies this transformation to a <see cref="Literal"/> instance. 
         /// The default implementation returns a <see cref="Literal"/> with the same positivity as the existing literal and a predicate that it the result of calling <see cref="ApplyTo(Predicate)"/> on the existing predicate.
         /// </summary>
-        /// <param name="literal">The <see cref="Literal"/> instance to visit.</param>
-        /// <returns>The transformed predicate.</returns>
+        /// <param name="literal">The <see cref="Literal"/> instance to transform.</param>
+        /// <returns>The transformed literal.</returns>
         public virtual Literal ApplyTo(Literal literal)
         {
             var predicate = ApplyTo(literal.Predicate);
@@ -70,7 +129,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// Applies this transformation to a <see cref="Predicate"/> instance. 
         /// The default implementation returns a <see cref="Predicate"/> with the same Symbol and with an argument list that is the result of calling <see cref="ApplyTo(Term)"/> on all of the existing arguments.
         /// </summary>
-        /// <param name="predicate">The <see cref="Predicate"/> instance to visit.</param>
+        /// <param name="predicate">The <see cref="Predicate"/> instance to transform.</param>
         /// <returns>The transformed predicate.</returns>
         public virtual Predicate ApplyTo(Predicate predicate)
         {
@@ -79,10 +138,12 @@ namespace SCClassicalPlanning.ProblemManipulation
             var arguments = predicate.Arguments.Select(a =>
             {
                 var transformed = ApplyTo(a);
+
                 if (transformed != a)
                 {
                     isChanged = true;
                 }
+
                 return transformed;
             }).ToList();
 
@@ -115,7 +176,7 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// Applies this transformation to a <see cref="VariableReference"/> instance.
         /// The default implementation returns a <see cref="VariableReference"/> referring to the variable that is the result of calling <see cref="ApplyTo(VariableDeclaration)"/> on the current declaration.
         /// </summary>
-        /// <param name="variable">The variable to transform.</param>
+        /// <param name="variable">The variable reference to transform.</param>
         /// <returns>The transformed term.</returns>
         public virtual Term ApplyTo(VariableReference variable)
         {

@@ -44,6 +44,9 @@ namespace SCClassicalPlanning
         /// <param name="sentence">The sentence that expresses the effect.</param>
         public Effect(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
 
+        // NB: uses argument directly, unlike public ctors. This is to avoid unnecessary GC pressure.
+        internal Effect(ImmutableHashSet<Literal> elements) => Elements = elements;
+
         /// <summary>
         /// Gets a singleton <see cref="Effect"/> instance that is empty.
         /// </summary>

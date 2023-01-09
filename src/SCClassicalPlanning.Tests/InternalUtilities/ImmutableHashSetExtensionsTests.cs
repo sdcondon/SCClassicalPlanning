@@ -12,23 +12,33 @@ namespace SCClassicalPlanning.InternalUtilities
             .GivenEachOf(() => new SetEqualsTestCase[]
             {
                 new(
-                    Set1: ImmutableHashSet.Create(Enumerable.Range(0, 100).ToArray()),
-                    Set2: ImmutableHashSet.Create(Enumerable.Range(0, 100).ToArray()),
+                    Set1: ImmutableHashSet.Create(Enumerable.Range(1, 100).ToArray()),
+                    Set2: ImmutableHashSet.Create(Enumerable.Range(1, 100).ToArray()),
                     ExpectedResult: true),
 
                 new(
-                    Set1: ImmutableHashSet.Create(Enumerable.Range(0, 100).ToArray()),
-                    Set2: ImmutableHashSet.Create(Enumerable.Range(0, 100).Reverse().ToArray()),
+                    Set1: ImmutableHashSet.Create(Enumerable.Range(1, 100).ToArray()),
+                    Set2: ImmutableHashSet.Create(Enumerable.Range(1, 100).Reverse().ToArray()),
                     ExpectedResult: true),
 
                 new(
-                    Set1: ImmutableHashSet.Create(Enumerable.Range(0, 100).ToArray()),
-                    Set2: ImmutableHashSet.Create(Enumerable.Range(0, 99).ToArray()),
+                    Set1: ImmutableHashSet.Create(Enumerable.Range(1, 100).ToArray()),
+                    Set2: ImmutableHashSet.Create(Enumerable.Range(1, 99).Append(101).ToArray()),
                     ExpectedResult: false),
 
                 new(
-                    Set1: ImmutableHashSet.Create(Enumerable.Range(0, 99).ToArray()),
-                    Set2: ImmutableHashSet.Create(Enumerable.Range(0, 100).ToArray()),
+                    Set1: ImmutableHashSet.Create(Enumerable.Range(1, 99).Append(101).ToArray()),
+                    Set2: ImmutableHashSet.Create(Enumerable.Range(1, 100).ToArray()),
+                    ExpectedResult: false),
+
+                new(
+                    Set1: ImmutableHashSet.Create(Enumerable.Range(1, 100).ToArray()),
+                    Set2: ImmutableHashSet.Create(Enumerable.Range(1, 99).ToArray()),
+                    ExpectedResult: false),
+
+                new(
+                    Set1: ImmutableHashSet.Create(Enumerable.Range(1, 99).ToArray()),
+                    Set2: ImmutableHashSet.Create(Enumerable.Range(1, 100).ToArray()),
                     ExpectedResult: false),
             })
             .When(tc => tc.Set1.SetEquals<int>(tc.Set2))
