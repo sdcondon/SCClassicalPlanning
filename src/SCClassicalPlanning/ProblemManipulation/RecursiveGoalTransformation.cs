@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCFirstOrderLogic;
+using System;
 
 namespace SCClassicalPlanning.ProblemManipulation
 {
@@ -75,20 +76,21 @@ namespace SCClassicalPlanning.ProblemManipulation
         public virtual Predicate ApplyTo(Predicate predicate)
         {
             var isChanged = false;
+            var transformed = new Term[predicate.Arguments.Count];
 
-            var arguments = predicate.Arguments.Select(a =>
+            for (int i = 0; i < predicate.Arguments.Count; i++)
             {
-                var transformed = ApplyTo(a);
-                if (transformed != a)
+                transformed[i] = ApplyTo(predicate.Arguments[i]);
+
+                if (transformed[i] != predicate.Arguments[i])
                 {
                     isChanged = true;
                 }
-                return transformed;
-            }).ToList();
+            }
 
             if (isChanged)
             {
-                return new Predicate(predicate.Symbol, arguments);
+                return new Predicate(predicate.Symbol, transformed);
             }
 
             return predicate;
@@ -148,20 +150,21 @@ namespace SCClassicalPlanning.ProblemManipulation
         public virtual Term ApplyTo(Function function)
         {
             var isChanged = false;
+            var transformed = new Term[function.Arguments.Count];
 
-            var arguments = function.Arguments.Select(a =>
+            for (int i = 0; i < function.Arguments.Count; i++)
             {
-                var transformed = ApplyTo(a);
-                if (transformed != a)
+                transformed[i] = ApplyTo(function.Arguments[i]);
+
+                if (transformed[i] != function.Arguments[i])
                 {
                     isChanged = true;
                 }
-                return transformed;
-            }).ToList();
+            }
 
             if (isChanged)
             {
-                return new Function(function.Symbol, arguments);
+                return new Function(function.Symbol, transformed);
             }
 
             return function;

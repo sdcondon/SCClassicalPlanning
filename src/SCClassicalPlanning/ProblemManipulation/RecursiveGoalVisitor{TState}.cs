@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCFirstOrderLogic;
+using System;
 
 namespace SCClassicalPlanning.ProblemManipulation
 {
@@ -54,9 +55,9 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// <param name="visitState">The state of this visit.</param>
         public virtual void Visit(Predicate predicate, TState visitState)
         {
-            foreach (var argument in predicate.Arguments)
+            for (int i = 0; i < predicate.Arguments.Count; i++)
             {
-                Visit(argument, visitState);
+                Visit(predicate.Arguments[i], visitState);
             }
         }
 
@@ -110,12 +111,12 @@ namespace SCClassicalPlanning.ProblemManipulation
         /// The default implementation just visits each of the arguments.
         /// </summary>
         /// <param name="function">The function to visit.</param>
-        /// <param name="state">The state of this visit.</param>
-        public virtual void Visit(Function function, TState state)
+        /// <param name="visitState">The state of this visit.</param>
+        public virtual void Visit(Function function, TState visitState)
         {
-            foreach (var argument in function.Arguments)
+            for (int i = 0; i < function.Arguments.Count; i++)
             {
-                Visit(argument, state);
+                Visit(function.Arguments[i], visitState);
             }
         }
 

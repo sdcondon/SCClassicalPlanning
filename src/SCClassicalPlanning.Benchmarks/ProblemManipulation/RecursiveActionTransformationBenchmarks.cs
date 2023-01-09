@@ -37,13 +37,13 @@ namespace SCClassicalPlanning.Benchmarks.ProblemManipulation
         public Action ToIHS() => new VarTransform_ToIHS(CurrentTestCase!.DoSomething).ApplyTo(CurrentTestCase!.Action);
 
         [Benchmark]
-        public Action IterateTwice() => new VarTransform_IterateTwice(CurrentTestCase!.DoSomething).ApplyTo(CurrentTestCase!.Action);
+        public Action Linq() => new VarTransform_Linq(CurrentTestCase!.DoSomething).ApplyTo(CurrentTestCase!.Action);
 
-        private class VarTransform_IterateTwice : RecursiveActionTransformation_IterateTwice
+        private class VarTransform_Linq : RecursiveActionTransformation_Linq
         {
             private readonly bool doSomething;
 
-            public VarTransform_IterateTwice(bool doSomething) => this.doSomething = doSomething;
+            public VarTransform_Linq(bool doSomething) => this.doSomething = doSomething;
 
             public override VariableDeclaration ApplyTo(VariableDeclaration variableDeclaration)
             {
