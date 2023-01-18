@@ -28,13 +28,13 @@ namespace SCClassicalPlanning.Planning.Search
         private bool isComplete;
         private Plan? result;
 
-        internal StateSpaceSearchPlanningTask(Problem problem, ICostStrategy strategy)
+        internal StateSpaceSearchPlanningTask(Problem problem, ICostStrategy costStrategy)
         {
             search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.InitialState),
                 isTarget: n => n.State.Satisfies(problem.Goal),
-                getEdgeCost: e => strategy.GetCost(e.Action),
-                getEstimatedCostToTarget: n => strategy.EstimateCost(n.State, problem.Goal));
+                getEdgeCost: e => costStrategy.GetCost(e.Action),
+                getEstimatedCostToTarget: n => costStrategy.EstimateCost(n.State, problem.Goal));
 
             CheckForSearchCompletion();
         }
