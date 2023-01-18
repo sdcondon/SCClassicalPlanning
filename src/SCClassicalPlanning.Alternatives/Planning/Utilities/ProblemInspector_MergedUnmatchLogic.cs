@@ -25,7 +25,6 @@ namespace SCClassicalPlanning.Alternatives.Planning.Utilities
     {
         /// <summary>
         /// Gets the (action schema, *ground* variable substitution) pairings that represent actions that are relevant to a given goal in a given problem.
-        /// <para/>
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>

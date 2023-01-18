@@ -19,11 +19,14 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning
 {
     /// <summary>
+    /// <para>
     /// Container for information about a goal.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// A <see cref="Goal"/> is essentially just a set of <see cref="Literal"/>s. The positive ones indicate predicates that must exist in a <see cref="State"/> for it 
     /// to satisfy the goal. The negative ones indicate predicates that must NOT exist in a state for it to satisfy the goal. Goals are used to describe the end goal of <see cref="Problem"/>
     /// instances, as well as the precondition of <see cref="Action"/> instances.
+    /// </para>
     /// </summary>
     public class Goal
     {
@@ -94,10 +97,13 @@ namespace SCClassicalPlanning
         public bool IsSatisfiedBy(State state) => state.Satisfies(this);
 
         /// <summary>
+        /// <para>
         /// Returns a value indicating whether a given effect is conceivably a useful final step in achieving this goal.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// Specifically, an effect is relevant to a goal if it accomplishes at least one element of the goal, and does not undo anything.
         /// That is, the effect's elements overlap with the goals elements, and the set comprised of the negation of each of the effect's elements does not.
+        /// </para>
         /// </summary>
         /// <param name="effect">The effect to determine relevancy of.</param>
         /// <returns>A value indicating whether the given effect is relevant to this goal.</returns>
@@ -111,9 +117,12 @@ namespace SCClassicalPlanning
         public Goal Regress(Action action) => new(Elements.Except(action.Effect.Elements).Union(action.Precondition.Elements));
 
         /// <summary>
+        /// <para>
         /// Determines whether the specified object is equal to the current object.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// Goals implement value semantics for equality - two Goals are equal if they share the same Elements.
+        /// </para>
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>

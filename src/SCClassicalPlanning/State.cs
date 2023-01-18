@@ -20,12 +20,16 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning
 {
     /// <summary>
+    /// <para>
     /// Container for information about a state.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// A state is essentially just a set of ground (i.e. variable-free) <see cref="Predicate"/>s. State instances occur as the initial state of <see cref="Problem"/>
     /// instances - and are also used by some planning algorithms to track intermediate states while looking for a solution to a problem.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// TODO: Of all the model classes, states are most at risk of being large - to the extent that abstracting them and allowing for IO would almost certainly be useful. Watch this space.
+    /// </para>
     /// </summary>
     public class State
     {
@@ -79,11 +83,14 @@ namespace SCClassicalPlanning
         public State Apply(Effect effect) => new(Elements.Except(effect.DeleteList).Union(effect.AddList));
 
         /// <summary>
+        /// <para>
         /// Gets a value indicating whether this state satisfies a given goal.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// A goal is satisfied by a state if all of its positive elements and none of its negative elements are present in the state.
         /// NB: This methods checks only if the goal is satisfied by the state exactly - meaning that it'll never return true if the goal
         /// has variables in it. See <see cref="GetSatisfyingSubstitutions(Goal)"/> for an alternative that allows for non-ground goals.
+        /// </para>
         /// </summary>
         /// <param name="goal">The goal to check.</param>
         /// <returns>A value indicating whether this state satisfies a given goal.</returns>

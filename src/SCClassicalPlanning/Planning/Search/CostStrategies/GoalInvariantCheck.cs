@@ -17,28 +17,34 @@ using SCFirstOrderLogic.Inference;
 namespace SCClassicalPlanning.Planning.Search.CostStrategies
 {
     /// <summary>
+    /// <para>
     /// A decorator cost strategy that checks whether the goal violates any known invariants
     /// before invoking the inner strategy. If any invariants are violated, returns <see cref="float.PositiveInfinity"/>.
     /// Intended to be of use for early pruning of unreachable goals when backward searching.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// NB #1: This strategy isn't driven by any particular source material, but given that it's a fairly
     /// obvious idea, there could well be some terminology that I'm not using - I may rename/refactor it as and when.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// NB #2: Checking invariants obviously comes at a performance cost (though fact that goals consist only of unit
     /// clauses likely mitigates this quite a lot - because it means that the negation of the query we ask our KB it
     /// consists only of unit clauses).
     /// The question is whether the benefit it provides outweighs the cost. I do wonder if we can somehow check
     /// only the stuff that has changed.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// NB #3: Ultimately it should be possible to derive the invariants by examining the problem.
     /// The simplest example of this is if a predicate doesn't appear in any effects. If this is true, the
     /// the occurences of this predicate in the initial state must persist throughout the problem.
     /// Might research / play with this idea at some point.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// TODO: thinking about it, this might be better implemented as part of a strategy for determining
     /// relevant actions - happens earlier and means that we could e.g. not even consider goal elements that
     /// are entailed by the invariants (e.g. IsBlock(BlockA)) - as we don't need to worry about things that
     /// will always be true.
+    /// </para>
     /// </summary>
     public class GoalInvariantCheck : ICostStrategy
     {

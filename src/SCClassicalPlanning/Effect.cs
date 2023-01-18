@@ -19,10 +19,13 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning
 {
     /// <summary>
+    /// <para>
     /// Container for information about an effect - some change in the state of a system.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// <see cref="Effect"/>s are essentially a set of <see cref="Literal"/>s. The positive ones indicate predicates that are added to a
     /// state by the effect's application. The negative ones indicate predicates that are removed. Effects are applied as the result of <see cref="Action"/>s.
+    /// </para>
     /// </summary>
     public class Effect
     {
@@ -75,10 +78,13 @@ namespace SCClassicalPlanning
         public IEnumerable<Predicate> DeleteList => Elements.Where(a => a.IsNegated).Select(l => l.Predicate);
 
         /// <summary>
+        /// <para>
         /// Returns a value indicating whether this effect is conceivably a useful final step in achieving a given goal.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// An effect is relevant to a goal if it accomplishes at least one element of the goal, and does not undo anything.
         /// That is, if the effect's elements overlap with the goals elements, but the set of the negation of each of the effect's elements does not.
+        /// </para>
         /// </summary>
         /// <param name="goal">The goal to determine relevancy to.</param>
         /// <returns>A value indicating whether this effect is relevant to a given goal.</returns>
@@ -92,9 +98,12 @@ namespace SCClassicalPlanning
         public State ApplyTo(State state) => state.Apply(this);
 
         /// <summary>
+        /// <para>
         /// Determines whether the specified object is equal to the current object.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// Effects implement value semantics for equality - two Effects are equal if they share the same Elements.
+        /// </para>
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>

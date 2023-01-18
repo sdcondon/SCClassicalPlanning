@@ -20,9 +20,12 @@ using System.Diagnostics.CodeAnalysis;
 namespace SCClassicalPlanning.Planning.Utilities
 {
     /// <summary>
+    /// <para>
     /// Various domain inspection methods, useful to planners.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// TODO: consider making this instantiable - domain passed to ctor. Opens way for caching etc.
+    /// </para>
     /// </summary>
     public static class DomainInspector
     {

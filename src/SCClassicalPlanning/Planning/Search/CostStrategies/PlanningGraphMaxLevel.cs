@@ -16,12 +16,15 @@ using SCClassicalPlanning.Planning.GraphPlan;
 namespace SCClassicalPlanning.Planning.Search.CostStrategies
 {
     /// <summary>
+    /// <para>
     /// Cost strategy that (gives all actions a cost of 1 and) uses a "max level" planning graph heuristic
     /// to provide cost estimates.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// To give an estimate, it first constructs a planning graph (yup, this is rather expensive..)
     /// starting from the current state. The cost estimate is the maximum level cost of any of the goal's
     /// elements.
+    /// </para>
     /// </summary>
     public class PlanningGraphMaxLevel : ICostStrategy
     {

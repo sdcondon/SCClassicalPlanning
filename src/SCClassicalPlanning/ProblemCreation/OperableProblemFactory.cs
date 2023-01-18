@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceCreation;
 using SCFirstOrderLogic.SentenceManipulation;
 using System.Collections.Immutable;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
@@ -20,11 +19,14 @@ using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 namespace SCClassicalPlanning.ProblemCreation
 {
     /// <summary>
+    /// <para>
     /// Utility logic for the declaration of <see cref="Problem"/> instances, prioritising succinct C# above all else.
-    /// <para/>
-    /// Allows for declaring actions that have preconditions and effects stated directly as <see cref="OperableSentenceFactory.OperableSentence"/> instances.
+    /// </para>
+    /// <para>
+    /// Allows for declaring actions that have preconditions and effects stated directly as <see cref="OperableSentence"/> instances.
     /// Which, err, really doesn't make much of a difference, to be honest - there's not nearly as much value in this as there is in the equivalent functionality in SCFirstOrderLogic.
     /// That's why it's not mentioned in the user guide.
+    /// </para>
     /// </summary>
     public static class OperableProblemFactory
     {

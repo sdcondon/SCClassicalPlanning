@@ -29,9 +29,12 @@ namespace SCClassicalPlanning.Planning
         public abstract Plan Result { get; }
 
         /// <summary>
+        /// <para>
         /// Executes the next step of the planning task.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// Calling <see cref="NextStep"/> on a completed planning task should result in an <see cref="InvalidOperationException"/>.
+        /// </para>
         /// </summary>
         /// <returns>A container for information about what happened during the step.</returns>
         public abstract TStepResult NextStep();

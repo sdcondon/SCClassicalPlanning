@@ -21,9 +21,12 @@ namespace SCClassicalPlanning.ProblemManipulation
     public abstract class RecursiveActionTransformation
     {
         /// <summary>
+        /// <para>
         /// Applies this transformation to a <see cref="Action"/> instance.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// The default implementation returns a <see cref="Action"/> with the same identifier, and with a goal and effect that is the result of applying the transformation to the action's goal and effect respectively.
+        /// </para>
         /// </summary>
         /// <param name="action">The action to transform.</param>
         /// <returns>The transformed <see cref="Action"/>.</returns>
@@ -41,9 +44,12 @@ namespace SCClassicalPlanning.ProblemManipulation
         }
 
         /// <summary>
+        /// <para>
         /// Applies this transformation to a <see cref="Goal"/> instance.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// The default implementation returns a <see cref="Goal"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
+        /// </para>
         /// </summary>
         /// <param name="goal">The goal to transform.</param>
         /// <returns>The transformed <see cref="Goal"/>.</returns>
@@ -67,9 +73,12 @@ namespace SCClassicalPlanning.ProblemManipulation
         }
 
         /// <summary>
+        /// <para>
         /// Applies this transformation to a <see cref="Effect"/> instance.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// The default implementation returns a <see cref="Effect"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
+        /// </para>
         /// </summary>
         /// <param name="effect">The effect to transform.</param>
         /// <returns>The transformed effect.</returns>

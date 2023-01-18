@@ -20,12 +20,15 @@ using System.Diagnostics;
 namespace SCClassicalPlanning.Planning.Search.CostStrategies
 {
     /// <summary>
+    /// <para>
     /// Cost strategy that (gives all actions a cost of 1 and) ignores preconditions
     /// and uses a greedy set cover algorithm to provide cost estimates.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// Not "admissable" (mostly because greedy set cover can overestimate) - 
     /// so the plans discovered using it won't necessarily be optimal, but better than heuristics
     /// that don't examine the available actions at all..
+    /// </para>
     /// </summary>
     public class IgnorePreconditionsGreedySetCover : ICostStrategy
     {

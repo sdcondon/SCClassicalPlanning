@@ -18,10 +18,13 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning
 {
     /// <summary>
+    /// <para>
     /// Container for information about a domain.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// A domain defines the aspects that are common to of all problems that occur within it.
     /// Specifically, the <see cref="Action"/>s available within it.
+    /// </para>
     /// </summary>
     public class Domain
     {

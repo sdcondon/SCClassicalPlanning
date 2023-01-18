@@ -14,11 +14,14 @@
 namespace SCClassicalPlanning
 {
     /// <summary>
+    /// <para>
     /// Container for information about an action.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// Actions can be applied to <see cref="State"/>s to create new states (via the action's Effect),
     /// provided that the action's Precondition (which is a <see cref="Goal"/>) is satisfied by the current state.
     /// <see cref="Domain"/>s include a description of all actions that are valid in the domain.
+    /// </para>
     /// </summary>
     public class Action
     {
@@ -48,28 +51,37 @@ namespace SCClassicalPlanning
         public Effect Effect { get; }
 
         /// <summary>
+        /// <para>
         /// Gets a value indicating whether the action is applicable in a given state.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// An action is applicable in a state if its <see cref="Precondition"/> is satisfied by that state.
+        /// </para>
         /// </summary>
         /// <param name="state">The state to examine.</param>
         /// <returns>A value indicating whether the action is applicable in a given state.</returns>
         public bool IsApplicableTo(State state) => state.Satisfies(Precondition);
 
         /// <summary>
+        /// <para>
         /// Applies this action to a given state, producing a new state.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// NB: Does NOT validate preconditions - to be of use with particular planning heuristics.
         /// TODO: Maybe rethink this. Any heuristic that wants to do this could just look at the effect and apply it..
+        /// </para>
         /// </summary>
         /// <param name="state">The state to apply the action to.</param>
         /// <returns>The new state.</returns>
         public State ApplyTo(State state) => state.Apply(Effect);
 
         /// <summary>
+        /// <para>
         /// Returns a value indicating whether this action is conceivably a useful final step in achieving a given goal.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// An action is relevant to a goal if its effect is relevant to the goal.
+        /// </para>
         /// </summary>
         /// <param name="goal">The goal to examine.</param>
         /// <returns>A value indicating whether this action is conceivably a useful final step in achieving the given goal.</returns>
@@ -83,9 +95,12 @@ namespace SCClassicalPlanning
         public Goal Regress(Goal goal) => goal.Regress(this);
 
         /// <summary>
+        /// <para>
         /// Determines whether the specified object is equal to the current object.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// Actions implement value semantics for equality - two Actions are equal if their Identifiers, Preconditions and Effects are.
+        /// </para>
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>

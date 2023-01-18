@@ -22,9 +22,12 @@ using System.Diagnostics;
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
     /// <summary>
-    /// Planning graph representation. 
-    /// <para/>
+    /// <para>
+    /// Planning graph representation.
+    /// </para>
+    /// <para>
     /// NB: Lazily populated - levels will be created as they are called for.
+    /// </para>
     /// </summary>
     public class PlanningGraph
     {

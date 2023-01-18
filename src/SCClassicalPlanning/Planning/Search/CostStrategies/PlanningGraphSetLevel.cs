@@ -16,12 +16,15 @@ using SCClassicalPlanning.Planning.GraphPlan;
 namespace SCClassicalPlanning.Planning.Search.CostStrategies
 {
     /// <summary>
+    /// <para>
     /// Cost strategy that (gives all actions a cost of 1 and) uses a "set level" planning graph heuristic
     /// to provide cost estimates.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// To give an estimate, it first constructs a planning graph (yup, this is rather expensive..)
     /// starting from the current state. The cost estimate is the level at which each of the goals
     /// elements appear and are all not mutually-exclusive with one another.
+    /// </para>
     /// </summary>
     public class PlanningGraphSetLevel : ICostStrategy
     {

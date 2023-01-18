@@ -21,13 +21,16 @@ namespace SCClassicalPlanning.InternalUtilities
     internal static class ImmutableHashSetExtensions
     {
         /// <summary>
+        /// <para>
         /// Determines whether the current set and the specified set contain the same elements.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// NB: In general, <see cref="ISet{T}.SetEquals(IEnumerable{T})"/> implementations have to handle the possibility that duplicates
         /// occur in the argument (note that even if the argument is another set, there is still the possibility that the equality
         /// comparers in use by each set differ). This necessarily slows it down. By accepting an immutable hash set in this method and
         /// checking its key comparer, we can avoid a bit of work if the key comparers are the same object (as they will tend to be for the 
         /// sets in this library).
+        /// </para>
         /// </summary>
         /// <typeparam name="T">The type of the elements held in both sets.</typeparam>
         /// <param name="thisSet">The current set.</param>

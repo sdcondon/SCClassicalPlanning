@@ -18,10 +18,13 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning
 {
     /// <summary>
+    /// <para>
     /// Encapsulates a planning problem.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// Problems exist within a <see cref="SCClassicalPlanning.Domain"/>, and consist of an initial <see cref="State"/>, an end <see cref="SCClassicalPlanning.Goal"/>,
     /// and a set of domain elements (represented by <see cref="Constant"/>s from the SCFirstOrderLogic library) that exist within the scope of the problem.
+    /// </para>
     /// </summary>
     public class Problem
     {

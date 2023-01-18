@@ -19,10 +19,13 @@ using SCFirstOrderLogic.SentenceManipulation.Unification;
 namespace SCClassicalPlanning.Planning.Utilities
 {
     /// <summary>
+    /// <para>
     /// Various problem inspection methods, useful to planners.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// TODO-EXTENSIBILITY: Might ultimately be useful to extract an interface(s) from this and allow planners to use other strategies
     /// (that leverage extensions such as type systems and axioms..). But for now at least, its just static.
+    /// </para>
     /// </summary>
     public static class ProblemInspector
     {
@@ -132,10 +135,13 @@ namespace SCClassicalPlanning.Planning.Utilities
         }
 
         /// <summary>
+        /// <para>
         /// Gets the (action schema, *ground* variable substitution) pairings that represent actions that are relevant to a given goal in a given problem.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
         /// See <see cref="DomainInspector.GetRelevantActionDetails(Domain, Goal)"/> for a variable-preserving equivalent to this method.
+        /// </para>
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>
@@ -209,10 +215,13 @@ namespace SCClassicalPlanning.Planning.Utilities
         }
 
         /// <summary>
+        /// <para>
         /// Gets the *ground* actions that are relevant to a given goal in a given problem.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
         /// See <see cref="DomainInspector.GetRelevantActions(Domain, Goal)"/> for a variable-preserving equivalent to this method.
+        /// </para>
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>
@@ -226,9 +235,12 @@ namespace SCClassicalPlanning.Planning.Utilities
         }
 
         /// <summary>
+        /// <para>
         /// Gets all possible variable substitutions that populate each of the arguments of a given predicate with a constant. Uses all constants of a given problem, and uses an existing substitution as a constraint.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// NB: be careful - the risk of combinatorial explosion is significant here.
+        /// </para>
         /// </summary>
         /// <param name="problem">The problem being solved.</param>
         /// <param name="predicate">The predicate to create all possible substitutions for.</param>

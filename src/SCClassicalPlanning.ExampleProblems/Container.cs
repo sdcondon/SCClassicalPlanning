@@ -5,9 +5,12 @@ using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 namespace SCClassicalPlanning.ExampleDomains
 {
     /// <summary>
+    /// <para>
     /// Incredibly simple domain, used for tests.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// The idea is that we have some kind of container that objects (the elements of the domain) can be added to and removed from.
+    /// </para>
     /// </summary>
     public static class Container
     {

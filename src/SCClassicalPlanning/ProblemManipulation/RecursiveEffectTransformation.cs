@@ -21,9 +21,12 @@ namespace SCClassicalPlanning.ProblemManipulation
     public abstract class RecursiveEffectTransformation
     {
         /// <summary>
+        /// <para>
         /// Applies this transformation to a <see cref="Effect"/> instance.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// The default implementation returns a <see cref="Effect"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
+        /// </para>
         /// </summary>
         /// <param name="effect">The effect to transform.</param>
         /// <returns>The transformed effect.</returns>

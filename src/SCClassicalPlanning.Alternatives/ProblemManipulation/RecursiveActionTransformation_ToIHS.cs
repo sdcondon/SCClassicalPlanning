@@ -17,19 +17,25 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning.ProblemManipulation
 {
     /// <summary>
+    /// <para>
     /// Base class for recursive transformations of <see cref="Action"/> instances to other <see cref="Action"/> instances.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// ALTERNATIVE: Converts goal/effect elements immediately to ImmutableHashSets rather than via Lists. Slower when the transform
     /// doesn't actually change a particular goal/element (since lists are quicker to create than IHSs). Quicker approach
     /// depends on how many goals/elements are changed, but some light testing indicates that going via Lists is probably a better call
     /// (because creating IHSs is really quite expensive).
+    /// </para>
     /// </summary>
     public abstract class RecursiveActionTransformation_ToIHS
     {
         /// <summary>
+        /// <para>
         /// Applies this transformation to a <see cref="Action"/> instance.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// The default implementation returns a <see cref="Action"/> with the same identifier, and with a goal and effect that is the result of applying the transformation to the action's goal and effect respectively.
+        /// </para>
         /// </summary>
         /// <param name="action">The action to transform.</param>
         /// <returns>The transformed <see cref="Action"/>.</returns>
@@ -47,9 +53,12 @@ namespace SCClassicalPlanning.ProblemManipulation
         }
 
         /// <summary>
+        /// <para>
         /// Applies this transformation to a <see cref="Goal"/> instance.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// The default implementation returns a <see cref="Goal"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
+        /// </para>
         /// </summary>
         /// <param name="goal">The goal to transform.</param>
         /// <returns>The transformed <see cref="Goal"/>.</returns>
@@ -78,9 +87,12 @@ namespace SCClassicalPlanning.ProblemManipulation
         }
 
         /// <summary>
+        /// <para>
         /// Applies this transformation to a <see cref="Effect"/> instance.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// The default implementation returns a <see cref="Effect"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
+        /// </para>
         /// </summary>
         /// <param name="effect">The effect to transform.</param>
         /// <returns>The transformed effect.</returns>

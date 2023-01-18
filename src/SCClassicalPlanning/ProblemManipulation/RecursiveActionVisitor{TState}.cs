@@ -22,9 +22,12 @@ namespace SCClassicalPlanning.ProblemManipulation
     public abstract class RecursiveActionVisitor<TState>
     {
         /// <summary>
+        /// <para>
         /// Visits an <see cref="Action"/> instance.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// The default implementation just visits the action's precondition and effect.
+        /// </para>
         /// </summary>
         /// <param name="action">The action to visit.</param>
         /// <param name="visitState">The state of this visit.</param>

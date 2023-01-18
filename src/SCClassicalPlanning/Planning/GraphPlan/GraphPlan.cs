@@ -14,9 +14,12 @@
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
     /// <summary>
+    /// <para>
     /// Planner implementation that uses the GraphPlan algorithm.
-    /// <para/>
+    /// </para>
+    /// <para>
     /// Extracts solutions via a backward search.
+    /// </para>
     /// </summary>
     internal class GraphPlan : IPlanner
     {
