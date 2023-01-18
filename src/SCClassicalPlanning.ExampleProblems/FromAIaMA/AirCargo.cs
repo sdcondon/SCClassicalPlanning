@@ -38,7 +38,7 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         }
 
         /// <summary>
-        /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates Air Cargo domain.
+        /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the Air Cargo domain.
         /// </summary>
         public static Domain Domain { get; }
 
