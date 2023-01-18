@@ -122,17 +122,21 @@ namespace SCClassicalPlanning.Planning.Utilities
         }
 
         /// <summary>
+        /// <para>
         /// Gets the variable substitution that must be made to transform the matching action schema (with the matching identifier)
         /// in the <see cref="Domain.Actions"/> of the given domain to the given action.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// Intended to be useful for succinct output of plan steps. We don't want to "bloat" our action model with this
         /// information (planners won't and shouldn't care what the original variable name was), but it is useful when
         /// producing human-readable information.
-        /// <para/>
+        /// </para>
+        /// <para>
         /// Note that we are effectively recreating the substitutions built by the relevant <see cref="ProblemInspector"/> methods, here.
         /// An alternative approach would of course be for those methods to return both the schema and the substitution (rather than just the
         /// transformed action), so that the algorithm can keep track itself if it wants to. For now at least though, I'm prioritising keep the
         /// actual planning as lean and mean as possible over making the action formatting super snappy.
+        /// </para>
         /// </summary>
         /// <returns>A <see cref="VariableSubstitution"/> that maps the variables as defined in the schema to the terms referred to in the provided action.</returns>
         public static VariableSubstitution GetMappingFromSchema(Domain domain, Action action)
