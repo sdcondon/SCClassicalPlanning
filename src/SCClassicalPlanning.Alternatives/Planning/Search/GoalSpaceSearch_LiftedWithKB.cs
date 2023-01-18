@@ -15,6 +15,7 @@ using SCClassicalPlanning.Planning.Utilities;
 using SCFirstOrderLogic.Inference;
 using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
+using System;
 using System.Collections;
 
 namespace SCClassicalPlanning.Planning.Search
@@ -178,9 +179,9 @@ namespace SCClassicalPlanning.Planning.Search
             /// <inheritdoc />
             public IEnumerator<GoalSpaceEdge> GetEnumerator()
             {
-                foreach (var action in DomainInspector.GetRelevantActions(planningTask.Domain, goal))
+                if (planningTask.InvariantInspector != null)
                 {
-                    if (planningTask.InvariantInspector != null)
+                    foreach (var action in DomainInspector.GetRelevantActions(planningTask.Domain, goal))
                     {
                         var effectiveAction = action;
 
@@ -195,7 +196,10 @@ namespace SCClassicalPlanning.Planning.Search
                             yield return new GoalSpaceEdge(planningTask, goal, effectiveAction);
                         }
                     }
-                    else
+                }
+                else
+                {
+                    foreach (var action in DomainInspector.GetRelevantActions(planningTask.Domain, goal))
                     {
                         yield return new GoalSpaceEdge(planningTask, goal, action);
                     }

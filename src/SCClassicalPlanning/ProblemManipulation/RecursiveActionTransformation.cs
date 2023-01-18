@@ -63,12 +63,7 @@ namespace SCClassicalPlanning.ProblemManipulation
                 return transformed;
             }).ToList();
 
-            if (isChanged)
-            {
-                return new Goal(elements);
-            }
-
-            return goal;
+            return isChanged ? new(elements) : goal;
         }
 
         /// <summary>
@@ -94,12 +89,7 @@ namespace SCClassicalPlanning.ProblemManipulation
                 return transformed;
             }).ToList();
 
-            if (isChanged)
-            {
-                return new Effect(elements);
-            }
-
-            return effect;
+            return isChanged ? new(elements) : effect;
         }
 
         /// <summary>
@@ -140,12 +130,7 @@ namespace SCClassicalPlanning.ProblemManipulation
                 }
             }
 
-            if (isChanged)
-            {
-                return new Predicate(predicate.Symbol, transformed);
-            }
-
-            return predicate;
+            return isChanged ? new(predicate.Symbol, transformed) : predicate;
         }
 
         /// <summary>
@@ -214,12 +199,7 @@ namespace SCClassicalPlanning.ProblemManipulation
                 }
             }
 
-            if (isChanged)
-            {
-                return new Function(function.Symbol, transformed);
-            }
-
-            return function;
+            return isChanged ? new(function.Symbol, transformed) : function;
         }
 
         /// <summary>

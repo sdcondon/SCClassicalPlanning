@@ -37,7 +37,7 @@ namespace SCClassicalPlanning
         {
             if (elements.SelectMany(e => e.Arguments).Any(a => !a.IsGroundTerm))
             {
-                throw new ArgumentException("States cannot include non-ground terms");
+                throw new ArgumentException("States cannot include non-ground terms", nameof(elements));
             }
 
             Elements = elements.ToImmutableHashSet();

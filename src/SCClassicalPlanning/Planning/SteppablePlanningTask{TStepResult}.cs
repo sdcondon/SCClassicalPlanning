@@ -1,6 +1,4 @@
-﻿using System.Threading;
-
-namespace SCClassicalPlanning.Planning
+﻿namespace SCClassicalPlanning.Planning
 {
     /// <summary>
     /// Base class for <see cref="IPlanningTask"/> implementations that are executable step-by-step.
