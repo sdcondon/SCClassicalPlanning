@@ -14,10 +14,10 @@
 using SCClassicalPlanning.Planning.Utilities;
 using SCFirstOrderLogic.Inference;
 
-namespace SCClassicalPlanning.Planning.Search.Strategies
+namespace SCClassicalPlanning.Planning.Search.CostStrategies
 {
     /// <summary>
-    /// A decorator strategy that checks whether the goal violates any known invariants
+    /// A decorator cost strategy that checks whether the goal violates any known invariants
     /// before invoking the inner strategy. If any invariants are violated, returns <see cref="float.PositiveInfinity"/>.
     /// Intended to be of use for early pruning of unreachable goals when backward searching.
     /// <para/>
@@ -40,17 +40,17 @@ namespace SCClassicalPlanning.Planning.Search.Strategies
     /// are entailed by the invariants (e.g. IsBlock(BlockA)) - as we don't need to worry about things that
     /// will always be true.
     /// </summary>
-    public class GoalInvariantCheck : IStrategy
+    public class GoalInvariantCheck : ICostStrategy
     {
         private readonly InvariantInspector invariantInspector;
-        private readonly IStrategy innerStrategy;
+        private readonly ICostStrategy innerStrategy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GoalInvariantCheck"/>.
         /// </summary>
         /// <param name="invariantsKB">A knowledge base containing all of the invariants of the problem.</param>
         /// <param name="innerStrategy">The inner strategy to invoke if no invariants are violated by the goal.</param>
-        public GoalInvariantCheck(IKnowledgeBase invariantsKB, IStrategy innerStrategy)
+        public GoalInvariantCheck(IKnowledgeBase invariantsKB, ICostStrategy innerStrategy)
         {
             this.invariantInspector = new InvariantInspector(invariantsKB);
             this.innerStrategy = innerStrategy;

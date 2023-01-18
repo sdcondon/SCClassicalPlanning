@@ -11,8 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using SCGraphTheory.Search.Classic;
-
 namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
@@ -22,7 +20,7 @@ namespace SCClassicalPlanning.Planning.Search
     /// problem being solved) of any given action, and can also estimate the total cost of getting from
     /// a given state to a state that satisfies a given goal.
     /// </summary>
-    public interface IStrategy
+    public interface ICostStrategy
     {
         /// <summary>
         /// Gets the cost of a given action.

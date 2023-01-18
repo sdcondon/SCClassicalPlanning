@@ -2,7 +2,7 @@
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 
-namespace SCClassicalPlanning.Planning.Search.Strategies
+namespace SCClassicalPlanning.Planning.Search.CostStrategies
 {
     public static class PlanningGraphMaxLevelTests
     {

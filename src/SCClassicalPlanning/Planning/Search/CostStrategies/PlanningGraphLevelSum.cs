@@ -13,16 +13,16 @@
 // limitations under the License.
 using SCClassicalPlanning.Planning.GraphPlan;
 
-namespace SCClassicalPlanning.Planning.Search.Strategies
+namespace SCClassicalPlanning.Planning.Search.CostStrategies
 {
     /// <summary>
-    /// Strategy that (gives all actions a cost of 1 and) uses a "max level" planning graph heuristic
+    /// Cost strategy that (gives all actions a cost of 1 and) uses a "max level" planning graph heuristic
     /// to provide cost estimates.
     /// <para/>
     /// To give an estimate, it first constructs a planning graph starting from the current state. 
     /// The cost estimate is the sum of the level costs of all of the goal's elements.
     /// </summary>
-    public class PlanningGraphLevelSum : IStrategy
+    public class PlanningGraphLevelSum : ICostStrategy
     {
         private readonly Domain domain;
 

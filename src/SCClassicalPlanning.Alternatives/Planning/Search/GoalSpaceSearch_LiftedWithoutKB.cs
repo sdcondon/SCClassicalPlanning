@@ -26,20 +26,20 @@ namespace SCClassicalPlanning.Planning.Search
     /// </summary>
     public class GoalSpaceSearch_LiftedWithoutKB : IPlanner
     {
-        private readonly IStrategy strategy;
+        private readonly ICostStrategy costStrategy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GoalSpaceSearch_LiftedWithoutKB"/> class.
         /// </summary>
-        /// <param name="strategy">The strategy to use.</param>
-        public GoalSpaceSearch_LiftedWithoutKB(IStrategy strategy) => this.strategy = strategy;
+        /// <param name="costStrategy">The cost strategy to use.</param>
+        public GoalSpaceSearch_LiftedWithoutKB(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
 
         /// <summary>
         /// Creates a (concretely-typed) planning task to work on solving a given problem.
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
         /// <returns></returns>
-        public PlanningTask CreatePlanningTask(Problem problem) => new(problem, strategy);
+        public PlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy);
 
         /// <inheritdoc />
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
@@ -54,13 +54,13 @@ namespace SCClassicalPlanning.Planning.Search
             private bool isComplete;
             private Plan? result;
 
-            internal PlanningTask(Problem problem, IStrategy strategy)
+            internal PlanningTask(Problem problem, ICostStrategy costStrategy)
             {
                 search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
                     source: new GoalSpaceNode(problem.Domain, problem.Goal),
                     isTarget: n => problem.InitialState.GetSatisfyingSubstitutions(n.Goal).Any(),
-                    getEdgeCost: e => strategy.GetCost(e.Action),
-                    getEstimatedCostToTarget: n => strategy.EstimateCost(problem.InitialState, n.Goal));
+                    getEdgeCost: e => costStrategy.GetCost(e.Action),
+                    getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));
 
                 CheckForSearchCompletion();
             }

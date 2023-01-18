@@ -28,7 +28,7 @@ namespace SCClassicalPlanning.Planning.Search
         private bool isComplete;
         private Plan? result;
 
-        internal StateSpaceSearchPlanningTask(Problem problem, IStrategy strategy)
+        internal StateSpaceSearchPlanningTask(Problem problem, ICostStrategy strategy)
         {
             search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.InitialState),

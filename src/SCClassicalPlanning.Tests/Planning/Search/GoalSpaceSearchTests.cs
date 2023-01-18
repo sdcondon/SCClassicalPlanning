@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
-using SCClassicalPlanning.Planning.Search.Strategies;
+using SCClassicalPlanning.Planning.Search.CostStrategies;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
@@ -13,7 +13,7 @@ namespace SCClassicalPlanning.Planning.Search
 {
     public static class GoalSpaceSearchTests
     {
-        private record TestCase(Problem Problem, IStrategy Strategy, IKnowledgeBase InvariantsKB);
+        private record TestCase(Problem Problem, ICostStrategy Strategy, IKnowledgeBase InvariantsKB);
 
         public static Test CreatedPlanValidity => TestThat
             .GivenTestContext()
@@ -80,7 +80,7 @@ namespace SCClassicalPlanning.Planning.Search
 
         public static Test CreatedPlanValidity_AlternativeImplementations => TestThat
             .GivenTestContext()
-            .AndEachOf(() => new Func<IStrategy, IKnowledgeBase, IPlanner>[]
+            .AndEachOf(() => new Func<ICostStrategy, IKnowledgeBase, IPlanner>[]
             {
                 //(h, kb) => new BackwardStateSpaceSearch_LiftedWithKB(h, kb), // doesnt work yet
                 //(h, kb) => new BackwardStateSpaceSearch_LiftedWithoutKB(h), // doesnt work yet

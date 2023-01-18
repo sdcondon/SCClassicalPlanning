@@ -15,7 +15,6 @@ using SCClassicalPlanning.Planning.Utilities;
 using SCFirstOrderLogic.Inference;
 using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
-using System;
 using System.Collections;
 
 namespace SCClassicalPlanning.Planning.Search
@@ -26,16 +25,16 @@ namespace SCClassicalPlanning.Planning.Search
     /// </summary>
     public class GoalSpaceSearch_LiftedWithKB : IPlanner
     {
-        private readonly IStrategy strategy;
+        private readonly ICostStrategy costStrategy;
         private readonly InvariantInspector? invariantInspector;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GoalSpaceSearch_LiftedWithKB"/> class.
         /// </summary>
-        /// <param name="strategy">The strategy to use.</param>
-        public GoalSpaceSearch_LiftedWithKB(IStrategy strategy, IKnowledgeBase? invariantsKB = null)
+        /// <param name="costStrategy">The cost strategy to use.</param>
+        public GoalSpaceSearch_LiftedWithKB(ICostStrategy costStrategy, IKnowledgeBase? invariantsKB = null)
         {
-            this.strategy = strategy;
+            this.costStrategy = costStrategy;
             this.invariantInspector = invariantsKB != null ? new InvariantInspector(invariantsKB) : null;
         }
 
@@ -44,7 +43,7 @@ namespace SCClassicalPlanning.Planning.Search
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
         /// <returns></returns>
-        public PlanningTask CreatePlanningTask(Problem problem) => new(problem, strategy, invariantInspector);
+        public PlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy, invariantInspector);
 
         /// <inheritdoc />
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
@@ -59,7 +58,7 @@ namespace SCClassicalPlanning.Planning.Search
             private bool isComplete;
             private Plan? result;
 
-            internal PlanningTask(Problem problem, IStrategy strategy, InvariantInspector? invariantInspector)
+            internal PlanningTask(Problem problem, ICostStrategy costStrategy, InvariantInspector? invariantInspector)
             {
                 Domain = problem.Domain;
                 InvariantInspector = invariantInspector;
@@ -67,8 +66,8 @@ namespace SCClassicalPlanning.Planning.Search
                 search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
                     source: new GoalSpaceNode(this, problem.Goal),
                     isTarget: n => problem.InitialState.GetSatisfyingSubstitutions(n.Goal).Any(),
-                    getEdgeCost: e => strategy.GetCost(e.Action),
-                    getEstimatedCostToTarget: n => strategy.EstimateCost(problem.InitialState, n.Goal));
+                    getEdgeCost: e => costStrategy.GetCost(e.Action),
+                    getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));
 
                 CheckForSearchCompletion();
             }

@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
-using SCClassicalPlanning.Planning.Search.Strategies;
+using SCClassicalPlanning.Planning.Search.CostStrategies;
 
 namespace SCClassicalPlanning.Planning.Search
 {

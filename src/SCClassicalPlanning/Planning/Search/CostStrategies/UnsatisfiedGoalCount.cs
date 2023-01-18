@@ -11,10 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace SCClassicalPlanning.Planning.Search.Strategies
+namespace SCClassicalPlanning.Planning.Search.CostStrategies
 {
     /// <summary>
-    /// Very simplistic strategy that just (gives each action a cost of 1 and) counts the number of
+    /// Very simplistic cost strategy that just (gives each action a cost of 1 and) counts the number of
     /// unsatisfied goals to provide cost estimates. That is, it adds the number of positive elements
     /// of the goal that do not occur in the state to the number of negative elements that do (that is,
     /// it assumes that we need to carry out one action per element of the goal that isn't currently
@@ -25,7 +25,7 @@ namespace SCClassicalPlanning.Planning.Search.Strategies
     /// One of the things that this heuristic simply can't do is tell when preconditions are unsatisfiable - which is very bad 
     /// news for a backward state space search, because you rely on being able to do this to prune branches.
     /// </summary>
-    public class UnsatisfiedGoalCount : IStrategy
+    public class UnsatisfiedGoalCount : ICostStrategy
     {
         /// <inheritdoc/>
         public float GetCost(Action action) => 1f;

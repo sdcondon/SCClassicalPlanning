@@ -7,7 +7,7 @@ using SCFirstOrderLogic.Inference;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using SCFirstOrderLogic.Inference.Resolution;
-using SCClassicalPlanning.Planning.Search.Strategies;
+using SCClassicalPlanning.Planning.Search.CostStrategies;
 
 namespace SCClassicalPlanning.Benchmarks.Planning
 {
@@ -15,7 +15,7 @@ namespace SCClassicalPlanning.Benchmarks.Planning
     [InProcess]
     public class PlannerBenchmarks
     {
-        public record TestCase(string Label, Problem Problem, IStrategy Strategy, IKnowledgeBase InvariantsKB)
+        public record TestCase(string Label, Problem Problem, ICostStrategy Strategy, IKnowledgeBase InvariantsKB)
         {
             public override string ToString() => Label;
         }

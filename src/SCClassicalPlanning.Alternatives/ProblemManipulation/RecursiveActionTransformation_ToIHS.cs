@@ -19,7 +19,7 @@ namespace SCClassicalPlanning.ProblemManipulation
     /// <summary>
     /// Base class for recursive transformations of <see cref="Action"/> instances to other <see cref="Action"/> instances.
     /// <para/>
-    /// ALTERNATIVE: Converts goal/effect elements immediately to ImmutableHashSets rather than via Lists. Quicker when the transform
+    /// ALTERNATIVE: Converts goal/effect elements immediately to ImmutableHashSets rather than via Lists. Slower when the transform
     /// doesn't actually change a particular goal/element (since lists are quicker to create than IHSs). Quicker approach
     /// depends on how many goals/elements are changed, but some light testing indicates that going via Lists is probably a better call
     /// (because creating IHSs is really quite expensive).

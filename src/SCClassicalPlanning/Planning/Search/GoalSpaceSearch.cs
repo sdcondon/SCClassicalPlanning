@@ -19,20 +19,20 @@ namespace SCClassicalPlanning.Planning.Search
     /// </summary>
     public class GoalSpaceSearch : IPlanner
     {
-        private readonly IStrategy strategy;
+        private readonly ICostStrategy costStrategy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GoalSpaceSearch"/> class.
         /// </summary>
-        /// <param name="strategy">The strategy to use.</param>
-        public GoalSpaceSearch(IStrategy strategy) => this.strategy = strategy;
+        /// <param name="costStrategy">The cost strategy to use.</param>
+        public GoalSpaceSearch(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
 
         /// <summary>
         /// Creates a (concretely-typed) planning task to work on solving a given problem.
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
         /// <returns>A new <see cref="GoalSpaceSearchPlanningTask"/> instance.</returns>
-        public GoalSpaceSearchPlanningTask CreatePlanningTask(Problem problem) => new(problem, strategy);
+        public GoalSpaceSearchPlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy);
 
         /// <inheritdoc />
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
