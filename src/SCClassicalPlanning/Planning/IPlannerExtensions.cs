@@ -28,8 +28,6 @@ namespace SCClassicalPlanning.Planning
         public static Task<Plan> CreatePlanAsync(this IPlanner planner, Problem problem, CancellationToken cancellationToken = default)
         {
             return planner.CreatePlanningTask(problem).ExecuteAsync(cancellationToken);
-
-            //throw new ArgumentException("Problem is unsolvable", nameof(problem)); ...?
         }
 
         /// <summary>

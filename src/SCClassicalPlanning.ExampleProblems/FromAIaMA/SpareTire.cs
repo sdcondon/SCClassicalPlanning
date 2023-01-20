@@ -5,7 +5,7 @@ using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
 {
     /// <summary>
-    /// The "Spare Tire" example from section 10.1.2 of "Artificial Intelligence: A Modern Approach".
+    /// The "Spare Tire" example from §10.1.2 of "Artificial Intelligence: A Modern Approach".
     /// </summary>
     public static class SpareTire
     {

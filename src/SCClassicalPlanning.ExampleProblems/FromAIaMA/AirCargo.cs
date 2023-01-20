@@ -5,36 +5,14 @@ using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
 {
     /// <summary>
-    /// The "Air Cargo" example from section 10.1.1 of "Artificial Intelligence: A Modern Approach".
+    /// The "Air Cargo" example from §10.1.1 of "Artificial Intelligence: A Modern Approach".
     /// </summary>
     public static class AirCargo
     {
         static AirCargo()
         {
             Domain = MakeDomain();
-
-            Constant cargo1 = new(nameof(cargo1));
-            Constant cargo2 = new(nameof(cargo2));
-            Constant plane1 = new(nameof(plane1));
-            Constant plane2 = new(nameof(plane2));
-            Constant airport1 = new(nameof(airport1));
-            Constant airport2 = new(nameof(airport2));
-
-            ExampleProblem = MakeProblem(
-                initialState: new(
-                    Cargo(cargo1)
-                    & Cargo(cargo2)
-                    & Plane(plane1)
-                    & Plane(plane2)
-                    & Airport(airport1)
-                    & Airport(airport2)
-                    & At(cargo1, airport1)
-                    & At(cargo2, airport2)
-                    & At(plane1, airport1)
-                    & At(plane2, airport2)),
-                goal: new(
-                    At(cargo2, airport1)
-                    & At(cargo1, airport2)));
+            ExampleProblem = MakeExampleProblem();
         }
 
         /// <summary>
@@ -50,24 +28,69 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         /// </summary>
         public static Problem ExampleProblem { get; }
 
+        /// <summary>
+        /// Constructs an <see cref="OperablePredicate"/> instance for indicating that a given domain element is a piece of cargo.
+        /// </summary>
+        /// <param name="cargo">A term representing the domain element.</param>
+        /// <returns>A new <see cref="OperablePredicate"/> instance for indicating that a given domain element is a piece of cargo.</returns>
         public static OperablePredicate Cargo(Term cargo) => new Predicate(nameof(Cargo), cargo);
+
+        /// <summary>
+        /// Constructs an <see cref="OperablePredicate"/> instance for indicating that a given domain element is a plane.
+        /// </summary>
+        /// <param name="plane">A term representing the domain element.</param>
+        /// <returns>A new <see cref="OperablePredicate"/> instance for indicating that a given domain element is a plane.</returns>
         public static OperablePredicate Plane(Term plane) => new Predicate(nameof(Plane), plane);
+
+        /// <summary>
+        /// Constructs an <see cref="OperablePredicate"/> instance for indicating that a given domain element is an airport.
+        /// </summary>
+        /// <param name="airport">A term representing the domain element.</param>
+        /// <returns>A new <see cref="OperablePredicate"/> instance for indicating that a given domain element is an airport.</returns>
         public static OperablePredicate Airport(Term airport) => new Predicate(nameof(Airport), airport);
+
+        /// <summary>
+        /// Constructs an <see cref="OperablePredicate"/> instance for indicating that a given domain element is "at" another given domain element.
+        /// </summary>
+        /// <param name="object">A term representing the situated domain element.</param>
+        /// <param name="location">A term representing the location.</param>
+        /// <returns>A new <see cref="OperablePredicate"/> instance for indicating that a given domain element is "at" another given domain element.</returns>
         public static OperablePredicate At(Term @object, Term location) => new Predicate(nameof(At), @object, location);
+
+        /// <summary>
+        /// Constructs an <see cref="OperablePredicate"/> instance for indicating that a given domain element is "in" another given domain element.
+        /// </summary>
+        /// <param name="object">A term representing the situated domain element.</param>
+        /// <param name="container">A term representing the container.</param>
+        /// <returns>A new <see cref="OperablePredicate"/> instance for indicating that a given domain element is "in" another given domain element.</returns>
         public static OperablePredicate In(Term @object, Term container) => new Predicate(nameof(In), @object, container);
 
+        /// <summary>
+        /// Constructs an <see cref="Action"/> instance that describes loading a given piece of cargo onto a given plane at a given airport.
+        /// </summary>
+        /// <param name="element">A term representing the piece of cargo.</param>
+        /// <param name="element">A term representing the plane.</param>
+        /// <param name="element">A term representing the airport.</param>
+        /// <returns>A new <see cref="Action"/> instance that describes loading a given piece of cargo onto a given plane at a given airport.</returns>
         public static Action Load(Term cargo, Term plane, Term airport) => new OperableAction(
             identifier: nameof(Load),
             precondition:
-                At(cargo, airport)
-                & At(plane, airport)
-                & Cargo(cargo)
+                Cargo(cargo)
                 & Plane(plane)
-                & Airport(airport),
+                & Airport(airport)
+                & At(cargo, airport)
+                & At(plane, airport),
             effect:
                 !At(cargo, airport)
                 & In(cargo, plane));
 
+        /// <summary>
+        /// Constructs an <see cref="Action"/> instance that describes unloading a given piece of cargo from a given plane at a given airport.
+        /// </summary>
+        /// <param name="element">A term representing the piece of cargo.</param>
+        /// <param name="element">A term representing the plane.</param>
+        /// <param name="element">A term representing the airport.</param>
+        /// <returns>A new <see cref="Action"/> instance that describes unloading a given piece of cargo from a given plane at a given airport.</returns>
         public static Action Unload(Term cargo, Term plane, Term airport) => new OperableAction(
             identifier: nameof(Unload),
             precondition:
@@ -80,17 +103,24 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                 At(cargo, airport)
                 & !In(cargo, plane));
 
-        public static Action Fly(Term plane, Term from, Term to) => new OperableAction(
+        /// <summary>
+        /// Constructs an <see cref="Action"/> instance that describes flying a given plane from a given airport to a given airport.
+        /// </summary>
+        /// <param name="element">A term representing the plane.</param>
+        /// <param name="element">A term representing the origin airport.</param>
+        /// <param name="element">A term representing the destination airport.</param>
+        /// <returns>A new <see cref="Action"/> instance that describes describes flying a given plane from a given airport to a given airport.</returns>
+        public static Action Fly(Term plane, Term origin, Term destination) => new OperableAction(
             identifier: nameof(Fly),
             precondition:
-                At(plane, from)
+                At(plane, origin)
                 & Plane(plane)
-                & Airport(from)
-                & Airport(to),
+                & Airport(origin)
+                & Airport(destination),
                 //& !AreEqual(from, to),
             effect:
-                !At(plane, from)
-                & At(plane, to));
+                !At(plane, origin)
+                & At(plane, destination));
 
         /// <summary>
         /// Creates a new <see cref="Problem"/> instance that refers to this domain.
@@ -115,6 +145,32 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                 Unload(cargo, plane, airport),
                 Fly(plane, from, to),
             });
+        }
+
+        private static Problem MakeExampleProblem()
+        {
+            Constant cargo1 = new(nameof(cargo1));
+            Constant cargo2 = new(nameof(cargo2));
+            Constant plane1 = new(nameof(plane1));
+            Constant plane2 = new(nameof(plane2));
+            Constant airport1 = new(nameof(airport1));
+            Constant airport2 = new(nameof(airport2));
+
+            return MakeProblem(
+                initialState: new(
+                    Cargo(cargo1)
+                    & Cargo(cargo2)
+                    & Plane(plane1)
+                    & Plane(plane2)
+                    & Airport(airport1)
+                    & Airport(airport2)
+                    & At(cargo1, airport1)
+                    & At(cargo2, airport2)
+                    & At(plane1, airport1)
+                    & At(plane2, airport2)),
+                goal: new(
+                    At(cargo2, airport1)
+                    & At(cargo1, airport2)));
         }
     }
 }

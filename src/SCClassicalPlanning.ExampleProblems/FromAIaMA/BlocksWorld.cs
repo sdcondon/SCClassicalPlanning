@@ -5,7 +5,7 @@ using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
 {
     /// <summary>
-    /// The "Blocks World" example from section 10.1.3 of "Artificial Intelligence: A Modern Approach".
+    /// The "Blocks World" example from §10.1.3 of "Artificial Intelligence: A Modern Approach".
     /// </summary>
     public static class BlocksWorld
     {

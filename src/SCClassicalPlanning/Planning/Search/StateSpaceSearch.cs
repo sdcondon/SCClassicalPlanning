@@ -15,13 +15,8 @@
 namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
-    /// <para>
     /// A simple implementation of <see cref="IPlanner"/> that carries out an A-star search of
     /// the state space to create plans.
-    /// </para>
-    /// <para>
-    /// See section 10.2.2 of "Artificial Intelligence: A Modern Approach" for more on this.
-    /// </para>
     /// </summary>
     public class StateSpaceSearch : IPlanner
     {
