@@ -352,6 +352,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         // NB: while an EMPTY goal and effect would at first glance seem to be intuitive - it is
         // defined like this to assist with mutex creation, and because of the idiosyncracies of
         // plan extraction in GraphPlan. Still feels awkward to me, but meh, never mind.
-        internal static Action MakePersistenceAction(Literal proposition) => new(PersistenceActionIdentifier, new(proposition), new(proposition));
+        private static Action MakePersistenceAction(Literal proposition) => new(PersistenceActionIdentifier, new(proposition), new(proposition));
     }
 }
