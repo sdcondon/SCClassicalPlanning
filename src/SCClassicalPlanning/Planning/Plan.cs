@@ -11,12 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 
 namespace SCClassicalPlanning.Planning
 {
     /// <summary>
-    /// Interface for types encapsulating a plan of action.
+    /// Container for a plan of action - essentially just a list of steps.
     /// </summary>
     public class Plan
     {
@@ -24,15 +24,20 @@ namespace SCClassicalPlanning.Planning
         /// Initializes a new instance of the <see cref="Plan"/> class.
         /// </summary>
         /// <param name="steps">The actions that comprise the plan.</param>
-        public Plan(IList<Action> steps) => Steps = new ReadOnlyCollection<Action>(steps);
+        public Plan(IEnumerable<Action> steps) => Steps = steps.ToImmutableList();
 
         /// <summary>
         /// Gets the steps of the plan.
         /// </summary>
-        public IReadOnlyCollection<Action> Steps { get; }
+        public ImmutableList<Action> Steps { get; }
 
         /// <summary>
+        /// <para>
         /// Applies this plan to a given state.
+        /// </para>
+        /// <para>
+        /// An exception will be thrown if any of the actions in the plan are not applicable to the current state when they are applied.
+        /// </para>
         /// </summary>
         public State ApplyTo(State state)
         {
