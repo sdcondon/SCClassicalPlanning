@@ -140,23 +140,13 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 MakeNextLevel();
             }
 
+            // TODO-BUG-CRITICAL: by returning the actual earlier level, we break GraphPlan
+            // - specifically, the of tracking nogoods. We need to use (the same content but)
+            // the requested index and previous reference etc - so that graphplan can tell when nogoods level off.
+            // At the same time, its probably worth adding some "is levelled off" props to the PlanningGraphLevel type?
+            // We probably want a level struct, separate to level content? Or just referring to the last real content..?
             return propositionLevels[Math.Min(index, LevelledOffAtLevel ?? int.MaxValue)];
         }
-
-        /////// <summary>
-        /////// Retrieves an object representing a particular 'action' level within the graph. Expands the graph if necessary.
-        /////// </summary>
-        /////// <param name="index">The index of the level to retrieve.</param>
-        /////// <returns>An object representing the level.</returns>
-        ////private ActionLevel GetActionLevel(int index)
-        ////{
-        ////    while (expandedToLevel < index + 1 && !LevelledOff)
-        ////    {
-        ////        MakeNextLevel();
-        ////    }
-
-        ////    return actionLevels[Math.Min(index, LevelledOffAtLevel ?? int.MaxValue)];
-        ////}
 
         private void MakeNextLevel()
         {
