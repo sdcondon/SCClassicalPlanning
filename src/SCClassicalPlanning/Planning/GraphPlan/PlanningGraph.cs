@@ -37,8 +37,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         public const string PersistenceActionIdentifier = "NOOP";
 
         private readonly Problem problem;
-        private readonly List<Level> propositionLevels = new();
-        private readonly List<Dictionary<Action, ActionNode>> actionLevels = new();
+        private readonly List<PlanningGraphLevel> propositionLevels = new();
+        private readonly List<Dictionary<Action, PlanningGraphActionNode>> actionLevels = new();
 
         private int expandedToLevel = 0;
 
@@ -53,7 +53,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             // Planning graphs only work with propositions - no variables allowed.
             // So here we iterate every possible ground predicate (by substituting every combination of known constants
             // for its arguments - add positive if it's in the initial state, otherwise negative)
-            var propositionLevel0 = new Dictionary<Literal, PropositionNode>();
+            var propositionLevel0 = new Dictionary<Literal, PlanningGraphPropositionNode>();
             foreach (var predicateTemplate in problem.Domain.Predicates)
             {
                 foreach (var substitution in ProblemInspector.GetAllPossibleSubstitutions(problem, predicateTemplate, new VariableSubstitution()))
@@ -62,7 +62,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     // Implicit conversion of predicate to literal a mistake, I think.
                     var predicate = (Predicate)substitution.ApplyTo(predicateTemplate).ToSentence();
                     var proposition = new Literal(predicate, !problem.InitialState.Elements.Contains(predicate));
-                    propositionLevel0.Add(proposition, new PropositionNode(proposition));
+                    propositionLevel0.Add(proposition, new PlanningGraphPropositionNode(proposition));
                 }
             }
 
@@ -133,7 +133,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// </summary>
         /// <param name="index">The index of the level to retrieve.</param>
         /// <returns>An object representing the level.</returns>
-        public Level GetLevel(int index)
+        public PlanningGraphLevel GetLevel(int index)
         {
             while (expandedToLevel < index && !IsLevelledOff)
             {
@@ -207,15 +207,15 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         {
             var currentPropositionLevel = propositionLevels[expandedToLevel];
 
-            var newActionLevel = new Dictionary<Action, ActionNode>();
-            var newPropositionLevel = new Dictionary<Literal, PropositionNode>();
+            var newActionLevel = new Dictionary<Action, PlanningGraphActionNode>();
+            var newPropositionLevel = new Dictionary<Literal, PlanningGraphPropositionNode>();
             var changesOccured = false;
 
             // Iterate all those applicable actions - ultimately to build the next action and proposition layers.
             foreach (var action in GetApplicableActions(problem, currentPropositionLevel.Propositions))
             {
                 // Add an action node to the new action layer:
-                var actionNode = newActionLevel[action] = new ActionNode(action);
+                var actionNode = newActionLevel[action] = new PlanningGraphActionNode(action);
 
                 // Link all of the preconditions to the new action node:
                 foreach (var preconditionElement in action.Precondition.Elements)
@@ -240,7 +240,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     // this graph is memory-hogging enough as it is.. So only create a new proposition node if we need to:
                     if (!newPropositionLevel.TryGetValue(effectElement, out var propositionNode))
                     {
-                        propositionNode = newPropositionLevel[effectElement] = new PropositionNode(effectElement);
+                        propositionNode = newPropositionLevel[effectElement] = new PlanningGraphPropositionNode(effectElement);
 
                         // Make a note if this effect isn't in the current layer - it means that the graph hasn't levelled off yet
                         // (TODO: do we actually need this, given that the action determines the effect, and we check for new actions. ponder me)
@@ -263,7 +263,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             {
                 // Add a persistence action & link its precondition
                 var action = MakePersistenceAction(proposition);
-                var actionNode = newActionLevel[action] = new ActionNode(action);
+                var actionNode = newActionLevel[action] = new PlanningGraphActionNode(action);
                 propositionNode.Actions.Add(actionNode);
 
                 // Make a note if this action isn't in the current layer - it means that the graph hasn't levelled off yet:
@@ -277,7 +277,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // Create a new proposition node if we need to:
                 if (!newPropositionLevel.TryGetValue(proposition, out var newPropositionNode))
                 {
-                    newPropositionNode = newPropositionLevel[proposition] = new PropositionNode(proposition);
+                    newPropositionNode = newPropositionLevel[proposition] = new PlanningGraphPropositionNode(proposition);
                 }
 
                 actionNode.Effects.Add(newPropositionNode);
@@ -353,135 +353,5 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         // defined like this to assist with mutex creation, and because of the idiosyncracies of
         // plan extraction in GraphPlan. Still feels awkward to me, but meh, never mind.
         internal static Action MakePersistenceAction(Literal proposition) => new(PersistenceActionIdentifier, new(proposition), new(proposition));
-
-        /// <summary>
-        /// Representation of a (proposition) level within a planning graph.
-        /// </summary>
-        public class Level
-        {
-            internal Level(PlanningGraph graph, int index, IReadOnlyDictionary<Literal, PropositionNode> nodesByProposition, Level? previousLevel)
-            {
-                Graph = graph;
-                Index = index;
-                NodesByProposition = nodesByProposition;
-                PreviousLevel = previousLevel;
-            }
-
-            /// <summary>
-            /// Gets the planning graph in which this level resides.
-            /// </summary>
-            public PlanningGraph Graph { get; }
-
-            /// <summary>
-            /// Gets the previous level of the graph - or null if this level represents the initial state of the problem.
-            /// </summary>
-            public Level? PreviousLevel { get; }
-
-            /// <summary>
-            /// Gets the index of this level - with node index 0 indicating the propositions of the initial state of the problem.
-            /// </summary>
-            public int Index { get; }
-
-            /// <summary>
-            /// Gets all of the planning graph nodes in this level, keyed by their respective propositions.
-            /// </summary>
-            public IReadOnlyDictionary<Literal, PropositionNode> NodesByProposition { get; }
-
-            /// <summary>
-            /// Gets an enumerable of the propositions in this level.
-            /// </summary>
-            public IEnumerable<Literal> Propositions => NodesByProposition.Keys;
-
-            /// <summary>
-            /// Gets an enumerable of the planning graph nodes in this level.
-            /// </summary>
-            public IEnumerable<PropositionNode> Nodes => NodesByProposition.Values;
-
-            /// <summary>
-            /// Gets a value indicating whether this level contains a given proposition.
-            /// </summary>
-            /// <param name="proposition">The proposition to check for.</param>
-            /// <returns>True if and only if the given proposition is present in this level.</returns>
-            public bool Contains(Literal proposition) => NodesByProposition.ContainsKey(proposition);
-
-            /// <summary>
-            /// Gets a value indicating whether all of a set of propositions are present at this level,
-            /// with no pair of them being mutually exclusive.
-            /// </summary>
-            /// <param name="propositions">The propositions to look for.</param>
-            /// <returns>True if and only if all the given propositions are present at this level, with no pair of them being mutually exclusive.</returns>
-            public bool ContainsNonMutex(IEnumerable<Literal> propositions)
-            {
-                var propositionIndex = 0;
-                foreach (var proposition in propositions)
-                {
-                    if (!NodesByProposition.TryGetValue(proposition, out var node))
-                    {
-                        return false;
-                    }
-
-                    if (node.Mutexes.Select(e => e.Proposition).Intersect(propositions.Take(propositionIndex)).Any())
-                    {
-                        return false;
-                    }
-
-                    propositionIndex++;
-                }
-
-                return true;
-            }
-        }
-
-        /// <summary>
-        /// <para>
-        /// Representation of a proposition node in a planning graph.
-        /// </para>
-        /// <para>
-        /// NB: We don't make use of the SCGraphTheory abstraction for the planning graph because none of the algorithms that use 
-        /// it query it via graph theoretical algorithms - so it would be needless complexity.
-        /// </para>
-        /// </summary>
-        [DebuggerDisplay("{Proposition}")]
-        public class PropositionNode
-        {
-            internal PropositionNode(Literal proposition) => Proposition = proposition;
-
-            /// <summary>
-            /// Gets the proposition represented by this node.
-            /// </summary>
-            public Literal Proposition { get; }
-
-            internal Collection<ActionNode> Actions { get; } = new();
-
-            internal Collection<ActionNode> Causes { get; } = new();
-
-            internal Collection<PropositionNode> Mutexes { get; } = new();
-        }
-
-        /// <summary>
-        /// <para>
-        /// Representation of an action node in a planning graph.
-        /// </para>
-        /// <para>
-        /// NB: We don't make use of SCGraphTheory abstraction for the planning graph because none of the algorithms that use 
-        /// it query it via graph theoretical algorithms - so it would be needless complexity.
-        /// </para>
-        /// </summary>
-        [DebuggerDisplay("{Action.Identifier}: {Action.Effect}")]
-        public class ActionNode
-        {
-            internal ActionNode(Action action) => Action = action;
-
-            /// <summary>
-            /// Gets the action represented by this node.
-            /// </summary>
-            public Action Action { get; }
-
-            internal Collection<PropositionNode> Effects { get; } = new();
-
-            internal Collection<PropositionNode> Preconditions { get; } = new();
-
-            internal Collection<ActionNode> Mutexes { get; } = new();
-        }
     }
 }

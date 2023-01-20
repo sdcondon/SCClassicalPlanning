@@ -106,7 +106,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         }
 
         private bool TryExtractSolution(
-            PlanningGraph.Level graphLevel,
+            PlanningGraphLevel graphLevel,
             HashSet<SearchState> noGoods,
             [MaybeNullWhen(false)] out Plan plan,
             CancellationToken cancellationToken)
@@ -154,7 +154,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         [DebuggerDisplay("{Goal} @ L{graphLevel.Index}")]
         private readonly struct SearchNode : INode<SearchNode, SearchEdge>, IEquatable<SearchNode>
         {
-            public SearchNode(PlanningGraph.Level graphLevel, Goal goal)
+            public SearchNode(PlanningGraphLevel graphLevel, Goal goal)
             {
                 this.GraphLevel = graphLevel;
                 this.Goal = goal;
@@ -162,7 +162,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             public readonly Goal Goal { get; }
 
-            public readonly PlanningGraph.Level GraphLevel { get; }
+            public readonly PlanningGraphLevel GraphLevel { get; }
 
             public IReadOnlyCollection<SearchEdge> Edges => new SearchNodeEdges(GraphLevel, Goal);
 
@@ -176,10 +176,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private readonly struct SearchNodeEdges : IReadOnlyCollection<SearchEdge>
         {
-            private readonly PlanningGraph.Level graphLevel;
+            private readonly PlanningGraphLevel graphLevel;
             private readonly Goal goal;
 
-            public SearchNodeEdges(PlanningGraph.Level graphLevel, Goal goal)
+            public SearchNodeEdges(PlanningGraphLevel graphLevel, Goal goal)
             {
                 this.graphLevel = graphLevel;
                 this.goal = goal;
@@ -228,7 +228,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // Now (recursively) attempt to cover all elements of the goal, with no mutexes:
                 // We go recursive to ensure that we ultimately find all combinations - but this is of course potentially expensive.
                 // There's no way around this, unfortunately - the set cover problem is NP-complete, after all..
-                return FindCoveringActionSets(goalElements, relevantActionNodes.ToImmutableHashSet(), ImmutableHashSet<PlanningGraph.ActionNode>.Empty).GetEnumerator();
+                return FindCoveringActionSets(goalElements, relevantActionNodes.ToImmutableHashSet(), ImmutableHashSet<PlanningGraphActionNode>.Empty).GetEnumerator();
             }
 
             /// <inheritdoc />
@@ -236,10 +236,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             private IEnumerable<SearchEdge> FindCoveringActionSets(
                 IEnumerable<Literal> unsatisfiedGoalElements,
-                ImmutableHashSet<PlanningGraph.ActionNode> unselectedActionNodes,
-                ImmutableHashSet<PlanningGraph.ActionNode> selectedActionNodes)
+                ImmutableHashSet<PlanningGraphActionNode> unselectedActionNodes,
+                ImmutableHashSet<PlanningGraphActionNode> selectedActionNodes)
             {
-                bool IsNonMutexWithSelectedActions(PlanningGraph.ActionNode actionNode)
+                bool IsNonMutexWithSelectedActions(PlanningGraphActionNode actionNode)
                 {
                     foreach (var selectedActionNode in selectedActionNodes)
                     {
@@ -283,10 +283,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private readonly struct SearchEdge : IEdge<SearchNode, SearchEdge>
         {
-            private readonly PlanningGraph.Level graphLevel;
+            private readonly PlanningGraphLevel graphLevel;
             private readonly Goal goal;
 
-            public SearchEdge(PlanningGraph.Level graphLevel, Goal goal, IEnumerable<Action> actions)
+            public SearchEdge(PlanningGraphLevel graphLevel, Goal goal, IEnumerable<Action> actions)
             {
                 this.graphLevel = graphLevel;
                 this.goal = goal;
@@ -313,7 +313,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             private readonly HashSet<SearchState> noGoods;
             private readonly Dictionary<SearchNode, SearchEdge> visited = new Dictionary<SearchNode, SearchEdge>();
 
-            public SolutionExtractionDFS(Problem problem, PlanningGraph.Level graphLevel, HashSet<SearchState> noGoods)
+            public SolutionExtractionDFS(Problem problem, PlanningGraphLevel graphLevel, HashSet<SearchState> noGoods)
             {
                 this.problem = problem;
                 this.source = new SearchNode(graphLevel, problem.Goal);
