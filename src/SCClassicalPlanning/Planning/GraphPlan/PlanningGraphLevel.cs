@@ -43,12 +43,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         public PlanningGraphLevel? PreviousLevel { get; }
 
         /// <summary>
-        /// Gets the index of this level - with node index 0 indicating the propositions of the initial state of the problem.
+        /// Gets the index of this level - with index 0 indicating the propositions of the initial state of the problem.
         /// </summary>
         public int Index { get; }
 
         /// <summary>
-        /// Gets all of the planning graph nodes in this level, keyed by their respective propositions.
+        /// Gets all of the proposition nodes in this level, keyed by their respective propositions.
         /// </summary>
         public IReadOnlyDictionary<Literal, PlanningGraphPropositionNode> NodesByProposition { get; }
 
@@ -58,7 +58,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         public IEnumerable<Literal> Propositions => NodesByProposition.Keys;
 
         /// <summary>
-        /// Gets an enumerable of the planning graph nodes in this level.
+        /// Gets an enumerable of the proposition nodes in this level.
         /// </summary>
         public IEnumerable<PlanningGraphPropositionNode> Nodes => NodesByProposition.Values;
 

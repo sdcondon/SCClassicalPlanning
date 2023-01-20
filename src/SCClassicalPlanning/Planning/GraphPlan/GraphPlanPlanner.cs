@@ -27,7 +27,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// Creates a (concretely-typed) planning task to work on solving a given problem.
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
-        /// <returns></returns>
+        /// <returns>A new <see cref="GraphPlanPlanningTask"/> for solving the problem.</returns>
         public static GraphPlanPlanningTask CreatePlanningTask(Problem problem) => new(problem);
 
         /// <inheritdoc />
