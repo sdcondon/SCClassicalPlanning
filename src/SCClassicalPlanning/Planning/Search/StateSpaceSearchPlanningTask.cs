@@ -22,6 +22,10 @@ namespace SCClassicalPlanning.Planning.Search
     /// A concrete subclass of <see cref="SteppablePlanningTask{TStepResult}"/> that carries out
     /// an A-star search of a problem's state space to create a plan.
     /// </summary>
+    // TODO-V1: Replace this value tuple with a named type. Just using StateSpaceEdge would work, but making
+    // that public would mean needing to make StateSpaceNode public, which would in turn mean needing to make
+    // a decision regarding equality checks. Could just use a separate type - StateSpaceTransition (or something).
+    // Decide and implement before v1.
     public class StateSpaceSearchPlanningTask : SteppablePlanningTask<(State, Action, State)>
     {
         private readonly AStarSearch<StateSpaceNode, StateSpaceEdge> search;

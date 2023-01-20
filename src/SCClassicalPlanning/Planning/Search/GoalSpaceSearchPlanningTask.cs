@@ -22,6 +22,10 @@ namespace SCClassicalPlanning.Planning.Search
     /// A concrete subclass of <see cref="SteppablePlanningTask{TStepResult}"/> that carries out
     /// an A-star search of a problem's goal space to create a plan.
     /// </summary>
+    // TODO-V1: Replace this value tuple with a named type. Just using GoalSpaceEdge would work, but making
+    // that public would mean needing to make GoalSpaceNode public, which would in turn mean needing to make
+    // a decision regarding equality checks. Could just use a separate type - GoalSpaceTransition (or something).
+    // Decide and implement before v1.
     public class GoalSpaceSearchPlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
     {
         private readonly AStarSearch<GoalSpaceNode, GoalSpaceEdge> search;
