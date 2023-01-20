@@ -7,7 +7,7 @@ Here is a quick overview of the namespaces found within this library. Reading th
     * **`GraphPlan`:** contains an implementation of `IPlanner` that uses the GraphPlan algorithm - as well as some supporting types (notably, a class for planning graphs).
     * **`Search`:** contains some very simple `IPlanner` implementations that search state- or goal-space to create plans.
       * **`Strategies`:** contains strategy implementations for use by search planners.
-    * **`Utilities`:** contains useful common logic for planners to make use of. For example, logic for the retrieval of actions applicable and relevant actions.
+    * **`Utilities`:** contains useful common logic for planners to make use of. For example, logic for the retrieval of applicable and relevant actions.
   * **`ProblemCreation`:** contains types that assist with the creation of problems and their constituent elements.
   * **`ProblemManipulation`:** contains types to assist with the manipulation of problems and their consituent elements.
 

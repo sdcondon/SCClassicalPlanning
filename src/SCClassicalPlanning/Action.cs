@@ -106,7 +106,10 @@ namespace SCClassicalPlanning
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
         public override bool Equals(object? obj)
         {
-            return obj is Action action && action.Identifier.Equals(Identifier) && action.Precondition.Equals(Precondition) && action.Effect.Equals(Effect);
+            return obj is Action action 
+                && action.Identifier.Equals(Identifier) 
+                && action.Precondition.Equals(Precondition) 
+                && action.Effect.Equals(Effect);
         }
 
         /// <inheritdoc />
