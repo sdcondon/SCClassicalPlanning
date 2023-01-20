@@ -6,7 +6,7 @@ namespace SCClassicalPlanning.ExampleDomains
 {
     /// <summary>
     /// <para>
-    /// Incredibly simple domain, used for tests.
+    /// Very simple domain, used for tests.
     /// </para>
     /// <para>
     /// The idea is that we have some kind of container that objects (the elements of the domain) can be added to and removed from.
@@ -63,7 +63,7 @@ namespace SCClassicalPlanning.ExampleDomains
         /// <param name="initialState">The initial state of the problem.</param>
         /// <param name="goal">The initial state of the problem.</param>
         /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-        public static Problem MakeProblem(State initialState, Goal goal) => new Problem(Domain, initialState, goal);
+        public static Problem MakeProblem(State initialState, Goal goal) => new(Domain, initialState, goal);
 
         // NB: This is in its own method so that we can run tests against domain construction.
         internal static Domain MakeDomain()
