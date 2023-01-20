@@ -14,8 +14,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 AirCargo.ExampleProblem,
                 BlocksWorld.ExampleProblem,
                 // BlocksWorld.LargeExampleProblem, // TODO: doesn't work (or indeed terminate). implement termination checks first, then fix this
+                AirCargoOneAtATime.Problem,
             })
-            .When((_, tc) => new GraphPlan().CreatePlan(tc))
+            .When((_, tc) => new GraphPlanPlanner().CreatePlan(tc))
             .ThenReturns()
             .And((_, tc, pl) => tc.Goal.IsSatisfiedBy(pl.ApplyTo(tc.InitialState)).Should().BeTrue())
             .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Domain).Format(pl)));
@@ -31,7 +32,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // reason. Given that we're testing "does this thing terminate" there's not really much
                 // of an alternative.
                 var timeoutToken = new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token;
-                return new GraphPlan().CreatePlan(p, timeoutToken);
+                return new GraphPlanPlanner().CreatePlan(p, timeoutToken);
             })
             .ThenThrows()
             .And((_, ex) => ex.Should().BeOfType<InvalidOperationException>());

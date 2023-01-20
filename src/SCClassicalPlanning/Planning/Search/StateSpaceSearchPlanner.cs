@@ -11,24 +11,29 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace SCClassicalPlanning.Planning.GraphPlan
+
+namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
-    /// <para>
-    /// Planner implementation that uses the GraphPlan algorithm.
-    /// </para>
-    /// <para>
-    /// Extracts solutions via a backward search.
-    /// </para>
+    /// A simple implementation of <see cref="IPlanner"/> that carries out
+    /// an A-star search of the state space to create plans.
     /// </summary>
-    internal class GraphPlan : IPlanner
+    public class StateSpaceSearchPlanner : IPlanner
     {
+        private readonly ICostStrategy costStrategy;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StateSpaceSearchPlanner"/> class.
+        /// </summary>
+        /// <param name="costStrategy">The cost strategy to use.</param>
+        public StateSpaceSearchPlanner(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
+
         /// <summary>
         /// Creates a (concretely-typed) planning task to work on solving a given problem.
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
-        /// <returns></returns>
-        public static GraphPlanPlanningTask CreatePlanningTask(Problem problem) => new(problem);
+        /// <returns>A new <see cref="StateSpaceSearchPlanningTask"/> instance.</returns>
+        public StateSpaceSearchPlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy);
 
         /// <inheritdoc />
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);

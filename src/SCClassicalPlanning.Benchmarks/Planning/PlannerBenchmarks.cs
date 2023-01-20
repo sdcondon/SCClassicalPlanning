@@ -102,13 +102,13 @@ namespace SCClassicalPlanning.Benchmarks.Planning
         [Benchmark]
         public Plan StateSpaceSearch()
         {
-            return new StateSpaceSearch(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
+            return new StateSpaceSearchPlanner(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
         public Plan GoalSpaceSearch()
         {
-            return new GoalSpaceSearch(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceSearchPlanner(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]

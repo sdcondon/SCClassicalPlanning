@@ -14,7 +14,7 @@
 namespace SCClassicalPlanning.Planning
 {
     /// <summary>
-    /// Base class for <see cref="IPlanningTask"/> implementations that are executable step-by-step.
+    /// Abstract base class for <see cref="IPlanningTask"/> implementations that are executable step-by-step.
     /// </summary>
     /// <typeparam name="TStepResult">The type of the result of each step. This type should be a container for information on what happened during the step.</typeparam>
     public abstract class SteppablePlanningTask<TStepResult> : IPlanningTask

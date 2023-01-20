@@ -11,7 +11,7 @@ using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.Planning.Search
 {
-    public static class GoalSpaceSearchTests
+    public static class GoalSpaceSearchPlannerTests
     {
         private record TestCase(Problem Problem, ICostStrategy Strategy, IKnowledgeBase InvariantsKB);
 
@@ -71,7 +71,7 @@ namespace SCClassicalPlanning.Planning.Search
             })
             .When((_, tc) =>
             {
-                var planner = new GoalSpaceSearch(tc.Strategy);
+                var planner = new GoalSpaceSearchPlanner(tc.Strategy);
                 return planner.CreatePlanAsync(tc.Problem).GetAwaiter().GetResult();
             })
             .ThenReturns()

@@ -22,7 +22,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
     /// <summary>
-    /// The implementation of <see cref="IPlanningTask"/> used by <see cref="GraphPlan"/>.
+    /// An implementation of <see cref="IPlanningTask"/> that uses the GraphPlan algorithm.
     /// </summary>
     public class GraphPlanPlanningTask : IPlanningTask
     {
@@ -31,7 +31,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         private bool isComplete;
         private Plan? result;
 
-        internal GraphPlanPlanningTask(Problem problem) => this.problem = problem;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GraphPlanPlanningTask"/> class.
+        /// </summary>
+        /// <param name="problem">The problem to solve.</param>
+        public GraphPlanPlanningTask(Problem problem) => this.problem = problem;
 
         /// <inheritdoc />
         public bool IsComplete => isComplete;

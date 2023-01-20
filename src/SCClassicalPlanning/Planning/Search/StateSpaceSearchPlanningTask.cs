@@ -19,7 +19,8 @@ using System.Collections;
 namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
-    /// The implementation of <see cref="IPlanningTask"/> used by <see cref="StateSpaceSearch"/>.
+    /// A concrete subclass of <see cref="SteppablePlanningTask{TStepResult}"/> that carries out
+    /// an A-star search of a problem's state space to create a plan.
     /// </summary>
     public class StateSpaceSearchPlanningTask : SteppablePlanningTask<(State, Action, State)>
     {
@@ -28,7 +29,12 @@ namespace SCClassicalPlanning.Planning.Search
         private bool isComplete;
         private Plan? result;
 
-        internal StateSpaceSearchPlanningTask(Problem problem, ICostStrategy costStrategy)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StateSpaceSearchPlanningTask"/> class.
+        /// </summary>
+        /// <param name="problem">The problem to solve.</param>
+        /// <param name="costStrategy">The cost strategy to use.</param>
+        public StateSpaceSearchPlanningTask(Problem problem, ICostStrategy costStrategy)
         {
             search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.InitialState),

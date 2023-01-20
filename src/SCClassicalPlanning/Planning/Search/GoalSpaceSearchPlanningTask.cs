@@ -19,7 +19,8 @@ using System.Collections;
 namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
-    /// The implementation of <see cref="IPlanningTask"/> used by <see cref="GoalSpaceSearch"/>.
+    /// A concrete subclass of <see cref="SteppablePlanningTask{TStepResult}"/> that carries out
+    /// an A-star search of a problem's goal space to create a plan.
     /// </summary>
     public class GoalSpaceSearchPlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
     {
@@ -28,7 +29,12 @@ namespace SCClassicalPlanning.Planning.Search
         private bool isComplete;
         private Plan? result;
 
-        internal GoalSpaceSearchPlanningTask(Problem problem, ICostStrategy costStrategy)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GoalSpaceSearchPlanningTask"/> class.
+        /// </summary>
+        /// <param name="problem">The problem to solve.</param>
+        /// <param name="costStrategy">The cost strategy to use.</param>
+        public GoalSpaceSearchPlanningTask(Problem problem, ICostStrategy costStrategy)
         {
             search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
                 source: new GoalSpaceNode(problem, problem.Goal),
