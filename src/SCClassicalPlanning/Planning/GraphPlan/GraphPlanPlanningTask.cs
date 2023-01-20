@@ -35,7 +35,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// Initializes a new instance of the <see cref="GraphPlanPlanningTask"/> class.
         /// </summary>
         /// <param name="problem">The problem to solve.</param>
-        public GraphPlanPlanningTask(Problem problem) => this.problem = problem;
+        public GraphPlanPlanningTask(Problem problem)
+        {
+            this.problem = problem;
+            PlanningGraph = new(problem);
+        }
 
         /// <inheritdoc />
         public bool IsComplete => isComplete;
@@ -63,6 +67,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
         }
 
+        /// <summary>
+        /// Gets the planning graph used by this planning task.
+        /// </summary>
+        public PlanningGraph PlanningGraph { get; }
+
         /// <inheritdoc />
         public async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
         {
@@ -70,13 +79,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var goalElementsPresentAndNonMutex = false;
             var noGoodsLevelledOff = false;
 
-            // First, create a planning graph.
-            var graph = new PlanningGraph(problem);
-
             // Iterate through the levels of the planning graph, and for each..
             for (int i = 0; ; i++)
             {
-                var graphLevel = graph.GetLevel(i);
+                var graphLevel = PlanningGraph.GetLevel(i);
 
                 // ..check if all of the goal's elements occur at this level, with no pair mutually exclusive. If so..
                 // (NB: we don't need to keep checking this once its true for a level - because mutexes decrease monotonically)
@@ -96,13 +102,20 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
 
                 // If we haven't managed to extract a solution, and both the graph and no-goods have levelled off, we fail.
-                if (graph.IsLevelledOff && noGoodsLevelledOff)
+                if (PlanningGraph.IsLevelledOff && noGoodsLevelledOff)
                 {
                     result = null;
                     isComplete = true;
                     throw new InvalidOperationException("Plan creation failed");
                 }
             }
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            // Nothing to do
+            GC.SuppressFinalize(this);
         }
 
         private bool TryExtractSolution(
@@ -125,8 +138,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 var actions = search
                     .PathFromTarget()
                     .SelectMany(e => e.Actions)
-                    .Where(a => !a.Identifier.Equals(PlanningGraph.PersistenceActionIdentifier))
-                    .ToList();
+                    .Where(a => !a.Identifier.Equals(PlanningGraph.PersistenceActionIdentifier));
 
                 plan = new Plan(actions);
                 return true;
@@ -136,13 +148,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 plan = null;
                 return false;
             }
-        }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            // Nothing to do
-            GC.SuppressFinalize(this);
         }
 
         private record struct SearchState(int Level, Goal Goal);
