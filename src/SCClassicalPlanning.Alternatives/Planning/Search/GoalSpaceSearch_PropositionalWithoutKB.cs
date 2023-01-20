@@ -24,9 +24,6 @@ namespace SCClassicalPlanning.Planning.Search
     /// the goal space to create plans.
     /// </para>
     /// <para>
-    /// See §10.2.2 of "Artificial Intelligence: A Modern Approach" for more on this.
-    /// </para>
-    /// <para>
     /// Differs from the library version in that it is completely propositional - variables are expanded
     /// out to every possible value whenever they occur. This is obviously suboptimal from a performance perspective.
     /// </para>

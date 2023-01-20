@@ -20,13 +20,8 @@ using System.Collections;
 namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
-    /// <para>
     /// A simple implementation of <see cref="IPlanner"/> that carries out an A-star search of
     /// the goal space to create plans.
-    /// </para>
-    /// <para>
-    /// See §10.2.2 of "Artificial Intelligence: A Modern Approach" for more on this.
-    /// </para>
     /// </summary>
     public class GoalSpaceSearch_PropositionalWithKB : IPlanner
     {
