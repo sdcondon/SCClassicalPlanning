@@ -15,7 +15,7 @@ namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
     /// <para>
-    /// Interface for state/goal-space search strategy implementations.
+    /// Interface for state/goal-space search cost strategy implementations.
     /// </para>
     /// <para>
     /// Implementations of this interface provide the "cost" (whatever that means in the context of the

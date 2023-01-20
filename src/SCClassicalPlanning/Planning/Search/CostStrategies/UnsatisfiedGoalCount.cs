@@ -23,9 +23,9 @@ namespace SCClassicalPlanning.Planning.Search.CostStrategies
     /// </para>
     /// <para>
     /// This is generally a pretty terrible heuristic - as are all heuristics that don't take into account the details of the
-    /// problem being solved. Consider using something else. DEFINITELY use something else for backward state space searches.
+    /// problem being solved. Consider using something else. DEFINITELY use something else for goal space searches.
     /// One of the things that this heuristic simply can't do is tell when preconditions are unsatisfiable - which is very bad 
-    /// news for a backward state space search, because you rely on being able to do this to prune branches.
+    /// news for a goal space search, because you rely on being able to do this to prune branches.
     /// </para>
     /// </summary>
     public class UnsatisfiedGoalCount : ICostStrategy
