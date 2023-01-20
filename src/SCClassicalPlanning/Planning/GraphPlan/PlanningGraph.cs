@@ -158,51 +158,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         ////    return actionLevels[Math.Min(index, LevelledOffAtLevel ?? int.MaxValue)];
         ////}
 
-        private static IEnumerable<Action> GetApplicableActions(Problem problem, IEnumerable<Literal> possiblePropositions)
-        {
-            // Local method to (recursively) match a set of (remaining) goal elements to the given state.
-            // goalElements: The remaining elements of the goal to be matched
-            // unifier: The VariableSubstitution established so far (by matching earlier goal elements)
-            // returns: An enumerable of VariableSubstitutions that can be applied to the goal elements to make them satisfied by the given state
-            IEnumerable<VariableSubstitution> MatchWithState(IEnumerable<Literal> goalElements, VariableSubstitution unifier)
-            {
-                if (!goalElements.Any())
-                {
-                    yield return unifier;
-                }
-                else
-                {
-                    // Here we iterate through ALL possible propositions, trying to find unifications with the goal element.
-                    // For each unification found, we then recurse for the rest of the elements of the goal.
-                    foreach (var proposition in possiblePropositions)
-                    {
-                        var firstGoalElementUnifier = new VariableSubstitution(unifier);
-
-                        if (LiteralUnifier.TryUpdateUnsafe(proposition, goalElements.First(), firstGoalElementUnifier))
-                        {
-                            foreach (var restOfGoalElementsUnifier in MatchWithState(goalElements.Skip(1), firstGoalElementUnifier))
-                            {
-                                yield return restOfGoalElementsUnifier;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // The overall task to be accomplished here is to find (action schema, variable substitution) pairings such that
-            // some subset of the possible propositions satisfy the action precondition (after the variable substitution is
-            // applied to it). First, we iterate the action schemas:
-            foreach (var actionSchema in problem.Domain.Actions)
-            {
-                // For each, we try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
-                foreach (var substitution in MatchWithState(actionSchema.Precondition.Elements, new VariableSubstitution()))
-                {
-                    // For each substitution, apply it to the action schema and return it:
-                    yield return new VariableSubstitutionActionTransformation(substitution).ApplyTo(actionSchema);
-                }
-            }
-        }
-
         private void MakeNextLevel()
         {
             var currentPropositionLevel = propositionLevels[expandedToLevel];
@@ -345,6 +300,51 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 actionLevels.Add(newActionLevel);
                 propositionLevels.Add(new(this, expandedToLevel + 1, newPropositionLevel, propositionLevels[expandedToLevel]));
                 expandedToLevel++;
+            }
+        }
+
+        private static IEnumerable<Action> GetApplicableActions(Problem problem, IEnumerable<Literal> possiblePropositions)
+        {
+            // Local method to (recursively) match a set of (remaining) goal elements to the given state.
+            // goalElements: The remaining elements of the goal to be matched
+            // unifier: The VariableSubstitution established so far (by matching earlier goal elements)
+            // returns: An enumerable of VariableSubstitutions that can be applied to the goal elements to make them satisfied by the given state
+            IEnumerable<VariableSubstitution> MatchWithState(IEnumerable<Literal> goalElements, VariableSubstitution unifier)
+            {
+                if (!goalElements.Any())
+                {
+                    yield return unifier;
+                }
+                else
+                {
+                    // Here we iterate through ALL possible propositions, trying to find unifications with the goal element.
+                    // For each unification found, we then recurse for the rest of the elements of the goal.
+                    foreach (var proposition in possiblePropositions)
+                    {
+                        var firstGoalElementUnifier = new VariableSubstitution(unifier);
+
+                        if (LiteralUnifier.TryUpdateUnsafe(proposition, goalElements.First(), firstGoalElementUnifier))
+                        {
+                            foreach (var restOfGoalElementsUnifier in MatchWithState(goalElements.Skip(1), firstGoalElementUnifier))
+                            {
+                                yield return restOfGoalElementsUnifier;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // The overall task to be accomplished here is to find (action schema, variable substitution) pairings such that
+            // some subset of the possible propositions satisfy the action precondition (after the variable substitution is
+            // applied to it). First, we iterate the action schemas:
+            foreach (var actionSchema in problem.Domain.Actions)
+            {
+                // For each, we try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
+                foreach (var substitution in MatchWithState(actionSchema.Precondition.Elements, new VariableSubstitution()))
+                {
+                    // For each substitution, apply it to the action schema and return it:
+                    yield return new VariableSubstitutionActionTransformation(substitution).ApplyTo(actionSchema);
+                }
             }
         }
 
