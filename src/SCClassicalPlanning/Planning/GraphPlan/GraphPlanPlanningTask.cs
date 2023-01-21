@@ -24,7 +24,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// <summary>
     /// An implementation of <see cref="IPlanningTask"/> that uses the GraphPlan algorithm.
     /// </summary>
-    public class GraphPlanPlanningTask : IPlanningTask
+    internal class GraphPlanPlanningTask : IPlanningTask
     {
         private readonly Problem problem;
 
@@ -102,7 +102,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
 
                 // If we haven't managed to extract a solution, and both the graph and no-goods have levelled off, we fail.
-                if (PlanningGraph.IsLevelledOff && noGoodsLevelledOff)
+                if (graphLevel.IsLevelledOff && noGoodsLevelledOff)
                 {
                     result = null;
                     isComplete = true;

@@ -16,8 +16,6 @@ using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
@@ -34,13 +32,15 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <summary>
         /// The identifier used for the persistence actions in <see cref="PlanningGraph"/> instances.
         /// </summary>
+        // TODO: this identifier is not guaranteed to be unique.
         public const string PersistenceActionIdentifier = "NOOP";
 
         private readonly Problem problem;
-        private readonly List<PlanningGraphLevel> propositionLevels = new();
+        private readonly List<Dictionary<Literal, PlanningGraphPropositionNode>> propositionLevels = new();
         private readonly List<Dictionary<Action, PlanningGraphActionNode>> actionLevels = new();
 
         private int expandedToLevel = 0;
+        private int? levelsOffAtLevel = null;
 
         /// <summary>
         /// Initialises a new instance of the <see cref="PlanningGraph"/> class.
@@ -66,22 +66,22 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
             }
 
-            propositionLevels.Add(new(this, 0, propositionLevel0, null));
+            propositionLevels.Add(propositionLevel0);
         }
 
         /// <summary>
-        /// Gets a value indicating whether the graph has levelled off
-        /// (that is, whether a <see cref="GetLevel"/> call has been made with an index that is at or past
-        /// the level at which the graph levels off - thus populating <see cref="LevelledOffAtLevel"/>).
+        /// Gets the index of the level at which the graph levels off. This is the index
+        /// of the last distinct level, after which all further levels are identical.
+        /// Implicitly fully expands the graph if it isn't already.
         /// </summary>
-        public bool IsLevelledOff => LevelledOffAtLevel.HasValue;
-
-        /// <summary>
-        /// Gets the level at which the graph levelled off - or null if the graph has not yet levelled off
-        /// (that is, if no <see cref="GetLevel"/> call has yet been made with an index that is at or past
-        /// the level at which the graph levels off).
-        /// </summary>
-        public int? LevelledOffAtLevel { get; private set; } = null;
+        public int LevelsOffAtLevel
+        {
+            get
+            {
+                FullyExpand();
+                return levelsOffAtLevel!.Value;
+            }
+        }
 
         /// <summary>
         /// Gets the level at which a given proposition first occurs.
@@ -94,7 +94,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var level = 0;
             while (!GetLevel(level).Contains(proposition))
             {
-                if (level == LevelledOffAtLevel)
+                if (level == levelsOffAtLevel)
                 {
                     return -1;
                 }
@@ -116,7 +116,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var level = 0;
             while (!GetLevel(level).ContainsNonMutex(propositions))
             {
-                if (level == LevelledOffAtLevel)
+                if (level == levelsOffAtLevel)
                 {
                     return -1;
                 }
@@ -135,22 +135,38 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <returns>An object representing the level.</returns>
         public PlanningGraphLevel GetLevel(int index)
         {
-            while (expandedToLevel < index && !IsLevelledOff)
+            while (expandedToLevel < index && !levelsOffAtLevel.HasValue)
             {
                 MakeNextLevel();
             }
 
-            // TODO-BUG-CRITICAL: by returning the actual earlier level, we break GraphPlan
-            // - specifically, the of tracking nogoods. We need to use (the same content but)
-            // the requested index and previous reference etc - so that graphplan can tell when nogoods level off.
-            // At the same time, its probably worth adding some "is levelled off" props to the PlanningGraphLevel type?
-            // We probably want a level struct, separate to level content? Or just referring to the last real content..?
-            return propositionLevels[Math.Min(index, LevelledOffAtLevel ?? int.MaxValue)];
+            return new(this, index);
+        }
+
+        /// <summary>
+        /// Fully expands the graph to the point at which it levels off - ensuring that future calls to <see cref="GetLevel"/> will be fast.
+        /// </summary>
+        public void FullyExpand()
+        {
+            while (!levelsOffAtLevel.HasValue)
+            {
+                MakeNextLevel();
+            }
+        }
+
+        internal IReadOnlyDictionary<Literal, PlanningGraphPropositionNode> GetNodesByProposition(int levelIndex)
+        {
+            return propositionLevels[Math.Min(levelIndex, levelsOffAtLevel ?? int.MaxValue)];
+        }
+
+        internal bool IsLevelledOff(int levelIndex)
+        {
+            return levelIndex > levelsOffAtLevel;
         }
 
         private void MakeNextLevel()
         {
-            var currentPropositionLevel = propositionLevels[expandedToLevel];
+            var currentPropositionLevel = new PlanningGraphLevel(this, expandedToLevel);
 
             var newActionLevel = new Dictionary<Action, PlanningGraphActionNode>();
             var newPropositionLevel = new Dictionary<Literal, PlanningGraphPropositionNode>();
@@ -283,12 +299,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             if (!changesOccured)
             {
-                LevelledOffAtLevel = expandedToLevel;
+                levelsOffAtLevel = expandedToLevel;
             }
             else
             {
                 actionLevels.Add(newActionLevel);
-                propositionLevels.Add(new(this, expandedToLevel + 1, newPropositionLevel, propositionLevels[expandedToLevel]));
+                propositionLevels.Add(newPropositionLevel);
                 expandedToLevel++;
             }
         }
@@ -338,7 +354,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
         }
 
-        // TODO: this identifier is not guaranteed to be unique.
         // NB: while an EMPTY goal and effect would at first glance seem to be intuitive - it is
         // defined like this to assist with mutex creation, and because of the idiosyncracies of
         // plan extraction in GraphPlan. Still feels awkward to me, but meh, never mind.
