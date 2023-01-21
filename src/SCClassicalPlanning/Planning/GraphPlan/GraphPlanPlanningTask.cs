@@ -311,6 +311,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         // gracefully make note of no-goods. Raises questions of whether we
         // should bother with SCGraphTheory's abstractions, but meh, lets
         // keep them for now.
+        //
+        // TODO: this design is the worst of both worlds. If we're not going to use one of SCGraphTheorySearch's
+        // DFS classes, I strongly suspect that just making solution extraction recursive would be much cleaner.
         private class SolutionExtractionDFS
         {
             private readonly SearchNode source;
