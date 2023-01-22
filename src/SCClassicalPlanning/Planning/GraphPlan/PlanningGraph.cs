@@ -71,8 +71,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         /// <summary>
         /// Gets the index of the level at which the graph levels off. This is the index
-        /// of the last distinct level, after which all further levels are identical.
-        /// Implicitly fully expands the graph if it isn't already.
+        /// of the last level that differs from the one before, after which all further 
+        /// levels are identical. Implicitly fully expands the graph if it isn't already.
         /// </summary>
         public int LevelsOffAtLevel
         {
@@ -129,7 +129,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         /// <summary>
         /// Retrieves an object representing a particular (proposition) level within the graph. Expands the graph to this level if necessary.
-        /// If the graph levels off before the requested level, returns the level at which the graph levels off.
         /// </summary>
         /// <param name="index">The index of the level to retrieve.</param>
         /// <returns>An object representing the level.</returns>
@@ -167,7 +166,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         private void MakeNextLevel()
         {
             var currentPropositionLevel = new PlanningGraphLevel(this, expandedToLevel);
-
             var newActionLevel = new Dictionary<Action, PlanningGraphActionNode>();
             var newPropositionLevel = new Dictionary<Literal, PlanningGraphPropositionNode>();
             var changesOccured = false;

@@ -16,7 +16,16 @@ using SCFirstOrderLogic;
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
     /// <summary>
+    /// <para>
     /// Representation of a (proposition) level within a planning graph.
+    /// </para>
+    /// <para>
+    /// NB: this is a struct rather than a class ultimately to protect against
+    /// needless consumption of heap memory. Once a graph has levelled off,
+    /// we shouldn't need to allocate anything else on the heap, regardless of
+    /// how many "levels" we need to retrieve beyond that (in e.g. GraphPlan). 
+    /// This is easy to accomplish by making this type a struct.
+    /// </para>
     /// </summary>
     public readonly struct PlanningGraphLevel
     {
@@ -56,8 +65,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         public IEnumerable<PlanningGraphPropositionNode> Nodes => NodesByProposition.Values;
 
         /// <summary>
-        /// Gets a value indicating whether this level is after the point at which the graph levels off.
-        /// That is, whether it is identical to the previous level.
+        /// Gets a value indicating whether this level is (strictly) after the point at which
+        /// the graph levels off. That is, whether it is identical to the previous level.
         /// </summary>
         public bool IsLevelledOff => Graph.IsLevelledOff(Index);
 

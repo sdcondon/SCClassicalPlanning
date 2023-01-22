@@ -55,6 +55,7 @@ namespace SCClassicalPlanning
         // TODO-EXTENSIBILITY: Problematic.. Large state? IO? Fairly big deal because could have significant impact.
         // Would just making State abstract or interface suffice?
         // Or would we want state and state storage separately?
+        // Also worth bearing in mind that our Problem.Constants could also be large.
         // Explore this. Later (prob last thing before v1 - want a 'complete' solution before looking at refactoring and abstractions).
         public Problem(Domain domain, State initialState, Goal goal, IEnumerable<Constant> additionalConstants)
         {
