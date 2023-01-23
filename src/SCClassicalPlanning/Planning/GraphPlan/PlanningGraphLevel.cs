@@ -19,14 +19,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// <para>
     /// Representation of a (proposition) level within a planning graph.
     /// </para>
-    /// <para>
-    /// NB: this is a struct rather than a class ultimately to protect against
-    /// needless consumption of heap memory. Once a graph has levelled off,
-    /// we shouldn't need to allocate anything else on the heap, regardless of
-    /// how many "levels" we need to retrieve beyond that (in e.g. GraphPlan). 
-    /// This is easy to accomplish by making this type a struct.
-    /// </para>
     /// </summary>
+    // NB: this is a struct rather than a class ultimately to protect against
+    // needless consumption of heap memory. Once a graph has levelled off,
+    // we shouldn't need to allocate anything else on the heap, regardless of
+    // how many "levels" we need to retrieve beyond that (in e.g. GraphPlan). 
+    // This is easy to accomplish by making this type a struct.
     public readonly struct PlanningGraphLevel
     {
         internal PlanningGraphLevel(PlanningGraph graph, int index) => (Graph, Index) = (graph, index);
