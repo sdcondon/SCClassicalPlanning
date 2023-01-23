@@ -9,6 +9,6 @@ Here is a quick overview of the namespaces found within this library. Reading th
       * **`Strategies`:** contains strategy implementations for use by search planners.
     * **`Utilities`:** contains useful common logic for planners to make use of. For example, logic for the retrieval of applicable and relevant actions.
   * **`ProblemCreation`:** contains types that assist with the creation of problems and their constituent elements.
-  * **`ProblemManipulation`:** contains types to assist with the manipulation of problems and their consituent elements.
+  * **`ProblemManipulation`:** contains types to assist with the manipulation of problems and their constituent elements.
 
 For a full type and member listing, the recommendation is to use the [FuGet package explorer](https://www.fuget.org/packages/SCClassicalPlanning/) - though going through [getting started](getting-started.md) first is probably a good idea, if you haven't already.
