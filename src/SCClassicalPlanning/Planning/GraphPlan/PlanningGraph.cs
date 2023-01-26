@@ -27,6 +27,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// NB: Lazily populated - levels will be created as they are called for.
     /// </para>
     /// </summary>
+    // TODO: Should probably implement IEnumerable<IPlanningGraphLevel>? Or have at least have a Levels prop?
+    // Or perhaps even IReadOnlyList<PlanningGraphLevel> - though Count is effectively infinite..
     public class PlanningGraph
     {
         /// <summary>
@@ -309,11 +311,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private static IEnumerable<Action> GetApplicableActions(Problem problem, IEnumerable<Literal> possiblePropositions)
         {
-            // Local method to (recursively) match a set of (remaining) goal elements to the given state.
+            // Local method to (recursively) match a set of (remaining) goal elements to the possiblePropositions.
             // goalElements: The remaining elements of the goal to be matched
             // unifier: The VariableSubstitution established so far (by matching earlier goal elements)
-            // returns: An enumerable of VariableSubstitutions that can be applied to the goal elements to make them satisfied by the given state
-            IEnumerable<VariableSubstitution> MatchWithState(IEnumerable<Literal> goalElements, VariableSubstitution unifier)
+            // returns: An enumerable of VariableSubstitutions that can be applied to the goal elements to make them match some subset of the possiblePropositions
+            IEnumerable<VariableSubstitution> MatchWithPossiblePropositions(IEnumerable<Literal> goalElements, VariableSubstitution unifier)
             {
                 if (!goalElements.Any())
                 {
@@ -329,7 +331,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
                         if (LiteralUnifier.TryUpdateUnsafe(proposition, goalElements.First(), firstGoalElementUnifier))
                         {
-                            foreach (var restOfGoalElementsUnifier in MatchWithState(goalElements.Skip(1), firstGoalElementUnifier))
+                            foreach (var restOfGoalElementsUnifier in MatchWithPossiblePropositions(goalElements.Skip(1), firstGoalElementUnifier))
                             {
                                 yield return restOfGoalElementsUnifier;
                             }
@@ -339,12 +341,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
 
             // The overall task to be accomplished here is to find (action schema, variable substitution) pairings such that
-            // some subset of the possible propositions satisfy the action precondition (after the variable substitution is
+            // some subset of the possible propositions matches the action precondition (after the variable substitution is
             // applied to it). First, we iterate the action schemas:
             foreach (var actionSchema in problem.Domain.Actions)
             {
                 // For each, we try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
-                foreach (var substitution in MatchWithState(actionSchema.Precondition.Elements, new VariableSubstitution()))
+                foreach (var substitution in MatchWithPossiblePropositions(actionSchema.Precondition.Elements, new VariableSubstitution()))
                 {
                     // For each substitution, apply it to the action schema and return it:
                     yield return new VariableSubstitutionActionTransformation(substitution).ApplyTo(actionSchema);
