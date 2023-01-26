@@ -165,6 +165,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             return levelIndex > levelsOffAtLevel;
         }
 
+        // TODO: a fair amount of refactoring to be done here..
         private void MakeNextLevel()
         {
             var currentPropositionLevel = new PlanningGraphLevel(this, expandedToLevel);
@@ -173,7 +174,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var changesOccured = false;
 
             // Iterate all those applicable actions - ultimately to build the next action and proposition layers.
-            foreach (var action in GetApplicableActions(problem, currentPropositionLevel.Propositions))
+            foreach (var action in GetPossiblyApplicableActions(problem, currentPropositionLevel.Propositions))
             {
                 // Add an action node to the new action layer:
                 var actionNode = newActionLevel[action] = new PlanningGraphActionNode(action);
@@ -226,6 +227,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 var action = MakePersistenceAction(proposition);
                 var actionNode = newActionLevel[action] = new PlanningGraphActionNode(action);
                 propositionNode.Actions.Add(actionNode);
+                actionNode.Preconditions.Add(propositionNode);
 
                 // Make a note if this action isn't in the current layer - it means that the graph hasn't levelled off yet:
                 // NB: ..because looking at the propositions isn't enough - different actions could lead to the same
@@ -309,7 +311,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
         }
 
-        private static IEnumerable<Action> GetApplicableActions(Problem problem, IEnumerable<Literal> possiblePropositions)
+        private static IEnumerable<Action> GetPossiblyApplicableActions(Problem problem, IEnumerable<Literal> possiblePropositions)
         {
             // Local method to (recursively) match a set of (remaining) goal elements to the possiblePropositions.
             // goalElements: The remaining elements of the goal to be matched
