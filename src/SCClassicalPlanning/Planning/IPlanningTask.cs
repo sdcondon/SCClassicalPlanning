@@ -23,9 +23,11 @@ namespace SCClassicalPlanning.Planning
     /// (see <see cref="SteppablePlanningTask{TStepResult}"/>) and result explanations.
     /// </para>
     /// </summary>
-    // TODO: Not 100% happy with the design, here. Can't help but think it should have a Start() method instead of an execute
-    // (and the CancellationToken should be CreatePlanningTask's problem..). In so doing, it'd echo the API of Tasks a little
-    // more. Maybe experiment at some point (obv a breaking change).
+    // TODO: Not 100% happy with the design, here. Can't help but think it should have Start() and a GetAwaiter() instead of ExecuteAsync
+    // (and the CancellationToken should be CreatePlanningTask's problem). In so doing, it'd echo the API of Tasks a little
+    // more, and by eliminating the cancellation token from here, we remove any possible awkwardness of ExecuteAsync being called
+    // multiple times with different CTs, making it simpler to handle multiple threads trying to interact with the task (even though,
+    // yeah, thats not a very likely scenario). Maybe experiment at some point (obv a breaking change).
     public interface IPlanningTask : IDisposable
     {
         /// <summary>
