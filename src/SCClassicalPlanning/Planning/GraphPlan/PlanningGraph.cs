@@ -27,7 +27,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// NB: Lazily populated - levels will be created as they are called for.
     /// </para>
     /// </summary>
-    // TODO: Should probably implement IEnumerable<IPlanningGraphLevel>? Or have at least have a Levels prop?
+    // TODO: Should probably implement IEnumerable<IPlanningGraphLevel>? Or at least have a Levels prop?
     // Or perhaps even IReadOnlyList<PlanningGraphLevel> - though Count is effectively infinite..
     public class PlanningGraph
     {
@@ -165,7 +165,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             return levelIndex > levelsOffAtLevel;
         }
 
-        // TODO: a fair amount of refactoring to be done here..
+        // TODO-V1: a fair amount of refactoring to be done here..
         private void MakeNextLevel()
         {
             var currentPropositionLevel = new PlanningGraphLevel(this, expandedToLevel);
@@ -173,13 +173,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var newPropositionLevel = new Dictionary<Literal, PlanningGraphPropositionNode>();
             var changesOccured = false;
 
-            // Iterate all those applicable actions - ultimately to build the next action and proposition layers.
+            // Iterate all the possibly applicable actions - ultimately to build the next action and proposition layers.
             foreach (var action in GetPossiblyApplicableActions(problem, currentPropositionLevel.Propositions))
             {
-                // Add an action node to the new action layer:
+                // Add an action node to the new action layer, and link all of its preconditions to it:
                 var actionNode = newActionLevel[action] = new PlanningGraphActionNode(action);
-
-                // Link all of the preconditions to the new action node:
                 foreach (var preconditionElement in action.Precondition.Elements)
                 {
                     var preconditionElementNode = currentPropositionLevel.NodesByProposition[preconditionElement];
@@ -195,7 +193,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     changesOccured = true;
                 }
 
-                // Iterate all of the action's effect elements to build the next proposition layer:
+                // Iterate all of the action's effect elements, and add them to the next proposition layer (if they aren't already there):
                 foreach (var effectElement in action.Effect.Elements)
                 {
                     // Multiple actions can of course have the same effect elements, and we don't want duplicate proposition nodes -

@@ -14,8 +14,13 @@
 namespace SCClassicalPlanning.Planning
 {
     /// <summary>
-    /// Interface for types that can create <see cref="Plan"/>s for given <see cref="Problem"/>s
-    /// (via <see cref="IPlanningTask"/> instances, which allow for fine-grained and/or interrogable plan creation processes).
+    /// <para>
+    /// Interface for types that can create <see cref="Plan"/>s for given <see cref="Problem"/>s - 
+    /// via <see cref="IPlanningTask"/> instances, which allow for fine-grained and/or interrogable plan creation processes.
+    /// </para>
+    /// <para>
+    /// Essentially, defines an abstract factory for <see cref="IPlanningTask"/> instances. 
+    /// </para>
     /// </summary>
     public interface IPlanner
     {

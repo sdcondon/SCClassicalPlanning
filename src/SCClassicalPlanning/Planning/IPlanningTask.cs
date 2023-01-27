@@ -23,8 +23,9 @@ namespace SCClassicalPlanning.Planning
     /// (see <see cref="SteppablePlanningTask{TStepResult}"/>) and result explanations.
     /// </para>
     /// </summary>
-    // TODO: Not 100% happy with the design, here. Can't help but think it should have a Task property, and have a Start() method.
-    // In so doing, it'd echo the API of Tasks a little more. Maybe experiment at some point (obv a breaking change).
+    // TODO: Not 100% happy with the design, here. Can't help but think it should have a Start() method instead of an execute
+    // (and the CancellationToken should be CreatePlanningTask's problem..). In so doing, it'd echo the API of Tasks a little
+    // more. Maybe experiment at some point (obv a breaking change).
     public interface IPlanningTask : IDisposable
     {
         /// <summary>
@@ -39,7 +40,7 @@ namespace SCClassicalPlanning.Planning
         bool IsSucceeded { get; }
 
         /// <summary>
-        /// Gets a value indicating the result of the task.
+        /// Gets the created plan. Should throw an <see cref="InvalidOperationException"/> if the task is not yet complete or failed to create a plan.
         /// </summary>
         /// <exception cref="InvalidOperationException">The task is not yet complete or failed to create a plan.</exception>
         Plan Result { get; }
