@@ -27,7 +27,8 @@ namespace SCClassicalPlanning.Planning
     // (and the CancellationToken should be CreatePlanningTask's problem). In so doing, it'd echo the API of Tasks a little
     // more, and by eliminating the cancellation token from here, we remove any possible awkwardness of ExecuteAsync being called
     // multiple times with different CTs, making it simpler to handle multiple threads trying to interact with the task (even though,
-    // yeah, thats not a very likely scenario). Maybe experiment at some point (obv a breaking change).
+    // yeah, thats not a very likely scenario). Then again, Task.Start simply throws if called more than once.
+    // Maybe experiment at some point (obv a breaking change).
     public interface IPlanningTask : IDisposable
     {
         /// <summary>
