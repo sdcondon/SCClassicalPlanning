@@ -16,7 +16,7 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning.Planning
 {
     /// <summary>
-    /// Container for a plan of action - essentially just a list of steps.
+    /// Container for a (totally-ordered) plan of action - essentially just a list of steps.
     /// </summary>
     public class Plan
     {
@@ -25,6 +25,11 @@ namespace SCClassicalPlanning.Planning
         /// </summary>
         /// <param name="steps">The actions that comprise the plan.</param>
         public Plan(IEnumerable<Action> steps) => Steps = steps.ToImmutableList();
+
+        /// <summary>
+        /// Gets a singleton instance of an empty plan;
+        /// </summary>
+        public static Plan Empty { get; } = new Plan(Array.Empty<Action>());
 
         /// <summary>
         /// Gets the steps of the plan.

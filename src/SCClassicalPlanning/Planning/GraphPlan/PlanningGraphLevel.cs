@@ -53,6 +53,14 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         }
 
         /// <summary>
+        /// Gets the next level of the graph.
+        /// </summary>
+        public PlanningGraphLevel NextLevel
+        {
+            get => Graph.GetLevel(Index + 1);
+        }
+
+        /// <summary>
         /// Gets an enumerable of the propositions in this level.
         /// </summary>
         public IEnumerable<Literal> Propositions => NodesByProposition.Keys;
