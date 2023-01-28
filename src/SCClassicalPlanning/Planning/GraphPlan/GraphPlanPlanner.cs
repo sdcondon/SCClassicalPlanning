@@ -14,12 +14,7 @@
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
     /// <summary>
-    /// <para>
-    /// An implementation of <see cref="IPlanner"/> that uses the GraphPlan algorithm.
-    /// </para>
-    /// <para>
-    /// Extracts solutions via a backward search.
-    /// </para>
+    /// An implementation of <see cref="IPlanner"/> that uses <see cref="GraphPlanPlanningTask"/> instances.
     /// </summary>
     internal class GraphPlanPlanner : IPlanner
     {

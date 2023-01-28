@@ -15,8 +15,7 @@
 namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
-    /// A simple implementation of <see cref="IPlanner"/> that carries out
-    /// an A-star search of the state space to create plans.
+    /// An implementation of <see cref="IPlanner"/> that uses <see cref="StateSpaceSearchPlanningTask"/> instances.
     /// </summary>
     public class StateSpaceSearchPlanner : IPlanner
     {
