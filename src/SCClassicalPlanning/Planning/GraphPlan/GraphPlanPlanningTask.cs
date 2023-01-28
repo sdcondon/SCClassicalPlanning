@@ -46,11 +46,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         // TODO: should probably expose NoGoods - just need to make it read-only.
 
         /// <inheritdoc/>
-        public override Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
+        public override async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
         {
             // Starting from the first level of the graph, step forward through the
             // levels until all goal elements are present and pairwise non-mutex, or the graph
-            // has levelled off:
+            // has levelled off (initialising the no-goods table HashSets as we go):
             var currentGraphLevel = PlanningGraph.GetLevel(0);
             while (!currentGraphLevel.ContainsNonMutex(problem.Goal.Elements) && !currentGraphLevel.IsLevelledOff)
             {
@@ -65,35 +65,33 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 throw new InvalidOperationException("Problem is unsolvable");
             }
 
-            // Try to extract a plan ending at the current level.
-            var plan = Extract(problem.Goal, currentGraphLevel);
-            var lastNoGoodCount = currentGraphLevel.IsLevelledOff ? noGoods[currentGraphLevel.Index].Count : 0;
-
-            // While we couldn't extract a plan, step forward through the
-            // levels and retry. Fail if we get to a point where both the
-            // graph and the nogoods have levelled off.
-            // (Yes, in C# this could probably be made more succinct with a do-while, but
-            // we're sticking to the book listing as closely as possible here).
-            while (plan == null)
+            // Attempt to extract a plan until we succeed - stepping forward through
+            // the levels on each attempt. Fail if we get to a point where both the
+            // graph and the no-goods have levelled off.
+            Plan? plan;
+            var lastNoGoodCount = 0;
+            do
             {
-                currentGraphLevel = currentGraphLevel.NextLevel;
-                noGoods[currentGraphLevel.Index] = new();
-
                 plan = Extract(problem.Goal, currentGraphLevel);
-                if (plan == null && currentGraphLevel.IsLevelledOff)
+
+                if (plan == null)
                 {
-                    if (lastNoGoodCount == noGoods[currentGraphLevel.Index].Count)
+                    var currentNoGoodCount = noGoods[currentGraphLevel.Index].Count;
+
+                    if (currentGraphLevel.IsLevelledOff && lastNoGoodCount == currentNoGoodCount)
                     {
                         throw new InvalidOperationException("Problem is unsolvable");
                     }
-                    else
-                    {
-                        lastNoGoodCount = noGoods[currentGraphLevel.Index].Count;
-                    }
+
+                    lastNoGoodCount = currentNoGoodCount;
+                    currentGraphLevel = currentGraphLevel.NextLevel;
+                    noGoods[currentGraphLevel.Index] = new();
+                    await Task.Yield(); // just until such time as e.g. States can include async stuff..
                 }
             }
+            while (plan == null);
 
-            return Task.FromResult(plan);
+            return plan;
         }
 
         public override void Dispose()
@@ -121,7 +119,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 return null;
             }
 
-            // Otherwise, try to find a plan via the recursive GPSearch method:
+            // Otherwise, try to find a plan using the (recursive) GPSearch method:
             Plan? plan = GPSearch(
                 remainingGoalElements: SortGoalElements(goal, level),
                 chosenActionNodes: Enumerable.Empty<PlanningGraphActionNode>(),
@@ -147,14 +145,14 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // There are no remaining uncovered goal elements at this level. That is, we've
                 // found a set of (non-mutually-exclusive) actions, the collective effects of which
                 // cover our goal.
-                // Now we call TryExtract with the previous level and all of the preconditions of our chosen actions.
-                // If that manages to return a plan, append our chosen actions to it and return.
+                // Now we call Extract with the previous level and all of the preconditions of our chosen actions.
                 var plan = Extract(
                     goal: new Goal(chosenActionNodes.SelectMany(n => n.Action.Precondition.Elements)),
                     level: level.PreviousLevel);
 
-                // If a plan was successfully for the prior level, append the chosen actions at this level to the plan returned.
-                // If no plan could be found for the prior level, return failure.
+                // If Extract found a plan for the prior level and goal, append our chosen actions to it
+                // (omitting any persistence actions) and return the result. If no plan could be found
+                // for the prior level, return failure.
                 if (plan != null)
                 {
                     return new Plan(plan.Steps
@@ -171,26 +169,13 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // There are still goal elements to be covered.
                 // Try to cover the first goal element (any others covered by the same action are a bonus),
                 // then recurse for the other actions and remaining uncovered goal elements.
-                bool IsNonMutexWithChosenActions(PlanningGraphActionNode actionNode)
-                {
-                    foreach (var selectedActionNode in chosenActionNodes)
-                    {
-                        if (actionNode.Mutexes.Any(m => m.Action.Equals(selectedActionNode.Action)))
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                }
-
                 var firstRemainingGoalElement = remainingGoalElements.First();
 
                 foreach (var actionNode in GetRelevantActions(remainingGoalElements, level))
                 {
-                    if (actionNode.Action.Effect.Elements.Contains(firstRemainingGoalElement) && IsNonMutexWithChosenActions(actionNode))
+                    if (actionNode.Action.Effect.Elements.Contains(firstRemainingGoalElement) && !actionNode.IsMutexWithAny(chosenActionNodes))
                     {
-                        // TODO-PERFORMANCE: lots of wrapped enumerables here. Benchmark and optimise (but get it working first..).
+                        // TODO-PERFORMANCE: we'll end up with lots of wrapped ienumerables here. Benchmark and optimise - but get it working first.
                         var plan = GPSearch(
                             remainingGoalElements: remainingGoalElements.Except(actionNode.Action.Effect.Elements),
                             chosenActionNodes: chosenActionNodes.Append(actionNode),

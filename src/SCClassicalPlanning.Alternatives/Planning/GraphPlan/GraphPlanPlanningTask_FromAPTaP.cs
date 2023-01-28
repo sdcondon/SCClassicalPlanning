@@ -161,24 +161,11 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // There are still goal elements to be covered.
                 // Try to cover the first goal element (any others covered by the same action are a bonus),
                 // then recurse for the other actions and remaining uncovered goal elements.
-                bool IsNonMutexWithChosenActions(PlanningGraphActionNode actionNode)
-                {
-                    foreach (var selectedActionNode in chosenActionNodes)
-                    {
-                        if (actionNode.Mutexes.Any(m => m.Action.Equals(selectedActionNode.Action)))
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                }
-
                 var firstRemainingGoalElement = remainingGoalElements.First();
 
                 foreach (var actionNode in GetRelevantActions(remainingGoalElements, level))
                 {
-                    if (actionNode.Action.Effect.Elements.Contains(firstRemainingGoalElement) && IsNonMutexWithChosenActions(actionNode))
+                    if (actionNode.Action.Effect.Elements.Contains(firstRemainingGoalElement) && actionNode.IsMutexWithAny(chosenActionNodes))
                     {
                         // TODO-PERFORMANCE: lots of wrapped enumerables here. benchmark and optimise (but get it working, first..).
                         var plan = GPSearch(

@@ -41,5 +41,23 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         internal Collection<PlanningGraphPropositionNode> Preconditions { get; } = new();
 
         internal Collection<PlanningGraphActionNode> Mutexes { get; } = new();
+
+        /// <summary>
+        /// Returns a value indicating whether this node indicates mutual exclusion with any of an enumerable of others.
+        /// </summary>
+        /// <param name="nodes">The other action nodes to examine.</param>
+        /// <returns><see langword="true"/> if this node has a mutex link with any of the given others; otherwise <see langword="false"/>.</returns>
+        public bool IsMutexWithAny(IEnumerable<PlanningGraphActionNode> nodes)
+        {
+            foreach (var node in nodes)
+            {
+                if (Mutexes.Any(m => m.Action.Equals(node.Action)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

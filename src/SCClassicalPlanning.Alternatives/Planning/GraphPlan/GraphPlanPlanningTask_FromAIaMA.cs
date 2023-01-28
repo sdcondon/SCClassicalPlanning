@@ -214,19 +214,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 ImmutableHashSet<PlanningGraphActionNode> unselectedActionNodes,
                 ImmutableHashSet<PlanningGraphActionNode> selectedActionNodes)
             {
-                bool IsNonMutexWithSelectedActions(PlanningGraphActionNode actionNode)
-                {
-                    foreach (var selectedActionNode in selectedActionNodes)
-                    {
-                        if (actionNode.Mutexes.Any(m => m.Action.Equals(selectedActionNode.Action)))
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                }
-
                 // TODO-PERFORMANCE: a lot of GC pressure here, what with all the immutable hash sets.
                 // We could eliminate the duplication by creating a tree instead, or even just some kind
                 // of bit-vector struct to indicate selection. Meh, lets get it working first, then at
@@ -241,7 +228,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     // then recurse for the other actions and remaining uncovered goal elements.
                     foreach (var actionNode in unselectedActionNodes)
                     {
-                        if (actionNode.Action.Effect.Elements.Contains(unsatisfiedGoalElements.First()) && IsNonMutexWithSelectedActions(actionNode))
+                        if (actionNode.Action.Effect.Elements.Contains(unsatisfiedGoalElements.First()) && !actionNode.IsMutexWithAny(selectedActionNodes))
                         {
                             foreach (var edge in FindCoveringActionSets(
                                 unsatisfiedGoalElements.Except(actionNode.Action.Effect.Elements),
