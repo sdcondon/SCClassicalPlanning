@@ -42,7 +42,7 @@ namespace SCClassicalPlanning.Planning
         /// <inheritdoc />
         public async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
         {
-            // TODO: decide on re-entry handling, if any
+            // TODO: decide on thread-safety, if any
             while (!IsComplete)
             {
                 NextStep();

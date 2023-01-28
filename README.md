@@ -2,7 +2,9 @@
 
 # SCClassicalPlanning
 
-[![NuGet version (SCClassicalPlanning)](https://img.shields.io/nuget/v/SCClassicalPlanning.svg?style=flat-square)](https://www.nuget.org/packages/SCClassicalPlanning/) [![NuGet downloads (SCClassicalPlanning)](https://img.shields.io/nuget/dt/SCClassicalPlanning.svg?style=flat-square)](https://www.nuget.org/packages/SCClassicalPlanning/)
+[![NuGet version (SCClassicalPlanning)](https://img.shields.io/nuget/v/SCClassicalPlanning.svg?style=flat-square)](https://www.nuget.org/packages/SCClassicalPlanning/) 
+[![NuGet downloads (SCClassicalPlanning)](https://img.shields.io/nuget/dt/SCClassicalPlanning.svg?style=flat-square)](https://www.nuget.org/packages/SCClassicalPlanning/) 
+[![Validation build](https://img.shields.io/github/actions/workflow/status/sdcondon/SCClassicalPlanning/onPush.yml?label=validation%20build&style=flat-square)](https://github.com/sdcondon/SCClassicalPlanning/actions/workflows/onPush.yml) 
 
 This repository contains the source code for the SCClassicalPlanning NuGet package - in addition to its tests, benchmarks, alternative implementations, example domains and documentation website.
 
