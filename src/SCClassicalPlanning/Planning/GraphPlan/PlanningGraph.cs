@@ -41,6 +41,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         private readonly List<Dictionary<Literal, PlanningGraphPropositionNode>> propositionLevels = new();
         private readonly List<Dictionary<Action, PlanningGraphActionNode>> actionLevels = new();
 
+        private int currentLevelPropositionMutexCount = 0;
         private int expandedToLevel = 0;
         private int? levelsOffAtLevel = null;
 
@@ -171,7 +172,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var currentPropositionLevel = new PlanningGraphLevel(this, expandedToLevel);
             var newActionLevel = new Dictionary<Action, PlanningGraphActionNode>();
             var newPropositionLevel = new Dictionary<Literal, PlanningGraphPropositionNode>();
-            var changesOccured = false;
+            var newPropositionLevelMutexCount = 0;
 
             // Iterate all the possibly applicable actions - ultimately to build the next action and proposition layers.
             foreach (var action in GetPossiblyApplicableActions(problem, currentPropositionLevel.Propositions))
@@ -185,14 +186,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     actionNode.Preconditions.Add(preconditionElementNode);
                 }
 
-                // Make a note if this action isn't in the current layer - it means that the graph hasn't levelled off yet:
-                // NB: ..because looking at the propositions isn't enough - different actions could lead to the same
-                // propositions WITH DIFFERENT MUTEXES
-                if (expandedToLevel == 0 || !actionLevels[expandedToLevel - 1].ContainsKey(action))
-                {
-                    changesOccured = true;
-                }
-
                 // Iterate all of the action's effect elements, and add them to the next proposition layer (if they aren't already there):
                 foreach (var effectElement in action.Effect.Elements)
                 {
@@ -201,14 +194,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     if (!newPropositionLevel.TryGetValue(effectElement, out var propositionNode))
                     {
                         propositionNode = newPropositionLevel[effectElement] = new PlanningGraphPropositionNode(effectElement);
-
-                        // Make a note if this effect isn't in the current layer - it means that the graph hasn't levelled off yet
-                        // (TODO: do we actually need this, given that the action determines the effect, and we check for new actions. ponder me)
-                        if (!currentPropositionLevel.Contains(effectElement))
-                        {
-                            changesOccured = true;
-                            // levelCost[effectElement] = expandedToLevel + 1; <-- something for the next pass, maybe
-                        }
                     }
 
                     // Link the new action node to the (*possibly* new) proposition node as an effect,
@@ -226,14 +211,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 var actionNode = newActionLevel[action] = new PlanningGraphActionNode(action);
                 propositionNode.Actions.Add(actionNode);
                 actionNode.Preconditions.Add(propositionNode);
-
-                // Make a note if this action isn't in the current layer - it means that the graph hasn't levelled off yet:
-                // NB: ..because looking at the propositions isn't enough - different actions could lead to the same
-                // propositions WITH DIFFERENT MUTEXES
-                if (expandedToLevel == 0 || !actionLevels[expandedToLevel - 1].ContainsKey(action))
-                {
-                    changesOccured = true;
-                }
 
                 // Create a new proposition node if we need to:
                 if (!newPropositionLevel.TryGetValue(proposition, out var newPropositionNode))
@@ -291,13 +268,14 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     {
                         propositionNode.Mutexes.Add(otherPropositionNode);
                         otherPropositionNode.Mutexes.Add(propositionNode);
+                        newPropositionLevelMutexCount++;
                     }
                 }
 
                 propositionIndex++;
             }
 
-            if (!changesOccured)
+            if (newPropositionLevel.Count == currentPropositionLevel.NodesByProposition.Count && newPropositionLevelMutexCount == currentLevelPropositionMutexCount)
             {
                 levelsOffAtLevel = expandedToLevel;
             }
@@ -306,6 +284,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 actionLevels.Add(newActionLevel);
                 propositionLevels.Add(newPropositionLevel);
                 expandedToLevel++;
+                currentLevelPropositionMutexCount = newPropositionLevelMutexCount;
             }
         }
 
