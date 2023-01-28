@@ -1,26 +1,16 @@
-﻿// Copyright 2022-2023 Simon Condon
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-// http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-using SCFirstOrderLogic;
+﻿using SCFirstOrderLogic;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
 {
     /// <summary>
-    /// An implementation of <see cref="IPlanningTask"/> that uses the GraphPlan algorithm.
+    /// <para>
+    /// GraphPlan, as close a possible to the way it is described in chapter 6
+    /// of "Automated Planning: Theory and Practice".
+    /// </para>
     /// </summary>
     // NB: Lots of comments here, perhaps too many - I'm leaving them in due to the
     // primary purpose of this lib - learning and experimentation.
-    internal class GraphPlanPlanningTask : TemplatePlanningTask
+    public class GraphPlanPlanningTask_FromAPTaP : TemplatePlanningTask
     {
         private readonly Problem problem;
 
@@ -32,7 +22,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// Initializes a new instance of the <see cref="GraphPlanPlanningTask"/> class.
         /// </summary>
         /// <param name="problem">The problem to solve.</param>
-        public GraphPlanPlanningTask(Problem problem)
+        public GraphPlanPlanningTask_FromAPTaP(Problem problem)
         {
             this.problem = problem;
             PlanningGraph = new(problem);
@@ -42,7 +32,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// Gets the planning graph used by this planning task.
         /// </summary>
         public PlanningGraph PlanningGraph { get; }
-
+        
         // TODO: should probably expose NoGoods - just need to make it read-only.
 
         /// <inheritdoc/>
