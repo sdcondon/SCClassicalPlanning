@@ -121,7 +121,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 return null;
             }
 
-            // Otherwise, try to find a plan:
+            // Otherwise, try to find a plan via the recursive GPSearch method:
             Plan? plan = GPSearch(
                 remainingGoalElements: SortGoalElements(goal, level),
                 chosenActionNodes: Enumerable.Empty<PlanningGraphActionNode>(),
@@ -155,15 +155,15 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
                 // If a plan was successfully for the prior level, append the chosen actions at this level to the plan returned.
                 // If no plan could be found for the prior level, return failure.
-                if (plan == null)
-                {
-                    return null;
-                }
-                else
+                if (plan != null)
                 {
                     return new Plan(plan.Steps
                         .Concat(chosenActionNodes.Select(n => n.Action))
                         .Where(a => !a.Identifier.Equals(PlanningGraph.PersistenceActionIdentifier)));
+                }
+                else
+                {
+                    return null;
                 }
             }
             else
@@ -190,7 +190,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 {
                     if (actionNode.Action.Effect.Elements.Contains(firstRemainingGoalElement) && IsNonMutexWithChosenActions(actionNode))
                     {
-                        // TODO-PERFORMANCE: lots of wrapped enumerables here. benchmark and optimise (but get it working, first..).
+                        // TODO-PERFORMANCE: lots of wrapped enumerables here. Benchmark and optimise (but get it working first..).
                         var plan = GPSearch(
                             remainingGoalElements: remainingGoalElements.Except(actionNode.Action.Effect.Elements),
                             chosenActionNodes: chosenActionNodes.Append(actionNode),
@@ -203,7 +203,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     }
                 }
 
-                return null; // yuck..
+                return null;
             }
         }
 
