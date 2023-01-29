@@ -49,13 +49,13 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         public override async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
         {
             // Starting from the first level of the graph, step forward through the
-            // levels until all goal elements are present and pairwise non-mutex, or the graph
-            // has levelled off (initialising the no-goods table HashSets as we go):
+            // levels until all goal elements are present and pairwise non-mutex
+            // (initialising the no-goods table HashSets as we go):
             var currentGraphLevel = PlanningGraph.GetLevel(0);
             while (!currentGraphLevel.ContainsNonMutex(problem.Goal.Elements))
             {
-                // If the graph levelled off before all elements were non-mutex,
-                // then we can't solve the problem:
+                // If the graph levels off before all elements are present and non-mutex,
+                // then the problem is unsolvable:
                 if (currentGraphLevel.IsLevelledOff)
                 {
                     throw new InvalidOperationException("Problem is unsolvable");
@@ -67,7 +67,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             // Attempt to extract a plan until we succeed - stepping forward through
             // the levels on each attempt. Fail if we get to a point where both the
-            // graph and the no-goods have levelled off.
+            // graph and the fixed-point no-goods have levelled off.
             Plan? plan;
             var previousFixedPointNoGoodCount = currentGraphLevel.IsLevelledOff ? noGoods[currentGraphLevel.Graph.LevelsOffAtLevel + 1].Count : 0;
             do
@@ -181,7 +181,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 {
                     if (actionNode.Action.Effect.Elements.Contains(firstRemainingGoalElement) && !actionNode.IsMutexWithAny(chosenActionNodes))
                     {
-                        // TODO-PERFORMANCE: we'll end up with lots of wrapped ienumerables here. Benchmark and optimise - but get it working first.
+                        // TODO-PERFORMANCE: we'll end up with lots of wrapped IEnumerables here.
+                        // Benchmark and optimise - but get it working first.
                         var plan = GPSearch(
                             remainingGoalElements: remainingGoalElements.Except(actionNode.Action.Effect.Elements),
                             chosenActionNodes: chosenActionNodes.Append(actionNode),
@@ -207,7 +208,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
          * 
          * Artificial Intelligence: A Modern Approach (Russel & Norvig)
          */
-        // TODO: At some point, remove this hard-coding.
+        // TODO: At some point, remove these hard-coded heuristics in favour of something injected by the consumer.
         IEnumerable<Literal> SortGoalElements(Goal goal, PlanningGraphLevel graphLevel)
         {
             return goal.Elements
