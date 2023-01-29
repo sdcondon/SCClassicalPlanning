@@ -24,7 +24,7 @@
         /// <inheritdoc />
         public Task<Plan> ExecuteAsync(CancellationToken cancellationToken)
         {
-            return execution = ExecuteAsync(cancellationToken);
+            return execution = ExecuteAsyncCore(cancellationToken);
         }
 
         /// <summary>
