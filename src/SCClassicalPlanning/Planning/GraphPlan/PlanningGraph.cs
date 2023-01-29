@@ -174,8 +174,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             var newPropositionLevel = new Dictionary<Literal, PlanningGraphPropositionNode>();
             var newPropositionLevelMutexCount = 0;
 
-            // Iterate all the possibly applicable actions - ultimately to build the next action and proposition layers.
-            foreach (var action in GetPossiblyApplicableActions(problem, currentPropositionLevel.Propositions))
+            // Iterate all the possible actions - ultimately to build the next action and proposition layers.
+            foreach (var action in GetPossibleActions(problem, currentPropositionLevel.Propositions))
             {
                 // Add an action node to the new action layer, and link all of its preconditions to it:
                 var actionNode = newActionLevel[action] = new PlanningGraphActionNode(action);
@@ -189,14 +189,14 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // Iterate all of the action's effect elements, and add them to the next proposition layer (if they aren't already there):
                 foreach (var effectElement in action.Effect.Elements)
                 {
-                    // Multiple actions can of course have the same effect elements, and we don't want duplicate proposition nodes -
-                    // this graph is memory-hogging enough as it is.. So only create a new proposition node if we need to:
+                    // Multiple actions can of course have the same effect elements, and we obviously don't want duplicate
+                    // proposition nodes, so only create a new proposition node if we need to:
                     if (!newPropositionLevel.TryGetValue(effectElement, out var propositionNode))
                     {
                         propositionNode = newPropositionLevel[effectElement] = new PlanningGraphPropositionNode(effectElement);
                     }
 
-                    // Link the new action node to the (*possibly* new) proposition node as an effect,
+                    // Link the new action node to the (possibly new) proposition node as an effect,
                     // and link the proposition node back to the action node as a cause.
                     actionNode.Effects.Add(propositionNode);
                     propositionNode.Causes.Add(actionNode);
@@ -270,7 +270,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             }
         }
 
-        private static IEnumerable<Action> GetPossiblyApplicableActions(Problem problem, IEnumerable<Literal> possiblePropositions)
+        private static IEnumerable<Action> GetPossibleActions(Problem problem, IEnumerable<Literal> possiblePropositions)
         {
             // Local method to (recursively) match a set of (remaining) goal elements to the possiblePropositions.
             // goalElements: The remaining elements of the goal to be matched

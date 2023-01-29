@@ -45,7 +45,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         public PlanningGraph PlanningGraph { get; }
 
         /// <inheritdoc />
-        public override async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
+        protected override async Task<Plan> ExecuteAsyncCore(CancellationToken cancellationToken = default)
         {
             HashSet<SearchState> noGoods = new();
             var goalElementsPresentAndNonMutex = false;

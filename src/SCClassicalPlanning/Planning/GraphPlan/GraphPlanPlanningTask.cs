@@ -46,7 +46,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         // TODO: should probably expose NoGoods - just need to make it read-only.
 
         /// <inheritdoc/>
-        public override async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
+        protected override async Task<Plan> ExecuteAsyncCore(CancellationToken cancellationToken = default)
         {
             // Starting from the first level of the graph, step forward through the
             // levels until all goal elements are present and pairwise non-mutex

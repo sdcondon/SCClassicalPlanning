@@ -3,7 +3,7 @@
     /// <summary>
     /// Abstract base class for <see cref="IPlanningTask"/>s that handles all of the properties itself,
     /// leaving derived classes just needing to provide implementations for two template methods
-    /// (<see cref="ExecuteAsync(CancellationToken)"/> and <see cref="Dispose"/>).
+    /// (<see cref="ExecuteAsyncCore(CancellationToken)"/> and <see cref="Dispose"/>).
     /// </summary>
     public abstract class TemplatePlanningTask : IPlanningTask
     {
@@ -22,7 +22,7 @@
         public abstract void Dispose();
 
         /// <inheritdoc />
-        Task<Plan> IPlanningTask.ExecuteAsync(CancellationToken cancellationToken)
+        public Task<Plan> ExecuteAsync(CancellationToken cancellationToken)
         {
             return execution = ExecuteAsync(cancellationToken);
         }
@@ -34,6 +34,6 @@
         /// </summary>
         /// <param name="cancellationToken">A cancellation token to respect.</param>
         /// <returns>A task representing the planning process.</returns>
-        public abstract Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default);
+        protected abstract Task<Plan> ExecuteAsyncCore(CancellationToken cancellationToken = default);
     }
 }
