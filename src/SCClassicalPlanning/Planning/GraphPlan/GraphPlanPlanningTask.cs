@@ -52,38 +52,44 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             // levels until all goal elements are present and pairwise non-mutex, or the graph
             // has levelled off (initialising the no-goods table HashSets as we go):
             var currentGraphLevel = PlanningGraph.GetLevel(0);
-            while (!currentGraphLevel.ContainsNonMutex(problem.Goal.Elements) && !currentGraphLevel.IsLevelledOff)
+            while (!currentGraphLevel.ContainsNonMutex(problem.Goal.Elements))
             {
+                // If the graph levelled off before all elements were non-mutex,
+                // then we can't solve the problem:
+                if (currentGraphLevel.IsLevelledOff)
+                {
+                    throw new InvalidOperationException("Problem is unsolvable");
+                }
+
                 currentGraphLevel = currentGraphLevel.NextLevel;
                 noGoods[currentGraphLevel.Index] = new();
-            }
-
-            // If the graph levelled off before all elements were non-mutex,
-            // then we can't solve the problem:
-            if (!currentGraphLevel.ContainsNonMutex(problem.Goal.Elements))
-            {
-                throw new InvalidOperationException("Problem is unsolvable");
             }
 
             // Attempt to extract a plan until we succeed - stepping forward through
             // the levels on each attempt. Fail if we get to a point where both the
             // graph and the no-goods have levelled off.
             Plan? plan;
-            var lastNoGoodCount = 0;
+            var previousFixedPointNoGoodCount = currentGraphLevel.IsLevelledOff ? noGoods[currentGraphLevel.Graph.LevelsOffAtLevel + 1].Count : 0;
             do
             {
                 plan = Extract(problem.Goal, currentGraphLevel);
 
                 if (plan == null)
                 {
-                    var currentNoGoodCount = noGoods[currentGraphLevel.Index].Count;
-
-                    if (currentGraphLevel.IsLevelledOff && lastNoGoodCount == currentNoGoodCount)
+                    if (currentGraphLevel.IsLevelledOff)
                     {
-                        throw new InvalidOperationException("Problem is unsolvable");
+                        var currentFixedPointNoGoodCount = noGoods[currentGraphLevel.Graph.LevelsOffAtLevel + 1].Count;
+
+                        if (previousFixedPointNoGoodCount == currentFixedPointNoGoodCount)
+                        {
+                            throw new InvalidOperationException("Problem is unsolvable");
+                        }
+                        else
+                        {
+                            previousFixedPointNoGoodCount = currentFixedPointNoGoodCount;
+                        }
                     }
 
-                    lastNoGoodCount = currentNoGoodCount;
                     currentGraphLevel = currentGraphLevel.NextLevel;
                     noGoods[currentGraphLevel.Index] = new();
                     await Task.Yield(); // just until such time as e.g. States can include async stuff..

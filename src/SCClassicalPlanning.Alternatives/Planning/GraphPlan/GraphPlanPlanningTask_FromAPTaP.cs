@@ -57,7 +57,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             // Try to extract a plan ending at the current level.
             var plan = Extract(problem.Goal, currentGraphLevel);
-            var lastNoGoodCount = currentGraphLevel.IsLevelledOff ? noGoods[currentGraphLevel.Index].Count : 0;
+            var previousFixedPointNoGoodCount = currentGraphLevel.IsLevelledOff ? noGoods[currentGraphLevel.Graph.LevelsOffAtLevel + 1].Count : 0;
 
             // While we couldn't extract a plan, step forward through the
             // levels and retry. Fail if we get to a point where both the
@@ -72,13 +72,15 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 plan = Extract(problem.Goal, currentGraphLevel);
                 if (plan == null && currentGraphLevel.IsLevelledOff)
                 {
-                    if (lastNoGoodCount == noGoods[currentGraphLevel.Index].Count)
+                    var currentFixedPointNoGoodCount = noGoods[currentGraphLevel.Graph.LevelsOffAtLevel + 1].Count;
+
+                    if (previousFixedPointNoGoodCount == currentFixedPointNoGoodCount)
                     {
                         throw new InvalidOperationException("Problem is unsolvable");
                     }
                     else
                     {
-                        lastNoGoodCount = noGoods[currentGraphLevel.Index].Count;
+                        previousFixedPointNoGoodCount = currentFixedPointNoGoodCount;
                     }
                 }
             }

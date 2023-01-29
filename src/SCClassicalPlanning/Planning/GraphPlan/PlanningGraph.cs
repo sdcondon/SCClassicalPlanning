@@ -275,7 +275,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 propositionIndex++;
             }
 
-            if (newPropositionLevel.Count == currentPropositionLevel.NodesByProposition.Count && newPropositionLevelMutexCount == currentLevelPropositionMutexCount)
+            if (newPropositionLevel.Count == currentPropositionLevel.NodesByProposition.Count
+                && newPropositionLevelMutexCount == currentLevelPropositionMutexCount)
             {
                 levelsOffAtLevel = expandedToLevel;
             }
