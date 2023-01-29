@@ -203,25 +203,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 }
             }
 
-            // Now we need to add the persistence ("no-op") actions:
-            foreach (var (proposition, propositionNode) in currentPropositionLevel.NodesByProposition)
-            {
-                // Add a persistence action & link its precondition
-                var action = MakePersistenceAction(proposition);
-                var actionNode = newActionLevel[action] = new PlanningGraphActionNode(action);
-                propositionNode.Actions.Add(actionNode);
-                actionNode.Preconditions.Add(propositionNode);
-
-                // Create a new proposition node if we need to:
-                if (!newPropositionLevel.TryGetValue(proposition, out var newPropositionNode))
-                {
-                    newPropositionNode = newPropositionLevel[proposition] = new PlanningGraphPropositionNode(proposition);
-                }
-
-                actionNode.Effects.Add(newPropositionNode);
-                newPropositionNode.Causes.Add(actionNode);
-            }
-
             // Add action mutexes
             var actionIndex = 0;
             foreach (var (action, actionNode) in newActionLevel)
@@ -332,11 +313,15 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     yield return new VariableSubstitutionActionTransformation(substitution).ApplyTo(actionSchema);
                 }
             }
-        }
 
-        // NB: while an EMPTY goal and effect would at first glance seem to be intuitive - it is
-        // defined like this to assist with mutex creation, and because of the idiosyncracies of
-        // plan extraction in GraphPlan. Still feels awkward to me, but meh, never mind.
-        private static Action MakePersistenceAction(Literal proposition) => new(PersistenceActionIdentifier, new(proposition), new(proposition));
+            // Now we need to also yield the persistence ("no-op") actions:
+            foreach (var proposition in possiblePropositions)
+            {
+                // NB: while an EMPTY goal and effect would at first glance seem to be intuitive - it is
+                // defined like this to assist with mutex creation, and because of the idiosyncracies of
+                // plan extraction in GraphPlan. Still feels awkward to me, but meh, never mind.
+                yield return new(PersistenceActionIdentifier, new(proposition), new(proposition));
+            }
+        }
     }
 }
