@@ -24,10 +24,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// Planning graph representation.
     /// </para>
     /// <para>
-    /// NB: Lazily populated - levels will be created as they are called for.
+    /// NB: Lazily populated - levels will be created as they are called for. Consumers can also call the <see cref="FullyExpand"/> method to ensure that future lookups are fast.
     /// </para>
     /// </summary>
-    // TODO: Should probably implement IEnumerable<IPlanningGraphLevel>? Or at least have a Levels prop?
+    // TODO: Should probably implement IEnumerable<IPlanningGraphLevel>? Or at least have this as a Levels prop?
     // Or perhaps even IReadOnlyList<PlanningGraphLevel> - though Count is effectively infinite..
     public class PlanningGraph
     {
@@ -139,7 +139,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         {
             while (expandedToLevel < index && !levelsOffAtLevel.HasValue)
             {
-                MakeNextLevel();
+                Expand();
             }
 
             return new(this, index);
@@ -152,7 +152,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         {
             while (!levelsOffAtLevel.HasValue)
             {
-                MakeNextLevel();
+                Expand();
             }
         }
 
@@ -167,7 +167,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         }
 
         // TODO-V1: a fair amount of refactoring to be done here..
-        private void MakeNextLevel()
+        private void Expand()
         {
             var currentPropositionLevel = new PlanningGraphLevel(this, expandedToLevel);
             var newActionLevel = new Dictionary<Action, PlanningGraphActionNode>();
@@ -244,6 +244,24 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                         return true;
                     }
 
+                    ////bool AnyActionGivesBoth()
+                    ////{
+                    ////    foreach (var actionNode in propositionNode.Causes)
+                    ////    {
+                    ////        foreach (var otherActionNode in otherPropositionNode.Causes)
+                    ////        {
+                    ////            if (actionNode.Equals(otherActionNode))
+                    ////            {
+                    ////                return true;
+                    ////            }
+                    ////        }
+                    ////    }
+
+                    ////    return false;
+                    ////}
+
+                    // NB: I think we don't *need* the negation check mentioned by AIaMA - since all actions must
+                    // be mutex (by "inconsistent effects") for negations.
                     if (proposition.Negate().Equals(otherProposition) // negation
                         || AllActionsMutex()) // inconsistent support
                     {
