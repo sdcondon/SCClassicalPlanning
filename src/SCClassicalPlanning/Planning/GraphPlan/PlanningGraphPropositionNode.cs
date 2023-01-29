@@ -36,7 +36,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// </summary>
         public Literal Proposition { get; }
 
-        // TODO-V1: make public but read-only (might need builder or similar during construction)
+        // TODO-V1: make public but read-only (additions via internal methods)
         internal Collection<PlanningGraphActionNode> Actions { get; } = new();
 
         internal Collection<PlanningGraphActionNode> Causes { get; } = new();

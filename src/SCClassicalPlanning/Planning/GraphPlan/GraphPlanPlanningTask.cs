@@ -179,7 +179,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
                 foreach (var actionNode in GetRelevantActions(firstRemainingGoalElement, level))
                 {
-                    if (actionNode.Action.Effect.Elements.Contains(firstRemainingGoalElement) && !actionNode.IsMutexWithAny(chosenActionNodes))
+                    if (!actionNode.IsMutexWithAny(chosenActionNodes))
                     {
                         // TODO-PERFORMANCE: we'll end up with lots of wrapped IEnumerables here.
                         // Benchmark and optimise - but get it working first.

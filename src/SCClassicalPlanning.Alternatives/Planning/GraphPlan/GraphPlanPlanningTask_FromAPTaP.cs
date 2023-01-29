@@ -165,9 +165,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // then recurse for the other actions and remaining uncovered goal elements.
                 var firstRemainingGoalElement = remainingGoalElements.First();
 
-                foreach (var actionNode in GetRelevantActions(remainingGoalElements, level))
+                foreach (var actionNode in GetRelevantActions(firstRemainingGoalElement, level))
                 {
-                    if (actionNode.Action.Effect.Elements.Contains(firstRemainingGoalElement) && actionNode.IsMutexWithAny(chosenActionNodes))
+                    if (!actionNode.IsMutexWithAny(chosenActionNodes))
                     {
                         // TODO-PERFORMANCE: lots of wrapped enumerables here. benchmark and optimise (but get it working, first..).
                         var plan = GPSearch(
@@ -202,12 +202,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 .OrderByDescending(e => graphLevel.Graph.GetLevelCost(e));
         }
 
-        IEnumerable<PlanningGraphActionNode> GetRelevantActions(IEnumerable<Literal> goalElements, PlanningGraphLevel graphLevel)
+        IEnumerable<PlanningGraphActionNode> GetRelevantActions(Literal goalElement, PlanningGraphLevel graphLevel)
         {
-            return goalElements
-                .SelectMany(e => graphLevel.NodesByProposition[e].Causes)
-                .OrderBy(n => n.Preconditions.Sum(p => graphLevel.Graph.GetLevelCost(p.Proposition)))
-                .Distinct(); // todo: can probably do this before order by? ref equality, but we take action to avoid dups.
+            return graphLevel.NodesByProposition[goalElement].Causes
+                .OrderBy(n => n.Preconditions.Sum(p => graphLevel.Graph.GetLevelCost(p.Proposition)));
         }
     }
 }
