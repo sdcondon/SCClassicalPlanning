@@ -69,7 +69,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             // the levels on each attempt. Fail if we get to a point where both the
             // graph and the fixed-point no-goods have levelled off.
             Plan? plan;
-            var previousFixedPointNoGoodCount = currentGraphLevel.IsLevelledOff ? noGoods[currentGraphLevel.Graph.LevelsOffAtLevel + 1].Count : 0;
+            var previousFixedPointNoGoodCount = currentGraphLevel.IsLevelledOff ? noGoods[currentGraphLevel.Graph.LevelsOffAtLevel].Count : 0;
             do
             {
                 plan = Extract(problem.Goal, currentGraphLevel);
@@ -78,7 +78,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 {
                     if (currentGraphLevel.IsLevelledOff)
                     {
-                        var currentFixedPointNoGoodCount = noGoods[currentGraphLevel.Graph.LevelsOffAtLevel + 1].Count;
+                        var currentFixedPointNoGoodCount = noGoods[currentGraphLevel.Graph.LevelsOffAtLevel].Count;
 
                         if (previousFixedPointNoGoodCount == currentFixedPointNoGoodCount)
                         {
@@ -111,7 +111,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             // If we've reached level 0 (i.e. the initial state of the problem), we're done.
             // NB: there's no need to consider the goal here. The initial state MUST satisfy
             // whatever goal we are left with at this point - because the initial state determines
-            // what actions were available for selection in TryGPSearch at level 1. (and we
+            // what actions were available for selection in GPSearch at level 1. (and we
             // could have only hit this method for the first time at level 0 if the initial state
             // satisfies the goal).
             if (level.Index == 0)
@@ -182,7 +182,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     if (!actionNode.IsMutexWithAny(chosenActionNodes))
                     {
                         // TODO-PERFORMANCE: we'll end up with lots of wrapped IEnumerables here.
-                        // Benchmark and optimise - but get it working first.
+                        // Benchmark then optimise - but get it working first.
                         var plan = GPSearch(
                             remainingGoalElements: remainingGoalElements.Except(actionNode.Action.Effect.Elements),
                             chosenActionNodes: chosenActionNodes.Append(actionNode),

@@ -13,8 +13,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 SpareTire.ExampleProblem,
                 AirCargo.ExampleProblem,
                 BlocksWorld.ExampleProblem,
-                //BlocksWorld.LargeExampleProblem, // TODO: doesn't work yet. make planningtask more interrogable, then fix.
-                //AirCargoOneAtATime.Problem, // TODO: doesn't work yet. make planningtask more interrogable, then fix.
+                BlocksWorld.LargeExampleProblem,
+                AirCargoOneAtATime.Problem,
             })
             .When((_, tc) => new GraphPlanPlanningTask_FromAPTaP(tc).Execute())
             .ThenReturns()

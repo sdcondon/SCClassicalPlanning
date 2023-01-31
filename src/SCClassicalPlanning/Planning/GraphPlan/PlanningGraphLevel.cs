@@ -40,7 +40,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         public int Index { get; }
 
         /// <summary>
+        /// <para>
         /// Gets all of the proposition nodes in this level, keyed by their respective propositions.
+        /// </para>
+        /// <para>
+        /// NB: Be careful with this for the mo. See the comment against <see cref="Nodes"/> for details.
+        /// </para>
         /// </summary>
         public IReadOnlyDictionary<Literal, PlanningGraphPropositionNode> NodesByProposition => Graph.GetNodesByProposition(Index);
 
@@ -66,7 +71,18 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         public IEnumerable<Literal> Propositions => NodesByProposition.Keys;
 
         /// <summary>
+        /// <para>
         /// Gets an enumerable of the proposition nodes in this level.
+        /// </para>
+        /// <para>
+        /// NB: Be careful when following links back through the graph from here
+        /// if <see cref="IsLevelledOff"/> is true. For ALL such (i.e. arbitrarily high-index)
+        /// levels, the nodes of this prop will be the same - those of the final (levelled-off)
+        /// level of the graph, and as such there will be no actions and all "backwards" links
+        /// will be to the last distinct level of the graph.
+        /// TODO-V1: this isn't really good enough - I should do something about this (by e.g.
+        /// making public-facing nodes struct-valued).
+        /// </para>
         /// </summary>
         public IEnumerable<PlanningGraphPropositionNode> Nodes => NodesByProposition.Values;
 

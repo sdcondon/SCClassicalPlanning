@@ -40,7 +40,9 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                     & IsCargo(Cargo3)
                     & IsPlane(Plane)
                     & IsAirport(Airport1)
+                    & AreEqual(Airport1, Airport1)
                     & IsAirport(Airport2)
+                    & AreEqual(Airport2, Airport2)
                     & IsAt(Cargo1, Airport1)
                     & IsAt(Cargo2, Airport1)
                     & IsAt(Cargo3, Airport1)
@@ -70,6 +72,7 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         public static OperablePredicate IsAirport(Term airport) => new Predicate(nameof(IsAirport), airport);
         public static OperablePredicate IsAt(Term @object, Term location) => new Predicate(nameof(IsAt), @object, location);
         public static OperablePredicate IsIn(Term @object, Term container) => new Predicate(nameof(IsIn), @object, container);
+        public static OperablePredicate AreEqual(Term x, Term y) => new Predicate(EqualitySymbol.Instance, x, y);
 
         public static Action Load(Term cargo, Term plane, Term airport) => new OperableAction(
             identifier: nameof(Load),
@@ -107,8 +110,8 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                 IsAt(plane, from)
                 & IsPlane(plane)
                 & IsAirport(from)
-                & IsAirport(to),
-                //& !AreEqual(from, to),
+                & IsAirport(to)
+                & !AreEqual(from, to),
             effect:
                 !IsAt(plane, from)
                 & IsAt(plane, to));

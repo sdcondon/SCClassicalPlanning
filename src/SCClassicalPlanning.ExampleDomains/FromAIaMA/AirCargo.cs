@@ -117,7 +117,7 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
                 & Plane(plane)
                 & Airport(origin)
                 & Airport(destination),
-                //& !AreEqual(from, to),
+                //& !AreEqual(origin, destination),
             effect:
                 !At(plane, origin)
                 & At(plane, destination));

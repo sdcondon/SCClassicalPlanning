@@ -24,7 +24,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// Planning graph representation.
     /// </para>
     /// <para>
-    /// NB: Lazily populated - levels will be created as they are called for. Consumers can also call the <see cref="FullyExpand"/> method to ensure that future lookups are fast.
+    /// NB: Lazily populated - levels will be created as they are called for. Consumers can also call the
+    /// <see cref="FullyExpand"/> method to do this ahead of time, thus ensuring that future lookups are fast.
     /// </para>
     /// </summary>
     // TODO: Should probably implement IEnumerable<IPlanningGraphLevel>? Or at least have this as a Levels prop?
@@ -74,8 +75,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         /// <summary>
         /// Gets the index of the level at which the graph levels off. This is the index
-        /// of the last level that differs from the one before, after which all further 
-        /// levels are identical. Implicitly fully expands the graph if it isn't already.
+        /// of the first level that is the same as the one before, and after which all further 
+        /// levels are identical. Retrieving this proprty implicitly fully expands the graph
+        /// if it isn't already.
         /// </summary>
         public int LevelsOffAtLevel
         {
@@ -212,7 +214,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                     if (otherAction.Effect.Elements.Overlaps(action.Effect.Elements.Select(l => l.Negate())) // inconsistent effects
                         || otherAction.Effect.Elements.Overlaps(action.Precondition.Elements.Select(l => l.Negate())) // interference
                         || otherAction.Precondition.Elements.Overlaps(action.Effect.Elements.Select(l => l.Negate())) // interference the other way around
-                        || otherActionNode.Preconditions.Any(p => p.Mutexes.Any(m => actionNode.Preconditions.Contains(m)))) // competing needs - nb ref equality on node - fine cos no dupes
+                        || otherActionNode.Preconditions.Any(op => op.Mutexes.Any(om => actionNode.Preconditions.Any(p => p.Proposition.Equals(om.Proposition))))) // competing needs
                     {
                         actionNode.Mutexes.Add(otherActionNode);
                         otherActionNode.Mutexes.Add(actionNode);
@@ -244,26 +246,26 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                         return true;
                     }
 
-                    ////bool AnyActionGivesBoth()
-                    ////{
-                    ////    foreach (var actionNode in propositionNode.Causes)
-                    ////    {
-                    ////        foreach (var otherActionNode in otherPropositionNode.Causes)
-                    ////        {
-                    ////            if (actionNode.Equals(otherActionNode))
-                    ////            {
-                    ////                return true;
-                    ////            }
-                    ////        }
-                    ////    }
+                    bool AnyActionGivesBoth()
+                    {
+                        foreach (var actionNode in propositionNode.Causes)
+                        {
+                            foreach (var otherActionNode in otherPropositionNode.Causes)
+                            {
+                                if (actionNode.Equals(otherActionNode))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
 
-                    ////    return false;
-                    ////}
+                        return false;
+                    }
 
                     // NB: I think we don't *need* the negation check mentioned by AIaMA - since all actions must
                     // be mutex (by "inconsistent effects") for negations.
                     if (proposition.Negate().Equals(otherProposition) // negation
-                        || AllActionsMutex()) // inconsistent support
+                        || (AllActionsMutex() && !AnyActionGivesBoth())) // inconsistent support
                     {
                         propositionNode.Mutexes.Add(otherPropositionNode);
                         otherPropositionNode.Mutexes.Add(propositionNode);
@@ -274,18 +276,19 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 propositionIndex++;
             }
 
-            if (newPropositionLevel.Count == currentPropositionLevel.NodesByProposition.Count
-                && newPropositionLevelMutexCount == currentLevelPropositionMutexCount)
+            // NB: we record the level even if this proposition level is the same as the previous one.
+            // this is so that the arcs are "correct" for all later levels of the graph (i.e. they all
+            // link back to the last distinct level of the graph, even for arbitrarily large graph levels).
+            actionLevels.Add(newActionLevel);
+            propositionLevels.Add(newPropositionLevel);
+            expandedToLevel++;
+
+            if (newPropositionLevel.Count == currentPropositionLevel.NodesByProposition.Count && newPropositionLevelMutexCount == currentLevelPropositionMutexCount)
             {
                 levelsOffAtLevel = expandedToLevel;
             }
-            else
-            {
-                actionLevels.Add(newActionLevel);
-                propositionLevels.Add(newPropositionLevel);
-                expandedToLevel++;
-                currentLevelPropositionMutexCount = newPropositionLevelMutexCount;
-            }
+
+            currentLevelPropositionMutexCount = newPropositionLevelMutexCount;
         }
 
         private static IEnumerable<Action> GetPossibleActions(Problem problem, IEnumerable<Literal> possiblePropositions)
