@@ -8,6 +8,7 @@ using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using SCFirstOrderLogic.Inference.Resolution;
 using SCClassicalPlanning.Planning.Search.CostStrategies;
+using SCClassicalPlanning.Planning.GraphPlan;
 
 namespace SCClassicalPlanning.Benchmarks.Planning
 {
@@ -15,7 +16,7 @@ namespace SCClassicalPlanning.Benchmarks.Planning
     [InProcess]
     public class PlannerBenchmarks
     {
-        public record TestCase(string Label, Problem Problem, ICostStrategy Strategy, IKnowledgeBase InvariantsKB)
+        public record TestCase(string Label, Problem Problem, ICostStrategy CostStrategy, IKnowledgeBase InvariantsKB)
         {
             public override string ToString() => Label;
         }
@@ -25,13 +26,13 @@ namespace SCClassicalPlanning.Benchmarks.Planning
             new(
                 Label: "Air Cargo",
                 Problem: AirCargo.ExampleProblem,
-                Strategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
+                CostStrategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
                 InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
             new(
                 Label: "Blocks - Small",
                 Problem: BlocksWorld.ExampleProblem,
-                Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                CostStrategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
                 InvariantsKB: MakeInvariantsKB(new Sentence[]
                 {
                     // TODO: slicker support for unique names assumption worth looking into at some point.. 
@@ -53,7 +54,7 @@ namespace SCClassicalPlanning.Benchmarks.Planning
             new(
                 Label: "Spare Tire",
                 Problem: SpareTire.ExampleProblem,
-                Strategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
+                CostStrategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
                 InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
             ////new(
@@ -100,27 +101,33 @@ namespace SCClassicalPlanning.Benchmarks.Planning
         public TestCase? CurrentTestCase { get; set; }
 
         [Benchmark]
-        public Plan StateSpaceSearch()
+        public Plan GraphPlan()
         {
-            return new StateSpaceAStarPlanner(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
+            return new GraphPlanPlanner().CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
-        public Plan GoalSpaceSearch()
+        public Plan StateSpaceAStar()
         {
-            return new GoalSpaceAStarPlanner(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
+            return new StateSpaceAStarPlanner(CurrentTestCase!.CostStrategy).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
-        public Plan GoalSpaceSearch_PropositionalWithoutKB()
+        public Plan GoalSpaceAStar()
         {
-            return new GoalSpaceAStar_PropositionalWithoutKB(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceAStarPlanner(CurrentTestCase!.CostStrategy).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
-        public Plan GoalSpaceSearch_PropositionalWithKB()
+        public Plan GoalSpaceAStar_PropositionalWithoutKB()
         {
-            return new GoalSpaceAStar_PropositionalWithKB(CurrentTestCase!.Strategy, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceAStar_PropositionalWithoutKB(CurrentTestCase!.CostStrategy).CreatePlan(CurrentTestCase.Problem);
+        }
+
+        [Benchmark]
+        public Plan GoalSpaceAStar_PropositionalWithKB()
+        {
+            return new GoalSpaceAStar_PropositionalWithKB(CurrentTestCase!.CostStrategy, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
         }
 
         private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)

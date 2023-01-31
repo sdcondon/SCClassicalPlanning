@@ -123,10 +123,10 @@ Once you have a problem, the types in the `SCClassicalPlanning.Planning` namespa
 
 ```
 using SCClassicalPlanning.Planning; // for PlanFormatter and CreatePlan extension method (plan creation is async by default)
-using SCClassicalPlanning.Planning.Search; // for StateSpaceSearch
+using SCClassicalPlanning.Planning.Search; // for StateSpaceAStarPlanner
 using SCClassicalPlanning.Planning.Search.Strategies; // for UnsatisfiedGoalCount
 
-// First instantiate a StateSpaceSearch, specifying a strategy to use (an object that gives
+// First instantiate a StateSpaceAStarPlanner, specifying a strategy to use (an object that gives
 // the cost of actions, and estimates the total cost of getting from a given state to a state
 // that satisfies a given goal). You can create a strategy specific to the domain, or you can use a
 // generic one provided by the library. Here we use one provided by the library.
@@ -135,7 +135,7 @@ using SCClassicalPlanning.Planning.Search.Strategies; // for UnsatisfiedGoalCoun
 // useless for goal space searches (because it can't rule out unsatisfiable goals) and isn't that great
 // for most state space searches either (note it's not admissable, so can give non-optimal plans). 
 // However, it suffices for the very simple problem we are trying to solve here:
-var planner = new StateSpaceSearch(new UnsatisfiedGoalCount());
+var planner = new StateSpaceAStarPlanner(new UnsatisfiedGoalCount());
 
 // Tell the planner to create a plan for our problem:
 var plan = planner.CreatePlan(problem);
@@ -162,10 +162,11 @@ Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.Goal)}!");
 
 ### Using Goal Space Search
 
-As above, but using `var planner = new GoalSpaceSearch(strategy);`, where strategy is an `IStrategy`.
+As above, but using `var planner = new GoalSpaceAStarPlanner(strategy);`, where strategy is an `IStrategy`.
 As mentioned above, UnsatisfiedGoalCount is useless for this. Either create one specifically for your
 domain, or wait until I implement some better generic ones.
 
 ### Using Graphplan
 
-*Not yet!*
+As above, but using `var planner = new GraphPlanPlanner();`. N.B. for the moment this planner has no configurability. 
+This will likely change pre-v1 to add some configurability of the heuristic used during the backward search part.
