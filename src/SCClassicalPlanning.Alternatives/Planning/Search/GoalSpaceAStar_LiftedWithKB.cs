@@ -23,16 +23,16 @@ namespace SCClassicalPlanning.Planning.Search
     /// A simple implementation of <see cref="IPlanner"/> that carries out an A-star search of
     /// the goal space to create plans.
     /// </summary>
-    public class GoalSpaceSearch_PropositionalWithKB : IPlanner
+    public class GoalSpaceAStar_LiftedWithKB : IPlanner
     {
         private readonly ICostStrategy costStrategy;
         private readonly InvariantInspector? invariantInspector;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GoalSpaceSearch_PropositionalWithKB"/> class.
+        /// Initializes a new instance of the <see cref="GoalSpaceAStar_LiftedWithKB"/> class.
         /// </summary>
-        /// <param name="costStrategy">The strategy to use.</param>
-        public GoalSpaceSearch_PropositionalWithKB(ICostStrategy costStrategy, IKnowledgeBase? invariantsKB = null)
+        /// <param name="costStrategy">The cost strategy to use.</param>
+        public GoalSpaceAStar_LiftedWithKB(ICostStrategy costStrategy, IKnowledgeBase? invariantsKB = null)
         {
             this.costStrategy = costStrategy;
             this.invariantInspector = invariantsKB != null ? new InvariantInspector(invariantsKB) : null;
@@ -49,7 +49,7 @@ namespace SCClassicalPlanning.Planning.Search
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
 
         /// <summary>
-        /// The implementation of <see cref="IPlanningTask"/> used by <see cref="GoalSpaceSearch_PropositionalWithKB"/>.
+        /// The implementation of <see cref="IPlanningTask"/> used by <see cref="GoalSpaceAStar_LiftedWithKB"/>.
         /// </summary>
         public class PlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
         {
@@ -60,19 +60,19 @@ namespace SCClassicalPlanning.Planning.Search
 
             internal PlanningTask(Problem problem, ICostStrategy costStrategy, InvariantInspector? invariantInspector)
             {
-                Problem = problem;
+                Domain = problem.Domain;
                 InvariantInspector = invariantInspector;
 
                 search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
                     source: new GoalSpaceNode(this, problem.Goal),
-                    isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
+                    isTarget: n => problem.InitialState.GetSatisfyingSubstitutions(n.Goal).Any(),
                     getEdgeCost: e => costStrategy.GetCost(e.Action),
                     getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));
 
                 CheckForSearchCompletion();
             }
 
-            public Problem Problem { get; }
+            public Domain Domain { get; }
 
             public InvariantInspector? InvariantInspector { get; }
 
@@ -173,14 +173,14 @@ namespace SCClassicalPlanning.Planning.Search
             public GoalSpaceNodeEdges(PlanningTask planningTask, Goal goal) => (this.planningTask, this.goal) = (planningTask, goal);
 
             /// <inheritdoc />
-            public int Count => ProblemInspector.GetRelevantActions(planningTask.Problem, goal).Count();
+            public int Count => DomainInspector.GetRelevantActions(planningTask.Domain, goal).Count();
 
             /// <inheritdoc />
             public IEnumerator<GoalSpaceEdge> GetEnumerator()
             {
                 if (planningTask.InvariantInspector != null)
                 {
-                    foreach (var action in ProblemInspector.GetRelevantActions(planningTask.Problem, goal))
+                    foreach (var action in DomainInspector.GetRelevantActions(planningTask.Domain, goal))
                     {
                         var effectiveAction = action;
 
@@ -198,7 +198,7 @@ namespace SCClassicalPlanning.Planning.Search
                 }
                 else
                 {
-                    foreach (var action in ProblemInspector.GetRelevantActions(planningTask.Problem, goal))
+                    foreach (var action in DomainInspector.GetRelevantActions(planningTask.Domain, goal))
                     {
                         yield return new GoalSpaceEdge(planningTask, goal, action);
                     }
@@ -233,7 +233,7 @@ namespace SCClassicalPlanning.Planning.Search
             public Action Action { get; }
 
             /// <inheritdoc />
-            public override string ToString() => new PlanFormatter(planningTask.Problem.Domain).Format(Action);
+            public override string ToString() => new PlanFormatter(planningTask.Domain).Format(Action);
         }
     }
 }

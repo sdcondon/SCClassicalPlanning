@@ -11,7 +11,7 @@ using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.Planning.Search
 {
-    public static class GoalSpaceSearchPlannerTests
+    public static class GoalSpaceAStarPlannerTests
     {
         private record TestCase(Problem Problem, ICostStrategy Strategy, IKnowledgeBase InvariantsKB);
 
@@ -71,7 +71,7 @@ namespace SCClassicalPlanning.Planning.Search
             })
             .When((_, tc) =>
             {
-                var planner = new GoalSpaceSearchPlanner(tc.Strategy);
+                var planner = new GoalSpaceAStarPlanner(tc.Strategy);
                 return planner.CreatePlanAsync(tc.Problem).GetAwaiter().GetResult();
             })
             .ThenReturns()
@@ -84,7 +84,7 @@ namespace SCClassicalPlanning.Planning.Search
             {
                 //(h, kb) => new BackwardStateSpaceSearch_LiftedWithKB(h, kb), // doesnt work yet
                 //(h, kb) => new BackwardStateSpaceSearch_LiftedWithoutKB(h), // doesnt work yet
-                (h, kb) => new GoalSpaceSearch_PropositionalWithoutKB(h),
+                (h, kb) => new GoalSpaceAStar_PropositionalWithoutKB(h),
                 //(h, kb) => new BackwardStateSpaceSearch_PropositionalWithKB(h, kb),
             })
             .AndEachOf(() => new TestCase[]

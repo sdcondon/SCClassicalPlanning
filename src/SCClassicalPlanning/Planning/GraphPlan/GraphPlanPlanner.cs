@@ -19,7 +19,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     internal class GraphPlanPlanner : IPlanner
     {
         /// <summary>
-        /// Creates a (concretely-typed) planning task to work on solving a given problem.
+        /// Creates a (specifically-typed) planning task to work on solving a given problem.
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
         /// <returns>A new <see cref="GraphPlanPlanningTask"/> for solving the problem.</returns>

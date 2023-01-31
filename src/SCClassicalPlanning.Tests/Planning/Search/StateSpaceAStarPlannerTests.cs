@@ -5,7 +5,7 @@ using SCClassicalPlanning.Planning.Search.CostStrategies;
 
 namespace SCClassicalPlanning.Planning.Search
 {
-    public static class StateSpaceSearchPlannerTests
+    public static class StateSpaceAStarPlannerTests
     {
         public static Test CreatedPlanValidity => TestThat
             .GivenTestContext()
@@ -19,7 +19,7 @@ namespace SCClassicalPlanning.Planning.Search
             .When((_, problem) =>
             {
                 var strategy = new IgnorePreconditionsGreedySetCover(problem.Domain);
-                var planner = new StateSpaceSearchPlanner(strategy);
+                var planner = new StateSpaceAStarPlanner(strategy);
                 return planner.CreatePlan(problem);
             })
             .ThenReturns()

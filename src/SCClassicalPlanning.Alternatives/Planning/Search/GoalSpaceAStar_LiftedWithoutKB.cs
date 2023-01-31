@@ -22,15 +22,15 @@ namespace SCClassicalPlanning.Planning.Search
     /// A simple implementation of <see cref="IPlanner"/> that carries out an A-star search of
     /// the goal space to create plans.
     /// </summary>
-    public class GoalSpaceSearch_LiftedWithoutKB : IPlanner
+    public class GoalSpaceAStar_LiftedWithoutKB : IPlanner
     {
         private readonly ICostStrategy costStrategy;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GoalSpaceSearch_LiftedWithoutKB"/> class.
+        /// Initializes a new instance of the <see cref="GoalSpaceAStar_LiftedWithoutKB"/> class.
         /// </summary>
         /// <param name="costStrategy">The cost strategy to use.</param>
-        public GoalSpaceSearch_LiftedWithoutKB(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
+        public GoalSpaceAStar_LiftedWithoutKB(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
 
         /// <summary>
         /// Creates a (concretely-typed) planning task to work on solving a given problem.
@@ -43,7 +43,7 @@ namespace SCClassicalPlanning.Planning.Search
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
 
         /// <summary>
-        /// The implementation of <see cref="IPlanningTask"/> used by <see cref="GoalSpaceSearch_LiftedWithoutKB"/>.
+        /// The implementation of <see cref="IPlanningTask"/> used by <see cref="GoalSpaceAStar_LiftedWithoutKB"/>.
         /// </summary>
         public class PlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
         {

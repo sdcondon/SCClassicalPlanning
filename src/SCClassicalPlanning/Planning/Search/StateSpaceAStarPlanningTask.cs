@@ -26,7 +26,7 @@ namespace SCClassicalPlanning.Planning.Search
     // that public would mean needing to make StateSpaceNode public, which would in turn mean needing to make
     // a decision regarding equality checks. Could just use a separate type - StateSpaceTransition (or something).
     // Decide and implement before v1.
-    public class StateSpaceSearchPlanningTask : SteppablePlanningTask<(State, Action, State)>
+    public class StateSpaceAStarPlanningTask : SteppablePlanningTask<(State, Action, State)>
     {
         private readonly AStarSearch<StateSpaceNode, StateSpaceEdge> search;
 
@@ -34,11 +34,11 @@ namespace SCClassicalPlanning.Planning.Search
         private Plan? result;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StateSpaceSearchPlanningTask"/> class.
+        /// Initializes a new instance of the <see cref="StateSpaceAStarPlanningTask"/> class.
         /// </summary>
         /// <param name="problem">The problem to solve.</param>
         /// <param name="costStrategy">The cost strategy to use.</param>
-        public StateSpaceSearchPlanningTask(Problem problem, ICostStrategy costStrategy)
+        public StateSpaceAStarPlanningTask(Problem problem, ICostStrategy costStrategy)
         {
             search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
                 source: new StateSpaceNode(problem, problem.InitialState),

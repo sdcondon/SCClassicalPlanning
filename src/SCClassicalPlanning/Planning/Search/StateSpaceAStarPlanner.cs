@@ -15,24 +15,24 @@
 namespace SCClassicalPlanning.Planning.Search
 {
     /// <summary>
-    /// An implementation of <see cref="IPlanner"/> that uses <see cref="StateSpaceSearchPlanningTask"/> instances.
+    /// An implementation of <see cref="IPlanner"/> that uses <see cref="StateSpaceAStarPlanningTask"/> instances.
     /// </summary>
-    public class StateSpaceSearchPlanner : IPlanner
+    public class StateSpaceAStarPlanner : IPlanner
     {
         private readonly ICostStrategy costStrategy;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StateSpaceSearchPlanner"/> class.
+        /// Initializes a new instance of the <see cref="StateSpaceAStarPlanner"/> class.
         /// </summary>
         /// <param name="costStrategy">The cost strategy to use.</param>
-        public StateSpaceSearchPlanner(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
+        public StateSpaceAStarPlanner(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
 
         /// <summary>
-        /// Creates a (concretely-typed) planning task to work on solving a given problem.
+        /// Creates a (specifically-typed) planning task to work on solving a given problem.
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
-        /// <returns>A new <see cref="StateSpaceSearchPlanningTask"/> instance.</returns>
-        public StateSpaceSearchPlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy);
+        /// <returns>A new <see cref="StateSpaceAStarPlanningTask"/> instance.</returns>
+        public StateSpaceAStarPlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy);
 
         /// <inheritdoc />
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);

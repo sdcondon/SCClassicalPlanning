@@ -102,25 +102,25 @@ namespace SCClassicalPlanning.Benchmarks.Planning
         [Benchmark]
         public Plan StateSpaceSearch()
         {
-            return new StateSpaceSearchPlanner(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
+            return new StateSpaceAStarPlanner(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
         public Plan GoalSpaceSearch()
         {
-            return new GoalSpaceSearchPlanner(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceAStarPlanner(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
         public Plan GoalSpaceSearch_PropositionalWithoutKB()
         {
-            return new GoalSpaceSearch_PropositionalWithoutKB(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceAStar_PropositionalWithoutKB(CurrentTestCase!.Strategy).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
         public Plan GoalSpaceSearch_PropositionalWithKB()
         {
-            return new GoalSpaceSearch_PropositionalWithKB(CurrentTestCase!.Strategy, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceAStar_PropositionalWithKB(CurrentTestCase!.Strategy, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
         }
 
         private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)
