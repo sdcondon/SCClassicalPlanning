@@ -94,11 +94,11 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         public static Action Unload(Term cargo, Term plane, Term airport) => new OperableAction(
             identifier: nameof(Unload),
             precondition:
-                In(cargo, plane)
-                & At(plane, airport)
-                & Cargo(cargo)
+                Cargo(cargo)
                 & Plane(plane)
-                & Airport(airport),
+                & Airport(airport)
+                & In(cargo, plane)
+                & At(plane, airport),
             effect:
                 At(cargo, airport)
                 & !In(cargo, plane));
@@ -113,11 +113,11 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         public static Action Fly(Term plane, Term origin, Term destination) => new OperableAction(
             identifier: nameof(Fly),
             precondition:
-                At(plane, origin)
-                & Plane(plane)
+                Plane(plane)
                 & Airport(origin)
-                & Airport(destination),
-                //& !AreEqual(origin, destination),
+                & Airport(destination)
+                //& !AreEqual(origin, destination)
+                & At(plane, origin),
             effect:
                 !At(plane, origin)
                 & At(plane, destination));

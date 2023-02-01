@@ -121,14 +121,14 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         public static Action Move(Term block, Term from, Term toBlock) => new OperableAction(
             identifier: nameof(Move),
             precondition:
-                On(block, from)
-                & Clear(block)
-                & Clear(toBlock)
-                & Block(block)
+                Block(block)
                 & Block(toBlock)
                 & !Equal(block, from)
                 & !Equal(block, toBlock)
-                & !Equal(from, toBlock),
+                & !Equal(from, toBlock)
+                & On(block, from)
+                & Clear(block)
+                & Clear(toBlock),
             effect:
                 On(block, toBlock)
                 & Clear(from)
@@ -138,10 +138,10 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         public static Action MoveToTable(Term block, Term from) => new OperableAction(
             identifier: nameof(MoveToTable),
             precondition:
-                On(block, from)
-                & Clear(block)
-                & Block(block)
-                & !Equal(block, from),
+                Block(block)
+                & !Equal(block, from)
+                & On(block, from)
+                & Clear(block),
             effect:
                 On(block, Table)
                 & Clear(from)

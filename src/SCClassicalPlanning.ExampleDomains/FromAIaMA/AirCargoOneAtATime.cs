@@ -107,11 +107,11 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         public static Action Fly(Term plane, Term from, Term to) => new OperableAction(
             identifier: nameof(Fly),
             precondition:
-                IsAt(plane, from)
-                & IsPlane(plane)
+                IsPlane(plane)
                 & IsAirport(from)
                 & IsAirport(to)
-                & !AreEqual(from, to),
+                & !AreEqual(from, to)
+                & IsAt(plane, from),
             effect:
                 !IsAt(plane, from)
                 & IsAt(plane, to));
