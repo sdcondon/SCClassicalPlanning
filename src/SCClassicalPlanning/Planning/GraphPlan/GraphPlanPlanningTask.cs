@@ -43,7 +43,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// </summary>
         public PlanningGraph PlanningGraph { get; }
 
-        // TODO: should probably expose NoGoods - just need to make it read-only.
+        // TODO: should probably have a public NoGoods prop - just need to make it read-only.
 
         /// <inheritdoc/>
         protected override async Task<Plan> ExecuteAsyncCore(CancellationToken cancellationToken = default)
@@ -65,8 +65,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 noGoods[currentGraphLevel.Index] = new();
             }
 
-            // Attempt to extract a plan until we succeed - stepping forward through
-            // the levels on each attempt. Fail if we get to a point where both the
+            // Attempt to extract a plan until we succeed - stepping forward to the
+            // next level on each failure. Terminate if we get to a point where both the
             // graph and the fixed-point no-goods have levelled off.
             Plan? plan;
             var previousFixedPointNoGoodCount = currentGraphLevel.IsLevelledOff ? noGoods[currentGraphLevel.Graph.LevelsOffAtLevel].Count : 0;
@@ -112,8 +112,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             // NB: there's no need to consider the goal here. The initial state MUST satisfy
             // whatever goal we are left with at this point - because the initial state determines
             // what actions were available for selection in GPSearch at level 1. (and we
-            // could have only hit this method for the first time at level 0 if the initial state
-            // satisfies the goal).
+            // could have only hit this method direct from ExecuteAsyncCore at level 0 if the
+            // initial state satisfies the goal).
             if (level.Index == 0)
             {
                 return Plan.Empty;
@@ -127,7 +127,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             // Otherwise, try to find a plan using the (recursive) GPSearch method:
             Plan? plan = GPSearch(
-                remainingGoalElements: SortGoalElements(goal, level),
+                remainingGoalElements: SortGoalElements(goal.Elements),
                 chosenActionNodes: Enumerable.Empty<PlanningGraphActionNode>(),
                 level: level);
 
@@ -146,12 +146,13 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             IEnumerable<PlanningGraphActionNode> chosenActionNodes,
             PlanningGraphLevel level)
         {
+            // Check if there are no remaining uncovered goal elements at this level. That is,
+            // if we've found a set of (non-mutually-exclusive) actions, the collective effects
+            // of which cover our goal.
             if (!remainingGoalElements.Any())
             {
-                // There are no remaining uncovered goal elements at this level. That is, we've
-                // found a set of (non-mutually-exclusive) actions, the collective effects of which
-                // cover our goal.
-                // Now we call Extract with the previous level and all of the preconditions of our chosen actions.
+                // We've covered all the goal elements. Now we call Extract with the previous
+                // level and all of the preconditions of our chosen actions.
                 var plan = Extract(
                     goal: new Goal(chosenActionNodes.SelectMany(n => n.Action.Precondition.Elements)),
                     level: level.PreviousLevel);
@@ -177,12 +178,12 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // then recurse for the other actions and remaining uncovered goal elements.
                 var firstRemainingGoalElement = remainingGoalElements.First();
 
-                foreach (var actionNode in GetRelevantActions(firstRemainingGoalElement, level))
+                foreach (var actionNode in SortActionNodes(level.NodesByProposition[firstRemainingGoalElement].Causes))
                 {
                     if (!actionNode.IsMutexWithAny(chosenActionNodes))
                     {
                         // TODO-PERFORMANCE: we'll end up with lots of wrapped IEnumerables here.
-                        // Benchmark then optimise - but get it working first.
+                        // Benchmark then optimise.
                         var plan = GPSearch(
                             remainingGoalElements: remainingGoalElements.Except(actionNode.Action.Effect.Elements),
                             chosenActionNodes: chosenActionNodes.Append(actionNode),
@@ -209,16 +210,14 @@ namespace SCClassicalPlanning.Planning.GraphPlan
          * Artificial Intelligence: A Modern Approach (Russel & Norvig)
          */
         // TODO: At some point, remove these hard-coded heuristics in favour of something injected by the consumer.
-        IEnumerable<Literal> SortGoalElements(Goal goal, PlanningGraphLevel graphLevel)
+        IEnumerable<Literal> SortGoalElements(IEnumerable<Literal> goalElements)
         {
-            return goal.Elements
-                .OrderByDescending(e => graphLevel.Graph.GetLevelCost(e));
+            return goalElements.OrderByDescending(e => PlanningGraph.GetLevelCost(e));
         }
 
-        IEnumerable<PlanningGraphActionNode> GetRelevantActions(Literal goalElement, PlanningGraphLevel graphLevel)
+        IEnumerable<PlanningGraphActionNode> SortActionNodes(IEnumerable<PlanningGraphActionNode> actionNodes)
         {
-            return graphLevel.NodesByProposition[goalElement].Causes
-                .OrderBy(n => n.Preconditions.Sum(p => graphLevel.Graph.GetLevelCost(p.Proposition)));
+            return actionNodes.OrderBy(n => n.Preconditions.Sum(p => PlanningGraph.GetLevelCost(p.Proposition)));
         }
     }
 }
