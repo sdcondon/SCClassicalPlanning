@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Equivalency;
 using FlUnit;
+using SCClassicalPlanning._TestUtilities;
 using SCClassicalPlanning.ExampleDomains;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using SCFirstOrderLogic;
@@ -29,10 +30,7 @@ namespace SCClassicalPlanning.Planning.Utilities
                     ExpectedResult: new[]
                     {
                         Add(element1),
-                        new( // Swap element1 in for something else
-                            identifier: "Swap",
-                            precondition: new(IsPresent(R) & !IsPresent(element1) & !AreEqual(R, element1)),
-                            effect: new(!IsPresent(R) & IsPresent(element1))),
+                        Swap(R, element1).WithAdditionalConstraints(!AreEqual(R, element1)),
                     }),
 
                 new(
@@ -42,14 +40,8 @@ namespace SCClassicalPlanning.Planning.Utilities
                     {
                         Add(element1),
                         Add(element2),
-                        new( // Swap element1 in for something else
-                            identifier: "Swap",
-                            precondition: new(IsPresent(R) & !IsPresent(element1) & !AreEqual(R, element1) & !AreEqual(R, element2)),
-                            effect: new(!IsPresent(R) & IsPresent(element1))),
-                        new( // Swap element2 in for something else
-                            identifier: "Swap",
-                            precondition: new(IsPresent(R) & !IsPresent(element2) & !AreEqual(R, element2) & !AreEqual(R, element1)),
-                            effect: new(!IsPresent(R) & IsPresent(element2))),
+                        Swap(R, element1).WithAdditionalConstraints(!AreEqual(R, element1) & !AreEqual(R, element2)),
+                        Swap(R, element2).WithAdditionalConstraints(!AreEqual(R, element1) & !AreEqual(R, element2)),
                     }),
 
                 new(
@@ -59,14 +51,8 @@ namespace SCClassicalPlanning.Planning.Utilities
                     {
                         Add(element1),
                         Remove(element2),
-                        new( // Swap element1 in for something else
-                            identifier: "Swap",
-                            precondition: new(IsPresent(R) & !IsPresent(element1) & !AreEqual(R, element1)),
-                            effect: new(!IsPresent(R) & IsPresent(element1))),
-                        new( // Swap element2 out for something else
-                            identifier: "Swap",
-                            precondition: new(IsPresent(element2) & !IsPresent(A) & !AreEqual(A, element2)),
-                            effect: new(IsPresent(A) & !IsPresent(element2))),
+                        Swap(R, element1).WithAdditionalConstraints(!AreEqual(R, element1)),
+                        Swap(element2, A).WithAdditionalConstraints(!AreEqual(A, element2)),
                     }),
 
                 new(
@@ -76,14 +62,8 @@ namespace SCClassicalPlanning.Planning.Utilities
                     {
                         Remove(element1),
                         Remove(element2),
-                        new( // Swap element1 out for something else
-                            identifier: "Swap",
-                            precondition: new(IsPresent(element1) & !IsPresent(A) & !AreEqual(A, element1) & !AreEqual(A, element2)),
-                            effect: new(IsPresent(A) & !IsPresent(element1))),
-                        new( // Swap element2 out for something else
-                            identifier: "Swap",
-                            precondition: new(IsPresent(element2) & !IsPresent(A) & !AreEqual(A, element2) & !AreEqual(A, element1)),
-                            effect: new(IsPresent(A) & !IsPresent(element2))),
+                        Swap(element1, A).WithAdditionalConstraints(!AreEqual(A, element1) & !AreEqual(A, element2)),
+                        Swap(element2, A).WithAdditionalConstraints(!AreEqual(A, element1) & !AreEqual(A, element2)),
                     }),
 
                 new(
@@ -91,18 +71,17 @@ namespace SCClassicalPlanning.Planning.Utilities
                     Goal: new(At(cargo, sfo)),
                     ExpectedResult: new Action[]
                     {
-                        Unload(cargo, new VariableReference("plane"), sfo),
-                        new(
-                            identifier: "Fly",
-                            precondition: new(Airport(sfo) & At(cargo, new VariableReference("from")) & !AreEqual(new VariableReference("from"), sfo) & Plane(cargo) & Airport(new VariableReference("from"))),
-                            effect: new(!At(cargo, new VariableReference("from")) & At(cargo, sfo))),
+                        Unload(cargo, Var("plane"), sfo),
+
+                        // obviously unsatisfiable because non-planes can't become planes, but spotting that is not this method's job:
+                        Fly(cargo, Var("from"), sfo).WithAdditionalConstraints(!AreEqual(Var("from"), sfo)), 
                     }),
             })
             .When(tc => DomainInspector.GetRelevantActions(tc.Domain, tc.Goal))
             .ThenReturns()
             .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult, ExpectVariablesToBeStandardised));
 
-        public static EquivalencyAssertionOptions<Action> ExpectVariablesToBeStandardised(this EquivalencyAssertionOptions<Action> opts)
+        private static EquivalencyAssertionOptions<Action> ExpectVariablesToBeStandardised(this EquivalencyAssertionOptions<Action> opts)
         {
             return opts
                 .RespectingRuntimeTypes()
