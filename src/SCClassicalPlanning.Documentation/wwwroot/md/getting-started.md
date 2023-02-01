@@ -124,7 +124,7 @@ Once you have a problem, the types in the `SCClassicalPlanning.Planning` namespa
 ```
 using SCClassicalPlanning.Planning; // for PlanFormatter and CreatePlan extension method (plan creation is async by default)
 using SCClassicalPlanning.Planning.Search; // for StateSpaceAStarPlanner
-using SCClassicalPlanning.Planning.Search.Strategies; // for UnsatisfiedGoalCount
+using SCClassicalPlanning.Planning.Search.CostStrategies; // for UnsatisfiedGoalCount
 
 // First instantiate a StateSpaceAStarPlanner, specifying a strategy to use (an object that gives
 // the cost of actions, and estimates the total cost of getting from a given state to a state
