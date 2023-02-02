@@ -7,8 +7,8 @@ namespace SCClassicalPlanning._TestUtilities
         /// <summary>
         /// Appends some extra elements to a given action's precondition and returns the result.
         /// </summary>
-        /// <returns>the updated action.</returns>
-        public static Action WithAdditionalConstraints(this Action action, OperableGoal additionalConstraints)
+        /// <returns>The updated action.</returns>
+        public static Action WithAdditionalPreconditions(this Action action, OperableGoal additionalConstraints)
         {
             return new Action(action.Identifier, new(action.Precondition.Elements.Union(additionalConstraints.Elements)), action.Effect);
         }

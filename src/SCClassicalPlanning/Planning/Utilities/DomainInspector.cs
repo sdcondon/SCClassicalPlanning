@@ -37,7 +37,7 @@ namespace SCClassicalPlanning.Planning.Utilities
         /// <returns>The actions that are relevant to the given state.</returns>
         public static IEnumerable<(Action schema, VariableSubstitution substitution, Goal constraints)> GetRelevantActionDetails(Domain domain, Goal goal)
         {
-            // Local method to find any constraints that apply to a given substitution for none of the goals elements to be negated.
+            // Local method to find any constraints that apply to a given substitution for none of the goal's elements to be negated.
             bool TryGetConstraints(IEnumerable<Literal> effectElements, VariableSubstitution substitution, [MaybeNullWhen(false)] out Goal constraints)
             {
                 List<Literal> constraintElements = new();

@@ -82,10 +82,10 @@ namespace SCClassicalPlanning.Planning.Search
             .GivenTestContext()
             .AndEachOf(() => new Func<ICostStrategy, IKnowledgeBase, IPlanner>[]
             {
-                //(h, kb) => new BackwardStateSpaceSearch_LiftedWithKB(h, kb), // doesnt work yet
-                //(h, kb) => new BackwardStateSpaceSearch_LiftedWithoutKB(h), // doesnt work yet
-                (h, kb) => new GoalSpaceAStar_PropositionalWithoutKB(h),
-                //(h, kb) => new BackwardStateSpaceSearch_PropositionalWithKB(h, kb),
+                //(h, kb) => new GoalSpaceAStarPlanner_LiftedWithKB(h, kb), // doesnt work yet
+                //(h, kb) => new GoalSpaceAStarPlanner_LiftedWithoutKB(h), // doesnt work yet
+                (h, kb) => new GoalSpaceAStarPlanner_PropositionalWithoutKB(h),
+                //(h, kb) => new GoalSpaceAStarPlanner_PropositionalWithKB(h, kb),
             })
             .AndEachOf(() => new TestCase[]
             {

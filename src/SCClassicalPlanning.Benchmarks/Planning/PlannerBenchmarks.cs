@@ -121,13 +121,13 @@ namespace SCClassicalPlanning.Benchmarks.Planning
         [Benchmark]
         public Plan GoalSpaceAStar_PropositionalWithoutKB()
         {
-            return new GoalSpaceAStar_PropositionalWithoutKB(CurrentTestCase!.CostStrategy).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceAStarPlanner_PropositionalWithoutKB(CurrentTestCase!.CostStrategy).CreatePlan(CurrentTestCase.Problem);
         }
 
         [Benchmark]
         public Plan GoalSpaceAStar_PropositionalWithKB()
         {
-            return new GoalSpaceAStar_PropositionalWithKB(CurrentTestCase!.CostStrategy, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
+            return new GoalSpaceAStarPlanner_PropositionalWithKB(CurrentTestCase!.CostStrategy, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
         }
 
         private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)

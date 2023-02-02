@@ -30,7 +30,7 @@ namespace SCClassicalPlanning.Planning.Utilities
                     ExpectedResult: new[]
                     {
                         Add(element1),
-                        Swap(R, element1).WithAdditionalConstraints(!AreEqual(R, element1)),
+                        Swap(R, element1).WithAdditionalPreconditions(!AreEqual(R, element1)),
                     }),
 
                 new(
@@ -40,8 +40,8 @@ namespace SCClassicalPlanning.Planning.Utilities
                     {
                         Add(element1),
                         Add(element2),
-                        Swap(R, element1).WithAdditionalConstraints(!AreEqual(R, element1) & !AreEqual(R, element2)),
-                        Swap(R, element2).WithAdditionalConstraints(!AreEqual(R, element1) & !AreEqual(R, element2)),
+                        Swap(R, element1).WithAdditionalPreconditions(!AreEqual(R, element1) & !AreEqual(R, element2)),
+                        Swap(R, element2).WithAdditionalPreconditions(!AreEqual(R, element1) & !AreEqual(R, element2)),
                     }),
 
                 new(
@@ -51,8 +51,8 @@ namespace SCClassicalPlanning.Planning.Utilities
                     {
                         Add(element1),
                         Remove(element2),
-                        Swap(R, element1).WithAdditionalConstraints(!AreEqual(R, element1)),
-                        Swap(element2, A).WithAdditionalConstraints(!AreEqual(A, element2)),
+                        Swap(R, element1).WithAdditionalPreconditions(!AreEqual(R, element1)),
+                        Swap(element2, A).WithAdditionalPreconditions(!AreEqual(A, element2)),
                     }),
 
                 new(
@@ -62,8 +62,8 @@ namespace SCClassicalPlanning.Planning.Utilities
                     {
                         Remove(element1),
                         Remove(element2),
-                        Swap(element1, A).WithAdditionalConstraints(!AreEqual(A, element1) & !AreEqual(A, element2)),
-                        Swap(element2, A).WithAdditionalConstraints(!AreEqual(A, element1) & !AreEqual(A, element2)),
+                        Swap(element1, A).WithAdditionalPreconditions(!AreEqual(A, element1) & !AreEqual(A, element2)),
+                        Swap(element2, A).WithAdditionalPreconditions(!AreEqual(A, element1) & !AreEqual(A, element2)),
                     }),
 
                 new(
@@ -74,7 +74,7 @@ namespace SCClassicalPlanning.Planning.Utilities
                         Unload(cargo, Var("plane"), sfo),
 
                         // obviously unsatisfiable because non-planes can't become planes, but spotting that is not this method's job:
-                        Fly(cargo, Var("from"), sfo).WithAdditionalConstraints(!AreEqual(Var("from"), sfo)), 
+                        Fly(cargo, Var("from"), sfo).WithAdditionalPreconditions(!AreEqual(Var("from"), sfo)), 
                     }),
             })
             .When(tc => DomainInspector.GetRelevantActions(tc.Domain, tc.Goal))
