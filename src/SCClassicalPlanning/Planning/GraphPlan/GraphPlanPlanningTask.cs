@@ -25,7 +25,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         private readonly Problem problem;
 
         // Is a dictionary because its described as a hashtable in the listing.
-        // Seems like a List'd do the job just fine (and obv be faster; okay, index 0 unneeded, but..)?
+        // Seems like a List'd do the job just fine (and obv be faster; okay, index 0 is unneeded, but..)?
         private readonly Dictionary<int, HashSet<Goal>> noGoods = new();
 
         /// <summary>
@@ -84,10 +84,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                         {
                             throw new InvalidOperationException("Problem is unsolvable");
                         }
-                        else
-                        {
-                            previousFixedPointNoGoodCount = currentFixedPointNoGoodCount;
-                        }
+
+                        previousFixedPointNoGoodCount = currentFixedPointNoGoodCount;
                     }
 
                     currentGraphLevel = currentGraphLevel.NextLevel;
@@ -201,13 +199,13 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         }
 
         /*
+         * From "Artificial Intelligence: A Modern Approach" (Russel & Norvig):
+         * 
          * "We need some heuristic guidance for choosing among actions during the backward search
          * One approach that works well in practice is a greedy algorithm based on the level cost of the literals.
          * For any set of goals, we proceed in the following order:
          * 1. Pick first the literal with the highest level cost.
          * 2. To achieve that literal, prefer actions with easier preconditions.That is, choose an action such that the sum (or maximum) of the level costs of its preconditions is smallest."
-         * 
-         * Artificial Intelligence: A Modern Approach (Russel & Norvig)
          */
         // TODO: At some point, remove these hard-coded heuristics in favour of something injected by the consumer.
         IEnumerable<Literal> SortGoalElements(IEnumerable<Literal> goalElements)

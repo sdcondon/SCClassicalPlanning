@@ -24,7 +24,7 @@ namespace SCClassicalPlanning.Planning.Utilities
                     Goal: Goal.Empty,
                     ExpectedResult: false),
 
-                new TestCase( // E;ement always true - fine
+                new TestCase( // Element always true - fine
                     Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
                     Goal: Block(Table),
                     ExpectedResult: false),
