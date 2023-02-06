@@ -80,7 +80,7 @@ namespace SCClassicalPlanning.Planning.Search
         {
             if (IsComplete)
             {
-                throw new InvalidOperationException("Task is complete");
+                throw new InvalidOperationException("Task is already complete");
             }
 
             var edge = search.NextStep();
