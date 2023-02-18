@@ -1,8 +1,8 @@
 ﻿# Home
 
-Basic but fully functional and documented [classical planning](https://www.google.com/search?q=classical+planning) implementations.
-Somewhat influenced by chapter 10 of *Artificial Intelligence: A Modern Approach (3rd Edition - [ISBN 978-1292153964](https://www.google.com/search?q=isbn+978-1292153964))*.
-Intended first and foremost to assist with learning and experimentation, but will (by the time v1 arrives) include extension points (and async support) so that it is at least conceivable that it could be (extended to be) useful in a production scenario.
+The SCClassicalPlanning NuGet package contains basic but fully functional and documented [classical planning](https://www.google.com/search?q=classical+planning) implementations for .NET.
+It is somewhat influenced by chapter 10 of *Artificial Intelligence: A Modern Approach (3rd Edition - [ISBN 978-1292153964](https://www.google.com/search?q=isbn+978-1292153964))*.
+It is intended first and foremost to assist with learning and experimentation, but will (by the time v1 arrives) include extension points (and async support) so that it is at least conceivable that it could be (extended to be) useful in a production scenario.
 Includes:
 
 * A model for planning problems that consists of [Problem](https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/Problem.cs), [Domain](https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/Domain.cs), [State](https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/State.cs), [Goal](https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/Goal.cs), [Action](https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/Action.cs), and [Effect](https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning/Effect.cs).
