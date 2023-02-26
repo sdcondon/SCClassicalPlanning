@@ -134,9 +134,9 @@ namespace SCClassicalPlanning.Planning.Search
             })
             .AndEachOf(() => new Func<TestCase, IPlanner>[]
             {
-                //tc => new GoalSpaceAStarPlanner_PropositionalWithoutKB(tc.Strategy),
+                tc => new GoalSpaceAStarPlanner_PropositionalWithoutKB(tc.Strategy),
                 //tc => new GoalSpaceAStarPlanner_PropositionalWithKB(tc.Strategy, tc.InvariantsKB),
-                tc => new GoalSpaceAStarPlanner_LiftedWithoutKB(tc.Strategy), // doesnt work yet
+                //tc => new GoalSpaceAStarPlanner_LiftedWithoutKB(tc.Strategy), // doesnt work yet
                 //tc => new GoalSpaceAStarPlanner_LiftedWithKB(tc.Strategy, tc.InvariantsKB), // doesnt work yet
             })
             .When((_, tc, makePlanner) => makePlanner(tc).CreatePlan(tc.Problem))
