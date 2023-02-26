@@ -46,10 +46,10 @@ namespace SCClassicalPlanning.Planning.Utilities
             })
             .When(tc =>
             {
-                var kb = new SimpleResolutionKnowledgeBase(
-                    new SimpleClauseStore(),
-                    SimpleResolutionKnowledgeBase.Filters.None,
-                    SimpleResolutionKnowledgeBase.PriorityComparisons.None); // No point in unitpreference, 'cos query is *all* unit clauses..
+                var kb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
+                    new HashSetClauseStore(),
+                    DelegateResolutionStrategy.Filters.None,
+                    DelegateResolutionStrategy.PriorityComparisons.None)); // No point in unitpreference, 'cos query is *all* unit clauses..
                 kb.Tell(tc.Invariants);
 
                 return new InvariantInspector(kb).IsGoalPrecludedByInvariants(tc.Goal);

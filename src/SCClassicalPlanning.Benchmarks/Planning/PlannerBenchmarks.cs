@@ -132,10 +132,10 @@ namespace SCClassicalPlanning.Benchmarks.Planning
 
         private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)
         {
-            var invariantKb = new SimpleResolutionKnowledgeBase(
-                new SimpleClauseStore(invariants),
-                SimpleResolutionKnowledgeBase.Filters.None,
-                SimpleResolutionKnowledgeBase.PriorityComparisons.UnitPreference);
+            var invariantKb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
+                new HashSetClauseStore(invariants),
+                DelegateResolutionStrategy.Filters.None,
+                DelegateResolutionStrategy.PriorityComparisons.UnitPreference));
 
             return invariantKb;
         }

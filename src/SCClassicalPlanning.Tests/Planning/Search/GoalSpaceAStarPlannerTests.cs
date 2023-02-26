@@ -80,13 +80,6 @@ namespace SCClassicalPlanning.Planning.Search
 
         public static Test CreatedPlanValidity_AlternativeImplementations => TestThat
             .GivenTestContext()
-            .AndEachOf(() => new Func<ICostStrategy, IKnowledgeBase, IPlanner>[]
-            {
-                //(h, kb) => new GoalSpaceAStarPlanner_LiftedWithKB(h, kb), // doesnt work yet
-                //(h, kb) => new GoalSpaceAStarPlanner_LiftedWithoutKB(h), // doesnt work yet
-                (h, kb) => new GoalSpaceAStarPlanner_PropositionalWithoutKB(h),
-                //(h, kb) => new GoalSpaceAStarPlanner_PropositionalWithKB(h, kb),
-            })
             .AndEachOf(() => new TestCase[]
             {
                 new(
@@ -139,17 +132,24 @@ namespace SCClassicalPlanning.Planning.Search
                         ForAll(A, B, If(On(A, B), !Clear(B))),
                     })),
             })
-            .When((_, makePlanner, tc) => makePlanner(tc.Strategy, tc.InvariantsKB).CreatePlan(tc.Problem))
+            .AndEachOf(() => new Func<TestCase, IPlanner>[]
+            {
+                //tc => new GoalSpaceAStarPlanner_PropositionalWithoutKB(tc.Strategy),
+                //tc => new GoalSpaceAStarPlanner_PropositionalWithKB(tc.Strategy, tc.InvariantsKB),
+                tc => new GoalSpaceAStarPlanner_LiftedWithoutKB(tc.Strategy), // doesnt work yet
+                //tc => new GoalSpaceAStarPlanner_LiftedWithKB(tc.Strategy, tc.InvariantsKB), // doesnt work yet
+            })
+            .When((_, tc, makePlanner) => makePlanner(tc).CreatePlan(tc.Problem))
             .ThenReturns()
-            .And((_, _, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
-            .And((cxt, _, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
+            .And((_, tc, _, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
+            .And((cxt, tc, _, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
 
         private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)
         {
-            var resolutionKb = new SimpleResolutionKnowledgeBase(
-                new SimpleClauseStore(),
-                SimpleResolutionKnowledgeBase.Filters.None,
-                SimpleResolutionKnowledgeBase.PriorityComparisons.UnitPreference);
+            var resolutionKb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
+                new HashSetClauseStore(),
+                DelegateResolutionStrategy.Filters.None,
+                DelegateResolutionStrategy.PriorityComparisons.UnitPreference));
 
             var invariantKb = new UniqueNamesAxiomisingKnowledgeBase(EqualityAxiomisingKnowledgeBase.CreateAsync(resolutionKb).GetAwaiter().GetResult());
             invariantKb.Tell(invariants);
