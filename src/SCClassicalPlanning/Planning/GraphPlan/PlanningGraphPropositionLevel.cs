@@ -17,7 +17,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 {
     /// <summary>
     /// <para>
-    /// Representation of a (proposition) level within a planning graph.
+    /// Representation of a proposition level within a planning graph.
     /// </para>
     /// </summary>
     // NB: this is a struct rather than a class ultimately to protect against
@@ -25,9 +25,9 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     // we shouldn't need to allocate anything else on the heap, regardless of
     // how many "levels" we need to retrieve beyond that (in e.g. GraphPlan). 
     // This is easy to accomplish by making this type a struct.
-    public readonly struct PlanningGraphLevel
+    public readonly struct PlanningGraphPropositionLevel
     {
-        internal PlanningGraphLevel(PlanningGraph graph, int index) => (Graph, Index) = (graph, index);
+        internal PlanningGraphPropositionLevel(PlanningGraph graph, int index) => (Graph, Index) = (graph, index);
 
         /// <summary>
         /// Gets the planning graph in which this level resides.
@@ -52,7 +52,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <summary>
         /// Gets the previous level of the graph. An exception will be thrown if the current level's index is 0.
         /// </summary>
-        public PlanningGraphLevel PreviousLevel
+        public PlanningGraphPropositionLevel PreviousLevel
         {
             get => Index >= 0 ? Graph.GetLevel(Index - 1) : throw new InvalidOperationException("Cannot retrieve the previous level to level 0");
         }
@@ -60,7 +60,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <summary>
         /// Gets the next level of the graph.
         /// </summary>
-        public PlanningGraphLevel NextLevel
+        public PlanningGraphPropositionLevel NextLevel
         {
             get => Graph.GetLevel(Index + 1);
         }

@@ -94,7 +94,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             GC.SuppressFinalize(this);
         }
 
-        private Plan? Extract(Goal goal, PlanningGraphLevel level)
+        private Plan? Extract(Goal goal, PlanningGraphPropositionLevel level)
         {
             // If we've reached level 0 (i.e. the initial state of the problem), we're done.
             // NB: there's no need to consider the goal here. The initial state MUST satisfy
@@ -132,7 +132,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         private Plan? GPSearch(
             IEnumerable<Literal> remainingGoalElements,
             IEnumerable<PlanningGraphActionNode> chosenActionNodes,
-            PlanningGraphLevel level)
+            PlanningGraphPropositionLevel level)
         {
             if (!remainingGoalElements.Any())
             {
@@ -196,13 +196,13 @@ namespace SCClassicalPlanning.Planning.GraphPlan
          * Artificial Intelligence: A Modern Approach (Russel & Norvig)
          */
         // TODO: At some point, remove this hard-coding.
-        IEnumerable<Literal> SortGoalElements(Goal goal, PlanningGraphLevel graphLevel)
+        IEnumerable<Literal> SortGoalElements(Goal goal, PlanningGraphPropositionLevel graphLevel)
         {
             return goal.Elements
                 .OrderByDescending(e => graphLevel.Graph.GetLevelCost(e));
         }
 
-        IEnumerable<PlanningGraphActionNode> GetRelevantActions(Literal goalElement, PlanningGraphLevel graphLevel)
+        IEnumerable<PlanningGraphActionNode> GetRelevantActions(Literal goalElement, PlanningGraphPropositionLevel graphLevel)
         {
             return graphLevel.NodesByProposition[goalElement].Causes
                 .OrderBy(n => n.Preconditions.Sum(p => graphLevel.Graph.GetLevelCost(p.Proposition)));

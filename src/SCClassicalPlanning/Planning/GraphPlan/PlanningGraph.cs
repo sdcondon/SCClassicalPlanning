@@ -137,7 +137,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// </summary>
         /// <param name="index">The index of the level to retrieve.</param>
         /// <returns>An object representing the level.</returns>
-        public PlanningGraphLevel GetLevel(int index)
+        public PlanningGraphPropositionLevel GetLevel(int index)
         {
             while (expandedToLevel < index && !levelsOffAtLevel.HasValue)
             {
@@ -171,7 +171,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         // TODO-V1: a fair amount of refactoring to be done here..
         private void Expand()
         {
-            var currentPropositionLevel = new PlanningGraphLevel(this, expandedToLevel);
+            var currentPropositionLevel = new PlanningGraphPropositionLevel(this, expandedToLevel);
             var newActionLevel = new Dictionary<Action, PlanningGraphActionNode>();
             var newPropositionLevel = new Dictionary<Literal, PlanningGraphPropositionNode>();
             var newPropositionLevelMutexCount = 0;

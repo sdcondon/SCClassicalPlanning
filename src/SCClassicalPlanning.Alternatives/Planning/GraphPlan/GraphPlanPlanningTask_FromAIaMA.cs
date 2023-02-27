@@ -89,7 +89,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         }
 
         private bool TryExtractSolution(
-            PlanningGraphLevel graphLevel,
+            PlanningGraphPropositionLevel graphLevel,
             HashSet<SearchState> noGoods,
             [MaybeNullWhen(false)] out Plan plan,
             CancellationToken cancellationToken)
@@ -129,7 +129,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         [DebuggerDisplay("{Goal} @ L{graphLevel.Index}")]
         private readonly struct SearchNode : INode<SearchNode, SearchEdge>, IEquatable<SearchNode>
         {
-            public SearchNode(PlanningGraphLevel graphLevel, Goal goal)
+            public SearchNode(PlanningGraphPropositionLevel graphLevel, Goal goal)
             {
                 this.GraphLevel = graphLevel;
                 this.Goal = goal;
@@ -137,7 +137,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
             public readonly Goal Goal { get; }
 
-            public readonly PlanningGraphLevel GraphLevel { get; }
+            public readonly PlanningGraphPropositionLevel GraphLevel { get; }
 
             public IReadOnlyCollection<SearchEdge> Edges => new SearchNodeEdges(GraphLevel, Goal);
 
@@ -151,10 +151,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private readonly struct SearchNodeEdges : IReadOnlyCollection<SearchEdge>
         {
-            private readonly PlanningGraphLevel graphLevel;
+            private readonly PlanningGraphPropositionLevel graphLevel;
             private readonly Goal goal;
 
-            public SearchNodeEdges(PlanningGraphLevel graphLevel, Goal goal)
+            public SearchNodeEdges(PlanningGraphPropositionLevel graphLevel, Goal goal)
             {
                 this.graphLevel = graphLevel;
                 this.goal = goal;
@@ -245,10 +245,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
 
         private readonly struct SearchEdge : IEdge<SearchNode, SearchEdge>
         {
-            private readonly PlanningGraphLevel graphLevel;
+            private readonly PlanningGraphPropositionLevel graphLevel;
             private readonly Goal goal;
 
-            public SearchEdge(PlanningGraphLevel graphLevel, Goal goal, IEnumerable<Action> actions)
+            public SearchEdge(PlanningGraphPropositionLevel graphLevel, Goal goal, IEnumerable<Action> actions)
             {
                 this.graphLevel = graphLevel;
                 this.goal = goal;
@@ -278,7 +278,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             private readonly HashSet<SearchState> noGoods;
             private readonly Dictionary<SearchNode, SearchEdge> visited = new Dictionary<SearchNode, SearchEdge>();
 
-            public SolutionExtractionDFS(Problem problem, PlanningGraphLevel graphLevel, HashSet<SearchState> noGoods)
+            public SolutionExtractionDFS(Problem problem, PlanningGraphPropositionLevel graphLevel, HashSet<SearchState> noGoods)
             {
                 this.problem = problem;
                 this.source = new SearchNode(graphLevel, problem.Goal);

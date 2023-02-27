@@ -104,7 +104,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
             GC.SuppressFinalize(this);
         }
 
-        private Plan? Extract(Goal goal, PlanningGraphLevel level)
+        private Plan? Extract(Goal goal, PlanningGraphPropositionLevel level)
         {
             // If we've reached level 0 (i.e. the initial state of the problem), we're done.
             // NB: there's no need to consider the goal here. The initial state MUST satisfy
@@ -142,7 +142,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         private Plan? GPSearch(
             IEnumerable<Literal> remainingGoalElements,
             IEnumerable<PlanningGraphActionNode> chosenActionNodes,
-            PlanningGraphLevel level)
+            PlanningGraphPropositionLevel level)
         {
             // Check if there are no remaining uncovered goal elements at this level. That is,
             // if we've found a set of (non-mutually-exclusive) actions, the collective effects
