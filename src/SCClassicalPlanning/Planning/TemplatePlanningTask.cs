@@ -24,6 +24,7 @@
         /// <inheritdoc />
         public Task<Plan> ExecuteAsync(CancellationToken cancellationToken)
         {
+            // TODO: multi-invocation protection
             return execution = ExecuteAsyncCore(cancellationToken);
         }
 

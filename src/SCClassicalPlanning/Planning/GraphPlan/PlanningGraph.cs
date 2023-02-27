@@ -76,7 +76,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// <summary>
         /// Gets the index of the level at which the graph levels off. This is the index
         /// of the first level that is the same as the one before, and after which all further 
-        /// levels are identical. Retrieving this proprty implicitly fully expands the graph
+        /// levels are identical. Retrieving this property implicitly fully expands the graph
         /// if it isn't already.
         /// </summary>
         public int LevelsOffAtLevel

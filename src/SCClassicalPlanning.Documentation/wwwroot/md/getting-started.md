@@ -78,7 +78,7 @@ Action moveToTable = new(
         & Clear(from)
         & !On(block, from)));
 
-// Now we are finally ready to declare our domain.
+// We are now ready to declare our domain.
 // A domain defines the common aspects of all problems that occur within it.
 // Minimally, what actions are available:
 var domain = new Domain(moveToBlock, moveToTable);
