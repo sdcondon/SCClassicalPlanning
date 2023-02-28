@@ -18,8 +18,8 @@ namespace SCClassicalPlanning.Planning.Search
             })
             .When((_, problem) =>
             {
-                var strategy = new IgnorePreconditionsGreedySetCover(problem.Domain);
-                var planner = new StateSpaceAStarPlanner(strategy);
+                var costStrategy = new IgnorePreconditionsGreedySetCover(problem.Domain);
+                var planner = new StateSpaceAStarPlanner(costStrategy);
                 return planner.CreatePlan(problem);
             })
             .ThenReturns()

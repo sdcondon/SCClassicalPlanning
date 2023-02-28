@@ -22,7 +22,7 @@ namespace SCClassicalPlanning.InternalUtilities
     {
         /// <summary>
         /// <para>
-        /// Determines whether the current set and the specified set contain the same elements.
+        /// Determines whether this set and the specified set contain the same elements.
         /// </para>
         /// <para>
         /// NB: In general, <see cref="ISet{T}.SetEquals(IEnumerable{T})"/> implementations have to handle the possibility that duplicates

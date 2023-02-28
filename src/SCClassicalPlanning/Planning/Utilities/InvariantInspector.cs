@@ -14,6 +14,8 @@
 using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
+using SCFirstOrderLogic.Inference.Resolution;
+using System.Diagnostics;
 
 namespace SCClassicalPlanning.Planning.Utilities
 {
@@ -46,6 +48,10 @@ namespace SCClassicalPlanning.Planning.Utilities
         /// <returns>A (task that returns a) value indicating whether the invariants mean that the given goal is impossible to achieve.</returns>
         public async Task<bool> IsGoalPrecludedByInvariantsAsync(Goal goal, CancellationToken cancellationToken = default)
         {
+            // NB For "true" values, we *could* be looking for a non-trivial subset of this goal as well.
+            // We'd probably want a structure other than a hash table for that, though (something tree-like).
+            // If we did it, we'd also be justified in removing all existing supersets when adding a goal with a "true" value.
+            // Vice-versa (i.e switch subset and superset in the above) for "false" values.
             if (!isPrecludedGoalResultCache.TryGetValue(goal, out bool isPrecludedGoal))
             {
                 var variables = new HashSet<VariableDeclaration>();
@@ -65,7 +71,15 @@ namespace SCClassicalPlanning.Planning.Utilities
                 // Note the negation here. We're not asking if the invariants mean that the goal MUST
                 // be true (that will of course generally not be the case!), we're asking if the goal
                 // CANNOT be true - that is, if its NEGATION must be true.
+#if true // temp...
                 isPrecludedGoal = isPrecludedGoalResultCache[goal] = await invariantsKB.AskAsync(new Negation(goalSentence), cancellationToken);
+#else
+                var query = await invariantsKB.CreateQueryAsync(new Negation(goalSentence), cancellationToken);
+                if (isPrecludedGoal = await query.ExecuteAsync(cancellationToken))
+                {
+                    Debug.WriteLine(((ResolutionQuery)query).ResultExplanation);
+                }
+#endif
             }
 
             return isPrecludedGoal;

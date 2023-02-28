@@ -22,7 +22,7 @@ namespace SCClassicalPlanning.Planning.Search
                 new(
                     Problem: AirCargo.ExampleProblem,
                     Strategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
-                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    InvariantsKB: MakeResolutionKB(new Sentence[]
                     {
                         Cargo(new Constant("cargo1")),
                         Cargo(new Constant("cargo2")),
@@ -41,7 +41,7 @@ namespace SCClassicalPlanning.Planning.Search
                 new(
                     Problem: BlocksWorld.ExampleProblem,
                     Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
-                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    InvariantsKB: MakeResolutionKB(new Sentence[]
                     {
                         Block(new Constant("blockA")),
                         Block(new Constant("blockB")),
@@ -53,12 +53,12 @@ namespace SCClassicalPlanning.Planning.Search
                 new(
                     Problem: SpareTire.ExampleProblem,
                     Strategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
-                    InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
+                    InvariantsKB: MakeResolutionKB(Array.Empty<Sentence>())),
 
                 new(
                     Problem: BlocksWorld.LargeExampleProblem,
                     Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
-                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    InvariantsKB: MakeResolutionKB(new Sentence[]
                     {
                         Block(new Constant("blockA")),
                         Block(new Constant("blockB")),
@@ -85,7 +85,7 @@ namespace SCClassicalPlanning.Planning.Search
                 new(
                     Problem: AirCargo.ExampleProblem,
                     Strategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
-                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    InvariantsKB: MakeResolutionKB(new Sentence[]
                     {
                         Cargo(new Constant("cargo1")),
                         Cargo(new Constant("cargo2")),
@@ -104,7 +104,7 @@ namespace SCClassicalPlanning.Planning.Search
                 new(
                     Problem: BlocksWorld.ExampleProblem,
                     Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
-                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    InvariantsKB: MakeResolutionKB(new Sentence[]
                     {
                         Block(new Constant("blockA")),
                         Block(new Constant("blockB")),
@@ -116,12 +116,12 @@ namespace SCClassicalPlanning.Planning.Search
                 new(
                     Problem: SpareTire.ExampleProblem,
                     Strategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
-                    InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
+                    InvariantsKB: MakeResolutionKB(Array.Empty<Sentence>())),
 
                 new(
                     Problem: BlocksWorld.LargeExampleProblem,
                     Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
-                    InvariantsKB: MakeInvariantsKB(new Sentence[]
+                    InvariantsKB: MakeResolutionKB(new Sentence[]
                     {
                         Block(new Constant("blockA")),
                         Block(new Constant("blockB")),
@@ -144,7 +144,7 @@ namespace SCClassicalPlanning.Planning.Search
             .And((_, tc, _, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
             .And((cxt, tc, _, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
 
-        private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)
+        private static IKnowledgeBase MakeResolutionKB(IEnumerable<Sentence> invariants)
         {
             var resolutionKb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
                 new HashSetClauseStore(),

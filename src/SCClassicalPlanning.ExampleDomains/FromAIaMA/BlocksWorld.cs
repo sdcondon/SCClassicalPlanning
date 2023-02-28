@@ -92,7 +92,7 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
         public static Problem ExampleProblem { get; }
 
         /// <summary>
-        /// Gets an instance of an example problem in this domain that is larger than the customery 3-block <see cref="ExampleProblem"/>.
+        /// Gets an instance of an example problem in this domain that is larger than the customary 3-block <see cref="ExampleProblem"/>.
         /// Consists of five blocks.
         /// </summary>
         public static Problem LargeExampleProblem { get; }

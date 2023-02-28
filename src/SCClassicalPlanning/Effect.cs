@@ -67,12 +67,12 @@ namespace SCClassicalPlanning
 
         /// <summary>
         /// Gets the "add list" of the effect - the non-negated predicates within the <see cref="Elements"/> set.
-        /// These are removed from a <see cref="State"/> when this effect is applied.
+        /// These are added to a <see cref="State"/> when this effect is applied.
         /// </summary>
         public IEnumerable<Predicate> AddList => Elements.Where(a => !a.IsNegated).Select(l => l.Predicate);
 
         /// <summary>
-        /// Gets the "delete list" of the effect - the non-negated predicates within the <see cref="Elements"/> set.
+        /// Gets the "delete list" of the effect - the negated predicates within the <see cref="Elements"/> set.
         /// These are removed from a <see cref="State"/> when this effect is applied.
         /// </summary>
         public IEnumerable<Predicate> DeleteList => Elements.Where(a => a.IsNegated).Select(l => l.Predicate);
