@@ -111,12 +111,13 @@ namespace SCClassicalPlanning.Planning.Search.CostStrategies
                     {
                         if (LiteralUnifier.TryCreate(effectElement, goalElement, out var unifier))
                         {
+#if false
                             var transformedEffectElement = new VariableSubstitutionEffectTransformation(unifier).ApplyTo(actionSchema.Effect);
-
-                            var message = $"Goal {goalElement} matched by effect {transformedEffectElement} from {actionSchema.Identifier}({string.Join(",", unifier.Bindings.Select(kvp => $"{kvp.Key}:{kvp.Value}"))})";
-                            Debug.WriteLine(message);
-
+                            Debug.WriteLine($"Goal {goalElement} matched by effect {transformedEffectElement} from {actionSchema.Identifier}({string.Join(",", unifier.Bindings.Select(kvp => $"{kvp.Key}:{kvp.Value}"))})");
                             yield return transformedEffectElement;
+#else
+                            yield return new VariableSubstitutionEffectTransformation(unifier).ApplyTo(actionSchema.Effect);
+#endif
                         }
                     }
                 }
