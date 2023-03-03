@@ -76,9 +76,13 @@ namespace SCClassicalPlanning.Planning.Utilities
 #if true
                 isPrecludedGoal = isPrecludedGoalResultCache[goal] = await invariantsKB.AskAsync(new Negation(goalSentence), cancellationToken);
 #else // temp...
+                Stopwatch sw = Stopwatch.StartNew();
                 var query = await invariantsKB.CreateQueryAsync(new Negation(goalSentence), cancellationToken);
-                if (isPrecludedGoal = await query.ExecuteAsync(cancellationToken))
+                isPrecludedGoal = isPrecludedGoalResultCache[goal] = await query.ExecuteAsync(cancellationToken);
+                sw.Stop();
+                if (isPrecludedGoal)
                 {
+                    Debug.WriteLine($"GOAL {goal} PRECLUDED BY INVARIANTS IN {sw.Elapsed}");
                     Debug.WriteLine(((ResolutionQuery)query).ResultExplanation);
                 }
 #endif
@@ -113,7 +117,29 @@ namespace SCClassicalPlanning.Planning.Utilities
             {
                 if (!isTrivialElementResultCache.TryGetValue(element, out bool isTrivialElement))
                 {
-                    isTrivialElement = isTrivialElementResultCache[element] = await invariantsKB.AskAsync(element.ToSentence(), cancellationToken);
+                    var elementSentence = element.ToSentence();
+
+                    var variables = new HashSet<VariableDeclaration>();
+                    GoalVariableFinder.Instance.Visit(element, variables);
+
+                    foreach (var variable in variables)
+                    {
+                        elementSentence = new ExistentialQuantification(variable, elementSentence);
+                    }
+
+#if true
+                    isTrivialElement = isTrivialElementResultCache[element] = await invariantsKB.AskAsync(elementSentence, cancellationToken);
+#else // temp...
+                    Stopwatch sw = Stopwatch.StartNew();
+                    var query = await invariantsKB.CreateQueryAsync(element.ToSentence(), cancellationToken);
+                    isTrivialElement = await query.ExecuteAsync(cancellationToken);
+                    sw.Stop();
+                    if (isTrivialElement)
+                    {
+                        Debug.WriteLine($"ELEMENT {element} TRIVIAL BY INVARIANTS IN {sw.Elapsed}");
+                        Debug.WriteLine(((ResolutionQuery)query).ResultExplanation);
+                    }
+#endif
                 }
 
                 if (isTrivialElement)

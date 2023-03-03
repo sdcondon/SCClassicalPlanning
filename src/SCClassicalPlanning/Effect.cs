@@ -136,7 +136,7 @@ namespace SCClassicalPlanning
         /// </summary>
         private class ConstructionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
         {
-            private static readonly ConstructionVisitor Instance = new ConstructionVisitor();
+            private static readonly ConstructionVisitor Instance = new();
 
             public static HashSet<Literal> Visit(Sentence sentence)
             {
