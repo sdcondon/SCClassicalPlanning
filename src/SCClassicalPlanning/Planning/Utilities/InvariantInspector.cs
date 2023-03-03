@@ -49,9 +49,10 @@ namespace SCClassicalPlanning.Planning.Utilities
         public async Task<bool> IsGoalPrecludedByInvariantsAsync(Goal goal, CancellationToken cancellationToken = default)
         {
             // NB For "true" values, we *could* be looking for a non-trivial subset of this goal as well.
-            // We'd probably want a structure other than a hash table for that, though (something tree-like).
+            // We'd probably want a structure other than a hash table for that, though (something trie-like).
             // If we did it, we'd also be justified in removing all existing supersets when adding a goal with a "true" value.
             // Vice-versa (i.e switch subset and superset in the above) for "false" values.
+            // except its not just sub or supersets here, is it? - its subsuming/subsumed goals.
             if (!isPrecludedGoalResultCache.TryGetValue(goal, out bool isPrecludedGoal))
             {
                 var variables = new HashSet<VariableDeclaration>();
@@ -59,7 +60,8 @@ namespace SCClassicalPlanning.Planning.Utilities
 
                 // NB: can safely skip here because otherwise the goal is empty - and we initialise
                 // the result cache with the empty goal - so the TryGetValue above would have succeeded.
-                // TODO-SCFIRSTORDERLOGIC-MAYBE: Annoying performance hit - goals are essentially already in CNF, but our knowledge bases want to do the conversion themselves.. Meh, never mind.
+                // TODO-SCFIRSTORDERLOGIC-MAYBE: Annoying performance hit - goals are essentially already in CNF,
+                // but our knowledge bases want to do the conversion themselves.. Meh, never mind.
                 // TODO: Perhaps a ToSentence in Goal? (and others..)
                 var goalSentence = goal.Elements.Skip(1).Aggregate(goal.Elements.First().ToSentence(), (c, e) => new Conjunction(c, e.ToSentence()));
 
@@ -71,9 +73,9 @@ namespace SCClassicalPlanning.Planning.Utilities
                 // Note the negation here. We're not asking if the invariants mean that the goal MUST
                 // be true (that will of course generally not be the case!), we're asking if the goal
                 // CANNOT be true - that is, if its NEGATION must be true.
-#if true // temp...
+#if true
                 isPrecludedGoal = isPrecludedGoalResultCache[goal] = await invariantsKB.AskAsync(new Negation(goalSentence), cancellationToken);
-#else
+#else // temp...
                 var query = await invariantsKB.CreateQueryAsync(new Negation(goalSentence), cancellationToken);
                 if (isPrecludedGoal = await query.ExecuteAsync(cancellationToken))
                 {

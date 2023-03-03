@@ -147,6 +147,8 @@ namespace SCClassicalPlanning.Planning.Search
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
+        // NB: three ref-valued fields puts this on the verge of being too large for a struct.
+        // Probably worth comparing performance with a class-based graph at some point, but meh, it'll do for now.
         private readonly struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
         {
             private readonly Problem problem;
