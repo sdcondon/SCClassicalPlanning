@@ -124,14 +124,14 @@ namespace SCClassicalPlanning.Planning.Utilities
 
                     foreach (var variable in variables)
                     {
-                        elementSentence = new ExistentialQuantification(variable, elementSentence);
+                        elementSentence = new UniversalQuantification(variable, elementSentence);
                     }
 
 #if true
                     isTrivialElement = isTrivialElementResultCache[element] = await invariantsKB.AskAsync(elementSentence, cancellationToken);
 #else // temp...
                     Stopwatch sw = Stopwatch.StartNew();
-                    var query = await invariantsKB.CreateQueryAsync(element.ToSentence(), cancellationToken);
+                    var query = await invariantsKB.CreateQueryAsync(elementSentence, cancellationToken);
                     isTrivialElement = await query.ExecuteAsync(cancellationToken);
                     sw.Stop();
                     if (isTrivialElement)
