@@ -1,0 +1,69 @@
+﻿@page "/utilities/goal-space-explorer"
+
+@using SCClassicalPlanning
+@using SCClassicalPlanning.ExampleDomains.FromAIaMA;
+@using SCClassicalPlanning.Planning.StateAndGoalSpace;
+
+<h3>Goal Space Explorer - Blocks World</h3>
+
+<p>
+    Yes, this is ugly and raw.
+    The author is more of a back-end guy, for now.
+    Will likely improve on it gradually whenever the mood takes me.
+    Who knows, might even add some pretty graph visualisation stuff at some point.
+    Anyway, below is a list of all edges on the currently explored path from the end goal of the problem.
+    Explore an edge (adding it to the end of the current path) by clicking on the action to regress.
+    NB: so far, our treatment of goal spaces is not lifted - which can result in combinatorial explosion. And we don't yet prune unsatisifiable goals via invariants knowledge.
+    So goal space exploration isn't actually massively useful..
+    It's interesting though, so there.
+    <a href="#" @onclick="@(() => { PathToCurrentNode.Clear(); })" @onclick:preventDefault="true" @onclick:stopPropagation="true">[Reset]</a>
+</p>
+
+<ul>
+    <li>
+        <b>End Goal:</b> @Problem.Goal
+        <ul>
+            @foreach (var edge in RootNode.Edges)
+            {
+                <li><a href="#" @onclick="@(() => { PathToCurrentNode.Clear(); PathToCurrentNode.AddLast(edge); })" @onclick:preventDefault="true" @onclick:stopPropagation="true">@edge.ToString()</a></li>
+            }
+        </ul>
+    </li>
+
+    @foreach (var edge in PathToCurrentNode)
+    {
+        <li> 
+            <b>Action: @edge.ToString()</b>
+            <br/><b>New Goal:</b> @edge.To.Goal
+            <ul>
+                @foreach (var nextEdge in edge.To.Edges)
+                {
+                    <li><a href="#" @onclick="@(() => ExploreEdge(edge, nextEdge))" @onclick:preventDefault="true" @onclick:stopPropagation="true">@nextEdge.ToString()</a></li>
+                }
+            </ul>
+        </li>
+    }
+</ul>
+
+@code {
+    private readonly LinkedList<GoalSpaceEdge> PathToCurrentNode = new();
+
+    [Parameter]
+    public Problem Problem { get; set; } = BlocksWorld.ExampleProblem;
+
+    public GoalSpaceNode RootNode => new(Problem, Problem.Goal);
+
+    public void ExploreEdge(GoalSpaceEdge priorEdge, GoalSpaceEdge edge)
+    {
+        var currentLLNode = PathToCurrentNode.Find(priorEdge);
+        if (currentLLNode != null)
+        {
+            while (currentLLNode.Next != null)
+            {
+                PathToCurrentNode.Remove(currentLLNode.Next);
+            }
+        }
+
+        PathToCurrentNode.AddLast(edge);
+    }
+}

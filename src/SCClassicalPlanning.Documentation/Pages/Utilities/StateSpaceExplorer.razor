@@ -1,0 +1,66 @@
+﻿@page "/utilities/state-space-explorer"
+
+@using SCClassicalPlanning
+@using SCClassicalPlanning.ExampleDomains.FromAIaMA;
+@using SCClassicalPlanning.Planning.StateAndGoalSpace;
+
+<h3>State Space Explorer - Blocks World</h3>
+
+<p>
+    Yes, this is ugly and raw.
+    The author is more of a back-end guy, for now.
+    Will likely improve on it gradually whenever the mood takes me.
+    Who knows, might even add some pretty graph visualisation stuff at some point.
+    Anyway, below is a list of all edges on the currently explored path from the initial state of the problem.
+    Explore an edge (adding it to the end of the current path) by clicking on the appropriate action.
+    <a href="#" @onclick="@(() => { PathToCurrentNode.Clear(); })" @onclick:preventDefault="true" @onclick:stopPropagation="true">[Reset]</a>
+</p>
+
+<ul>
+    <li>
+        <b>Initial State:</b> @Problem.InitialState
+        <ul>
+            @foreach (var edge in RootNode.Edges)
+            {
+                <li><a href="#" @onclick="@(() => { PathToCurrentNode.Clear(); PathToCurrentNode.AddLast(edge); })" @onclick:preventDefault="true" @onclick:stopPropagation="true">@edge.ToString()</a></li>
+            }
+        </ul>
+    </li>
+
+    @foreach (var edge in PathToCurrentNode)
+    {
+        <li> 
+            <b>Action: @edge.ToString()</b>
+            <br/><b>New State:</b> @edge.To.State
+            <ul>
+                @foreach (var nextEdge in edge.To.Edges)
+                {
+                    <li><a href="#" @onclick="@(() => ExploreEdge(edge, nextEdge))" @onclick:preventDefault="true" @onclick:stopPropagation="true">@nextEdge.ToString()</a></li>
+                }
+            </ul>
+        </li>
+    }
+</ul>
+
+@code {
+    private readonly LinkedList<StateSpaceEdge> PathToCurrentNode = new();
+
+    [Parameter]
+    public Problem Problem { get; set; } = BlocksWorld.ExampleProblem;
+
+    public StateSpaceNode RootNode => new(Problem, Problem.InitialState);
+
+    public void ExploreEdge(StateSpaceEdge priorEdge, StateSpaceEdge edge)
+    {
+        var currentLLNode = PathToCurrentNode.Find(priorEdge);
+        if (currentLLNode != null)
+        {
+            while (currentLLNode.Next != null)
+            {
+                PathToCurrentNode.Remove(currentLLNode.Next);
+            }
+        }
+
+        PathToCurrentNode.AddLast(edge);
+    }
+}
