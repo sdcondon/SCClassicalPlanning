@@ -11,10 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using SCClassicalPlanning.Planning.Utilities;
-using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
-using System.Collections;
 
 namespace SCClassicalPlanning.Planning.Search
 {
@@ -22,11 +19,7 @@ namespace SCClassicalPlanning.Planning.Search
     /// A concrete subclass of <see cref="SteppablePlanningTask{TStepResult}"/> that carries out
     /// an A-star search of a problem's goal space to create a plan.
     /// </summary>
-    // TODO-V1: Replace this value tuple with a named type. Just using GoalSpaceEdge would work, but making
-    // that public would mean needing to make GoalSpaceNode public, which would in turn mean needing to make
-    // a decision regarding equality checks. Could just use a separate type - GoalSpaceTransition (or something).
-    // Decide and implement before v1.
-    public class GoalSpaceAStarPlanningTask : SteppablePlanningTask<(Goal, Action, Goal)>
+    public class GoalSpaceAStarPlanningTask : SteppablePlanningTask<GoalSpaceEdge>
     {
         private readonly AStarSearch<GoalSpaceNode, GoalSpaceEdge> search;
 
@@ -76,7 +69,7 @@ namespace SCClassicalPlanning.Planning.Search
         }
 
         /// <inheritdoc />
-        public override (Goal, Action, Goal) NextStep()
+        public override GoalSpaceEdge NextStep()
         {
             if (IsComplete)
             {
@@ -85,8 +78,7 @@ namespace SCClassicalPlanning.Planning.Search
 
             var edge = search.NextStep();
             CheckForSearchCompletion();
-
-            return (edge.From.Goal, edge.Action, edge.To.Goal);
+            return edge;
         }
 
         /// <inheritdoc />
@@ -107,86 +99,6 @@ namespace SCClassicalPlanning.Planning.Search
 
                 isComplete = true;
             }
-        }
-
-        private readonly struct GoalSpaceNode : INode<GoalSpaceNode, GoalSpaceEdge>, IEquatable<GoalSpaceNode>
-        {
-            private readonly Problem problem;
-
-            public GoalSpaceNode(Problem problem, Goal goal) => (this.problem, Goal) = (problem, goal);
-
-            /// <summary>
-            /// Gets the goal represented by this node.
-            /// </summary>
-            public Goal Goal { get; }
-
-            /// <inheritdoc />
-            public IReadOnlyCollection<GoalSpaceEdge> Edges => new GoalSpaceNodeEdges(problem, Goal);
-
-            /// <inheritdoc />
-            public override bool Equals(object? obj) => obj is GoalSpaceNode node && Equals(node);
-
-            /// <inheritdoc />
-            // NB: this struct is private - so we don't need to look at the problem, since it'll always match
-            public bool Equals(GoalSpaceNode node) => Equals(Goal, node.Goal);
-
-            /// <inheritdoc />
-            public override int GetHashCode() => HashCode.Combine(Goal);
-
-            /// <inheritdoc />
-            public override string ToString() => Goal.ToString();
-        }
-
-        private readonly struct GoalSpaceNodeEdges : IReadOnlyCollection<GoalSpaceEdge>
-        {
-            private readonly Problem problem;
-            private readonly Goal goal;
-
-            public GoalSpaceNodeEdges(Problem problem, Goal goal) => (this.problem, this.goal) = (problem, goal);
-
-            /// <inheritdoc />
-            public int Count => ProblemInspector.GetRelevantActions(problem, goal).Count();
-
-            /// <inheritdoc />
-            public IEnumerator<GoalSpaceEdge> GetEnumerator()
-            {
-                foreach (var action in ProblemInspector.GetRelevantActions(problem, goal))
-                {
-                    yield return new GoalSpaceEdge(problem, goal, action);
-                }
-            }
-
-            /// <inheritdoc />
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        }
-
-        // NB: three ref-valued fields puts this on the verge of being too large for a struct.
-        // Probably worth comparing performance with a class-based graph at some point, but meh, it'll do for now.
-        private readonly struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
-        {
-            private readonly Problem problem;
-            private readonly Goal fromGoal;
-
-            public GoalSpaceEdge(Problem problem, Goal fromGoal, Action action)
-            {
-                this.problem = problem;
-                this.fromGoal = fromGoal;
-                this.Action = action;
-            }
-
-            /// <inheritdoc />
-            public GoalSpaceNode From => new(problem, fromGoal);
-
-            /// <inheritdoc />
-            public GoalSpaceNode To => new(problem, Action.Regress(fromGoal));
-
-            /// <summary>
-            /// Gets the action that is regressed over to achieve this goal transition.
-            /// </summary>
-            public Action Action { get; }
-
-            /// <inheritdoc />
-            public override string ToString() => new PlanFormatter(problem.Domain).Format(Action);
         }
     }
 }
