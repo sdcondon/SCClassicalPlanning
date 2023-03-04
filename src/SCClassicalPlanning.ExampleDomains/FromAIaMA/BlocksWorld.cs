@@ -19,7 +19,8 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
 
             ExampleProblem = MakeProblem(
                 initialState: new(
-                    Block(blockA)
+                    Equal(Table, Table)
+                    & Block(blockA)
                     & Equal(blockA, blockA)
                     & Block(blockB)
                     & Equal(blockB, blockB)
@@ -39,7 +40,8 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
 
             LargeExampleProblem = MakeProblem(
                 initialState: new(
-                    Block(blockA)
+                    Equal(Table, Table)
+                    & Block(blockA)
                     & Equal(blockA, blockA)
                     & Block(blockB)
                     & Equal(blockB, blockB)
@@ -65,7 +67,8 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
 
             UnsolvableExampleProblem = MakeProblem(
                 initialState: new(
-                    Block(blockA)
+                    Equal(Table, Table)
+                    & Block(blockA)
                     & Equal(blockA, blockA)
                     & Block(blockB)
                     & Equal(blockB, blockB)
@@ -140,6 +143,7 @@ namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
             precondition:
                 Block(block)
                 & !Equal(block, from)
+                & !Equal(from, Table)
                 & On(block, from)
                 & Clear(block),
             effect:
