@@ -8,11 +8,11 @@
 
 <p>
     Yes, this is ugly and raw.
-    The author is more of a back-end guy, for now.
     Will likely improve on it gradually whenever the mood takes me.
     Who knows, might even add some pretty graph visualisation stuff at some point.
     Anyway, below is a list of all edges on the currently explored path from the initial state of the problem (the problem being the standard Sussman anomaly example in a three-block "blocks world").
     Explore an edge (adding it to the end of the current path) by clicking on the appropriate action.
+    NB: Collapses down the loop if the same edge is navigated twice. 
     <a href="#" @onclick="@(() => { PathToCurrentNode.Clear(); })" @onclick:preventDefault="true" @onclick:stopPropagation="true">[Reset]</a>
 </p>
 
