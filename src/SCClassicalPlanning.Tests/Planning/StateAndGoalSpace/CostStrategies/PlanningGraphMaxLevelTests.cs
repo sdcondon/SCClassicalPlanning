@@ -1,11 +1,10 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
-using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 
-namespace SCClassicalPlanning.Planning.Search.CostStrategies
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies
 {
-    public class PlanningGraphSetLevelTests
+    public static class PlanningGraphMaxLevelTests
     {
         private record TestCase(Problem Problem, float ExpectedCost);
 
@@ -14,9 +13,9 @@ namespace SCClassicalPlanning.Planning.Search.CostStrategies
             {
                 new(
                     Problem: HaveCakeAndEatCakeToo.ExampleProblem,
-                    ExpectedCost: 2),
+                    ExpectedCost: 1),
             })
-            .When(tc => new PlanningGraphSetLevel(tc.Problem.Domain).EstimateCost(tc.Problem.InitialState, tc.Problem.Goal))
+            .When(tc => new PlanningGraphMaxLevel(tc.Problem.Domain).EstimateCost(tc.Problem.InitialState, tc.Problem.Goal))
             .ThenReturns()
             .And((tc, rv) => rv.Should().Be(tc.ExpectedCost));
     }

@@ -13,31 +13,31 @@
 // limitations under the License.
 using SCGraphTheory.Search.Classic;
 
-namespace SCClassicalPlanning.Planning.Search
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace
 {
     /// <summary>
     /// A concrete subclass of <see cref="SteppablePlanningTask{TStepResult}"/> that carries out
-    /// an A-star search of a problem's state space to create a plan.
+    /// an A-star search of a problem's goal space to create a plan.
     /// </summary>
-    public class StateSpaceAStarPlanningTask : SteppablePlanningTask<StateSpaceEdge>
+    public class GoalSpaceAStarPlanningTask : SteppablePlanningTask<GoalSpaceEdge>
     {
-        private readonly AStarSearch<StateSpaceNode, StateSpaceEdge> search;
+        private readonly AStarSearch<GoalSpaceNode, GoalSpaceEdge> search;
 
         private bool isComplete;
         private Plan? result;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StateSpaceAStarPlanningTask"/> class.
+        /// Initializes a new instance of the <see cref="GoalSpaceAStarPlanningTask"/> class.
         /// </summary>
         /// <param name="problem">The problem to solve.</param>
         /// <param name="costStrategy">The cost strategy to use.</param>
-        public StateSpaceAStarPlanningTask(Problem problem, ICostStrategy costStrategy)
+        public GoalSpaceAStarPlanningTask(Problem problem, ICostStrategy costStrategy)
         {
-            search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
-                source: new StateSpaceNode(problem, problem.InitialState),
-                isTarget: n => n.State.Satisfies(problem.Goal),
+            search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
+                source: new GoalSpaceNode(problem, problem.Goal),
+                isTarget: n => problem.InitialState.Satisfies(n.Goal),
                 getEdgeCost: e => costStrategy.GetCost(e.Action),
-                getEstimatedCostToTarget: n => costStrategy.EstimateCost(n.State, problem.Goal));
+                getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));
 
             CheckForSearchCompletion();
         }
@@ -69,7 +69,7 @@ namespace SCClassicalPlanning.Planning.Search
         }
 
         /// <inheritdoc />
-        public override StateSpaceEdge NextStep()
+        public override GoalSpaceEdge NextStep()
         {
             if (IsComplete)
             {
@@ -94,7 +94,7 @@ namespace SCClassicalPlanning.Planning.Search
             {
                 if (search.IsSucceeded)
                 {
-                    result = new Plan(search.PathToTarget().Select(e => e.Action).ToList());
+                    result = new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
                 }
 
                 isComplete = true;

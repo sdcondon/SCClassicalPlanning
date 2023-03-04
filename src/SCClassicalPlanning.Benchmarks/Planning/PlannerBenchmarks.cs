@@ -1,13 +1,13 @@
 ﻿using BenchmarkDotNet.Attributes;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 using SCClassicalPlanning.Planning;
-using SCClassicalPlanning.Planning.Search;
+using SCClassicalPlanning.Planning.StateAndGoalSpace;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using SCFirstOrderLogic.Inference.Resolution;
-using SCClassicalPlanning.Planning.Search.CostStrategies;
+using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 using SCClassicalPlanning.Planning.GraphPlan;
 
 namespace SCClassicalPlanning.Benchmarks.Planning

@@ -14,7 +14,7 @@
 using SCClassicalPlanning.Planning.Utilities;
 using SCFirstOrderLogic.Inference;
 
-namespace SCClassicalPlanning.Planning.Search.CostStrategies
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies
 {
     /// <summary>
     /// <para>

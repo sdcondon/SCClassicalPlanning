@@ -2,9 +2,9 @@
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
 
-namespace SCClassicalPlanning.Planning.Search.CostStrategies
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies
 {
-    public static class PlanningGraphMaxLevelTests
+    public class PlanningGraphLevelSumTesrs
     {
         private record TestCase(Problem Problem, float ExpectedCost);
 
@@ -15,7 +15,7 @@ namespace SCClassicalPlanning.Planning.Search.CostStrategies
                     Problem: HaveCakeAndEatCakeToo.ExampleProblem,
                     ExpectedCost: 1),
             })
-            .When(tc => new PlanningGraphMaxLevel(tc.Problem.Domain).EstimateCost(tc.Problem.InitialState, tc.Problem.Goal))
+            .When(tc => new PlanningGraphLevelSum(tc.Problem.Domain).EstimateCost(tc.Problem.InitialState, tc.Problem.Goal))
             .ThenReturns()
             .And((tc, rv) => rv.Should().Be(tc.ExpectedCost));
     }

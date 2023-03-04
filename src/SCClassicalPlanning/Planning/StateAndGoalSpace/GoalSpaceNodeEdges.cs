@@ -14,7 +14,7 @@
 using SCClassicalPlanning.Planning.Utilities;
 using System.Collections;
 
-namespace SCClassicalPlanning.Planning.Search
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace
 {
     /// <summary>
     /// Represents the collection of outbound edges of a node in the goal space of a planning problem. 

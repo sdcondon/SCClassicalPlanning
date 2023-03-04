@@ -13,20 +13,20 @@
 // limitations under the License.
 using SCClassicalPlanning.Planning.GraphPlan;
 
-namespace SCClassicalPlanning.Planning.Search.CostStrategies
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies
 {
     /// <summary>
     /// <para>
-    /// Cost strategy that (gives all actions a cost of 1 and) uses a "set level" planning graph heuristic
+    /// Cost strategy that (gives all actions a cost of 1 and) uses a "max level" planning graph heuristic
     /// to provide cost estimates.
     /// </para>
     /// <para>
     /// To give an estimate, it first constructs a planning graph (yup, this is rather expensive..)
-    /// starting from the current state. The cost estimate is the level at which each of the goals
-    /// elements appear and are all not mutually-exclusive with one another.
+    /// starting from the current state. The cost estimate is the maximum level cost of any of the goal's
+    /// elements.
     /// </para>
     /// </summary>
-    public class PlanningGraphSetLevel : ICostStrategy
+    public class PlanningGraphMaxLevel : ICostStrategy
     {
         private readonly Domain domain;
 
@@ -34,7 +34,7 @@ namespace SCClassicalPlanning.Planning.Search.CostStrategies
         /// Initialises a new instance of the <see cref="PlanningGraphMaxLevel"/> class.
         /// </summary>
         /// <param name="domain">The relevant domain.</param>
-        public PlanningGraphSetLevel(Domain domain) => this.domain = domain;
+        public PlanningGraphMaxLevel(Domain domain) => this.domain = domain;
 
         /// <inheritdoc/>
         public float GetCost(Action action) => 1f;
@@ -44,15 +44,18 @@ namespace SCClassicalPlanning.Planning.Search.CostStrategies
         {
             var planningGraph = new PlanningGraph(new(domain, state, goal));
 
-            var level = planningGraph.GetLevelCost(goal.Elements);
-            if (level != -1)
+            return goal.Elements.Max(e =>
             {
-                return level;
-            }
-            else
-            {
-                return float.PositiveInfinity;
-            }
+                var level = planningGraph.GetLevelCost(e);
+                if (level != -1)
+                {
+                    return level;
+                }
+                else
+                {
+                    return float.PositiveInfinity;
+                }
+            });
         }
     }
 }

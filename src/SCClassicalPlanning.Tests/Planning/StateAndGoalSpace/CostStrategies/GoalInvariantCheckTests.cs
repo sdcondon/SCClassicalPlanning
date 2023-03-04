@@ -8,7 +8,7 @@ using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
-namespace SCClassicalPlanning.Planning.Search.CostStrategies
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies
 {
     public static class GoalInvariantCheckTests
     {

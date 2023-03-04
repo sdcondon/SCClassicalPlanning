@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.FromAIaMA;
-using SCClassicalPlanning.Planning.Search.CostStrategies;
+using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 
-namespace SCClassicalPlanning.Planning.Search
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace
 {
     public static class StateSpaceAStarPlannerTests
     {

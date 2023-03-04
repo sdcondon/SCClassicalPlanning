@@ -16,7 +16,7 @@ using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
 using System.Collections;
 
-namespace SCClassicalPlanning.Planning.Search
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace
 {
     /// <summary>
     /// <para>

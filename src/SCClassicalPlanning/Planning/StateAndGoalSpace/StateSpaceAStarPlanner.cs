@@ -11,27 +11,28 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace SCClassicalPlanning.Planning.Search
+
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace
 {
     /// <summary>
-    /// An implementation of <see cref="IPlanner"/> that uses <see cref="GoalSpaceAStarPlanningTask"/> instances.
+    /// An implementation of <see cref="IPlanner"/> that uses <see cref="StateSpaceAStarPlanningTask"/> instances.
     /// </summary>
-    public class GoalSpaceAStarPlanner : IPlanner
+    public class StateSpaceAStarPlanner : IPlanner
     {
         private readonly ICostStrategy costStrategy;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GoalSpaceAStarPlanner"/> class.
+        /// Initializes a new instance of the <see cref="StateSpaceAStarPlanner"/> class.
         /// </summary>
         /// <param name="costStrategy">The cost strategy to use.</param>
-        public GoalSpaceAStarPlanner(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
+        public StateSpaceAStarPlanner(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
 
         /// <summary>
         /// Creates a (specifically-typed) planning task to work on solving a given problem.
         /// </summary>
         /// <param name="problem">The problem to create a plan for.</param>
-        /// <returns>A new <see cref="GoalSpaceAStarPlanningTask"/> instance.</returns>
-        public GoalSpaceAStarPlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy);
+        /// <returns>A new <see cref="StateSpaceAStarPlanningTask"/> instance.</returns>
+        public StateSpaceAStarPlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy);
 
         /// <inheritdoc />
         IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);

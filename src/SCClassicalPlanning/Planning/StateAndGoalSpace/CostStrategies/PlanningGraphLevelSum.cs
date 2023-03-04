@@ -13,7 +13,7 @@
 // limitations under the License.
 using SCClassicalPlanning.Planning.GraphPlan;
 
-namespace SCClassicalPlanning.Planning.Search.CostStrategies
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies
 {
     /// <summary>
     /// <para>
@@ -21,12 +21,11 @@ namespace SCClassicalPlanning.Planning.Search.CostStrategies
     /// to provide cost estimates.
     /// </para>
     /// <para>
-    /// To give an estimate, it first constructs a planning graph (yup, this is rather expensive..)
-    /// starting from the current state. The cost estimate is the maximum level cost of any of the goal's
-    /// elements.
+    /// To give an estimate, it first constructs a planning graph starting from the current state. 
+    /// The cost estimate is the sum of the level costs of all of the goal's elements.
     /// </para>
     /// </summary>
-    public class PlanningGraphMaxLevel : ICostStrategy
+    public class PlanningGraphLevelSum : ICostStrategy
     {
         private readonly Domain domain;
 
@@ -34,7 +33,7 @@ namespace SCClassicalPlanning.Planning.Search.CostStrategies
         /// Initialises a new instance of the <see cref="PlanningGraphMaxLevel"/> class.
         /// </summary>
         /// <param name="domain">The relevant domain.</param>
-        public PlanningGraphMaxLevel(Domain domain) => this.domain = domain;
+        public PlanningGraphLevelSum(Domain domain) => this.domain = domain;
 
         /// <inheritdoc/>
         public float GetCost(Action action) => 1f;
@@ -44,7 +43,7 @@ namespace SCClassicalPlanning.Planning.Search.CostStrategies
         {
             var planningGraph = new PlanningGraph(new(domain, state, goal));
 
-            return goal.Elements.Max(e =>
+            return goal.Elements.Sum(e =>
             {
                 var level = planningGraph.GetLevelCost(e);
                 if (level != -1)

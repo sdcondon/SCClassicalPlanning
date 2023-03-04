@@ -13,53 +13,55 @@
 // limitations under the License.
 using SCGraphTheory;
 
-namespace SCClassicalPlanning.Planning.Search
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace
 {
     /// <summary>
-    /// Represents an edge in the state space of a planning problem.
+    /// Represents an edge in the goal space of a planning problem.
     /// </summary>
-    // NB: three ref-valued fields puts this on the verge of being too large for a struct (24 bytes on a 64-bit system).
+    // NB: three ref-valued fields puts this on the verge of being too large for a struct.
     // Probably worth comparing performance with a class-based graph at some point, but meh, it'll do for now.
-    public readonly struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
+    public readonly struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
     {
         /// <summary>
-        /// The problem whose state space this edge is a member of.
+        /// The problem whose goal space this edge is a member of.
         /// </summary>
         public readonly Problem Problem;
 
         /// <summary>
-        /// The state represented by the node that this edge connects from.
+        /// The goal represented by the node that this edge connects from.
         /// </summary>
-        public readonly State FromState;
+        public readonly Goal FromGoal;
 
         /// <summary>
-        /// The action that this edge represents the application of.
+        /// The action that this edge represents the regression of.
         /// </summary>
         public readonly Action Action;
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="StateSpaceEdge"/> struct.
+        /// Initialises a new instance of the <see cref="GoalSpaceEdge"/> struct.
         /// </summary>
-        /// <param name="problem">The problem whose state space this edge is a member of.</param>
-        /// <param name="fromState">The state represented by the node that this edge connects from.</param>
-        /// <param name="action">The action that this edge represents the application of.</param>
-        public StateSpaceEdge(Problem problem, State fromState, Action action)
+        /// <param name="problem">The problem whose goal space this edge is a member of.</param>
+        /// <param name="fromGoal">The goal represented by the node that this edge connects from.</param>
+        /// <param name="action">The action that this edge represents the regression of.</param>
+        public GoalSpaceEdge(Problem problem, Goal fromGoal, Action action)
         {
             Problem = problem;
-            FromState = fromState;
+            FromGoal = fromGoal;
             Action = action;
         }
 
         /// <inheritdoc />
-        public StateSpaceNode From => new(Problem, FromState);
+        public GoalSpaceNode From => new(Problem, FromGoal);
 
         /// <inheritdoc />
-        public StateSpaceNode To => new(Problem, Action.ApplyTo(FromState));
+        public GoalSpaceNode To => new(Problem, Action.Regress(FromGoal));
 
         /// <summary>
         /// Returns a string that represents the current object.
         /// </summary>
         /// <returns>A string that represents the current object.</returns>
         public override string ToString() => new PlanFormatter(Problem.Domain).Format(Action);
+
+        
     }
 }
