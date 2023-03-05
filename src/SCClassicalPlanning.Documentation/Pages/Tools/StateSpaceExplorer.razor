@@ -21,36 +21,26 @@
 </p>
 
 <ul>
-    <li>
-        @RenderState(problem.InitialState)
-        <ul>
-            @foreach (var edge in new StateSpaceNode(problem, problem.InitialState).Edges)
-            {
-                <li>
-                    <a href="#"
-                       style="@(edge.Equals(path.First?.Value) ? "font-weight:bold" : "")"
-                       @onclick="@(() => ExploreEdge(null, edge))"
-                       @onclick:preventDefault="true" 
-                       @onclick:stopPropagation="true">@edge.ToString()</a>
-                </li>
-            }
-        </ul>
-    </li>
-
-    @for (var n = path.First; n != null; n = n.Next)
+@{
+    void RenderStateListItem(LinkedListNode<StateSpaceEdge>? fromPathNode, StateSpaceNode stateNode, StateSpaceEdge? nextExploredEdge)
     {
-        var stateNode = n.Value.To;
-        var nextExploredEdge = n.Next?.Value;
-
         <li>
-            @RenderState(stateNode.State)
+            @{
+                // this wouldn't be needed if we had richer formatting functionality..
+                var stateElements = stateNode.State.Elements
+                    ////.Where(e => !invariants.IsTrivial(e))
+                    .OrderBy(e => e.Symbol.ToString())
+                    .ThenBy(e => string.Join(",", e.Arguments.Select(a => a.ToString())));
+            }
+            @string.Join(" ∧ ", stateElements);
+
             <ul>
                 @foreach (var edge in stateNode.Edges)
                 {
                     <li>
                         <a href="#"
                            style="@(edge.Equals(nextExploredEdge) ? "font-weight:bold" : "")"
-                           @onclick="@(() => ExploreEdge(n, edge))"
+                           @onclick="@(() => ExploreEdge(fromPathNode, edge))"
                            @onclick:preventDefault="true"
                            @onclick:stopPropagation="true">@edge.ToString()</a>
                     </li>
@@ -58,6 +48,14 @@
             </ul>
         </li>
     }
+
+    RenderStateListItem(null, new StateSpaceNode(problem, problem.InitialState), path.First?.Value);
+
+    @for (var n = path.First; n != null; n = n.Next)
+    {
+        RenderStateListItem(n, n.Value.To, n.Next?.Value);
+    }
+}
 </ul>
 
 @code {
@@ -73,7 +71,7 @@
     ////})));
 
     private void ExploreEdge(LinkedListNode<StateSpaceEdge>? fromPathNode, StateSpaceEdge edge)
-    {
+    {  
         if (fromPathNode != null)
         {
             while (fromPathNode.Next != null)
@@ -89,14 +87,5 @@
         }
 
         path.AddLast(edge);
-    }
-
-    private string RenderState(State state)
-    {
-        var elements = state.Elements
-            ////.Where(e => !invariants.IsTrivial(e))
-            .OrderBy(e => e.Symbol.ToString())
-            .ThenBy(e => string.Join(",", e.Arguments.Select(a => a.ToString())));
-        return string.Join(" ∧ ", elements);
     }
 }
