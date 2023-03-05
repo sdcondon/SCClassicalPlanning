@@ -12,7 +12,7 @@
 <h3>State Space Explorer - Blocks World</h3>
 
 <p>
-    A demonstration of the state space representation types to be found in the `<a href="https://github.com/sdcondon/SCClassicalPlanning/tree/main/src/SCClassicalPlanning/Planning/StateAndGoalSpace">SCClassicalPlanning.Planning.StateAndGoalSpace</a>` namespace.
+    A demonstration of the state space representation types to be found in the <a href="https://github.com/sdcondon/SCClassicalPlanning/tree/main/src/SCClassicalPlanning/Planning/StateAndGoalSpace">SCClassicalPlanning.Planning.StateAndGoalSpace</a> namespace.
     Yes, this isn't very pretty - will improve on it gradually.
     Starting from the initial state of the problem (the problem being hard-coded as the "blocks world" Sussman anomaly example depicted in the package icon for the mo), explore the state space by clicking on the action to apply.
     NB: Collapses down the loop if the same edge is navigated twice. 
@@ -22,7 +22,7 @@
 
 <ul>
 @{
-    void RenderStateListItem(LinkedListNode<StateSpaceEdge>? fromPathNode, StateSpaceNode stateNode, StateSpaceEdge? nextExploredEdge)
+    void RenderListItem(LinkedListNode<StateSpaceEdge>? lastPathNode, StateSpaceNode stateNode, StateSpaceEdge? nextExploredEdge)
     {
         <li>
             @{
@@ -40,7 +40,7 @@
                     <li>
                         <a href="#"
                            style="@(edge.Equals(nextExploredEdge) ? "font-weight:bold" : "")"
-                           @onclick="@(() => ExploreEdge(fromPathNode, edge))"
+                           @onclick="@(() => ExploreEdge(lastPathNode, edge))"
                            @onclick:preventDefault="true"
                            @onclick:stopPropagation="true">@edge.ToString()</a>
                     </li>
@@ -49,11 +49,11 @@
         </li>
     }
 
-    RenderStateListItem(null, new StateSpaceNode(problem, problem.InitialState), path.First?.Value);
+    RenderListItem(null, new StateSpaceNode(problem, problem.InitialState), path.First?.Value);
 
     @for (var n = path.First; n != null; n = n.Next)
     {
-        RenderStateListItem(n, n.Value.To, n.Next?.Value);
+        RenderListItem(n, n.Value.To, n.Next?.Value);
     }
 }
 </ul>
@@ -70,15 +70,15 @@
     ////    BlocksWorld.Block(new Constant("blockC")),
     ////})));
 
-    private void ExploreEdge(LinkedListNode<StateSpaceEdge>? fromPathNode, StateSpaceEdge edge)
+    private void ExploreEdge(LinkedListNode<StateSpaceEdge>? lastPathNode, StateSpaceEdge edge)
     {  
-        if (fromPathNode != null)
+        if (lastPathNode != null)
         {
-            while (fromPathNode.Next != null)
+            // huh, weird - assumed .net linked lists could just be chopped.
+            // turns out we have to remove nodes one at a time.
+            while (lastPathNode.Next != null)
             {
-                // huh, weird - assumed .net linked lists could just be chopped. 
-                // turns out we have to remove one at a time. might be worth using something else.
-                path.Remove(fromPathNode.Next);
+                path.Remove(lastPathNode.Next);
             }
         }
         else
