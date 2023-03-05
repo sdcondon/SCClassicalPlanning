@@ -44,7 +44,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                         !Equal(Table, blockA),
                         !Equal(Table, blockB),
                         !Equal(Table, blockC),
-                        !Equal(Table, Table), // Fine - we just don't say this - and there's no implicit stuff about equality in the lib
+                        Equal(Table, Table),
                         
                         !On(blockA, blockA),
                         !On(blockA, blockB),
