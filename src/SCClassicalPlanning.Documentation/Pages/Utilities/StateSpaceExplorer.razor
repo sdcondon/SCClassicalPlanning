@@ -8,34 +8,46 @@
 
 <p>
     Yes, this is ugly and raw.
-    Will likely improve on it gradually whenever the mood takes me.
-    Who knows, might even add some pretty graph visualisation stuff at some point.
-    Anyway, below is a list of all edges on the currently explored path from the initial state of the problem (the problem being the standard Sussman anomaly example in a three-block "blocks world").
-    Explore an edge (adding it to the end of the current path) by clicking on the appropriate action.
+    Will improve on it gradually whenever the mood takes me.
+    Starting from the initial state of the problem (the problem being the "blocks world" Sussman anomaly example depicted in the package icon), explore the state space by clicking on the action to apply.
     NB: Collapses down the loop if the same edge is navigated twice. 
-    <a href="#" @onclick="@(() => { PathToCurrentNode.Clear(); })" @onclick:preventDefault="true" @onclick:stopPropagation="true">[Reset]</a>
+    <a href="#" @onclick="@(() => { Path.Clear(); })" @onclick:preventDefault="true" @onclick:stopPropagation="true">[Reset]</a>
 </p>
 
 <ul>
     <li>
-        <b>Initial State:</b> @Problem.InitialState
+        @Problem.InitialState
         <ul>
             @foreach (var edge in RootNode.Edges)
             {
-                <li><a href="#" @onclick="@(() => { PathToCurrentNode.Clear(); PathToCurrentNode.AddLast(edge); })" @onclick:preventDefault="true" @onclick:stopPropagation="true">@edge.ToString()</a></li>
+                <li>
+                    <a href="#"
+                       style="@(edge.Equals(Path.First?.Value) ? "font-weight:bold" : "")"
+                       @onclick="@(() => { Path.Clear(); Path.AddLast(edge); })" 
+                       @onclick:preventDefault="true" 
+                       @onclick:stopPropagation="true">@edge.ToString()</a>
+                </li>
             }
         </ul>
     </li>
 
-    @foreach (var edge in PathToCurrentNode)
+    @for (var n = Path.First; n != null; n = n.Next)
     {
-        <li> 
-            <b>Action: @edge.ToString()</b>
-            <br/><b>New State:</b> @edge.To.State
+        var edge = n.Value;
+        var nextExploredEdge = n.Next?.Value;
+
+        <li>
+            @edge.To.State
             <ul>
-                @foreach (var nextEdge in edge.To.Edges)
+                @foreach (var possibleEdge in edge.To.Edges)
                 {
-                    <li><a href="#" @onclick="@(() => ExploreEdge(edge, nextEdge))" @onclick:preventDefault="true" @onclick:stopPropagation="true">@nextEdge.ToString()</a></li>
+                    <li>
+                        <a href="#"
+                           style="@(possibleEdge.Equals(nextExploredEdge) ? "font-weight:bold" : "")"
+                           @onclick="@(() => ExploreEdge(edge, possibleEdge))"
+                           @onclick:preventDefault="true"
+                           @onclick:stopPropagation="true">@possibleEdge.ToString()</a>
+                    </li>
                 }
             </ul>
         </li>
@@ -43,24 +55,22 @@
 </ul>
 
 @code {
-    private readonly LinkedList<StateSpaceEdge> PathToCurrentNode = new();
+    private readonly LinkedList<StateSpaceEdge> Path = new();
+    private readonly Problem Problem = BlocksWorld.ExampleProblem;
 
-    [Parameter]
-    public Problem Problem { get; set; } = BlocksWorld.ExampleProblem;
+    private StateSpaceNode RootNode => new(Problem, Problem.InitialState);
 
-    public StateSpaceNode RootNode => new(Problem, Problem.InitialState);
-
-    public void ExploreEdge(StateSpaceEdge priorEdge, StateSpaceEdge edge)
+    private void ExploreEdge(StateSpaceEdge priorEdge, StateSpaceEdge edge)
     {
-        var currentLLNode = PathToCurrentNode.Find(priorEdge);
+        var currentLLNode = Path.Find(priorEdge);
         if (currentLLNode != null)
         {
             while (currentLLNode.Next != null)
             {
-                PathToCurrentNode.Remove(currentLLNode.Next);
+                Path.Remove(currentLLNode.Next);
             }
         }
 
-        PathToCurrentNode.AddLast(edge);
+        Path.AddLast(edge);
     }
 }
