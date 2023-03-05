@@ -16,6 +16,8 @@ using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
 using System.Diagnostics;
+using System.Threading;
+using System.Xml.Linq;
 
 namespace SCClassicalPlanning.Planning.Utilities
 {
@@ -115,34 +117,7 @@ namespace SCClassicalPlanning.Planning.Utilities
 
             foreach (var element in goal.Elements)
             {
-                if (!isTrivialElementResultCache.TryGetValue(element, out bool isTrivialElement))
-                {
-                    var elementSentence = element.ToSentence();
-
-                    var variables = new HashSet<VariableDeclaration>();
-                    GoalVariableFinder.Instance.Visit(element, variables);
-
-                    foreach (var variable in variables)
-                    {
-                        elementSentence = new UniversalQuantification(variable, elementSentence);
-                    }
-
-#if true
-                    isTrivialElement = isTrivialElementResultCache[element] = await invariantsKB.AskAsync(elementSentence, cancellationToken);
-#else // temp...
-                    Stopwatch sw = Stopwatch.StartNew();
-                    var query = await invariantsKB.CreateQueryAsync(elementSentence, cancellationToken);
-                    isTrivialElement = await query.ExecuteAsync(cancellationToken);
-                    sw.Stop();
-                    if (isTrivialElement)
-                    {
-                        Debug.WriteLine($"ELEMENT {element} TRIVIAL BY INVARIANTS IN {sw.Elapsed}");
-                        Debug.WriteLine(((ResolutionQuery)query).ResultExplanation);
-                    }
-#endif
-                }
-
-                if (isTrivialElement)
+                if (await IsTrivial(element, cancellationToken))
                 {
                     remainingElements = remainingElements.Remove(element);
                     modified = true;
@@ -168,6 +143,49 @@ namespace SCClassicalPlanning.Planning.Utilities
         public Goal RemoveTrivialElements(Goal goal, CancellationToken cancellationToken = default)
         {
             return RemoveTrivialElementsAsync(goal, cancellationToken).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the given literal is trivial - that is, if the invariants mean that it always holds.
+        /// </summary>
+        /// <param name="literal"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<bool> IsTrivial(Literal literal, CancellationToken cancellationToken = default)
+        {
+            if (!isTrivialElementResultCache.TryGetValue(literal, out bool isTrivialElement))
+            {
+                var elementSentence = literal.ToSentence();
+
+                var variables = new HashSet<VariableDeclaration>();
+                GoalVariableFinder.Instance.Visit(literal, variables);
+
+                foreach (var variable in variables)
+                {
+                    elementSentence = new UniversalQuantification(variable, elementSentence);
+                }
+
+#if true
+                isTrivialElement = isTrivialElementResultCache[literal] = await invariantsKB.AskAsync(elementSentence, cancellationToken);
+#else // temp...
+                Stopwatch sw = Stopwatch.StartNew();
+                var query = await invariantsKB.CreateQueryAsync(elementSentence, cancellationToken);
+                isTrivialElement = await query.ExecuteAsync(cancellationToken);
+                sw.Stop();
+                if (isTrivialElement)
+                {
+                    Debug.WriteLine($"ELEMENT {element} TRIVIAL BY INVARIANTS IN {sw.Elapsed}");
+                    Debug.WriteLine(((ResolutionQuery)query).ResultExplanation);
+                }
+#endif
+            }
+
+            return isTrivialElement;
+        }
+
+        public bool IsTrivial(Literal literal)
+        {
+            return IsTrivial(literal, CancellationToken.None).GetAwaiter().GetResult();
         }
 
         private class GoalVariableFinder : RecursiveGoalVisitor<HashSet<VariableDeclaration>>
