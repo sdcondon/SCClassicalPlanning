@@ -19,7 +19,7 @@
     <a href="#" @onclick="@(() => { path.Clear(); })" @onclick:preventDefault="true" @onclick:stopPropagation="true">[Reset]</a>
 </p>
 
-<ul>
+<ol>
 @{
     void RenderListItem(LinkedListNode<StateSpaceEdge>? lastPathNode, StateSpaceNode stateNode, StateSpaceEdge? nextExploredEdge)
     {
@@ -55,7 +55,7 @@
         RenderListItem(n, n.Value.To, n.Next?.Value);
     }
 }
-</ul>
+</ol>
 
 @code {
     private readonly Problem problem = BlocksWorld.ExampleProblem;
