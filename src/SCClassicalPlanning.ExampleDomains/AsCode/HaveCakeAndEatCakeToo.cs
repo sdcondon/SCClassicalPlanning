@@ -2,7 +2,7 @@
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
-namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
+namespace SCClassicalPlanning.ExampleDomains.AsCode
 {
     /// <summary>
     /// The "have cake and eat cake too" domain used to demonstrate planning graphs in AIaMA.

@@ -1,12 +1,13 @@
 ﻿@page "/lab/state-space-explorer"
 
 @using SCClassicalPlanning
-@using SCClassicalPlanning.ExampleDomains.FromAIaMA;
+@using SCClassicalPlanning.ExampleDomains;
 @using SCClassicalPlanning.Planning.StateAndGoalSpace;
 @using SCClassicalPlanning.Planning.Utilities;
 @using SCFirstOrderLogic.Inference.BackwardChaining;
 @using SCFirstOrderLogic.Inference;
 @using SCFirstOrderLogic;
+@using SCClassicalPlanning.ExampleDomains.AsCode;
 @using static SCFirstOrderLogic.SentenceCreation.SentenceFactory;
 
 <h3>State Space Explorer - Blocks World</h3>
@@ -36,11 +37,13 @@
                 @foreach (var edge in stateNode.Edges)
                 {
                     <li>
+                        <!-- yeah, should be a button not an anchor, 
+                             but all of bootstrap's classes make it look rubbish.. -->
                         <a href="#"
+                           role="button"
                            style="@(edge.Equals(nextExploredEdge) ? "font-weight:bold" : "")"
                            @onclick="@(() => ExploreEdge(lastPathNode, edge))"
-                           @onclick:preventDefault="true"
-                           @onclick:stopPropagation="true">@edge.ToString()</a>
+                           @onclick:preventDefault>@edge.ToString()</a>
                     </li>
                 }
             </ul>

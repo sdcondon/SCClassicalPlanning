@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using FlUnit;
-using SCClassicalPlanning.ExampleDomains.FromAIaMA;
+using SCClassicalPlanning.ExampleDomains.AsCode;
 using SCFirstOrderLogic;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
+using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargo;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies

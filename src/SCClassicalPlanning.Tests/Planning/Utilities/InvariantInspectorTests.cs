@@ -2,7 +2,7 @@
 using FlUnit;
 using SCClassicalPlanning._TestUtilities;
 using SCFirstOrderLogic;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
+using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorld;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using SCFirstOrderLogic.Inference;

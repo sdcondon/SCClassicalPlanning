@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 using FlUnit;
-using SCClassicalPlanning.ExampleDomains.FromAIaMA;
+using SCClassicalPlanning.ExampleDomains.AsCode;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
+using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorld;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 

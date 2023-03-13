@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
 using FlUnit;
-using SCClassicalPlanning.ExampleDomains.FromAIaMA;
+using SCClassicalPlanning.ExampleDomains.AsCode;
 using SCFirstOrderLogic;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.HaveCakeAndEatCakeToo;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.SpareTire;
+using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorld;
+using static SCClassicalPlanning.ExampleDomains.AsCode.HaveCakeAndEatCakeToo;
+using static SCClassicalPlanning.ExampleDomains.AsCode.SpareTire;
 
 namespace SCClassicalPlanning.Planning.GraphPlan
 {

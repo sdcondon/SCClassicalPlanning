@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using FlUnit;
-using SCClassicalPlanning.ExampleDomains.FromAIaMA;
+using SCClassicalPlanning.ExampleDomains.AsCode;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies

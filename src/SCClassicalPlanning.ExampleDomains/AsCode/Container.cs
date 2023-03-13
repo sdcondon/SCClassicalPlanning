@@ -2,7 +2,7 @@
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
-namespace SCClassicalPlanning.ExampleDomains
+namespace SCClassicalPlanning.ExampleDomains.AsCode
 {
     /// <summary>
     /// <para>

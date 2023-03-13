@@ -1,14 +1,14 @@
 ﻿using BenchmarkDotNet.Attributes;
-using SCClassicalPlanning.ExampleDomains.FromAIaMA;
+using SCClassicalPlanning.ExampleDomains.AsCode;
 using SCClassicalPlanning.Planning;
+using SCClassicalPlanning.Planning.GraphPlan;
 using SCClassicalPlanning.Planning.StateAndGoalSpace;
+using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
 using SCFirstOrderLogic.Inference.Resolution;
-using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
-using SCClassicalPlanning.Planning.GraphPlan;
+using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorld;
+using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.Benchmarks.Planning
 {

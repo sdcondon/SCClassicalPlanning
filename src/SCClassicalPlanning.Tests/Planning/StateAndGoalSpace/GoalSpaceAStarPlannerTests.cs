@@ -1,12 +1,12 @@
 ﻿using FluentAssertions;
 using FlUnit;
-using SCClassicalPlanning.ExampleDomains.FromAIaMA;
+using SCClassicalPlanning.ExampleDomains.AsCode;
 using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.AirCargo;
-using static SCClassicalPlanning.ExampleDomains.FromAIaMA.BlocksWorld;
+using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargo;
+using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorld;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace

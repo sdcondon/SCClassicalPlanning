@@ -1,5 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
-using SCClassicalPlanning.ExampleDomains.FromAIaMA;
+using SCClassicalPlanning.ExampleDomains.AsCode;
 using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
 

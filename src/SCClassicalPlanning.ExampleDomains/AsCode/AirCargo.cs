@@ -2,7 +2,7 @@
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 
-namespace SCClassicalPlanning.ExampleDomains.FromAIaMA
+namespace SCClassicalPlanning.ExampleDomains.AsCode
 {
     /// <summary>
     /// The "Air Cargo" example from §10.1.1 of "Artificial Intelligence: A Modern Approach".
