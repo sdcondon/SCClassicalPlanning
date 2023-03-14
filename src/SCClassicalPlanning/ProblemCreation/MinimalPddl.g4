@@ -13,14 +13,14 @@ grammar MinimalPDDL;
 singleDomain: domain EOF;
 singleProblem: problem EOF;
 
-////////// DOMAINS
+/********** DOMAINS (, ACTIONS & EFFECTS) **********/
 
 domain: '(' 'define' '(' 'domain' NAME ')' extendsDef? requirementsDef? constantsDef? predicatesDef? timelessDef? structureDef* ')';
 
 extendsDef:      '(' ':extends' NAME+ ')';
 requirementsDef: '(' ':requirements' REQUIREMENT_FLAG+ ')';
 constantsDef:    '(' ':constants' constantDecList ')';
-predicatesDef:   '(' ':predicates' (predicates+=predicateDef)+ ')';
+predicatesDef:   '(' ':predicates' (predicates+=predicateDec)+ ')';
 timelessDef:     '(' ':timeless' literalList ')'; // grammar doesn't specify that it has to be ground, perhaps should..
 structureDef:    '(' ':action' NAME ':parameters' '(' variableDecList ')' (':precondition' goal)? (':effect' effect)? ')' # ActionDef
             ;
@@ -31,7 +31,7 @@ effect: literal                      # LiteralEffectElement
 
 
 
-////////// PROBLEMS
+/********** PROBLEMS **********/
 
 problem: '(' 'define' '(' 'problem' NAME ')' '(' ':domain' NAME ')' requirementsDef? objectsDef? initDef? goalDef+ ')';
 
@@ -41,7 +41,7 @@ goalDef:    '(' ':goal' goal ')';
 
 
 
-////////// GOALS
+/********** GOALS **********/
 
 goal: literal                  # LiteralGoalElement
     | '(' 'and' goal goal+ ')' # ConjunctiveGoalElement
@@ -49,14 +49,14 @@ goal: literal                  # LiteralGoalElement
 
 
 
-////////// LITERALS, PREDICATES & TERMS
+/********** LITERALS, PREDICATES & TERMS **********/
 
 literalList: (elements+=literal)+;
 literal: predicate               # PositiveLiteral
        | '(' 'not' predicate ')' # NegativeLiteral
        ;
 
-predicateDef: '(' NAME variableDecList ')';
+predicateDec: '(' NAME variableDecList ')';
 predicate: '(' NAME termList ')';
 
 termList: (elements+=term)*;
@@ -70,7 +70,7 @@ constantDecList: (elements+=NAME)*;
 
 
 
-////////// LEXER
+/********** LEXER **********/
 
 REQUIREMENT_FLAG: ':' NAME;
 VARIABLE_NAME: '?' NAME;

@@ -1,5 +1,4 @@
-(define
-    (problem sussman-anomaly)
+(define (problem sussman-anomaly)
     (:domain blocks-world)
     (:objects 
         blockA 

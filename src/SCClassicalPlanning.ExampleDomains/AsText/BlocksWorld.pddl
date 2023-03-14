@@ -1,7 +1,5 @@
 (define (domain blocks-world)
-
     (:constants Table)
-
     (:action MOVE
         :parameters (?block ?from ?toBlock)
         :precondition (and
@@ -21,7 +19,6 @@
             (not (clear ?toBlock))
         )
     )
-
     (:action MOVE-TO-TABLE
         :parameters (?block ?from)
         :precondition (and
@@ -32,7 +29,7 @@
             (clear ?block)
         )
         :effect (and
-            (On ?block Table)
+            (on ?block Table)
             (Clear ?from)
             (not (on ?block ?from))
         )

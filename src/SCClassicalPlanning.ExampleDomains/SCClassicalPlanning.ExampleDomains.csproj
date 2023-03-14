@@ -7,6 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="AsText\BlocksWorld.pddl" />
+    <None Remove="AsText\BlocksWorld.Sussman.pddl" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="AsText\BlocksWorld.pddl" />
+    <EmbeddedResource Include="AsText\BlocksWorld.Sussman.pddl" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="SCClassicalPlanning.Tests" />
   </ItemGroup>
 
