@@ -7,13 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="AsText\BlocksWorld.pddl" />
-    <None Remove="AsText\BlocksWorld.Sussman.pddl" />
+    <None Remove="AsPDDL\BlocksWorld.pddl" />
+    <None Remove="AsPDDL\BlocksWorld.Sussman.pddl" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="AsText\BlocksWorld.pddl" />
-    <EmbeddedResource Include="AsText\BlocksWorld.Sussman.pddl" />
+    <EmbeddedResource Include="AsPDDL\BlocksWorld.pddl" />
+    <EmbeddedResource Include="AsPDDL\BlocksWorld.Sussman.pddl" />
   </ItemGroup>
 
   <ItemGroup>

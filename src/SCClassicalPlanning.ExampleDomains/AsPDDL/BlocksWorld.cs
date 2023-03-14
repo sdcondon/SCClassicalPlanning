@@ -1,7 +1,7 @@
 ﻿using SCClassicalPlanning.ProblemCreation;
 using System.Reflection;
 
-namespace SCClassicalPlanning.ExampleDomains.AsText
+namespace SCClassicalPlanning.ExampleDomains.AsPDDL
 {
     /// <summary>
     /// The "Blocks World" example from §10.1.3 of "Artificial Intelligence: A Modern Approach".

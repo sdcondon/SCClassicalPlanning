@@ -43,8 +43,6 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// </summary>
         public PlanningGraph PlanningGraph { get; }
 
-        // TODO: should probably have a public NoGoods prop - just need to make it read-only.
-
         /// <inheritdoc/>
         protected override async Task<Plan> ExecuteAsyncCore(CancellationToken cancellationToken = default)
         {
