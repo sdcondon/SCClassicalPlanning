@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# ANTLR auto-generated files
+/src/SCClassicalPlanning/ProblemCreation/Antlr/
+
 # User-specific files
 *.rsuser
 *.suo

@@ -19,10 +19,10 @@ domain: '(' 'define' '(' 'domain' NAME ')' extendsDef? requirementsDef? constant
 
 extendsDef:      '(' ':extends' NAME+ ')';
 requirementsDef: '(' ':requirements' REQUIREMENT_FLAG+ ')';
-constantsDef:    '(' ':constants' (constants+=NAME)+ ')';
+constantsDef:    '(' ':constants' constantDecList ')';
 predicatesDef:   '(' ':predicates' (predicates+=predicateDef)+ ')';
-timelessDef:     '(' ':timeless' literalList ')';
-structureDef:    '(' ':action' NAME ':parameters' '(' parameterDefList ')' (':precondition' goal)? (':effect' effect)? ')' # ActionDef
+timelessDef:     '(' ':timeless' literalList ')'; // grammar doesn't specify that it has to be ground, perhaps should..
+structureDef:    '(' ':action' NAME ':parameters' '(' variableDecList ')' (':precondition' goal)? (':effect' effect)? ')' # ActionDef
             ;
 
 effect: literal                      # LiteralEffectElement
@@ -35,8 +35,8 @@ effect: literal                      # LiteralEffectElement
 
 problem: '(' 'define' '(' 'problem' NAME ')' '(' ':domain' NAME ')' requirementsDef? objectsDef? initDef? goalDef+ ')';
 
-objectsDef: '(' ':objects' (elements+=NAME)* ')';
-initDef:    '(' ':init' literalList ')';
+objectsDef: '(' ':objects' constantDecList ')';
+initDef:    '(' ':init' literalList ')'; // grammar doesn't specify that it has to be ground, perhaps should..
 goalDef:    '(' ':goal' goal ')';
 
 
@@ -49,24 +49,24 @@ goal: literal                  # LiteralGoalElement
 
 
 
-////////// LITERALS, PREDICATES, TERMS, ..
+////////// LITERALS, PREDICATES & TERMS
 
 literalList: (elements+=literal)+;
-
 literal: predicate               # PositiveLiteral
        | '(' 'not' predicate ')' # NegativeLiteral
        ;
 
-predicateDef: '(' NAME parameterDefList ')';
+predicateDef: '(' NAME variableDecList ')';
 predicate: '(' NAME termList ')';
 
-parameterDefList: (elements+=VARIABLE_NAME)*;
-
 termList: (elements+=term)*;
-
 term: NAME          # ConstantTerm
     | VARIABLE_NAME # VariableTerm
     ;
+
+// NB: this is where we'd add typing support:
+variableDecList: (elements+=VARIABLE_NAME)*;
+constantDecList: (elements+=NAME)*;
 
 
 

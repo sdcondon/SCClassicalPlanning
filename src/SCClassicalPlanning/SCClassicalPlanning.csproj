@@ -15,8 +15,21 @@
     <PackageIcon>SCClassicalPlanning-128.png</PackageIcon>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="ProblemCreation\MinimalPddl.g4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Antlr4 Include="ProblemCreation\MinimalPDDL.g4">
+      <AntOutDir>ProblemCreation\Antlr</AntOutDir>
+      <Package>SCClassicalPlanning.ProblemCreation.Antlr</Package>
+    </Antlr4>
+  </ItemGroup>
    
   <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.12.0" />
+    <PackageReference Include="Antlr4BuildTasks" Version="12.2.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
