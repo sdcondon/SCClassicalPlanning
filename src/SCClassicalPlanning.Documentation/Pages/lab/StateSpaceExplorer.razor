@@ -43,12 +43,12 @@
     </div>
     <div class="form-group">
         <label for="domainPddlTextArea">Domain PDDL</label>
-        <InputTextArea class="form-control" id="domainPddlTextArea" @bind-Value=formData.DomainPDDL rows="12" />
+        <InputTextArea class="form-control small" id="domainPddlTextArea" @bind-Value=formData.DomainPDDL rows="12" />
         <ValidationMessage For="@(() => formData.DomainPDDL)" />
     </div>
     <div class="form-group">
         <label for="problemPddlTextArea">Problem PDDL</label>
-        <InputTextArea class="form-control" id="factsTextArea" @bind-Value=formData.ProblemPDDL rows="12" />
+        <InputTextArea class="form-control small" id="factsTextArea" @bind-Value=formData.ProblemPDDL rows="12" />
         <ValidationMessage For="@(() => formData.ProblemPDDL)" />
     </div>
     <div class="form-group mt-2">
