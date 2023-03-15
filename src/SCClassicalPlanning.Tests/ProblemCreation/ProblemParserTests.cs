@@ -12,6 +12,11 @@ namespace SCClassicalPlanning.ProblemCreation
                     ExampleDomains.AsPDDL.BlocksWorld.ExampleProblemPDDL, 
                     ExampleDomains.AsPDDL.BlocksWorld.DomainPDDL,
                     ExampleDomains.AsCode.BlocksWorld.ExampleProblem),
+
+                new(
+                    ExampleDomains.AsPDDL.AirCargo.ExampleProblemPDDL,
+                    ExampleDomains.AsPDDL.AirCargo.DomainPDDL,
+                    ExampleDomains.AsCode.AirCargo.ExampleProblem),
             })
             .When(tc => PddlParser.ParseProblem(tc.problemPddl, tc.domainPddl))
             .ThenReturns()

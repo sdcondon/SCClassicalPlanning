@@ -7,11 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="AsPDDL\AirCargo.pddl" />
+    <None Remove="AsPDDL\AirCargo.TwoPlanes.pddl" />
     <None Remove="AsPDDL\BlocksWorld.pddl" />
     <None Remove="AsPDDL\BlocksWorld.Sussman.pddl" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="AsPDDL\AirCargo.pddl" />
+    <EmbeddedResource Include="AsPDDL\AirCargo.TwoPlanes.pddl" />
     <EmbeddedResource Include="AsPDDL\BlocksWorld.pddl" />
     <EmbeddedResource Include="AsPDDL\BlocksWorld.Sussman.pddl" />
   </ItemGroup>
