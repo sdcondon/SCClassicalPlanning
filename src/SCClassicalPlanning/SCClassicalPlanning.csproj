@@ -38,7 +38,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SCFirstOrderLogic" Version="4.0.0" />
+    <PackageReference Include="SCFirstOrderLogic" Version="4.1.1" />
     <PackageReference Include="SCGraphTheory.Search" Version="3.0.0" />
   </ItemGroup>
 
