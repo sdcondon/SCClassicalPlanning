@@ -37,7 +37,7 @@ namespace SCClassicalPlanning.ExampleDomains.AsPDDL
         private static string ReadEmbeddedResource(string resourceName)
         {
             var assembly = Assembly.GetExecutingAssembly();
-            var fullResourceName = $"SCClassicalPlanning.ExampleDomains.AsText.{resourceName}";
+            var fullResourceName = $"SCClassicalPlanning.ExampleDomains.AsPDDL.{resourceName}";
 
             using (Stream stream = assembly.GetManifestResourceStream(fullResourceName)!)
             using (StreamReader reader = new StreamReader(stream))
