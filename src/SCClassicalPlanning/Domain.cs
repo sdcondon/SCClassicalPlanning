@@ -74,6 +74,14 @@ namespace SCClassicalPlanning
         /// </summary>
         public ImmutableHashSet<Constant> Constants { get; }
 
+        //// TODO-FEATURE: It is increasingly looking like adding the following would be useful.
+        //// This could be used to represent both the :timeless and :axioms of PDDL, possibly 
+        //// in addition to predicate typing (assuming we don't decide to do this via a richer
+        //// predicate-wrapping object) - MyPredicate(x, y) => IsOfMyType(x) & IsOfMyOtherType(y)..
+        //// public ImmutableHashSet<Sentence> Invariants { get; }
+        //// or (to ease duplication concerns):
+        //// public ImmutableHashSet<CNFClause> Invariants { get; }
+
         private class PredicateFinder : RecursiveActionVisitor<HashSet<Predicate>>
         {
             public static PredicateFinder Instance { get; } = new();

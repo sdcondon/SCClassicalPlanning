@@ -92,6 +92,16 @@ namespace SCClassicalPlanning
         /// </summary>
         public Goal Goal { get; }
 
+        //// TODO-FEATURE: It is increasingly looking like adding the following would be useful.
+        //// The Domain's Invariants are relevant of course, but you also have things like certain
+        //// predicates that never change as a result of actions (e.g. "typing" predicates) - so the subset
+        //// of initial state that refers to these predicates is invariant. E.g. IsOfMyType(MyObject).
+        //// And of course predicates that change "together" in certain ways.
+        //// Having said this, I worry a little about SoC..
+        //// public ImmutableHashSet<Sentence> Invariants { get; }
+        //// or (to ease duplication concerns):
+        //// public ImmutableHashSet<CNFClause> Invariants { get; }
+
         /// <summary>
         /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="State"/>, and add them to a given <see cref="HashSet{T}"/>.
         /// </summary>
