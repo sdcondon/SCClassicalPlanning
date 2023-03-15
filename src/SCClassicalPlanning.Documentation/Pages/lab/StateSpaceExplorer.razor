@@ -1,33 +1,72 @@
 ﻿@page "/lab/state-space-explorer"
 
-@using SCClassicalPlanning
-@using SCClassicalPlanning.ExampleDomains;
+@using SCClassicalPlanning;
+@using SCClassicalPlanning.ExampleDomains.AsPDDL;
 @using SCClassicalPlanning.Planning.StateAndGoalSpace;
-@using SCClassicalPlanning.Planning.Utilities;
-@using SCFirstOrderLogic.Inference.BackwardChaining;
-@using SCFirstOrderLogic.Inference;
-@using SCFirstOrderLogic;
-@using SCClassicalPlanning.ExampleDomains.AsCode;
-@using static SCFirstOrderLogic.SentenceCreation.SentenceFactory;
+@using SCClassicalPlanning.ProblemCreation;
+@using System.ComponentModel.DataAnnotations;
 
-<h3>State Space Explorer - Blocks World</h3>
+<h3>State Space Explorer</h3>
 
-<p>
-    A demonstration of the state space representation types to be found in the <a href="https://github.com/sdcondon/SCClassicalPlanning/tree/main/src/SCClassicalPlanning/Planning/StateAndGoalSpace">SCClassicalPlanning.Planning.StateAndGoalSpace</a> namespace.
-    Starting from the initial state of the problem (the problem being hard-coded as the "blocks world" Sussman anomaly example depicted in the package icon for the mo), explore the state space by clicking on the action to apply.
-    <a href="https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning.Documentation/Pages/lab/StateSpaceExplorer.razor">[Page Source]</a>
-    <a href="#" @onclick="@(path.Clear)" @onclick:preventDefault="true" @onclick:stopPropagation="true">[Reset]</a>
-</p>
+<div class="alert alert-primary" role="alert">
+    <p>
+        This page is an interactive demonstration of PDDL parsing and the state space representation types found in the <a href="https://github.com/sdcondon/SCClassicalPlanning/tree/main/src/SCClassicalPlanning/Planning/StateAndGoalSpace">SCClassicalPlanning.Planning.StateAndGoalSpace</a> namespace.
+        It runs entirely in your browser.
+        Notes:
+    </p>
+    <ul>
+        <li>
+            Use the buttons at the top of the form to populate it with example domain and problem definitions,
+            using a minimal version of <a href="https://www.google.com/search?q=planning+domain+definition+language">PDDL</a>.
+        </li>
+        <!--<li>Guidance for defining problems with PDDL can be found on the <a href="getting-started#writing-sentences-as-strings">getting started</a> page.</li>-->
+        <li>
+            Once the problem definition has been submitted, a representation of the initial state of the problem will appear below the form. You can explore the state space by clicking on the action to apply.
+        </li>
+        <li>
+            The source code for this page can be found <a href="https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning.Documentation/Pages/lab/StateSpaceExplorer.razor">here</a>.
+        </li>
+    </ul>
+</div>
 
-<ol>
+<EditForm Model=@formData OnSubmit=@HandleFormSubmission style="font-family: monospace">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>Presets</label>
+        <div>
+            @foreach (var kvp in Presets)
+            {
+                <button @onclick="@(() => formData = kvp.Value.Invoke())">@kvp.Key</button>
+                @(" ")
+            }
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="domainPddlTextArea">Domain PDDL</label>
+        <InputTextArea class="form-control" id="domainPddlTextArea" @bind-Value=formData.DomainPDDL rows="12" />
+        <ValidationMessage For="@(() => formData.DomainPDDL)" />
+    </div>
+    <div class="form-group">
+        <label for="problemPddlTextArea">Problem PDDL</label>
+        <InputTextArea class="form-control" id="factsTextArea" @bind-Value=formData.ProblemPDDL rows="12" />
+        <ValidationMessage For="@(() => formData.ProblemPDDL)" />
+    </div>
+    <div class="form-group mt-2">
+        <button type="submit" class="btn btn-primary">Submit / Reset</button>
+    </div>
+</EditForm>
+
 @{
     void RenderListItem(LinkedListNode<StateSpaceEdge>? lastPathNode, StateSpaceNode stateNode, StateSpaceEdge? nextExploredEdge)
     {
         <li>
+            @if (stateNode.State.Satisfies(problem.Goal))
+            {
+                <b>GOAL MET! </b>
+            }
             @{
                 // richer formatting functionality could make this more succinct, which would be nice..
                 var stateElements = stateNode.State.Elements
-                    ////.Where(e => !invariants.IsTrivial(e))
                     .OrderBy(e => e.Symbol.ToString())
                     .ThenBy(e => string.Join(",", e.Arguments.Select(a => a.ToString())));
             }
@@ -37,42 +76,85 @@
                 @foreach (var edge in stateNode.Edges)
                 {
                     <li>
-                        <!-- yeah, should be a button not an anchor, 
-                             but all of bootstrap's classes make it look rubbish.. -->
+                        <!-- yeah, should be a button not an anchor, but all of bootstrap's classes make it look rubbish.. -->
+                        <!-- disclaimer: the author doesn't consider themselves a front-end dev.. -->
                         <a href="#"
-                           role="button"
-                           style="@(edge.Equals(nextExploredEdge) ? "font-weight:bold" : "")"
-                           @onclick="@(() => ExploreEdge(lastPathNode, edge))"
-                           @onclick:preventDefault>@edge.ToString()</a>
+                            role="button"
+                            style="@(edge.Equals(nextExploredEdge) ? "font-weight:bold" : "")"
+                            @onclick="@(() => ExploreEdge(lastPathNode, edge))"
+                            @onclick:preventDefault>@edge.ToString()</a>
                     </li>
                 }
             </ul>
         </li>
     }
 
-    RenderListItem(null, new StateSpaceNode(problem, problem.InitialState), path.First?.Value);
-
-    @for (var n = path.First; n != null; n = n.Next)
+    if (parseError != null)
     {
-        RenderListItem(n, n.Value.To, n.Next?.Value);
+        <div class="alert alert-danger mt-4" role="alert">
+            <h3>Query Failed</h3>
+            <p>
+                Sorry, this demo isn't perfect.
+                In particular, the input validation is a little lacklustre.
+                It'll hopefully improve gradually over time.
+                In case it helps, here's the details of the exception that was thrown:
+            </p>
+            <p><pre>@(parseError.ToString())</pre></p>
+        </div>
+    }
+    else if (problem != null)
+    {
+        <ol class="mt-4">
+            @{RenderListItem(null, new StateSpaceNode(problem, problem.InitialState), path.First?.Value);}
+
+            @for (var n = path.First; n != null; n = n.Next)
+            {
+                RenderListItem(n, n.Value.To, n.Next?.Value);
+            }      
+        </ol>
     }
 }
-</ol>
 
 @code {
-    private readonly Problem problem = BlocksWorld.ExampleProblem;
-    private readonly LinkedList<StateSpaceEdge> path = new();
+    private static Dictionary<string, Func<FormData>> Presets = new()
+    {
+        ["[Empty]"] = () => new(
+            domainPddl: string.Empty,
+            problemPddl: string.Empty),
 
-    ////private readonly InvariantInspector invariants = new(new BackwardChainingKnowledgeBase(new DictionaryClauseStore(new[]
-    ////{
-    ////    ForAll(X, AreEqual(X, X)),
-    ////    BlocksWorld.Block(new Constant("blockA")),
-    ////    BlocksWorld.Block(new Constant("blockB")),
-    ////    BlocksWorld.Block(new Constant("blockC")),
-    ////})));
+        ["Blocks World"] = () => new(
+            domainPddl: BlocksWorld.DomainPDDL,
+            problemPddl: BlocksWorld.ExampleProblemPDDL),
+
+        // Need to fix action rendering stuff..
+        ////["Air Cargo"] = () => new(
+        ////    domainPddl: AirCargo.DomainPDDL,
+        ////    problemPddl: AirCargo.ExampleProblemPDDL),
+    };
+
+    private FormData formData = Presets["Blocks World"].Invoke();
+
+    private Exception? parseError = null; // TODO: should be done via form validation instead.. tidy me!
+    private Problem? problem = null;
+    private LinkedList<StateSpaceEdge> path = new();
+
+    private async Task HandleFormSubmission(EditContext editContext)
+    {
+        try
+        {
+            problem = null;
+            parseError = null;
+            path.Clear();
+            problem = PddlParser.ParseProblem(formData.ProblemPDDL, formData.DomainPDDL);
+        }
+        catch (Exception e)
+        {
+            parseError = e;
+        }
+    }
 
     private void ExploreEdge(LinkedListNode<StateSpaceEdge>? lastPathNode, StateSpaceEdge edge)
-    {  
+    {
         if (lastPathNode != null)
         {
             // huh, weird - i thought .net linked lists could just be chopped.
@@ -88,5 +170,18 @@
         }
 
         path.AddLast(edge);
+    }
+
+    private class FormData
+    {
+        public FormData(string domainPddl, string problemPddl)
+        {
+            this.DomainPDDL = domainPddl;
+            this.ProblemPDDL = problemPddl;
+        }
+
+        public string DomainPDDL { get; set; }
+
+        public string ProblemPDDL { get; set; }
     }
 }

@@ -209,6 +209,7 @@ namespace SCClassicalPlanning.ProblemCreation
                 _ => symbol
             };
 
+            // should probably validate terms are in scope, given that PDDL expects stuff to be declared..
             var arguments = context.termList()._elements.Select<MinimalPDDLParser.TermContext, Term>(t => t switch
             {
                 MinimalPDDLParser.ConstantTermContext ctc => new Constant(ctc.NAME().Symbol.Text),
