@@ -10,41 +10,40 @@
  */
 grammar MinimalPDDL;
 
-singleDomain: domain EOF;
-singleProblem: problem EOF;
-
 /********** DOMAINS (, ACTIONS & EFFECTS) **********/
 
+singleDomain: domain EOF;
 domain: '(' 'define' '(' 'domain' NAME ')' extendsDef? requirementsDef? constantsDef? predicatesDef? timelessDef? structureDef* ')';
 
 extendsDef:      '(' ':extends' NAME+ ')';
-requirementsDef: '(' ':requirements' REQUIREMENT_FLAG+ ')';
+requirementsDef: '(' ':requirements' (flags+=REQUIREMENT_FLAG)+ ')';
 constantsDef:    '(' ':constants' constantDecList ')';
-predicatesDef:   '(' ':predicates' (predicates+=predicateDec)+ ')';
-timelessDef:     '(' ':timeless' literalList ')'; // grammar doesn't specify that it has to be ground, perhaps should..
-structureDef:    '(' ':action' NAME ':parameters' '(' variableDecList ')' (':precondition' goal)? (':effect' effect)? ')' # ActionDef
+predicatesDef:   '(' ':predicates' predicateDecList ')';
+timelessDef:     '(' ':timeless' literalList ')'; // grammar doesn't specify that these literals have to be *ground* literals, perhaps should..
+structureDef:    '(' ':action' NAME ':parameters' '(' variableDecList ')' (':precondition' precondition=goal)? (':effect' effect)? ')' # ActionDef
             ;
 
-effect: literal                      # LiteralEffectElement
-      | '(' 'and' effect effect+ ')' # ConjunctionEffectElement                     
+effect: literal                      # LiteralEffect
+      | '(' 'and' effect effect+ ')' # ConjunctionEffect                    
       ;
 
 
 
 /********** PROBLEMS **********/
 
-problem: '(' 'define' '(' 'problem' NAME ')' '(' ':domain' NAME ')' requirementsDef? objectsDef? initDef? goalDef+ ')';
+singleProblem: problem EOF;
+problem: '(' 'define' '(' 'problem' NAME ')' '(' ':domain' domainName=NAME ')' requirementsDef? objectsDef? initDef? goalDef ')';
 
 objectsDef: '(' ':objects' constantDecList ')';
-initDef:    '(' ':init' literalList ')'; // grammar doesn't specify that it has to be ground, perhaps should..
+initDef:    '(' ':init' literalList ')'; // grammar doesn't specify that these literals have to be *ground* literals, perhaps should..
 goalDef:    '(' ':goal' goal ')';
 
 
 
 /********** GOALS **********/
 
-goal: literal                  # LiteralGoalElement
-    | '(' 'and' goal goal+ ')' # ConjunctiveGoalElement
+goal: literal                  # LiteralGoal
+    | '(' 'and' goal goal+ ')' # ConjunctionGoal
     ;
 
 
@@ -56,7 +55,9 @@ literal: predicate               # PositiveLiteral
        | '(' 'not' predicate ')' # NegativeLiteral
        ;
 
+predicateDecList: (elements+=predicateDec)+;
 predicateDec: '(' NAME variableDecList ')';
+
 predicate: '(' NAME termList ')';
 
 termList: (elements+=term)*;
@@ -74,8 +75,7 @@ constantDecList: (elements+=NAME)*;
 
 REQUIREMENT_FLAG: ':' NAME;
 VARIABLE_NAME: '?' NAME;
-// Too restrictive?
-NAME: [-a-zA-Z]+;
+NAME: [-a-zA-Z0-9_=><!]+; // too restrictive?
 
 WHITESPACE: [ \t\r\n]+ -> skip;
 // Also need to skip comments..

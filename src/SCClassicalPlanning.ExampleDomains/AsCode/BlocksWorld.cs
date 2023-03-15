@@ -164,11 +164,11 @@ namespace SCClassicalPlanning.ExampleDomains.AsCode
         {
             VariableDeclaration block = new(nameof(block));
             VariableDeclaration from = new(nameof(from));
-            VariableDeclaration to = new(nameof(to));
+            VariableDeclaration toBlock = new(nameof(toBlock));
 
             return new Domain(new Action[]
             {
-                Move(block, from, to),
+                Move(block, from, toBlock),
                 MoveToTable(block, from),
             });
         }
