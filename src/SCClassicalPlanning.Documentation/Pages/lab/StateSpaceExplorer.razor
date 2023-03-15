@@ -92,7 +92,7 @@ else if (problem != null)
                     .OrderBy(e => e.Symbol.ToString())
                     .ThenBy(e => string.Join(",", e.Arguments.Select(a => a.ToString())));
             }
-            @string.Join(" ∧ ", stateElements);
+            @string.Join(" ∧ ", stateElements)
 
             <ul>
                 @foreach (var edge in stateNode.Edges)
