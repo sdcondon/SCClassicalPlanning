@@ -7,6 +7,7 @@ using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.AsCode.Container;
 using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargo;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
+using SCFirstOrderLogic.SentenceManipulation;
 
 namespace SCClassicalPlanning.Planning.Utilities
 {
@@ -17,8 +18,6 @@ namespace SCClassicalPlanning.Planning.Utilities
 
         private static readonly Constant sfo = new(nameof(sfo));
         private static readonly Constant cargo = new(nameof(cargo));
-
-        private record GetRelevantActionsTestCase(Domain Domain, Goal Goal, Action[] ExpectedResult);
 
         public static Test GetRelevantActionsBehaviour => TestThat
             .GivenEachOf(() => new GetRelevantActionsTestCase[]
@@ -73,13 +72,37 @@ namespace SCClassicalPlanning.Planning.Utilities
                         Unload(cargo, Var("plane"), sfo),
 
                         // obviously unsatisfiable because non-planes can't become planes, but spotting that is not this method's job:
-                        Fly(cargo, Var("from"), sfo).WithAdditionalPreconditions(!AreEqual(Var("from"), sfo)), 
+                        Fly(cargo, Var("from"), sfo).WithAdditionalPreconditions(!AreEqual(Var("from"), sfo)),
                     }),
             })
             .When(tc => DomainInspector.GetRelevantActions(tc.Domain, tc.Goal))
             .ThenReturns()
             .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult, ExpectVariablesToBeStandardised));
 
+        public static Test GetMappingFromSchemaBehaviour => TestThat
+            .GivenEachOf(() => new GetMappingFromSchemaTestCase[]
+            {
+                new(
+                    Domain: Container.Domain,
+                    Action: Container.Add(new VariableReference("myObject")),
+                    Expected: new VariableSubstitution(new Dictionary<VariableReference, Term>()
+                    {
+                        [Var("A")] = Var("myObject"),
+                    })),
+
+                new( // Repeated vars shouldn't cause an issue
+                    Domain: AirCargo.Domain,
+                    Action: AirCargo.Fly(Var("plane1"), Var("airport1"), Var("airport1")),
+                    Expected: new VariableSubstitution(new Dictionary<VariableReference, Term>()
+                    {
+                        [Var("plane")] = Var("plane1"),
+                        [Var("from")] = Var("airport1"),
+                        [Var("to")] = Var("airport1"),
+                    })),
+            })
+            .When(tc => DomainInspector.GetMappingFromSchema(tc.Domain, tc.Action))
+            .ThenReturns((tc, rv) => rv.Should().Be(tc.Expected));
+    
         private static EquivalencyAssertionOptions<Action> ExpectVariablesToBeStandardised(this EquivalencyAssertionOptions<Action> opts)
         {
             return opts
@@ -105,5 +128,9 @@ namespace SCClassicalPlanning.Planning.Utilities
                 })
                 .WhenTypeIs<VariableDeclaration>();
         }
+
+        private record GetRelevantActionsTestCase(Domain Domain, Goal Goal, Action[] ExpectedResult);
+
+        private record GetMappingFromSchemaTestCase(Domain Domain, Action Action, VariableSubstitution Expected);
     }
 }
