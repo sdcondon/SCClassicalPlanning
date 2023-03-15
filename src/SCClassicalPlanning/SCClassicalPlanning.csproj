@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Antlr4 Include="ProblemCreation\MinimalPDDL.g4">
+    <Antlr4 Include="ProblemCreation\MinimalPddl.g4">
       <AntOutDir>ProblemCreation\Antlr</AntOutDir>
       <Package>SCClassicalPlanning.ProblemCreation.Antlr</Package>
     </Antlr4>
