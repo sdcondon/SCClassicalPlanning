@@ -17,11 +17,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="ProblemCreation\MinimalPddl.g4" />
+    <None Remove="ProblemCreation\MinimalPDDLX.g4" />
   </ItemGroup>
 
   <ItemGroup>
-    <Antlr4 Include="ProblemCreation\MinimalPddl.g4">
+    <Antlr4 Include="ProblemCreation\MinimalPDDLX.g4">
       <AntOutDir>ProblemCreation\Antlr</AntOutDir>
       <Package>SCClassicalPlanning.ProblemCreation.Antlr</Package>
     </Antlr4>
