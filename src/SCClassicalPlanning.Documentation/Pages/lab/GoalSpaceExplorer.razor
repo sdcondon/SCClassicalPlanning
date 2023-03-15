@@ -1,69 +1,195 @@
 ﻿@page "/lab/goal-space-explorer"
 
-@using SCClassicalPlanning
-@using SCClassicalPlanning.ExampleDomains.AsCode;
+@using SCClassicalPlanning;
+@using SCClassicalPlanning.ExampleDomains.AsPDDL;
 @using SCClassicalPlanning.Planning.StateAndGoalSpace;
+@using SCClassicalPlanning.ProblemCreation;
+@using System.ComponentModel.DataAnnotations;
 
-<h3>Goal Space Explorer - Blocks World</h3>
+<h3>Goal Space Explorer</h3>
 
-<p>
-    Yes, this is ugly and raw.
-    The author is more of a back-end guy, for now.
-    Will likely improve on it gradually whenever the mood takes me.
-    Who knows, might even add some pretty graph visualisation stuff at some point.
-    Anyway, below is a list of all edges on the currently explored path from the end goal of the problem.
-    Explore an edge (adding it to the end of the current path) by clicking on the action to regress.
-    NB: so far, our treatment of goal spaces is not lifted - which can result in combinatorial explosion. And we don't yet prune unsatisifiable goals via invariants knowledge.
-    So goal space exploration isn't actually massively useful..
-    It's interesting though, so there.
-    <a href="#" @onclick="@(() => { PathToCurrentNode.Clear(); })" @onclick:preventDefault="true" @onclick:stopPropagation="true">[Reset]</a>
-</p>
+<div class="alert alert-primary" role="alert">
+    <p>
+        This page is an interactive demonstration of (PDDL parsing and) the goal space representation types found in the <a href="https://github.com/sdcondon/SCClassicalPlanning/tree/main/src/SCClassicalPlanning/Planning/StateAndGoalSpace">SCClassicalPlanning.Planning.StateAndGoalSpace</a> namespace.
+        It runs entirely in your browser.
+        Notes:
+    </p>
+    <ul>
+        <li>
+            Use the buttons at the top of the form to populate it with example domain and problem definitions,
+            using a minimal version of <a href="https://www.google.com/search?q=planning+domain+definition+language">PDDL</a>.
+        </li>
+        <li>
+            Some guidance for defining problems as PDDL will be added to the getting started page at some point before v1.
+            For now, consult the presets and Internet resources about PDDL.
+            Note that we use an absolutely minimal version of the earliest public version of PDDL (1.2).
+            Absolutely no extensions are supported - not even typing.
+            Yet.
+        </li>
+        <li>
+            Once the problem definition has been submitted, a representation of the goal of the problem will appear below the form.
+            You can explore the goal space by clicking on the action to regress.
+        </li>
+        <li>
+            The source code for this page can be found <a href="https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning.Documentation/Pages/lab/GoalSpaceExplorer.razor">here</a>.
+        </li>
+    </ul>
+</div>
 
-<ul>
-    <li>
-        <b>End Goal:</b> @Problem.Goal
-        <ul>
-            @foreach (var edge in RootNode.Edges)
+<EditForm Model=@formData OnSubmit=@HandleFormSubmission style="font-family: monospace">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <label>Presets</label>
+        <div>
+            @foreach (var kvp in Presets)
             {
-                <li><a href="#" @onclick="@(() => { PathToCurrentNode.Clear(); PathToCurrentNode.AddLast(edge); })" @onclick:preventDefault="true" @onclick:stopPropagation="true">@edge.ToString()</a></li>
+                <button @onclick="@(() => formData = kvp.Value.Invoke())">@kvp.Key</button>
+                @(" ")
             }
-        </ul>
-    </li>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="domainPddlTextArea">Domain PDDL</label>
+        <InputTextArea class="form-control small" id="domainPddlTextArea" @bind-Value=formData.DomainPDDL rows="12" />
+        <ValidationMessage For="@(() => formData.DomainPDDL)" />
+    </div>
+    <div class="form-group">
+        <label for="problemPddlTextArea">Problem PDDL</label>
+        <InputTextArea class="form-control small" id="factsTextArea" @bind-Value=formData.ProblemPDDL rows="12" />
+        <ValidationMessage For="@(() => formData.ProblemPDDL)" />
+    </div>
+    <div class="form-group mt-2">
+        <button type="submit" class="btn btn-primary">Submit / Reset</button>
+    </div>
+</EditForm>
 
-    @foreach (var edge in PathToCurrentNode)
+@{
+    void RenderListItem(LinkedListNode<GoalSpaceEdge>? lastPathNode, GoalSpaceNode goalNode, GoalSpaceEdge? nextExploredEdge)
     {
-        <li> 
-            <b>Action: @edge.ToString()</b>
-            <br/><b>New Goal:</b> @edge.To.Goal
+        <li>
+            @if (goalNode.Goal.IsSatisfiedBy(problem.InitialState))
+            {
+                <b>INITIAL STATE SATISFIES THIS! </b>
+            }
+            @{
+                // richer formatting functionality could make this more succinct, which would be nice..
+                var goalElements = goalNode.Goal.Elements
+                .OrderBy(e => e.Predicate.Symbol.ToString())
+                .ThenBy(e => string.Join(",", e.Predicate.Arguments.Select(a => a.ToString())));
+            }
+            @string.Join(" ∧ ", goalElements);
+
             <ul>
-                @foreach (var nextEdge in edge.To.Edges)
+                @foreach (var edge in goalNode.Edges)
                 {
-                    <li><a href="#" @onclick="@(() => ExploreEdge(edge, nextEdge))" @onclick:preventDefault="true" @onclick:stopPropagation="true">@nextEdge.ToString()</a></li>
+                    <li>
+                        <!-- yeah, should be a button not an anchor, but all of bootstrap's classes make it look rubbish.. -->
+                        <!-- disclaimer: the author doesn't consider themselves a front-end dev.. -->
+                        <a href="#"
+                            role="button"
+                            style="@(edge.Equals(nextExploredEdge) ? "font-weight:bold" : "")"
+                            @onclick="@(() => ExploreEdge(lastPathNode, edge))"
+                            @onclick:preventDefault>@edge.ToString()</a>
+                    </li>
                 }
             </ul>
         </li>
     }
-</ul>
+
+    if (parseError != null)
+    {
+        <div class="alert alert-danger mt-4" role="alert">
+            <h3>Query Failed</h3>
+            <p>
+                Sorry, this demo isn't perfect.
+                In particular, the input validation is a little lacklustre.
+                It'll hopefully improve gradually over time.
+                In case it helps, here's the details of the exception that was thrown:
+            </p>
+            <p><pre>@(parseError.ToString())</pre></p>
+        </div>
+    }
+    else if (problem != null)
+    {
+        <ol class="mt-4">
+            @{
+                RenderListItem(null, new GoalSpaceNode(problem, problem.Goal), path.First?.Value);
+            }
+
+            @for (var n = path.First; n != null; n = n.Next)
+            {
+                RenderListItem(n, n.Value.To, n.Next?.Value);
+            }
+        </ol>
+    }
+}
 
 @code {
-    private readonly LinkedList<GoalSpaceEdge> PathToCurrentNode = new();
-
-    [Parameter]
-    public Problem Problem { get; set; } = BlocksWorld.ExampleProblem;
-
-    public GoalSpaceNode RootNode => new(Problem, Problem.Goal);
-
-    public void ExploreEdge(GoalSpaceEdge priorEdge, GoalSpaceEdge edge)
-    {
-        var currentLLNode = PathToCurrentNode.Find(priorEdge);
-        if (currentLLNode != null)
+    private static Dictionary<string, Func<FormData>> Presets = new()
         {
-            while (currentLLNode.Next != null)
+            ["[Empty]"] = () => new(
+                domainPddl: string.Empty,
+                problemPddl: string.Empty),
+
+            ["Blocks World"] = () => new(
+                domainPddl: BlocksWorld.DomainPDDL,
+                problemPddl: BlocksWorld.ExampleProblemPDDL),
+
+            ["Air Cargo"] = () => new(
+                domainPddl: AirCargo.DomainPDDL,
+                problemPddl: AirCargo.ExampleProblemPDDL),
+        };
+
+    private FormData formData = Presets["Blocks World"].Invoke();
+
+    private Exception? parseError = null; // TODO: should be done via form validation instead.. tidy me!
+    private Problem? problem = null;
+    private LinkedList<GoalSpaceEdge> path = new();
+
+    private void HandleFormSubmission(EditContext editContext)
+    {
+        try
+        {
+            problem = null;
+            parseError = null;
+            path.Clear();
+            problem = PddlParser.ParseProblem(formData.ProblemPDDL, formData.DomainPDDL);
+        }
+        catch (Exception e)
+        {
+            parseError = e;
+        }
+    }
+
+    private void ExploreEdge(LinkedListNode<GoalSpaceEdge>? lastPathNode, GoalSpaceEdge edge)
+    {
+        if (lastPathNode != null)
+        {
+            // huh, weird - i thought .net linked lists could just be chopped.
+            // turns out we have to remove nodes one at a time.
+            while (lastPathNode.Next != null)
             {
-                PathToCurrentNode.Remove(currentLLNode.Next);
+                path.Remove(lastPathNode.Next);
             }
         }
+        else
+        {
+            path.Clear();
+        }
 
-        PathToCurrentNode.AddLast(edge);
+        path.AddLast(edge);
+    }
+
+    private class FormData
+    {
+        public FormData(string domainPddl, string problemPddl)
+        {
+            this.DomainPDDL = domainPddl;
+            this.ProblemPDDL = problemPddl;
+        }
+
+        public string DomainPDDL { get; set; }
+
+        public string ProblemPDDL { get; set; }
     }
 }
