@@ -186,8 +186,9 @@ namespace SCClassicalPlanning.Planning.Utilities
                 domain.Actions.SingleOrDefault(a => a.Identifier.Equals(action.Identifier))
                 ?? throw new ArgumentException($"Action not found! There is no action in the domain with identifier '{action.Identifier}'");
 
-            // TODO: I suspect its possible for this to return more than one result.. investigate, write tests
-            return MatchWithSchema(action, schema, new VariableSubstitution()).Single();
+            // It's possible for more than one entry here - but where they do exist they will be duplicates
+            // Probably worth an investigation into performance here, but just returning the first hit is fine.
+            return MatchWithSchema(action, schema, new VariableSubstitution()).First();
         }
 
         private class Standardisation : RecursiveActionTransformation

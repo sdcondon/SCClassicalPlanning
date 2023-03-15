@@ -133,10 +133,9 @@
             domainPddl: BlocksWorld.DomainPDDL,
             problemPddl: BlocksWorld.ExampleProblemPDDL),
 
-        // Need to fix action rendering stuff..
-        ////["Air Cargo"] = () => new(
-        ////    domainPddl: AirCargo.DomainPDDL,
-        ////    problemPddl: AirCargo.ExampleProblemPDDL),
+        ["Air Cargo"] = () => new(
+            domainPddl: AirCargo.DomainPDDL,
+            problemPddl: AirCargo.ExampleProblemPDDL),
     };
 
     private FormData formData = Presets["Blocks World"].Invoke();
