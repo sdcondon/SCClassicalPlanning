@@ -110,10 +110,92 @@ var problem = new Problem(
         & On(blockB, blockC)));
 ```
 
-### (Not) Defining Problems using a PDDL-like Grammar
+### Defining Problems using a PDDL-like Grammar
 
-It would be great to be able to point a parser at some text containing a problem defined in (an appropriate subset of) PDDL.
-I haven't gotten around to that just yet, though..
+As of v0.9, you can express problems as PDDL, like this:
+
+```
+using SCClassicalPlanning.ProblemCreation; // For PddlParser
+
+var domainPddl = @"
+(define (domain blocks-world)
+    (:constants Table)
+    (:action Move
+        :parameters (?block ?from ?toBlock)
+        :precondition (and
+            (Block ?block)
+            (Block ?toBlock)
+            (not (= ?block ?from))
+            (not (= ?block ?toBlock))
+            (not (= ?from ?toBlock))
+            (On ?block ?from)
+            (Clear ?block)
+            (Clear ?toBlock)
+        )
+        :effect (and
+            (On ?block ?toBlock)
+            (Clear ?from)
+            (not (On ?block ?from))
+            (not (Clear ?toBlock))
+        )
+    )
+    (:action MoveToTable
+        :parameters (?block ?from)
+        :precondition (and
+            (Block ?block)
+            (not (= ?block ?from))
+            (not (= ?from Table))
+            (On ?block ?from)
+            (Clear ?block)
+        )
+        :effect (and
+            (On ?block Table)
+            (Clear ?from)
+            (not (On ?block ?from))
+        )
+    )
+)";
+
+var problemPddl = @"
+(define (problem sussman-anomaly)
+    (:domain blocks-world)
+    (:objects 
+        blockA 
+        blockB
+        blockC
+    )
+    (:init
+        (= Table Table)
+        (Block blockA)
+        (= blockA blockA)
+        (Block blockB)
+        (= blockB blockB)
+        (Block blockC)
+        (= blockC blockC)
+        (On blockA Table)
+        (On blockB Table)
+        (On blockC blockA)
+        (Clear blockB)
+        (Clear blockC)
+    )
+    (:goal (and
+            (On blockA blockB)
+            (On blockB blockC)
+        )
+    )
+)";
+
+var problem = PddlParser.ParseProblem(problemPddl, domainPddl);
+```
+
+Notes:
+* PDDL is a whole language, and no attempt to explain it will be made here - sorry!
+The version of PDDL used is an absolutely minimal version of the earliest public version of the language (1.2).
+Absolutely NO extensions (not even typing) are recognised at the moment - STRIPS only.
+Have also omitted problem situations and length specs. While they aren't marked as a particular
+extension by the spec, they are marked as deprecated by this (well, length spec isn't even mentioned):
+https://planning.wiki/ref/pddl/problem. That may just be due to incompleteness of this wiki, but
+I'm taking every excuse I can to minimise this.
 
 ## Solving Problems
 
