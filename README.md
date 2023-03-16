@@ -16,7 +16,7 @@ For documentation of the package itself, see https://sdcondon.net/SCClassicalPla
 
 I haven't written up any documentation of the source (e.g. repo overview, design discussion, compilation guidance…) - and likely won't unless someone else expresses an interest in contributing.
 Once cloned, it should "just work" as far as compiling is concerned.
-The only thing perhaps worthy of note is that it uses [Antlr4BuildTasks](https://github.com/kaby76/Antlr4BuildTasks) to invoke ANTLR to generate the FoL-parsing code. ANTLR is ultimately a Java tool - something Antlr4BuildTasks handles by downloading the JRE to your system for you - see its docs for details.
+The only thing perhaps worthy of note is that it uses [Antlr4BuildTasks](https://github.com/kaby76/Antlr4BuildTasks) to invoke ANTLR to generate the PDDL-parsing code. ANTLR is ultimately a Java tool - something Antlr4BuildTasks handles by downloading the JRE to your system for you - see its docs for details.
 
 ## Issues and Contributions
 
