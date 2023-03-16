@@ -14,10 +14,6 @@
 using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
-using SCFirstOrderLogic.Inference.Resolution;
-using System.Diagnostics;
-using System.Threading;
-using System.Xml.Linq;
 
 namespace SCClassicalPlanning.Planning.Utilities
 {
