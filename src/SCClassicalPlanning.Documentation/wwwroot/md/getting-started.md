@@ -110,7 +110,7 @@ var problem = new Problem(
         & On(blockB, blockC)));
 ```
 
-### Defining Problems using a PDDL-like Grammar
+### Defining Problems with PDDL
 
 As of v0.9, you can express problems as PDDL, like this:
 
@@ -179,10 +179,9 @@ var problemPddl = @"
         (Clear blockC)
     )
     (:goal (and
-            (On blockA blockB)
-            (On blockB blockC)
-        )
-    )
+        (On blockA blockB)
+        (On blockB blockC)
+    ))
 )";
 
 var problem = PddlParser.ParseProblem(problemPddl, domainPddl);
