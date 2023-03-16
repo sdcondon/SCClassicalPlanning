@@ -117,8 +117,8 @@ As of v0.9, you can express problems as PDDL, like this:
 ```
 using SCClassicalPlanning.ProblemCreation; // For PddlParser
 
-var domainPddl = @"
-(define (domain blocks-world)
+var domainPddl = 
+@"(define (domain blocks-world)
     (:constants Table)
     (:action Move
         :parameters (?block ?from ?toBlock)
@@ -156,8 +156,8 @@ var domainPddl = @"
     )
 )";
 
-var problemPddl = @"
-(define (problem sussman-anomaly)
+var problemPddl = 
+@"(define (problem sussman-anomaly)
     (:domain blocks-world)
     (:objects 
         blockA 
