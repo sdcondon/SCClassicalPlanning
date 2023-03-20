@@ -192,8 +192,8 @@ Notes:
 The version of PDDL used is an absolutely minimal version of the earliest public version of the language (1.2).
 Absolutely NO extensions (not even typing) are recognised at the moment - STRIPS only.
 Have also omitted problem situations and length specs. While they aren't marked as a particular
-extension by the spec, they are marked as deprecated by this (well, length spec isn't even mentioned):
-https://planning.wiki/ref/pddl/problem. That may just be due to incompleteness of this wiki, but
+extension by the spec, they are marked as deprecated by [this wiki](https://planning.wiki/ref/pddl/problem) (well, length spec isn't even mentioned).
+That may just be due to incompleteness of this wiki, but
 I'm taking every excuse I can to minimise this.
 
 ## Solving Problems

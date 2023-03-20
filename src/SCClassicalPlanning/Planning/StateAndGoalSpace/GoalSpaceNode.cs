@@ -46,7 +46,7 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace
 
         /// <inheritdoc />
         // NB: we don't compare the problem, since in expected usage (i.e. searching a particular
-        // state space) it'll always match, so would be a needless drag on performance.
+        // goal space) it'll always match, so would be a needless drag on performance.
         public bool Equals(GoalSpaceNode node) => Equals(Goal, node.Goal);
 
         /// <inheritdoc />

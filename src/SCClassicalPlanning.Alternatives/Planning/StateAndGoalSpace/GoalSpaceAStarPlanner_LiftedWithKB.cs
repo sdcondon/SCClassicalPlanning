@@ -137,7 +137,7 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace
             }
         }
 
-        private readonly struct GoalSpaceNode : INode<GoalSpaceNode, GoalSpaceEdge>, IEquatable<GoalSpaceNode>
+        public readonly struct GoalSpaceNode : INode<GoalSpaceNode, GoalSpaceEdge>, IEquatable<GoalSpaceNode>
         {
             private readonly PlanningTask planningTask;
 
@@ -155,7 +155,8 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace
             public override bool Equals(object? obj) => obj is GoalSpaceNode node && Equals(node);
 
             /// <inheritdoc />
-            // NB: this struct is private - so we don't need to look at the problem, since it'll always match
+            // NB: we don't compare the problem, since in expected usage (i.e. searching a particular
+            // state space) it'll always match, so would be a needless drag on performance.
             public bool Equals(GoalSpaceNode node) => Equals(Goal, node.Goal);
 
             /// <inheritdoc />
@@ -165,7 +166,7 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace
             public override string ToString() => Goal.ToString();
         }
 
-        private readonly struct GoalSpaceNodeEdges : IReadOnlyCollection<GoalSpaceEdge>
+        public readonly struct GoalSpaceNodeEdges : IReadOnlyCollection<GoalSpaceEdge>
         {
             private readonly PlanningTask planningTask;
             private readonly Goal goal;
@@ -209,7 +210,7 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        private readonly struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
+        public readonly struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
         {
             private readonly PlanningTask planningTask;
             private readonly Goal fromGoal;
