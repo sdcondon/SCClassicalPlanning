@@ -67,7 +67,7 @@ namespace SCClassicalPlanning.Planning.Utilities
                         Add(element1),
                         Remove(element2),
                         Swap(element2, element1),
-                        Swap(element2, element1), // TODO-BUG: yeah, hits twice - for the element1 presence and for the element2 non-presence). dedupe should probably be expected.
+                        Swap(element2, element1), // TODO-BUG: yeah, hits twice - once for the element1 presence and again for the element2 non-presence. dedupe should probably be expected.
                     }),
 
                 new(
