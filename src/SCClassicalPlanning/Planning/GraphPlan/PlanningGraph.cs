@@ -28,16 +28,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan
     /// <see cref="FullyExpand"/> method to do this ahead of time, thus ensuring that future lookups are fast.
     /// </para>
     /// </summary>
-    // TODO: Should probably implement IEnumerable<IPlanningGraphLevel>? Or at least have this as a Levels prop?
-    // Or perhaps even IReadOnlyList<PlanningGraphLevel> - though Count is effectively infinite..
+    // TODO: Should probably implement IEnumerable<IPlanningGraphPropositionLevel>? Or at least have this as a Levels prop?
+    // Or perhaps even IReadOnlyList<PlanningGraphPropositionLevel> (because random access is allowed) - though Count is effectively infinite..
     public class PlanningGraph
     {
-        /// <summary>
-        /// The identifier used for the persistence actions in <see cref="PlanningGraph"/> instances.
-        /// </summary>
-        // TODO: this identifier is not guaranteed to be unique.
-        public const string PersistenceActionIdentifier = "NOOP";
-
         private readonly Problem problem;
         private readonly List<Dictionary<Literal, PlanningGraphPropositionNode>> propositionLevels = new();
         private readonly List<Dictionary<Action, PlanningGraphActionNode>> actionLevels = new();
@@ -341,8 +335,21 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 // NB: while an EMPTY goal and effect would at first glance seem to be intuitive - it is
                 // defined like this to assist with mutex creation, and because of the idiosyncracies of
                 // plan extraction in GraphPlan. Still feels awkward to me, but meh, never mind.
-                yield return new(PersistenceActionIdentifier, new(proposition), new(proposition));
+                yield return new(PersistenceActionIdentifier.Instance, new(proposition), new(proposition));
             }
+        }
+
+        /// <summary>
+        /// The identifier used for the persistence actions in <see cref="PlanningGraph"/> instances.
+        /// Is its own class (with reference semantics for equality) to guarantee uniqueness.
+        /// </summary>
+        private class PersistenceActionIdentifier
+        {
+            private PersistenceActionIdentifier() { }
+
+            public static PersistenceActionIdentifier Instance { get; } = new();
+
+            public override string ToString() => "NOOP";
         }
     }
 }
