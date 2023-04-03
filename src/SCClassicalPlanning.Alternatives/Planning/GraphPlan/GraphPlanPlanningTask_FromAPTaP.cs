@@ -155,7 +155,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 {
                     return new Plan(plan.Steps
                         .Concat(chosenActionNodes.Select(n => n.Action))
-                        .Where(a => !a.Identifier.Equals(PlanningGraph.PersistenceActionIdentifier)));
+                        .Where(a => !a.Identifier.Equals(PlanningGraph.PersistenceActionIdentifier.Instance)));
                 }
             }
             else

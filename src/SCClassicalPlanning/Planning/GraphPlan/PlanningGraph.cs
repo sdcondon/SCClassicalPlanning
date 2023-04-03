@@ -343,12 +343,16 @@ namespace SCClassicalPlanning.Planning.GraphPlan
         /// The identifier used for the persistence actions in <see cref="PlanningGraph"/> instances.
         /// Is its own class (with reference semantics for equality) to guarantee uniqueness.
         /// </summary>
-        private class PersistenceActionIdentifier
+        public class PersistenceActionIdentifier
         {
             private PersistenceActionIdentifier() { }
 
+            /// <summary>
+            /// Gets the singleton instance of this type.
+            /// </summary>
             public static PersistenceActionIdentifier Instance { get; } = new();
 
+            /// <inheritdoc />
             public override string ToString() => "NOOP";
         }
     }

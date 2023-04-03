@@ -108,7 +108,7 @@ namespace SCClassicalPlanning.Planning.GraphPlan
                 var actions = search
                     .PathFromTarget()
                     .SelectMany(e => e.Actions)
-                    .Where(a => !a.Identifier.Equals(PlanningGraph.PersistenceActionIdentifier));
+                    .Where(a => !a.Identifier.Equals(PlanningGraph.PersistenceActionIdentifier.Instance));
 
                 plan = new Plan(actions);
                 return true;
