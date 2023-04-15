@@ -65,20 +65,7 @@
     </div>
 </EditForm>
 
-@if (parseError != null)
-{
-    <div class="alert alert-danger mt-4" role="alert">
-        <h3>Query Failed</h3>
-        <p>
-            Sorry, this demo isn't perfect.
-            In particular, the input validation is a little lacklustre.
-            It'll hopefully improve gradually over time.
-            In case it helps, here's the details of the exception that was thrown:
-        </p>
-        <p><pre>@(parseError.ToString())</pre></p>
-    </div>
-}
-else if (problem != null)
+@if (problem != null)
 {
     void RenderListItem(LinkedListNode<StateSpaceEdge>? lastPathNode, StateSpaceNode stateNode, StateSpaceEdge? nextExploredEdge)
     {
@@ -140,22 +127,17 @@ else if (problem != null)
 
     private FormData formData = Presets["Blocks World"].Invoke();
 
-    private Exception? parseError = null; // TODO: should be done via form validation instead.. tidy me!
     private Problem? problem = null;
     private LinkedList<StateSpaceEdge> path = new();
 
     private void HandleFormSubmission(EditContext editContext)
     {
-        try
+        problem = null;
+        path.Clear();
+
+        if (editContext.Validate())
         {
-            parseError = null;
-            path.Clear();
             problem = PddlParser.ParseProblem(formData.ProblemPDDL, formData.DomainPDDL);
-        }
-        catch (Exception e)
-        {
-            problem = null;
-            parseError = e;
         }
     }
 
@@ -178,7 +160,7 @@ else if (problem != null)
         path.AddLast(edge);
     }
 
-    private class FormData
+    private class FormData : IValidatableObject
     {
         public FormData(string domainPddl, string problemPddl)
         {
@@ -189,5 +171,34 @@ else if (problem != null)
         public string DomainPDDL { get; set; }
 
         public string ProblemPDDL { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            // Yes, could cache the parse results to avoid parsing multiple times, but not worth it for now at least.
+            // TODO: Some "TryParse.." methods might be useful - they'd certainly make this method a bit cleaner.
+            // TODO: If we had a ParseError exception type, we could perhaps highlight the offending text..
+            Domain? domain = null;
+            Problem? problem = null;
+            List<ValidationResult> errors = new();
+            try
+            {
+                domain = PddlParser.ParseDomain(DomainPDDL);
+
+                try
+                {
+                    problem = PddlParser.ParseProblem(ProblemPDDL, domain!);
+                }
+                catch (Exception e)
+                {
+                    errors.Add(new ValidationResult(e.Message, new[] { nameof(ProblemPDDL) }));
+                }
+            }
+            catch (Exception e)
+            {
+                errors.Add(new ValidationResult(e.Message, new[] { nameof(DomainPDDL) }));
+            }
+
+            return errors;
+        }
     }
 }
