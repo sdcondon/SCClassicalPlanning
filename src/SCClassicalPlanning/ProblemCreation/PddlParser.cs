@@ -228,7 +228,7 @@ namespace SCClassicalPlanning.ProblemCreation
 
             public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
             {
-                throw new ArgumentException("line " + line + ":" + charPositionInLine + " " + msg, "sentence");
+                throw new ArgumentException("line " + line + ":" + charPositionInLine + " " + msg, "sentence", e);
             }
         }
 
