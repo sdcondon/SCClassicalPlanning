@@ -1,4 +1,4 @@
-name: Build docs site to gh-pages branch
+name: Deploy Docs to GitHub pages
 
 on:
   push:
@@ -6,28 +6,39 @@ on:
     paths:
       - 'src/SCClassicalPlanning.Documentation/**'
 
-jobs:
-  deploy-to-github-pages:
-    runs-on: ubuntu-latest
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Yes, some of this should probably be separated out into a build job..
+  deploy-to-github-pages:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
     steps:
 
-    # uses GitHub's checkout action to checkout code form the master branch
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     
-    # Set up .NET
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: |
           6.0.x
           7.0.x
 
-    # publishes Blazor project to the release folder
-    - name: Publish .NET Core Project
+    - name: Publish Docs Project
       run: dotnet publish src/SCClassicalPlanning.Documentation/SCClassicalPlanning.Documentation.csproj -c Release -o release --nologo
     
-    # changes the base-tag in index.html from '/' to 'SCClassicalPlanning' to match GitHub Pages repository subdirectory
-    - name: Change base-tag in index.html from / to SCClassicalPlanning
+    - name: Change base href in index.html from / to SCClassicalPlanning
       run: sed -i 's/<base href="\/" \/>/<base href="\/SCClassicalPlanning\/" \/>/g' release/wwwroot/index.html
     
     # copy index.html to 404.html to serve the same file when a file is not found
@@ -38,10 +49,14 @@ jobs:
     - name: Add .nojekyll file
       run: touch release/wwwroot/.nojekyll
      
-    # copy to github pages sources
-    - name: Commit wwwroot to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@3.7.1
+    - name: Setup Pages
+      uses: actions/configure-pages@v3
+      
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v1
       with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: release/wwwroot
+        path: release/wwwroot
+      
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
