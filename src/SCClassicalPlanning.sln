@@ -7,10 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repo Items", "Repo Items", 
 	ProjectSection(SolutionItems) = preProject
 		..\.gitignore = ..\.gitignore
 		..\LICENSE.txt = ..\LICENSE.txt
-		..\.github\workflows\onPush.yml = ..\.github\workflows\onPush.yml
-		..\.github\workflows\onPushDocs.yml = ..\.github\workflows\onPushDocs.yml
-		..\.github\workflows\onRelease.yml = ..\.github\workflows\onRelease.yml
+		..\.github\workflows\DeployDocsToGitHubPages.yml = ..\.github\workflows\DeployDocsToGitHubPages.yml
 		..\README.md = ..\README.md
+		..\.github\workflows\PublishNuGetPackages.yml = ..\.github\workflows\PublishNuGetPackages.yml
+		..\.github\workflows\ValidationBuild.yml = ..\.github\workflows\ValidationBuild.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B5ACFEC3-2BED-4BA8-809D-35D2AF01F917}"
