@@ -116,8 +116,8 @@ namespace SCClassicalPlanning.ExampleDomains.AsCode
                 Plane(plane)
                 & Airport(origin)
                 & Airport(destination)
-                //& !AreEqual(origin, destination)
-                & At(plane, origin),
+                & At(plane, origin)
+                & !AreEqual(origin, destination),
             effect:
                 !At(plane, origin)
                 & At(plane, destination));
@@ -163,7 +163,9 @@ namespace SCClassicalPlanning.ExampleDomains.AsCode
                     & Plane(plane1)
                     & Plane(plane2)
                     & Airport(airport1)
+                    & AreEqual(airport1, airport1)
                     & Airport(airport2)
+                    & AreEqual(airport2, airport2)
                     & At(cargo1, airport1)
                     & At(cargo2, airport2)
                     & At(plane1, airport1)

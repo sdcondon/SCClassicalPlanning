@@ -34,6 +34,7 @@
             (Airport ?from)
             (Airport ?to)
             (At ?plane ?from)
+            (not (= ?from ?to))
         )
         :effect (and
             (not (At ?plane ?from))

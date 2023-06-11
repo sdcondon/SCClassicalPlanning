@@ -34,7 +34,7 @@ namespace SCClassicalPlanning.Planning.Utilities
         /// </summary>
         /// <param name="domain">The domain of the problem being solved.</param>
         /// <param name="goal">The goal to retrieve the relevant actions for.</param>
-        /// <returns>The actions that are relevant to the given state.</returns>
+        /// <returns>The details of the actions that are relevant to the given state.</returns>
         public static IEnumerable<(Action schema, VariableSubstitution substitution, Goal constraints)> GetRelevantActionDetails(Domain domain, Goal goal)
         {
             // Local method to find any constraints that apply to a given substitution for none of the goal's elements to be negated.

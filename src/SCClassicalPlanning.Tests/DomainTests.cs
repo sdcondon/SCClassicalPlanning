@@ -34,6 +34,7 @@ namespace SCClassicalPlanning
                         Airport(A),
                         At(A, B),
                         In(A, B),
+                        Equal(A, B),
                     },
                     ExpectedConstants: Array.Empty<Constant>()),
 
