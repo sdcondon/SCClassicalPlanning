@@ -6,6 +6,9 @@
 # ANTLR auto-generated files
 /src/SCClassicalPlanning/ProblemCreation/Antlr/
 
+# Documentation libman libs
+/src/SCClassicalPlanning.Documentation/wwwroot/lib/
+
 # User-specific files
 *.rsuser
 *.suo
