@@ -32,9 +32,7 @@ jobs:
     
     - uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: |
-          6.0.x
-          7.0.x
+        dotnet-version: '8.x'
 
     - name: Publish Docs Project
       run: dotnet publish src/SCClassicalPlanning.Documentation/SCClassicalPlanning.Documentation.csproj -c Release -o release --nologo
