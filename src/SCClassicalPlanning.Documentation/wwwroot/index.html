@@ -6,16 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>SCClassicalPlanning</title>
     <base href="/" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link href="app.css" rel="stylesheet" />
     <link href="SCClassicalPlanning.Documentation.styles.css" rel="stylesheet" />
-    <link href="SCClassicalPlanning-32.png" rel="icon" type="image/png" />
+    <link href="img/SCClassicalPlanning-32.png" rel="icon" type="image/png" />
 </head>
 
 <body>
     <div id="app">
         <div id="loading-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center">
-            <img src="SCClassicalPlanning-128.png" alt="SCClassicalPlanning icon" />
-            <br /><br />Loading, please wait...
+            <img src="img/SCClassicalPlanning-128.png" alt="SCClassicalPlanning icon" />
+            <div><span id="progressLabel">Loading,&nbsp;please&nbsp;wait..</span></div>
+            <div><span id="progressDetail" class="text-muted"></span></div>
         </div>
     </div>
 
@@ -25,9 +27,47 @@
         <a class="dismiss">🗙</a>
     </div>
 
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+
     <link rel="stylesheet" type="text/css" href="lib/google-code-prettify/bin/prettify.min.css">
     <script type="text/javascript" src="lib/google-code-prettify/bin/prettify.min.js"></script>
+
+    <script>
+        // Shamelessly nabbed and adapted from https://swharden.com/blog/2022-05-29-blazor-loading-progress/
+        function StartBlazor() {
+            let loadedCount = 0;
+            const resourcesToLoad = [];
+            Blazor.start({
+                loadBootResource:
+                    function (type, filename, defaultUri, integrity) {
+                        if (type == "dotnetjs")
+                            return defaultUri;
+
+                        const fetchResources = fetch(defaultUri, {
+                            cache: 'no-cache',
+                            integrity: integrity
+                        });
+
+                        resourcesToLoad.push(fetchResources);
+
+                        fetchResources.then((r) => {
+                            loadedCount += 1;
+                            if (filename == "blazor.boot.json")
+                                return;
+                            const totalCount = resourcesToLoad.length;
+                            document.getElementById('progressLabel').innerHTML = `Loading,&nbsp;please&nbsp;wait.. (${loadedCount}/${totalCount})`;
+                            document.getElementById('progressDetail').innerText = filename;
+                        });
+
+                        return fetchResources;
+                    }
+            });
+        }
+
+        StartBlazor();
+    </script>
 </body>
 
 </html>

@@ -1,6 +1,14 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href=""><img src="SCClassicalPlanning-32.png" alt="SCClassicalPlanning icon"/> SCClassicalPlanning</a>
+﻿<div class="top-row ps-1 navbar navbar-dark">
+    <div class="container-fluid ps-2 dropdown">
+        <a class="navbar-brand dropdown-toggle" href="" id="dropdown01" data-bs-toggle="dropdown" aria-expanded="false"><img src="img/SCClassicalPlanning-32.png" alt="SCClassicalPlanning icon" /> SCClassicalPlanning</a>
+        <ul class="dropdown-menu" aria-labelledby="dropdown01">
+            <li><a class="dropdown-item" href="https://sdcondon.net/FlUnit">FlUnit</a></li>
+            <li><a class="dropdown-item" href="https://sdcondon.net/SCFirstOrderLogic">SCFirstOrderLogic</a></li>
+            <li><a class="dropdown-item" href="https://sdcondon.net/SCGraphTheory">SCGraphTheory</a></li>
+            <li><a class="dropdown-item" href="https://sdcondon.net/SCSetTrie">SCSetTrie</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="https://sdcondon.net/">Personal Homepage</a></li>
+        </ul>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -9,33 +17,33 @@
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+        <div class="nav-item px-1">
+            <NavLink class="nav-link px-2" href="" Match="NavLinkMatch.All">
                 <span class="bi bi-house-door-fill" aria-hidden="true"></span> Home
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="library-overview">
+        <div class="nav-item px-1">
+            <NavLink class="nav-link px-2" href="library-overview">
                 <span class="bi bi-braces" aria-hidden="true"></span> Library Overview
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="getting-started">
+        <div class="nav-item px-1">
+            <NavLink class="nav-link px-2" href="getting-started">
                 <span class="bi bi-info-circle" aria-hidden="true"></span> Getting Started
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="lab">
+        <div class="nav-item px-1">
+            <NavLink class="nav-link px-2" href="lab">
                 <span class="bi bi-tools" aria-hidden="true"></span> Lab
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="roadmap">
+        <div class="nav-item px-1">
+            <NavLink class="nav-link px-2" href="roadmap">
                 <span class="bi bi-signpost-split-fill" aria-hidden="true"></span> Roadmap
             </NavLink>
         </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="see-also.md">
+        <div class="nav-item px-1">
+            <NavLink class="nav-link px-2" href="see-also.md">
                 <span class="bi bi-box-arrow-up-right" aria-hidden="true"></span> See Also
             </NavLink>
         </div>
