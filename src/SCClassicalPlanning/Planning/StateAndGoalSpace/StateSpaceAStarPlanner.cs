@@ -12,29 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SCClassicalPlanning.Planning.StateAndGoalSpace
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
+
+/// <summary>
+/// An implementation of <see cref="IPlanner"/> that uses <see cref="StateSpaceAStarPlanningTask"/> instances.
+/// </summary>
+public class StateSpaceAStarPlanner : IPlanner
 {
+    private readonly ICostStrategy costStrategy;
+
     /// <summary>
-    /// An implementation of <see cref="IPlanner"/> that uses <see cref="StateSpaceAStarPlanningTask"/> instances.
+    /// Initializes a new instance of the <see cref="StateSpaceAStarPlanner"/> class.
     /// </summary>
-    public class StateSpaceAStarPlanner : IPlanner
-    {
-        private readonly ICostStrategy costStrategy;
+    /// <param name="costStrategy">The cost strategy to use.</param>
+    public StateSpaceAStarPlanner(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StateSpaceAStarPlanner"/> class.
-        /// </summary>
-        /// <param name="costStrategy">The cost strategy to use.</param>
-        public StateSpaceAStarPlanner(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
+    /// <summary>
+    /// Creates a (specifically-typed) planning task to work on solving a given problem.
+    /// </summary>
+    /// <param name="problem">The problem to create a plan for.</param>
+    /// <returns>A new <see cref="StateSpaceAStarPlanningTask"/> instance.</returns>
+    public StateSpaceAStarPlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy);
 
-        /// <summary>
-        /// Creates a (specifically-typed) planning task to work on solving a given problem.
-        /// </summary>
-        /// <param name="problem">The problem to create a plan for.</param>
-        /// <returns>A new <see cref="StateSpaceAStarPlanningTask"/> instance.</returns>
-        public StateSpaceAStarPlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy);
-
-        /// <inheritdoc />
-        IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
-    }
+    /// <inheritdoc />
+    IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
 }

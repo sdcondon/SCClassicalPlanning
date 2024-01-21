@@ -15,48 +15,47 @@ using SCClassicalPlanning.Planning.Utilities;
 using SCFirstOrderLogic.SentenceManipulation;
 using System.Text;
 
-namespace SCClassicalPlanning.Planning
+namespace SCClassicalPlanning.Planning;
+
+/// <summary>
+/// Formatting logic for plans (and actions).
+/// </summary>
+public class PlanFormatter
 {
+    private readonly Domain domain;
+
     /// <summary>
-    /// Formatting logic for plans (and actions).
+    /// Initialises a new instance of the <see cref="PlanFormatter"/> class.
     /// </summary>
-    public class PlanFormatter
+    /// <param name="domain">The domain of the plans that will be formatted by this instance. Used to establish succinct output for individual actions.</param>
+    public PlanFormatter(Domain domain) => this.domain = domain;
+
+    /// <summary>
+    /// Creates a human-readable string representation of a given plan.
+    /// </summary>
+    /// <param name="plan">The plan to format.</param>
+    /// <returns>A string representing the given plan. Each line of the output describes the next action in the plan.</returns>
+    public string Format(Plan plan)
     {
-        private readonly Domain domain;
+        var builder = new StringBuilder();
 
-        /// <summary>
-        /// Initialises a new instance of the <see cref="PlanFormatter"/> class.
-        /// </summary>
-        /// <param name="domain">The domain of the plans that will be formatted by this instance. Used to establish succinct output for individual actions.</param>
-        public PlanFormatter(Domain domain) => this.domain = domain;
-
-        /// <summary>
-        /// Creates a human-readable string representation of a given plan.
-        /// </summary>
-        /// <param name="plan">The plan to format.</param>
-        /// <returns>A string representing the given plan. Each line of the output describes the next action in the plan.</returns>
-        public string Format(Plan plan)
+        foreach (var step in plan.Steps)
         {
-            var builder = new StringBuilder();
-
-            foreach (var step in plan.Steps)
-            {
-                builder.AppendLine(Format(step));
-            }
-
-            return builder.ToString();
+            builder.AppendLine(Format(step));
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        public string Format(Action action)
-        {
-            VariableSubstitution substitution = DomainInspector.GetMappingFromSchema(domain, action);
-            var orderedBindings = substitution.Bindings.OrderBy(b => b.Key.Symbol.ToString());
-            return $"{action.Identifier}({string.Join(", ", orderedBindings.Select(b => b.Key.ToString() + ": " + b.Value.ToString()))})";
-        }
+        return builder.ToString();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="action"></param>
+    /// <returns></returns>
+    public string Format(Action action)
+    {
+        VariableSubstitution substitution = DomainInspector.GetMappingFromSchema(domain, action);
+        var orderedBindings = substitution.Bindings.OrderBy(b => b.Key.Symbol.ToString());
+        return $"{action.Identifier}({string.Join(", ", orderedBindings.Select(b => b.Key.ToString() + ": " + b.Value.ToString()))})";
     }
 }

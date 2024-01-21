@@ -13,92 +13,91 @@
 // limitations under the License.
 using SCGraphTheory.Search.Classic;
 
-namespace SCClassicalPlanning.Planning.StateAndGoalSpace
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
+
+/// <summary>
+/// A concrete subclass of <see cref="SteppablePlanningTask{TStepResult}"/> that carries out
+/// an A-star search of a problem's state space to create a plan.
+/// </summary>
+public class StateSpaceAStarPlanningTask : SteppablePlanningTask<StateSpaceEdge>
 {
+    private readonly AStarSearch<StateSpaceNode, StateSpaceEdge> search;
+
+    private bool isComplete;
+    private Plan? result;
+
     /// <summary>
-    /// A concrete subclass of <see cref="SteppablePlanningTask{TStepResult}"/> that carries out
-    /// an A-star search of a problem's state space to create a plan.
+    /// Initializes a new instance of the <see cref="StateSpaceAStarPlanningTask"/> class.
     /// </summary>
-    public class StateSpaceAStarPlanningTask : SteppablePlanningTask<StateSpaceEdge>
+    /// <param name="problem">The problem to solve.</param>
+    /// <param name="costStrategy">The cost strategy to use.</param>
+    public StateSpaceAStarPlanningTask(Problem problem, ICostStrategy costStrategy)
     {
-        private readonly AStarSearch<StateSpaceNode, StateSpaceEdge> search;
+        search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
+            source: new StateSpaceNode(problem, problem.InitialState),
+            isTarget: n => n.State.Satisfies(problem.Goal),
+            getEdgeCost: e => costStrategy.GetCost(e.Action),
+            getEstimatedCostToTarget: n => costStrategy.EstimateCost(n.State, problem.Goal));
 
-        private bool isComplete;
-        private Plan? result;
+        CheckForSearchCompletion();
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StateSpaceAStarPlanningTask"/> class.
-        /// </summary>
-        /// <param name="problem">The problem to solve.</param>
-        /// <param name="costStrategy">The cost strategy to use.</param>
-        public StateSpaceAStarPlanningTask(Problem problem, ICostStrategy costStrategy)
+    /// <inheritdoc />
+    public override bool IsComplete => isComplete;
+
+    /// <inheritdoc />
+    public override bool IsSucceeded => result != null;
+
+    /// <inheritdoc />
+    public override Plan Result
+    {
+        get
         {
-            search = new AStarSearch<StateSpaceNode, StateSpaceEdge>(
-                source: new StateSpaceNode(problem, problem.InitialState),
-                isTarget: n => n.State.Satisfies(problem.Goal),
-                getEdgeCost: e => costStrategy.GetCost(e.Action),
-                getEstimatedCostToTarget: n => costStrategy.EstimateCost(n.State, problem.Goal));
-
-            CheckForSearchCompletion();
-        }
-
-        /// <inheritdoc />
-        public override bool IsComplete => isComplete;
-
-        /// <inheritdoc />
-        public override bool IsSucceeded => result != null;
-
-        /// <inheritdoc />
-        public override Plan Result
-        {
-            get
+            if (!IsComplete)
             {
-                if (!IsComplete)
-                {
-                    throw new InvalidOperationException("Task is not yet complete");
-                }
-                else if (result == null)
-                {
-                    throw new InvalidOperationException("Plan creation failed");
-                }
-                else
-                {
-                    return result;
-                }
+                throw new InvalidOperationException("Task is not yet complete");
+            }
+            else if (result == null)
+            {
+                throw new InvalidOperationException("Plan creation failed");
+            }
+            else
+            {
+                return result;
             }
         }
+    }
 
-        /// <inheritdoc />
-        public override StateSpaceEdge NextStep()
+    /// <inheritdoc />
+    public override StateSpaceEdge NextStep()
+    {
+        if (IsComplete)
         {
-            if (IsComplete)
-            {
-                throw new InvalidOperationException("Task is already complete");
-            }
-
-            var edge = search.NextStep();
-            CheckForSearchCompletion();
-            return edge;
+            throw new InvalidOperationException("Task is already complete");
         }
 
-        /// <inheritdoc />
-        public override void Dispose()
-        {
-            // Nothing to do
-            GC.SuppressFinalize(this);
-        }
+        var edge = search.NextStep();
+        CheckForSearchCompletion();
+        return edge;
+    }
 
-        private void CheckForSearchCompletion()
+    /// <inheritdoc />
+    public override void Dispose()
+    {
+        // Nothing to do
+        GC.SuppressFinalize(this);
+    }
+
+    private void CheckForSearchCompletion()
+    {
+        if (search.IsConcluded)
         {
-            if (search.IsConcluded)
+            if (search.IsSucceeded)
             {
-                if (search.IsSucceeded)
-                {
-                    result = new Plan(search.PathToTarget().Select(e => e.Action).ToList());
-                }
-
-                isComplete = true;
+                result = new Plan(search.PathToTarget().Select(e => e.Action).ToList());
             }
+
+            isComplete = true;
         }
     }
 }

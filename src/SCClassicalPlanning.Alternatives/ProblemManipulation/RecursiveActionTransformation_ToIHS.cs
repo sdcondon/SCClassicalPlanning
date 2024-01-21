@@ -14,241 +14,240 @@
 using SCFirstOrderLogic;
 using System.Collections.Immutable;
 
-namespace SCClassicalPlanning.ProblemManipulation
+namespace SCClassicalPlanning.ProblemManipulation;
+
+/// <summary>
+/// <para>
+/// Base class for recursive transformations of <see cref="Action"/> instances to other <see cref="Action"/> instances.
+/// </para>
+/// <para>
+/// ALTERNATIVE: Converts goal/effect elements immediately to ImmutableHashSets rather than via Lists. Slower when the transform
+/// doesn't actually change a particular goal/element (since lists are quicker to create than IHSs). Quicker approach
+/// depends on how many goals/elements are changed, but some light testing indicates that going via Lists is probably a better call
+/// (because creating IHSs is really quite expensive).
+/// </para>
+/// </summary>
+public abstract class RecursiveActionTransformation_ToIHS
 {
     /// <summary>
     /// <para>
-    /// Base class for recursive transformations of <see cref="Action"/> instances to other <see cref="Action"/> instances.
+    /// Applies this transformation to a <see cref="Action"/> instance.
     /// </para>
     /// <para>
-    /// ALTERNATIVE: Converts goal/effect elements immediately to ImmutableHashSets rather than via Lists. Slower when the transform
-    /// doesn't actually change a particular goal/element (since lists are quicker to create than IHSs). Quicker approach
-    /// depends on how many goals/elements are changed, but some light testing indicates that going via Lists is probably a better call
-    /// (because creating IHSs is really quite expensive).
+    /// The default implementation returns a <see cref="Action"/> with the same identifier, and with a goal and effect that is the result of applying the transformation to the action's goal and effect respectively.
     /// </para>
     /// </summary>
-    public abstract class RecursiveActionTransformation_ToIHS
+    /// <param name="action">The action to transform.</param>
+    /// <returns>The transformed <see cref="Action"/>.</returns>
+    public virtual Action ApplyTo(Action action)
     {
-        /// <summary>
-        /// <para>
-        /// Applies this transformation to a <see cref="Action"/> instance.
-        /// </para>
-        /// <para>
-        /// The default implementation returns a <see cref="Action"/> with the same identifier, and with a goal and effect that is the result of applying the transformation to the action's goal and effect respectively.
-        /// </para>
-        /// </summary>
-        /// <param name="action">The action to transform.</param>
-        /// <returns>The transformed <see cref="Action"/>.</returns>
-        public virtual Action ApplyTo(Action action)
-        {
-            var precondition = ApplyTo(action.Precondition);
-            var effect = ApplyTo(action.Effect);
+        var precondition = ApplyTo(action.Precondition);
+        var effect = ApplyTo(action.Effect);
 
-            if (precondition != action.Precondition || effect != action.Effect)
+        if (precondition != action.Precondition || effect != action.Effect)
+        {
+            return new(action.Identifier, precondition, effect);
+        }
+
+        return action;
+    }
+
+    /// <summary>
+    /// <para>
+    /// Applies this transformation to a <see cref="Goal"/> instance.
+    /// </para>
+    /// <para>
+    /// The default implementation returns a <see cref="Goal"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
+    /// </para>
+    /// </summary>
+    /// <param name="goal">The goal to transform.</param>
+    /// <returns>The transformed <see cref="Goal"/>.</returns>
+    public virtual Goal ApplyTo(Goal goal)
+    {
+        var isChanged = false;
+
+        var elements = goal.Elements.Select(a =>
+        {
+            var transformed = ApplyTo(a);
+
+            if (transformed != a)
             {
-                return new(action.Identifier, precondition, effect);
+                isChanged = true;
             }
 
-            return action;
+            return transformed;
+        }).ToImmutableHashSet();
+
+        if (isChanged)
+        {
+            return new Goal(elements);
         }
 
-        /// <summary>
-        /// <para>
-        /// Applies this transformation to a <see cref="Goal"/> instance.
-        /// </para>
-        /// <para>
-        /// The default implementation returns a <see cref="Goal"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
-        /// </para>
-        /// </summary>
-        /// <param name="goal">The goal to transform.</param>
-        /// <returns>The transformed <see cref="Goal"/>.</returns>
-        public virtual Goal ApplyTo(Goal goal)
+        return goal;
+    }
+
+    /// <summary>
+    /// <para>
+    /// Applies this transformation to a <see cref="Effect"/> instance.
+    /// </para>
+    /// <para>
+    /// The default implementation returns a <see cref="Effect"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
+    /// </para>
+    /// </summary>
+    /// <param name="effect">The effect to transform.</param>
+    /// <returns>The transformed effect.</returns>
+    public virtual Effect ApplyTo(Effect effect)
+    {
+        var isChanged = false;
+
+        var elements = effect.Elements.Select(a =>
         {
-            var isChanged = false;
+            var transformed = ApplyTo(a);
 
-            var elements = goal.Elements.Select(a =>
+            if (transformed != a)
             {
-                var transformed = ApplyTo(a);
-
-                if (transformed != a)
-                {
-                    isChanged = true;
-                }
-
-                return transformed;
-            }).ToImmutableHashSet();
-
-            if (isChanged)
-            {
-                return new Goal(elements);
+                isChanged = true;
             }
 
-            return goal;
+            return transformed;
+        }).ToImmutableHashSet();
+
+        if (isChanged)
+        {
+            return new Effect(elements);
         }
 
-        /// <summary>
-        /// <para>
-        /// Applies this transformation to a <see cref="Effect"/> instance.
-        /// </para>
-        /// <para>
-        /// The default implementation returns a <see cref="Effect"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
-        /// </para>
-        /// </summary>
-        /// <param name="effect">The effect to transform.</param>
-        /// <returns>The transformed effect.</returns>
-        public virtual Effect ApplyTo(Effect effect)
+        return effect;
+    }
+
+    /// <summary>
+    /// Applies this transformation to a <see cref="Literal"/> instance. 
+    /// The default implementation returns a <see cref="Literal"/> with the same positivity as the existing literal and a predicate that it the result of calling <see cref="ApplyTo(Predicate)"/> on the existing predicate.
+    /// </summary>
+    /// <param name="literal">The <see cref="Literal"/> instance to transform.</param>
+    /// <returns>The transformed literal.</returns>
+    public virtual Literal ApplyTo(Literal literal)
+    {
+        var predicate = ApplyTo(literal.Predicate);
+        if (predicate != literal.Predicate)
         {
-            var isChanged = false;
+            return new Literal(predicate, literal.IsNegated);
+        }
 
-            var elements = effect.Elements.Select(a =>
+        return literal;
+    }
+
+    /// <summary>
+    /// Applies this transformation to a <see cref="Predicate"/> instance. 
+    /// The default implementation returns a <see cref="Predicate"/> with the same Symbol and with an argument list that is the result of calling <see cref="ApplyTo(Term)"/> on all of the existing arguments.
+    /// </summary>
+    /// <param name="predicate">The <see cref="Predicate"/> instance to transform.</param>
+    /// <returns>The transformed predicate.</returns>
+    public virtual Predicate ApplyTo(Predicate predicate)
+    {
+        var isChanged = false;
+
+        var arguments = predicate.Arguments.Select(a =>
+        {
+            var transformed = ApplyTo(a);
+
+            if (transformed != a)
             {
-                var transformed = ApplyTo(a);
-
-                if (transformed != a)
-                {
-                    isChanged = true;
-                }
-
-                return transformed;
-            }).ToImmutableHashSet();
-
-            if (isChanged)
-            {
-                return new Effect(elements);
+                isChanged = true;
             }
 
-            return effect;
+            return transformed;
+        }).ToList();
+
+        if (isChanged)
+        {
+            return new Predicate(predicate.Symbol, arguments);
         }
 
-        /// <summary>
-        /// Applies this transformation to a <see cref="Literal"/> instance. 
-        /// The default implementation returns a <see cref="Literal"/> with the same positivity as the existing literal and a predicate that it the result of calling <see cref="ApplyTo(Predicate)"/> on the existing predicate.
-        /// </summary>
-        /// <param name="literal">The <see cref="Literal"/> instance to transform.</param>
-        /// <returns>The transformed literal.</returns>
-        public virtual Literal ApplyTo(Literal literal)
+        return predicate;
+    }
+
+    /// <summary>
+    /// Applies this transformation to a <see cref="Term"/> instance.
+    /// The default implementation simply invokes the ApplyTo method appropriate to the type of the term.
+    /// </summary>
+    /// <param name="term">The term to visit.</param>
+    /// <returns>The transformed term.</returns>
+    public virtual Term ApplyTo(Term term)
+    {
+        return term switch
         {
-            var predicate = ApplyTo(literal.Predicate);
-            if (predicate != literal.Predicate)
+            VariableReference variable => ApplyTo(variable),
+            Constant constant => ApplyTo(constant),
+            Function function => ApplyTo(function),
+            _ => throw new ArgumentException($"Unsupported Term type '{term.GetType()}'", nameof(term))
+        };
+    }
+
+    /// <summary>
+    /// Applies this transformation to a <see cref="VariableReference"/> instance.
+    /// The default implementation returns a <see cref="VariableReference"/> referring to the variable that is the result of calling <see cref="ApplyTo(VariableDeclaration)"/> on the current declaration.
+    /// </summary>
+    /// <param name="variable">The variable reference to transform.</param>
+    /// <returns>The transformed term.</returns>
+    public virtual Term ApplyTo(VariableReference variable)
+    {
+        var variableDeclaration = ApplyTo(variable.Declaration);
+        if (variableDeclaration != variable.Declaration)
+        {
+            return new VariableReference(variableDeclaration);
+        }
+
+        return variable;
+    }
+
+    /// <summary>
+    /// Applies this transformation to a <see cref="Constant"/> instance.
+    /// The default implementation simply returns the constant unchanged.
+    /// </summary>
+    /// <param name="constant">The constant to transform.</param>
+    /// <returns>The transformed term.</returns>
+    public virtual Term ApplyTo(Constant constant)
+    {
+        return constant;
+    }
+
+    /// <summary>
+    /// Applies this transformation to a <see cref="Function"/> instance.
+    /// The default implementation returns a <see cref="Function"/> with the same Symbol and with an argument list that is the result of calling <see cref="ApplyTo(Term)"/> on each of the existing arguments.
+    /// </summary>
+    /// <param name="function">The function to transform.</param>
+    /// <returns>The transformed term.</returns>
+    public virtual Term ApplyTo(Function function)
+    {
+        var isChanged = false;
+
+        var arguments = function.Arguments.Select(a =>
+        {
+            var transformed = ApplyTo(a);
+            if (transformed != a)
             {
-                return new Literal(predicate, literal.IsNegated);
+                isChanged = true;
             }
+            return transformed;
+        }).ToList();
 
-            return literal;
-        }
-
-        /// <summary>
-        /// Applies this transformation to a <see cref="Predicate"/> instance. 
-        /// The default implementation returns a <see cref="Predicate"/> with the same Symbol and with an argument list that is the result of calling <see cref="ApplyTo(Term)"/> on all of the existing arguments.
-        /// </summary>
-        /// <param name="predicate">The <see cref="Predicate"/> instance to transform.</param>
-        /// <returns>The transformed predicate.</returns>
-        public virtual Predicate ApplyTo(Predicate predicate)
+        if (isChanged)
         {
-            var isChanged = false;
-
-            var arguments = predicate.Arguments.Select(a =>
-            {
-                var transformed = ApplyTo(a);
-
-                if (transformed != a)
-                {
-                    isChanged = true;
-                }
-
-                return transformed;
-            }).ToList();
-
-            if (isChanged)
-            {
-                return new Predicate(predicate.Symbol, arguments);
-            }
-
-            return predicate;
+            return new Function(function.Symbol, arguments);
         }
 
-        /// <summary>
-        /// Applies this transformation to a <see cref="Term"/> instance.
-        /// The default implementation simply invokes the ApplyTo method appropriate to the type of the term.
-        /// </summary>
-        /// <param name="term">The term to visit.</param>
-        /// <returns>The transformed term.</returns>
-        public virtual Term ApplyTo(Term term)
-        {
-            return term switch
-            {
-                VariableReference variable => ApplyTo(variable),
-                Constant constant => ApplyTo(constant),
-                Function function => ApplyTo(function),
-                _ => throw new ArgumentException($"Unsupported Term type '{term.GetType()}'", nameof(term))
-            };
-        }
+        return function;
+    }
 
-        /// <summary>
-        /// Applies this transformation to a <see cref="VariableReference"/> instance.
-        /// The default implementation returns a <see cref="VariableReference"/> referring to the variable that is the result of calling <see cref="ApplyTo(VariableDeclaration)"/> on the current declaration.
-        /// </summary>
-        /// <param name="variable">The variable reference to transform.</param>
-        /// <returns>The transformed term.</returns>
-        public virtual Term ApplyTo(VariableReference variable)
-        {
-            var variableDeclaration = ApplyTo(variable.Declaration);
-            if (variableDeclaration != variable.Declaration)
-            {
-                return new VariableReference(variableDeclaration);
-            }
-
-            return variable;
-        }
-
-        /// <summary>
-        /// Applies this transformation to a <see cref="Constant"/> instance.
-        /// The default implementation simply returns the constant unchanged.
-        /// </summary>
-        /// <param name="constant">The constant to transform.</param>
-        /// <returns>The transformed term.</returns>
-        public virtual Term ApplyTo(Constant constant)
-        {
-            return constant;
-        }
-
-        /// <summary>
-        /// Applies this transformation to a <see cref="Function"/> instance.
-        /// The default implementation returns a <see cref="Function"/> with the same Symbol and with an argument list that is the result of calling <see cref="ApplyTo(Term)"/> on each of the existing arguments.
-        /// </summary>
-        /// <param name="function">The function to transform.</param>
-        /// <returns>The transformed term.</returns>
-        public virtual Term ApplyTo(Function function)
-        {
-            var isChanged = false;
-
-            var arguments = function.Arguments.Select(a =>
-            {
-                var transformed = ApplyTo(a);
-                if (transformed != a)
-                {
-                    isChanged = true;
-                }
-                return transformed;
-            }).ToList();
-
-            if (isChanged)
-            {
-                return new Function(function.Symbol, arguments);
-            }
-
-            return function;
-        }
-
-        /// <summary>
-        /// Applies this transformation to a <see cref="VariableDeclaration"/> instance.
-        /// The default implementation simply returns the passed value.
-        /// </summary>
-        /// <param name="variableDeclaration">The <see cref="VariableDeclaration"/> instance to transform.</param>
-        /// <returns>The transformed <see cref="VariableReference"/> declaration.</returns>
-        public virtual VariableDeclaration ApplyTo(VariableDeclaration variableDeclaration)
-        {
-            return variableDeclaration;
-        }
+    /// <summary>
+    /// Applies this transformation to a <see cref="VariableDeclaration"/> instance.
+    /// The default implementation simply returns the passed value.
+    /// </summary>
+    /// <param name="variableDeclaration">The <see cref="VariableDeclaration"/> instance to transform.</param>
+    /// <returns>The transformed <see cref="VariableReference"/> declaration.</returns>
+    public virtual VariableDeclaration ApplyTo(VariableDeclaration variableDeclaration)
+    {
+        return variableDeclaration;
     }
 }

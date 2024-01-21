@@ -13,48 +13,47 @@
 // limitations under the License.
 using SCClassicalPlanning.Planning.GraphPlan;
 
-namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
+
+/// <summary>
+/// <para>
+/// Cost strategy that (gives all actions a cost of 1 and) uses a "max level" planning graph heuristic
+/// to provide cost estimates.
+/// </para>
+/// <para>
+/// To give an estimate, it first constructs a planning graph starting from the current state. 
+/// The cost estimate is the sum of the level costs of all of the goal's elements.
+/// </para>
+/// </summary>
+public class PlanningGraphLevelSum : ICostStrategy
 {
+    private readonly Domain domain;
+
     /// <summary>
-    /// <para>
-    /// Cost strategy that (gives all actions a cost of 1 and) uses a "max level" planning graph heuristic
-    /// to provide cost estimates.
-    /// </para>
-    /// <para>
-    /// To give an estimate, it first constructs a planning graph starting from the current state. 
-    /// The cost estimate is the sum of the level costs of all of the goal's elements.
-    /// </para>
+    /// Initialises a new instance of the <see cref="PlanningGraphMaxLevel"/> class.
     /// </summary>
-    public class PlanningGraphLevelSum : ICostStrategy
+    /// <param name="domain">The relevant domain.</param>
+    public PlanningGraphLevelSum(Domain domain) => this.domain = domain;
+
+    /// <inheritdoc/>
+    public float GetCost(Action action) => 1f;
+
+    /// <inheritdoc/>
+    public float EstimateCost(State state, Goal goal)
     {
-        private readonly Domain domain;
+        var planningGraph = new PlanningGraph(new(domain, state, goal));
 
-        /// <summary>
-        /// Initialises a new instance of the <see cref="PlanningGraphMaxLevel"/> class.
-        /// </summary>
-        /// <param name="domain">The relevant domain.</param>
-        public PlanningGraphLevelSum(Domain domain) => this.domain = domain;
-
-        /// <inheritdoc/>
-        public float GetCost(Action action) => 1f;
-
-        /// <inheritdoc/>
-        public float EstimateCost(State state, Goal goal)
+        return goal.Elements.Sum(e =>
         {
-            var planningGraph = new PlanningGraph(new(domain, state, goal));
-
-            return goal.Elements.Sum(e =>
+            var level = planningGraph.GetLevelCost(e);
+            if (level != -1)
             {
-                var level = planningGraph.GetLevelCost(e);
-                if (level != -1)
-                {
-                    return level;
-                }
-                else
-                {
-                    return float.PositiveInfinity;
-                }
-            });
-        }
+                return level;
+            }
+            else
+            {
+                return float.PositiveInfinity;
+            }
+        });
     }
 }

@@ -11,21 +11,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace SCClassicalPlanning.Planning.GraphPlan
+namespace SCClassicalPlanning.Planning.GraphPlan;
+
+/// <summary>
+/// An implementation of <see cref="IPlanner"/> that uses <see cref="GraphPlanPlanningTask"/> instances.
+/// </summary>
+internal class GraphPlanPlanner : IPlanner
 {
     /// <summary>
-    /// An implementation of <see cref="IPlanner"/> that uses <see cref="GraphPlanPlanningTask"/> instances.
+    /// Creates a (specifically-typed) planning task to work on solving a given problem.
     /// </summary>
-    internal class GraphPlanPlanner : IPlanner
-    {
-        /// <summary>
-        /// Creates a (specifically-typed) planning task to work on solving a given problem.
-        /// </summary>
-        /// <param name="problem">The problem to create a plan for.</param>
-        /// <returns>A new <see cref="GraphPlanPlanningTask"/> for solving the problem.</returns>
-        public static GraphPlanPlanningTask CreatePlanningTask(Problem problem) => new(problem);
+    /// <param name="problem">The problem to create a plan for.</param>
+    /// <returns>A new <see cref="GraphPlanPlanningTask"/> for solving the problem.</returns>
+    public static GraphPlanPlanningTask CreatePlanningTask(Problem problem) => new(problem);
 
-        /// <inheritdoc />
-        IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
-    }
+    /// <inheritdoc />
+    IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
 }

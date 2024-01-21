@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace SCClassicalPlanning.Planning
+namespace SCClassicalPlanning.Planning;
+
+/// <summary>
+/// Helpful extension methods for <see cref="IPlanningTask"/> instances.
+/// </summary>
+public static class IPlanningTaskExtensions
 {
     /// <summary>
-    /// Helpful extension methods for <see cref="IPlanningTask"/> instances.
+    /// Executes a planning task to completion.
     /// </summary>
-    public static class IPlanningTaskExtensions
+    /// <param name="planningTask">The planning task to execute.</param>
+    /// <returns>The result of the planning task.</returns>
+    public static Plan Execute(this IPlanningTask planningTask)
     {
-        /// <summary>
-        /// Executes a planning task to completion.
-        /// </summary>
-        /// <param name="planningTask">The planning task to execute.</param>
-        /// <returns>The result of the planning task.</returns>
-        public static Plan Execute(this IPlanningTask planningTask)
-        {
-            return planningTask.ExecuteAsync().GetAwaiter().GetResult();
-        }
+        return planningTask.ExecuteAsync().GetAwaiter().GetResult();
     }
 }

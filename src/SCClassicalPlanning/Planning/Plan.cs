@@ -13,50 +13,49 @@
 // limitations under the License.
 using System.Collections.Immutable;
 
-namespace SCClassicalPlanning.Planning
+namespace SCClassicalPlanning.Planning;
+
+/// <summary>
+/// Container for a (totally-ordered) plan of action - essentially just a list of steps.
+/// </summary>
+public class Plan
 {
     /// <summary>
-    /// Container for a (totally-ordered) plan of action - essentially just a list of steps.
+    /// Initializes a new instance of the <see cref="Plan"/> class.
     /// </summary>
-    public class Plan
+    /// <param name="steps">The actions that comprise the plan.</param>
+    public Plan(IEnumerable<Action> steps) => Steps = steps.ToImmutableList();
+
+    /// <summary>
+    /// Gets a singleton instance of an empty plan;
+    /// </summary>
+    public static Plan Empty { get; } = new Plan(Array.Empty<Action>());
+
+    /// <summary>
+    /// Gets the steps of the plan.
+    /// </summary>
+    public ImmutableList<Action> Steps { get; }
+
+    /// <summary>
+    /// <para>
+    /// Applies this plan to a given state.
+    /// </para>
+    /// <para>
+    /// An exception will be thrown if any of the actions in the plan are not applicable to the current state when they are applied.
+    /// </para>
+    /// </summary>
+    public State ApplyTo(State state)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Plan"/> class.
-        /// </summary>
-        /// <param name="steps">The actions that comprise the plan.</param>
-        public Plan(IEnumerable<Action> steps) => Steps = steps.ToImmutableList();
-
-        /// <summary>
-        /// Gets a singleton instance of an empty plan;
-        /// </summary>
-        public static Plan Empty { get; } = new Plan(Array.Empty<Action>());
-
-        /// <summary>
-        /// Gets the steps of the plan.
-        /// </summary>
-        public ImmutableList<Action> Steps { get; }
-
-        /// <summary>
-        /// <para>
-        /// Applies this plan to a given state.
-        /// </para>
-        /// <para>
-        /// An exception will be thrown if any of the actions in the plan are not applicable to the current state when they are applied.
-        /// </para>
-        /// </summary>
-        public State ApplyTo(State state)
+        foreach (var action in Steps)
         {
-            foreach (var action in Steps)
+            if (!action.IsApplicableTo(state))
             {
-                if (!action.IsApplicableTo(state))
-                {
-                    throw new ArgumentException("Invalid plan of action - current action is not applicable in the current state");
-                }
-
-                state = action.ApplyTo(state);
+                throw new ArgumentException("Invalid plan of action - current action is not applicable in the current state");
             }
 
-            return state;
+            state = action.ApplyTo(state);
         }
+
+        return state;
     }
 }

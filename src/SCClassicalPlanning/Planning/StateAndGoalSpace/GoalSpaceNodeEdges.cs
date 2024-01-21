@@ -14,43 +14,42 @@
 using SCClassicalPlanning.Planning.Utilities;
 using System.Collections;
 
-namespace SCClassicalPlanning.Planning.StateAndGoalSpace
+namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
+
+/// <summary>
+/// Represents the collection of outbound edges of a node in the goal space of a planning problem. 
+/// </summary>
+public readonly struct GoalSpaceNodeEdges : IReadOnlyCollection<GoalSpaceEdge>
 {
     /// <summary>
-    /// Represents the collection of outbound edges of a node in the goal space of a planning problem. 
+    /// The problem whose goal space the node that owns this collection is a member of.
     /// </summary>
-    public readonly struct GoalSpaceNodeEdges : IReadOnlyCollection<GoalSpaceEdge>
+    public readonly Problem Problem;
+
+    /// <summary>
+    /// The goal represented by the node that owns this collection.
+    /// </summary>
+    public readonly Goal Goal;
+
+    /// <summary>
+    /// Initialises a new instance of the <see cref="GoalSpaceNodeEdges"/> struct.
+    /// </summary>
+    /// <param name="problem">The problem whose goal space the node that owns this collection is a member of.</param>
+    /// <param name="goal">The goal represented by the node that owns this collection.</param>
+    public GoalSpaceNodeEdges(Problem problem, Goal goal) => (Problem, Goal) = (problem, goal);
+
+    /// <inheritdoc />
+    public int Count => ProblemInspector.GetRelevantActions(Problem, Goal).Count();
+
+    /// <inheritdoc />
+    public IEnumerator<GoalSpaceEdge> GetEnumerator()
     {
-        /// <summary>
-        /// The problem whose goal space the node that owns this collection is a member of.
-        /// </summary>
-        public readonly Problem Problem;
-
-        /// <summary>
-        /// The goal represented by the node that owns this collection.
-        /// </summary>
-        public readonly Goal Goal;
-
-        /// <summary>
-        /// Initialises a new instance of the <see cref="GoalSpaceNodeEdges"/> struct.
-        /// </summary>
-        /// <param name="problem">The problem whose goal space the node that owns this collection is a member of.</param>
-        /// <param name="goal">The goal represented by the node that owns this collection.</param>
-        public GoalSpaceNodeEdges(Problem problem, Goal goal) => (Problem, Goal) = (problem, goal);
-
-        /// <inheritdoc />
-        public int Count => ProblemInspector.GetRelevantActions(Problem, Goal).Count();
-
-        /// <inheritdoc />
-        public IEnumerator<GoalSpaceEdge> GetEnumerator()
+        foreach (var action in ProblemInspector.GetRelevantActions(Problem, Goal))
         {
-            foreach (var action in ProblemInspector.GetRelevantActions(Problem, Goal))
-            {
-                yield return new GoalSpaceEdge(Problem, Goal, action);
-            }
+            yield return new GoalSpaceEdge(Problem, Goal, action);
         }
-
-        /// <inheritdoc />
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
+
+    /// <inheritdoc />
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

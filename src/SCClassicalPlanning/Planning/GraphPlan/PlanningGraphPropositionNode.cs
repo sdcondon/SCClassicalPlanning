@@ -15,32 +15,31 @@ using SCFirstOrderLogic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
-namespace SCClassicalPlanning.Planning.GraphPlan
+namespace SCClassicalPlanning.Planning.GraphPlan;
+
+/// <summary>
+/// <para>
+/// Representation of a proposition node in a planning graph.
+/// </para>
+/// <para>
+/// NB: We don't make use of the SCGraphTheory abstraction for the planning graph because none of the algorithms that use 
+/// it query it via graph theoretical algorithms - so it would be needless complexity.
+/// </para>
+/// </summary>
+[DebuggerDisplay("{Proposition}")]
+public class PlanningGraphPropositionNode
 {
+    internal PlanningGraphPropositionNode(Literal proposition) => Proposition = proposition;
+
     /// <summary>
-    /// <para>
-    /// Representation of a proposition node in a planning graph.
-    /// </para>
-    /// <para>
-    /// NB: We don't make use of the SCGraphTheory abstraction for the planning graph because none of the algorithms that use 
-    /// it query it via graph theoretical algorithms - so it would be needless complexity.
-    /// </para>
+    /// Gets the proposition represented by this node.
     /// </summary>
-    [DebuggerDisplay("{Proposition}")]
-    public class PlanningGraphPropositionNode
-    {
-        internal PlanningGraphPropositionNode(Literal proposition) => Proposition = proposition;
+    public Literal Proposition { get; }
 
-        /// <summary>
-        /// Gets the proposition represented by this node.
-        /// </summary>
-        public Literal Proposition { get; }
+    // TODO-V1: make public but read-only (additions via internal methods)
+    internal Collection<PlanningGraphActionNode> Actions { get; } = new();
 
-        // TODO-V1: make public but read-only (additions via internal methods)
-        internal Collection<PlanningGraphActionNode> Actions { get; } = new();
+    internal Collection<PlanningGraphActionNode> Causes { get; } = new();
 
-        internal Collection<PlanningGraphActionNode> Causes { get; } = new();
-
-        internal Collection<PlanningGraphPropositionNode> Mutexes { get; } = new();
-    }
+    internal Collection<PlanningGraphPropositionNode> Mutexes { get; } = new();
 }
