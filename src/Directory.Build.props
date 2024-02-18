@@ -9,11 +9,23 @@
     <PackageProjectUrl>https://sdcondon.net/SCClassicalPlanning/</PackageProjectUrl>
     <PackageReleaseNotes>See https://github.com/sdcondon/SCClassicalPlanning/releases.</PackageReleaseNotes>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <Copyright>2022-2023 Simon Condon</Copyright>
+    <Copyright>2022-2024 Simon Condon</Copyright>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
 
-    <Version>0.0.0-localbuild+localbuild</Version>
+    <!-- NB: timestamp below doesn't include seconds because depending on such a package gets VS into an infinite restore loop. -->
+    <!-- More than one build in a minute isn't something that's going to be an issue, though. -->
+    <Version>0.0.0-local.$([System.DateTime]::Now.ToString(yyMMddTHHmm))</Version>
+    <!-- Might make this cleverer if anyone else starts contributing to this (look for local package sources with Powershell, maybe?) -->
+    <LocalPackageSource>$(UserProfile)\Coding\Packages</LocalPackageSource>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' != 'true' And Exists('$(LocalPackageSource)')">
+    <PackageOutputPath>$(LocalPackageSource)</PackageOutputPath>
   </PropertyGroup>
 </Project>
