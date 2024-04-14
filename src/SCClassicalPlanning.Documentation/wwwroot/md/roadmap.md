@@ -24,10 +24,9 @@ Stuff I want to do before ticking the major version number to 1:
 - [x] A simple GraphPlan implementation
 - [x] Basic PDDL parsing
 - [ ] I've at least considered all of the existing TODOs.
-    - [ ] Most notably the ones around State abstraction and state indexing - so its at least conceivable that someone could extend it to be workable with large (secondary-storage requiring) problems.
-    - [x] Also want to allow planners to open up the planning process. E.g. allowing consumers to see the search in state space searching, and the planning graph in graphplan. Perhaps even allow for them to be created step-by-step. Yes this is overhead, but given the purpose of the lib.. Likely accomplished by having IPlanner return a PlanningTask rather than a Task<Plan>
+    - [ ] Most notably the ones around State abstraction and state indexing - so its at least conceivable that someone could extend it to be workable with large (secondary storage requiring) problems.
+    - [x] Also want to allow planners to open up the planning process. E.g. allowing consumers to see the search in state space searching, and the planning graph in graphplan. Perhaps even allow for them to be created step-by-step. Yes this is overhead, but given the purpose of the lib.. Likely accomplished by having IPlanner return a PlanningTask rather than a Task&lt;Plan&gt;
 
 ## Post-V1
 
-Honestly not sure - might call it 'done' at that point, might continue playing with it.
-Will certainly be willing to talk to any interested parties about it. Time will tell.
+Honestly not sure - might call it 'done' at that point, might continue playing with it. Time will tell.

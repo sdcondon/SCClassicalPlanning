@@ -17,12 +17,12 @@ public static class GoalSpaceAStarPlannerTests
 
     public static Test CreatedPlanValidity => TestThat
         .GivenTestContext()
-        .AndEachOf(() => new TestCase[]
+        .AndEachOfAsync<TestCase>(async () => new TestCase[]
         {
             new(
                 Problem: AirCargo.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
-                InvariantsKB: MakeResolutionKB(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Cargo(new Constant("cargo1")),
                     Cargo(new Constant("cargo2")),
@@ -41,7 +41,7 @@ public static class GoalSpaceAStarPlannerTests
             new(
                 Problem: BlocksWorld.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
-                InvariantsKB: MakeResolutionKB(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Block(new Constant("blockA")),
                     Block(new Constant("blockB")),
@@ -53,12 +53,12 @@ public static class GoalSpaceAStarPlannerTests
             new(
                 Problem: SpareTire.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
-                InvariantsKB: MakeResolutionKB(Array.Empty<Sentence>())),
+                InvariantsKB: await MakeResolutionKBAsync(Array.Empty<Sentence>())),
 
             new(
                 Problem: BlocksWorld.LargeExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
-                InvariantsKB: MakeResolutionKB(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Block(new Constant("blockA")),
                     Block(new Constant("blockB")),
@@ -69,10 +69,10 @@ public static class GoalSpaceAStarPlannerTests
                     ForAll(A, B, If(On(A, B), !Clear(B))),
                 })),
         })
-        .When((_, tc) =>
+        .WhenAsync(async (_, tc) =>
         {
             var planner = new GoalSpaceAStarPlanner(tc.Strategy);
-            return planner.CreatePlanAsync(tc.Problem).GetAwaiter().GetResult();
+            return await planner.CreatePlanAsync(tc.Problem);
         })
         .ThenReturns()
         .And((_, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
@@ -80,12 +80,12 @@ public static class GoalSpaceAStarPlannerTests
 
     public static Test CreatedPlanValidity_AlternativeImplementations => TestThat
         .GivenTestContext()
-        .AndEachOf(() => new TestCase[]
+        .AndEachOfAsync<TestCase>(async () => new TestCase[]
         {
             new(
                 Problem: AirCargo.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
-                InvariantsKB: MakeResolutionKB(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Cargo(new Constant("cargo1")),
                     Cargo(new Constant("cargo2")),
@@ -104,7 +104,7 @@ public static class GoalSpaceAStarPlannerTests
             new(
                 Problem: BlocksWorld.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
-                InvariantsKB: MakeResolutionKB(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Block(new Constant("blockA")),
                     Block(new Constant("blockB")),
@@ -116,12 +116,12 @@ public static class GoalSpaceAStarPlannerTests
             new(
                 Problem: SpareTire.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
-                InvariantsKB: MakeResolutionKB(Array.Empty<Sentence>())),
+                InvariantsKB: await MakeResolutionKBAsync(Array.Empty<Sentence>())),
 
             new(
                 Problem: BlocksWorld.LargeExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
-                InvariantsKB: MakeResolutionKB(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Block(new Constant("blockA")),
                     Block(new Constant("blockB")),
@@ -144,14 +144,14 @@ public static class GoalSpaceAStarPlannerTests
         .And((_, tc, _, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
         .And((cxt, tc, _, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
 
-    private static IKnowledgeBase MakeResolutionKB(IEnumerable<Sentence> invariants)
+    private static async Task<IKnowledgeBase> MakeResolutionKBAsync(IEnumerable<Sentence> invariants)
     {
         var resolutionKb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
             new HashSetClauseStore(),
             DelegateResolutionStrategy.Filters.None,
             DelegateResolutionStrategy.PriorityComparisons.UnitPreference));
 
-        var invariantKb = new UniqueNamesAxiomisingKnowledgeBase(EqualityAxiomisingKnowledgeBase.CreateAsync(resolutionKb).GetAwaiter().GetResult());
+        var invariantKb = new UniqueNamesAxiomisingKnowledgeBase(await EqualityAxiomisingKnowledgeBase.CreateAsync(resolutionKb));
         invariantKb.Tell(invariants);
 
         return invariantKb;

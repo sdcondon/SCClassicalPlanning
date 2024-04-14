@@ -26,13 +26,13 @@ public static class GraphPlanPlanningTask_FromAPTaPTests
         {
             BlocksWorld.UnsolvableExampleProblem,
         })
-        .When(p =>
+        .WhenAsync(async p =>
         {
             // NB: Yes, in theory a flaky test if the machine is running really slowly for whatever
             // reason. Given that we're testing "does this thing terminate" there's not really much
             // of an alternative.
             var timeoutToken = new CancellationTokenSource(TimeSpan.FromSeconds(2)).Token;
-            return new GraphPlanPlanningTask_FromAPTaP(p).ExecuteAsync(timeoutToken).GetAwaiter().GetResult();
+            return await new GraphPlanPlanningTask_FromAPTaP(p).ExecuteAsync(timeoutToken);
         })
         .ThenThrows()
         .And((_, ex) => ex.Should().BeOfType<InvalidOperationException>());
