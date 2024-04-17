@@ -205,7 +205,7 @@ public static class PddlParser
         var symbol = context.NAME().Symbol.Text;
         object identifier = symbol switch
         {
-            "=" => EqualitySymbol.Instance,
+            "=" => EqualityIdentifier.Instance,
             _ => symbol
         };
 

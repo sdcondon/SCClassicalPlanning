@@ -82,7 +82,7 @@ public static class PlanningGraphTests
                 return g.GetLevel(level).Propositions
                     .Where(p =>
                         p.IsPositive
-                        && p.Predicate.Symbol.Equals("IsAt")
+                        && p.Predicate.Identifier.Equals("IsAt")
                         && (p.Predicate.Arguments[0].Equals(Spare) || p.Predicate.Arguments[0].Equals(Flat)))
                     .Select(l => l.Predicate);
             }

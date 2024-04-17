@@ -72,7 +72,7 @@ public static class AirCargoOneAtATime
     public static OperablePredicate IsAirport(Term airport) => new Predicate(nameof(IsAirport), airport);
     public static OperablePredicate IsAt(Term @object, Term location) => new Predicate(nameof(IsAt), @object, location);
     public static OperablePredicate IsIn(Term @object, Term container) => new Predicate(nameof(IsIn), @object, container);
-    public static OperablePredicate AreEqual(Term x, Term y) => new Predicate(EqualitySymbol.Instance, x, y);
+    public static OperablePredicate AreEqual(Term x, Term y) => new Predicate(EqualityIdentifier.Instance, x, y);
 
     public static Action Load(Term cargo, Term plane, Term airport) => new OperableAction(
         identifier: nameof(Load),

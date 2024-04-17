@@ -303,9 +303,7 @@ public class PlanningGraph
                 // For each unification found, we then recurse for the rest of the elements of the goal.
                 foreach (var proposition in possiblePropositions)
                 {
-                    var firstGoalElementUnifier = new VariableSubstitution(unifier);
-
-                    if (LiteralUnifier.TryUpdateUnsafe(proposition, goalElements.First(), firstGoalElementUnifier))
+                    if (Unifier.TryUpdate(proposition, goalElements.First(), unifier, out var firstGoalElementUnifier))
                     {
                         foreach (var restOfGoalElementsUnifier in MatchWithPossiblePropositions(goalElements.Skip(1), firstGoalElementUnifier))
                         {

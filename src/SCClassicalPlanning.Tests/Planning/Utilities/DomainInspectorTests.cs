@@ -116,15 +116,15 @@ public static class DomainInspectorTests
             .Using<VariableReference>(cxt =>
             {
                 cxt.Subject
-                    .Symbol.Should().BeOfType<DomainInspector.StandardisedVariableSymbol>()
-                    .Which.OriginalSymbol.Should().Be(cxt.Expectation.Symbol);
+                    .Identifier.Should().BeOfType<DomainInspector.StandardisedVariableSymbol>()
+                    .Which.OriginalSymbol.Should().Be(cxt.Expectation.Identifier);
             })
             .WhenTypeIs<VariableReference>()
             .Using<VariableDeclaration>(cxt =>
             {
                 cxt.Subject
-                    .Symbol.Should().BeOfType<DomainInspector.StandardisedVariableSymbol>()
-                    .Which.OriginalSymbol.Should().Be(cxt.Expectation.Symbol);
+                    .Identifier.Should().BeOfType<DomainInspector.StandardisedVariableSymbol>()
+                    .Which.OriginalSymbol.Should().Be(cxt.Expectation.Identifier);
             })
             .WhenTypeIs<VariableDeclaration>();
     }

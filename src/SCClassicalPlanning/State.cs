@@ -131,9 +131,7 @@ public class State
                 // Here we iterate through all elements of the state, trying to find unifications with the first goal element.
                 foreach (var stateElement in Elements)
                 {
-                    var firstGoalElementUnifier = new VariableSubstitution(substitution);
-
-                    if (LiteralUnifier.TryUpdateUnsafe(firstGoalElement, stateElement, firstGoalElementUnifier))
+                    if (Unifier.TryUpdate(firstGoalElement, stateElement, substitution, out var firstGoalElementUnifier))
                     {
                         foreach (var restOfGoalElementsUnifier in GetPositiveGoalElementUnifiers(positiveGoalPredicates.Skip(1), firstGoalElementUnifier))
                         {

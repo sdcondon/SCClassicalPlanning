@@ -53,7 +53,7 @@ public static class ProblemInspector_MergedUnmatchLogic
                     // exactly matches with an element of the goal. Discard this unifier.
                     yield break;
                 }
-                else if (goal.Elements.Any(e => LiteralUnifier.TryUpdateUnsafe(e, unifier.ApplyTo(firstEffectElement).Negate(), new VariableSubstitution(unifier))))
+                else if (goal.Elements.Any(e => Unifier.TryUpdate(e, unifier.ApplyTo(firstEffectElement).Negate(), unifier, out var _)))
                 {
                     // There exists a unifier such that this effect element transformed by the unifier so far then negated,
                     // exactly matches with an element of the goal. Need to explode out into all possible substitutions.
@@ -108,7 +108,7 @@ public static class ProblemInspector_MergedUnmatchLogic
                 {
                     // TODO: using LiteralUnifier is perhaps overkill given that we know we're functionless,
                     // but will do for now. (doesn't necessarily cost more..)
-                    if (LiteralUnifier.TryCreate(goalElement, effectElement, out var unifier))
+                    if (Unifier.TryCreate(goalElement, effectElement, out var unifier))
                     {
                         yield return unifier;
                     }

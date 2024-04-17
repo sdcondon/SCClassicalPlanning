@@ -87,7 +87,7 @@ public class IgnorePreconditionsGreedySetCover : ICostStrategy
         foreach (var goalElement in goal.Elements)
         {
             // Unifying here because positive elements of the goal can include variables..
-            if (goalElement.IsPositive && state.Elements.Any(e => LiteralUnifier.TryCreate(goalElement, e, out var _)))
+            if (goalElement.IsPositive && state.Elements.Any(e => Unifier.TryCreate(goalElement, e, out var _)))
             {
                 uncovered.Remove(goalElement);
             }
@@ -109,7 +109,7 @@ public class IgnorePreconditionsGreedySetCover : ICostStrategy
             {
                 foreach (var effectElement in actionSchema.Effect.Elements)
                 {
-                    if (LiteralUnifier.TryCreate(effectElement, goalElement, out var unifier))
+                    if (Unifier.TryCreate(effectElement, goalElement, out var unifier))
                     {
 #if false
                         var transformedEffectElement = new VariableSubstitutionEffectTransformation(unifier).ApplyTo(actionSchema.Effect);

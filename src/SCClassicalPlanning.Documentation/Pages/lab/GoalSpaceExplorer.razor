@@ -88,7 +88,7 @@
             @{
                 // richer formatting functionality could make this more succinct, which would be nice..
                 var goalElements = goalNode.Goal.Elements
-                .OrderBy(e => e.Predicate.Symbol.ToString())
+                .OrderBy(e => e.Predicate.Identifier.ToString())
                 .ThenBy(e => string.Join(",", e.Predicate.Arguments.Select(a => a.ToString())));
             }
             @string.Join(" ∧ ", goalElements);

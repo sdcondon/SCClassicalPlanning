@@ -92,7 +92,7 @@ public abstract class RecursiveGoalTransformation
 
         if (isChanged)
         {
-            return new Predicate(predicate.Symbol, transformed);
+            return new Predicate(predicate.Identifier, transformed);
         }
 
         return predicate;
@@ -166,7 +166,7 @@ public abstract class RecursiveGoalTransformation
 
         if (isChanged)
         {
-            return new Function(function.Symbol, transformed);
+            return new Function(function.Identifier, transformed);
         }
 
         return function;

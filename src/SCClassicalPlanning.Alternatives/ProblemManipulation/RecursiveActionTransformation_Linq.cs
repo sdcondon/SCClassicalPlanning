@@ -152,7 +152,7 @@ public abstract class RecursiveActionTransformation_Linq
 
         if (isChanged)
         {
-            return new Predicate(predicate.Symbol, arguments);
+            return new Predicate(predicate.Identifier, arguments);
         }
 
         return predicate;
@@ -225,7 +225,7 @@ public abstract class RecursiveActionTransformation_Linq
 
         if (isChanged)
         {
-            return new Function(function.Symbol, arguments);
+            return new Function(function.Identifier, arguments);
         }
 
         return function;

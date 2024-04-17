@@ -91,7 +91,7 @@ public class Domain
             // Ultimately, it might be a nice quality-of-life improvement to keep variable names as-is if its appropriate (e.g. if its the same
             // in all copies of this predicate) - but can come back to that.
             var standardisedParameters = Enumerable.Range(0, predicate.Arguments.Count).Select(i => new VariableReference(((char)('A' + i)).ToString())).ToArray();
-            predicates.Add(new Predicate(predicate.Symbol, standardisedParameters));
+            predicates.Add(new Predicate(predicate.Identifier, standardisedParameters));
         }
     }
 

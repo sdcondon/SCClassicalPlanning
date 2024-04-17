@@ -59,9 +59,7 @@ public static class ProblemInspector
                     // For each unification found, we then recurse for the rest of the elements of the goal.
                     foreach (var stateElement in state.Elements)
                     {
-                        var firstGoalElementUnifier = new VariableSubstitution(unifier);
-
-                        if (LiteralUnifier.TryUpdateUnsafe(stateElement, firstGoalElement, firstGoalElementUnifier))
+                        if (Unifier.TryUpdate(stateElement, firstGoalElement, unifier, out var firstGoalElementUnifier))
                         {
                             foreach (var restOfGoalElementsUnifier in MatchWithState(goalElements.Skip(1), firstGoalElementUnifier))
                             {
@@ -194,7 +192,7 @@ public static class ProblemInspector
                 // We return each unification we find immediately - for an effect to be relevant it only needs to match at least one element of the goal.
                 foreach (var goalElement in goal.Elements)
                 {
-                    if (LiteralUnifier.TryCreate(goalElement, effectElement, out var unifier))
+                    if (Unifier.TryCreate(goalElement, effectElement, out var unifier))
                     {
                         yield return unifier;
                     }

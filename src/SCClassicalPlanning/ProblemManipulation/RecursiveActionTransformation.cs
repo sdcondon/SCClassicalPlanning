@@ -139,7 +139,7 @@ public abstract class RecursiveActionTransformation
             }
         }
 
-        return isChanged ? new(predicate.Symbol, transformed) : predicate;
+        return isChanged ? new(predicate.Identifier, transformed) : predicate;
     }
 
     /// <summary>
@@ -208,7 +208,7 @@ public abstract class RecursiveActionTransformation
             }
         }
 
-        return isChanged ? new(function.Symbol, transformed) : function;
+        return isChanged ? new(function.Identifier, transformed) : function;
     }
 
     /// <summary>

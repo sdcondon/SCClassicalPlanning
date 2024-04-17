@@ -46,9 +46,7 @@ public static class DomainInspector
             {
                 foreach (var goalElement in goal.Elements)
                 {
-                    var clashingSubstitution = new VariableSubstitution(substitution);
-
-                    if (LiteralUnifier.TryUpdateUnsafe(goalElement, substitution.ApplyTo(effectElement).Negate(), clashingSubstitution))
+                    if (Unifier.TryUpdate(goalElement, substitution.ApplyTo(effectElement).Negate(), substitution, out var clashingSubstitution))
                     {
                         var precludedBindings = clashingSubstitution.Bindings.Where(k => !substitution.Bindings.ContainsKey(k.Key));
 
@@ -56,7 +54,7 @@ public static class DomainInspector
                         {
                             foreach (var kvp in precludedBindings)
                             {
-                                constraintElements.Add(new Literal(new Predicate(EqualitySymbol.Instance, kvp.Key, kvp.Value), true));
+                                constraintElements.Add(new Literal(new Predicate(EqualityIdentifier.Instance, kvp.Key, kvp.Value), true));
                             }
                         }
                         else
@@ -85,7 +83,7 @@ public static class DomainInspector
                 // We return each unification we find immediately - for an effect to be relevant it only needs to match at least one element of the goal.
                 foreach (var goalElement in goal.Elements)
                 {
-                    if (LiteralUnifier.TryCreate(goalElement, effectElement, out var unifier))
+                    if (Unifier.TryCreate(goalElement, effectElement, out var unifier))
                     {
                         yield return unifier;
                     }
@@ -158,9 +156,7 @@ public static class DomainInspector
 
                 foreach (var schemaElement in schemaElements)
                 {
-                    var firstActionElementUnifier = new VariableSubstitution(unifier);
-
-                    if (LiteralUnifier.TryUpdateUnsafe(schemaElement, firstActionElement, firstActionElementUnifier))
+                    if (Unifier.TryUpdate(schemaElement, firstActionElement, unifier, out var firstActionElementUnifier))
                     {
                         foreach (var restOfActionElementsUnifier in MatchWithSchemaElements(actionElements.Skip(1), schemaElements.Except(new[] { schemaElement }), firstActionElementUnifier))
                         {
@@ -199,7 +195,7 @@ public static class DomainInspector
         {
             if (!mapping.TryGetValue(variableDeclaration, out var standardisedVariableDeclaration))
             {
-                standardisedVariableDeclaration = mapping[variableDeclaration] = new VariableDeclaration(new StandardisedVariableSymbol(variableDeclaration.Symbol));
+                standardisedVariableDeclaration = mapping[variableDeclaration] = new VariableDeclaration(new StandardisedVariableSymbol(variableDeclaration.Identifier));
             }
 
             return standardisedVariableDeclaration;

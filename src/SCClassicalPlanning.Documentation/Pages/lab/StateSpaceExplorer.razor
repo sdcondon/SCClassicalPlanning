@@ -87,7 +87,7 @@
             @{
                 // richer formatting functionality could make this more succinct, which would be nice..
                 var stateElements = stateNode.State.Elements
-                    .OrderBy(e => e.Symbol.ToString())
+                    .OrderBy(e => e.Identifier.ToString())
                     .ThenBy(e => string.Join(",", e.Arguments.Select(a => a.ToString())));
             }
             @string.Join(" ∧ ", stateElements)

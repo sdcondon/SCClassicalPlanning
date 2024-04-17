@@ -55,7 +55,7 @@ public class PlanFormatter
     public string Format(Action action)
     {
         VariableSubstitution substitution = DomainInspector.GetMappingFromSchema(domain, action);
-        var orderedBindings = substitution.Bindings.OrderBy(b => b.Key.Symbol.ToString());
+        var orderedBindings = substitution.Bindings.OrderBy(b => b.Key.Identifier.ToString());
         return $"{action.Identifier}({string.Join(", ", orderedBindings.Select(b => b.Key.ToString() + ": " + b.Value.ToString()))})";
     }
 }
