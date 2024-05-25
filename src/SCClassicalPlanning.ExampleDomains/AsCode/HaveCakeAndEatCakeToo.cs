@@ -16,14 +16,14 @@ public class HaveCakeAndEatCakeToo
         Constant cake = new(nameof(cake));
 
         ExampleProblem = MakeProblem(
-            initialState: new(Have(cake)),
+            initialState: new HashSetState(Have(cake)),
             goal: new(Have(cake) & Eaten(cake)));
     }
 
     /// <summary>
     /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the domain.
     /// </summary>
-    public static Domain Domain { get; }
+    public static HashSetDomain Domain { get; }
 
     /// <summary>
     /// Gets an instance of the example problem for this domain.
@@ -52,8 +52,8 @@ public class HaveCakeAndEatCakeToo
     /// <param name="initialState">The initial state of the problem.</param>
     /// <param name="goal">The initial state of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(State initialState, Goal goal) => new(Domain, initialState, goal);
+    public static Problem MakeProblem(IState initialState, Goal goal) => new(Domain, initialState, goal);
 
     // NB: This is in its own method rather than the static ctor just so that we can run tests against domain construction.
-    internal static Domain MakeDomain() => new Domain(Eat(C), Bake(C));
+    internal static HashSetDomain MakeDomain() => new(Eat(C), Bake(C));
 }

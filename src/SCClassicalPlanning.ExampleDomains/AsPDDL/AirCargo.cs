@@ -14,7 +14,7 @@ public static class AirCargo
     /// <summary>
     /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Air Cargo" domain.
     /// </summary>
-    public static Domain Domain { get; } = PddlParser.ParseDomain(DomainPDDL);
+    public static HashSetDomain Domain { get; } = PddlParser.ParseDomain(DomainPDDL);
 
     /// <summary>
     /// Gets a PDDL representation of the "Air Cargo" domain.
