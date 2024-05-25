@@ -42,10 +42,8 @@ public static class AirCargo
         var assembly = Assembly.GetExecutingAssembly();
         var fullResourceName = $"SCClassicalPlanning.ExampleDomains.AsPDDL.{resourceName}";
 
-        using (Stream stream = assembly.GetManifestResourceStream(fullResourceName)!)
-        using (StreamReader reader = new StreamReader(stream))
-        {
-            return reader.ReadToEnd();
-        }
+        using Stream stream = assembly.GetManifestResourceStream(fullResourceName)!;
+        using StreamReader reader = new(stream);
+        return reader.ReadToEnd();
     }
 }

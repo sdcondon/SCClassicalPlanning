@@ -197,6 +197,7 @@ public static class PddlParser
         {
             MinimalPDDLParser.PositiveLiteralContext plc => new Literal(TransformPredicate(plc.predicate())),
             MinimalPDDLParser.NegativeLiteralContext nlc => new Literal(TransformPredicate(nlc.predicate()), true),
+            _ => throw new ArgumentException($"Unexpected LiteralContext type encountered: {context.GetType()}", nameof(context))
         };
     }
 
@@ -214,7 +215,7 @@ public static class PddlParser
         {
             MinimalPDDLParser.ConstantTermContext ctc => new Constant(ctc.NAME().Symbol.Text),
             MinimalPDDLParser.VariableTermContext vtc => new VariableReference(vtc.VARIABLE_NAME().Symbol.Text.TrimStart('?')),
-            _ => throw new ArgumentException("Unsupported term type encountered")
+            _ => throw new ArgumentException($"Unexpected TermContext type encountered: {context.GetType()}", nameof(context))
         });
 
         return new Predicate(identifier, arguments);
