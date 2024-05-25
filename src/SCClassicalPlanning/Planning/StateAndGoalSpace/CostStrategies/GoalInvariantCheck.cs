@@ -71,7 +71,7 @@ public class GoalInvariantCheck : ICostStrategy
     /// <param name="state">The state.</param>
     /// <param name="goal">The goal.</param>
     /// <returns><see cref="float.PositiveInfinity"/> if any invariants are violated by the goal. Otherwise, the cost estimated by the inner strategy.</returns>
-    public float EstimateCost(State state, Goal goal)
+    public float EstimateCost(IState state, Goal goal)
     {
         if (invariantInspector.IsGoalPrecludedByInvariants(goal))
         {

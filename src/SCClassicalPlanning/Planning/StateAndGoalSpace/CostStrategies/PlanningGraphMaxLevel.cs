@@ -28,19 +28,19 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 /// </summary>
 public class PlanningGraphMaxLevel : ICostStrategy
 {
-    private readonly Domain domain;
+    private readonly IDomain domain;
 
     /// <summary>
     /// Initialises a new instance of the <see cref="PlanningGraphMaxLevel"/> class.
     /// </summary>
     /// <param name="domain">The relevant domain.</param>
-    public PlanningGraphMaxLevel(Domain domain) => this.domain = domain;
+    public PlanningGraphMaxLevel(IDomain domain) => this.domain = domain;
 
     /// <inheritdoc/>
     public float GetCost(Action action) => 1f;
 
     /// <inheritdoc/>
-    public float EstimateCost(State state, Goal goal)
+    public float EstimateCost(IState state, Goal goal)
     {
         var planningGraph = new PlanningGraph(new(domain, state, goal));
 

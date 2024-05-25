@@ -18,21 +18,15 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning;
 
 /// <summary>
-/// <para>
-/// Container for information about a domain.
-/// </para>
-/// <para>
-/// A domain defines the aspects that are common to of all problems that occur within it.
-/// Specifically, the <see cref="Action"/>s available within it.
-/// </para>
+/// Implementation of <see cref="IDomain"/> that stores everything in memory.
 /// </summary>
-public class Domain
+public class HashSetDomain : IDomain
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Domain"/> class.
     /// </summary>
     /// <param name="actions">The set of actions that exist within the domain.</param>
-    public Domain(IEnumerable<Action> actions) // TODO: perhaps allow for the specification of additional constants?
+    public HashSetDomain(IEnumerable<Action> actions) // TODO: perhaps allow for the specification of additional constants?
     {
         Actions = actions.ToImmutableHashSet();
 
@@ -57,7 +51,16 @@ public class Domain
     /// Initializes a new instance of the <see cref="Domain"/> class.
     /// </summary>
     /// <param name="actions">The set of actions that exist within the domain.</param>
-    public Domain(params Action[] actions) : this((IList<Action>)actions) { }
+    public HashSetDomain(params Action[] actions) : this((IList<Action>)actions) { }
+
+    /// <inheritdoc />
+    IQueryable<Action> IDomain.Actions => Actions.AsQueryable();
+
+    /// <inheritdoc />
+    IQueryable<Predicate> IDomain.Predicates => Predicates.AsQueryable();
+
+    /// <inheritdoc />
+    IQueryable<Constant> IDomain.Constants => Constants.AsQueryable();
 
     /// <summary>
     /// Gets the set of actions that exist within the domain.
@@ -72,6 +75,7 @@ public class Domain
     /// <summary>
     /// Gets the set of constants that exist within the domain
     /// </summary>
+    // IKnowledgeBase? - only need to read..
     public ImmutableHashSet<Constant> Constants { get; }
 
     //// TODO-FEATURE: It is increasingly looking like adding the following would be useful.

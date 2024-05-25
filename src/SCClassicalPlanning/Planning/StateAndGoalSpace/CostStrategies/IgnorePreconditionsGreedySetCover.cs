@@ -32,19 +32,19 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 /// </summary>
 public class IgnorePreconditionsGreedySetCover : ICostStrategy
 {
-    private readonly Domain domain;
+    private readonly IDomain domain;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IgnorePreconditionsGreedySetCover"/> class.
     /// </summary>
     /// <param name="domain">The domain of the problem being solved.</param>
-    public IgnorePreconditionsGreedySetCover(Domain domain) => this.domain = domain;
+    public IgnorePreconditionsGreedySetCover(IDomain domain) => this.domain = domain;
 
     /// <inheritdoc/>
     public float GetCost(Action action) => 1f;
 
     /// <inheritdoc/>
-    public float EstimateCost(State state, Goal goal)
+    public float EstimateCost(IState state, Goal goal)
     {
         var unsatisfiedGoalElements = GetUnsatisfiedGoalElements(state, goal);
         if (!unsatisfiedGoalElements.Any())
@@ -69,7 +69,7 @@ public class IgnorePreconditionsGreedySetCover : ICostStrategy
         }
     }
 
-    private static HashSet<Literal> GetUnsatisfiedGoalElements(State state, Goal goal)
+    private static HashSet<Literal> GetUnsatisfiedGoalElements(IState state, Goal goal)
     {
         ////// At some point might want to test whether the cost of keeping elements ordered outweighs the cost of having to do stuff like this the long way..
         ////var uncovered = new HashSet<Literal>();

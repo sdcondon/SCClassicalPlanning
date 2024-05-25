@@ -30,7 +30,7 @@ public readonly struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
     /// <summary>
     /// The state represented by the node that this edge connects from.
     /// </summary>
-    public readonly State FromState;
+    public readonly IState FromState;
 
     /// <summary>
     /// The action that this edge represents the application of.
@@ -43,7 +43,7 @@ public readonly struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
     /// <param name="problem">The problem whose state space this edge is a member of.</param>
     /// <param name="fromState">The state represented by the node that this edge connects from.</param>
     /// <param name="action">The action that this edge represents the application of.</param>
-    public StateSpaceEdge(Problem problem, State fromState, Action action)
+    public StateSpaceEdge(Problem problem, IState fromState, Action action)
     {
         Problem = problem;
         FromState = fromState;

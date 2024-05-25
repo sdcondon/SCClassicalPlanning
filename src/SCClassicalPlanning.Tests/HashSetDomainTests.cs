@@ -10,12 +10,12 @@ using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning;
 
-public static class DomainTests
+public static class HashSetDomainTests
 {
     private static readonly Constant element1 = new(nameof(element1));
     private static readonly Constant element2 = new(nameof(element2));
 
-    private record ConstructionTestCase(Func<Domain> MakeDomain, IEnumerable<Predicate> ExpectedPredicates, IEnumerable<Constant> ExpectedConstants);
+    private record ConstructionTestCase(Func<HashSetDomain> MakeDomain, IEnumerable<Predicate> ExpectedPredicates, IEnumerable<Constant> ExpectedConstants);
 
     public static Test ConstructionBehaviour => TestThat
         .GivenEachOf<ConstructionTestCase>(() => new ConstructionTestCase[]
@@ -58,7 +58,7 @@ public static class DomainTests
                 },
                 ExpectedConstants: new[] { Spare, Flat, Ground, Axle, Trunk }),
         })
-        .When<Domain>(tc => tc.MakeDomain()) 
+        .When(tc => tc.MakeDomain()) 
         .ThenReturns()
         .And((tc, r) => r.Predicates.Should().BeEquivalentTo(tc.ExpectedPredicates))
         .And((tc, r) => r.Constants.Should().BeEquivalentTo(tc.ExpectedConstants));

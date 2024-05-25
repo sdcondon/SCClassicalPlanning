@@ -95,7 +95,7 @@ public class Effect
     /// </summary>
     /// <param name="state">The state to apply the effect to.</param>
     /// <returns>The new state.</returns>
-    public State ApplyTo(State state) => state.Apply(this);
+    public IState ApplyTo(IState state) => state.Apply(this);
 
     /// <summary>
     /// <para>

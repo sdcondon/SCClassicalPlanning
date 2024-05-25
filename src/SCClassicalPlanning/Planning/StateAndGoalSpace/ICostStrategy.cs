@@ -38,5 +38,5 @@ public interface ICostStrategy
     /// <param name="state">The start state.</param>
     /// <param name="goal">The goal to be satisfied.</param>
     /// <returns>The estimated cost.</returns>
-    float EstimateCost(State state, Goal goal);
+    float EstimateCost(IState state, Goal goal);
 }

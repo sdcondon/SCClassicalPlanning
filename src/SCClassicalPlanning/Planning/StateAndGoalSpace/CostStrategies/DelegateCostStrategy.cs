@@ -19,14 +19,14 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 public class DelegateCostStrategy : ICostStrategy
 {
     private readonly Func<Action, float> getCost;
-    private readonly Func<State, Goal, float> estimateCost;
+    private readonly Func<IState, Goal, float> estimateCost;
 
     /// <summary>
     /// Initialises a new instance of the <see cref="DelegateCostStrategy"/> class.
     /// </summary>
     /// <param name="getCost">The delegate to invoke to get the cost of an action.</param>
     /// <param name="estimateCost">The delegate to invoke to estimate the total cost of getting from a given state to a state that satisfies a given goal.</param>
-    public DelegateCostStrategy(Func<Action, float> getCost, Func<State, Goal, float> estimateCost)
+    public DelegateCostStrategy(Func<Action, float> getCost, Func<IState, Goal, float> estimateCost)
     {
         this.getCost = getCost;
         this.estimateCost = estimateCost;
@@ -36,5 +36,5 @@ public class DelegateCostStrategy : ICostStrategy
     public float GetCost(Action action) => getCost(action);
 
     /// <inheritdoc/>
-    public float EstimateCost(State state, Goal goal) => estimateCost(state, goal);
+    public float EstimateCost(IState state, Goal goal) => estimateCost(state, goal);
 }

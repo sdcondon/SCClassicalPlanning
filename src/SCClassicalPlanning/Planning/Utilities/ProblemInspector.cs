@@ -35,7 +35,7 @@ public static class ProblemInspector
     /// <param name="problem">The problem being solved.</param>
     /// <param name="state">The state to retrieve the applicable actions for.</param>
     /// <returns>The actions that are applicable from the given state.</returns>
-    public static IEnumerable<(Action schema, VariableSubstitution substitution)> GetApplicableActionDetails(Problem problem, State state)
+    public static IEnumerable<(Action schema, VariableSubstitution substitution)> GetApplicableActionDetails(Problem problem, IState state)
     {
         // Local method to (recursively) match a set of (remaining) goal elements to the given state.
         // goalElements: The remaining elements of the goal to be matched
@@ -122,7 +122,7 @@ public static class ProblemInspector
     /// <param name="problem">The problem being solved.</param>
     /// <param name="state">The state to retrieve the applicable actions for.</param>
     /// <returns>The actions that are applicable from the given state.</returns>
-    public static IEnumerable<Action> GetApplicableActions(Problem problem, State state)
+    public static IEnumerable<Action> GetApplicableActions(Problem problem, IState state)
     {
         // Now we can try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
         foreach (var (Schema, Substitution) in GetApplicableActionDetails(problem, state))

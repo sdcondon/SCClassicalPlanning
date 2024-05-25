@@ -110,7 +110,9 @@
     }
 
     <ol class="mt-4">
-        @{RenderListItem(null, new StateSpaceNode(problem, problem.InitialState), path.First?.Value);}
+        @{
+            RenderListItem(null, new StateSpaceNode(problem, problem.InitialState), path.First?.Value);
+        }
 
         @for (var n = path.First; n != null; n = n.Next)
         {
@@ -187,7 +189,7 @@
             // Yes, could cache the parse results to avoid parsing multiple times, but not worth it for now at least.
             // TODO: Some "TryParse.." methods might be useful - they'd certainly make this method a bit cleaner.
             // TODO: If we had a ParseError exception type, we could perhaps highlight the offending text..
-            Domain? domain = null;
+            HashSetDomain? domain = null;
             Problem? problem = null;
             List<ValidationResult> errors = new();
             try

@@ -18,7 +18,7 @@ public static class BlocksWorld
         Constant blockC = new(nameof(blockC));
 
         ExampleProblem = MakeProblem(
-            initialState: new(
+            initialState: new HashSetState(
                 Equal(Table, Table)
                 & Block(blockA)
                 & Equal(blockA, blockA)
@@ -39,7 +39,7 @@ public static class BlocksWorld
         Constant blockE = new(nameof(blockE));
 
         LargeExampleProblem = MakeProblem(
-            initialState: new(
+            initialState: new HashSetState(
                 Equal(Table, Table)
                 & Block(blockA)
                 & Equal(blockA, blockA)
@@ -66,7 +66,7 @@ public static class BlocksWorld
                 & On(blockD, blockE)));
 
         UnsolvableExampleProblem = MakeProblem(
-            initialState: new(
+            initialState: new HashSetState(
                 Equal(Table, Table)
                 & Block(blockA)
                 & Equal(blockA, blockA)
@@ -110,9 +110,9 @@ public static class BlocksWorld
     public static Problem UnsolvableExampleProblem { get; }
 
     /// <summary>
-    /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
+    /// Gets a <see cref="HashSetDomain"/ instance that encapsulates the "Blocks World" domain.
     /// </summary>
-    public static Domain Domain { get; }
+    public static HashSetDomain Domain { get; }
 
     public static Constant Table { get; } = new(nameof(Table));
 
@@ -157,16 +157,16 @@ public static class BlocksWorld
     /// <param name="initialState">The initial state of the problem.</param>
     /// <param name="goal">The initial state of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(State initialState, Goal goal) => new Problem(Domain, initialState, goal);
+    public static Problem MakeProblem(IState initialState, Goal goal) => new Problem(Domain, initialState, goal);
 
     // NB: This is in its own method rather than the static ctor just so that we can run tests against domain construction.
-    internal static Domain MakeDomain()
+    internal static HashSetDomain MakeDomain()
     {
         VariableDeclaration block = new(nameof(block));
         VariableDeclaration from = new(nameof(from));
         VariableDeclaration toBlock = new(nameof(toBlock));
 
-        return new Domain(new Action[]
+        return new(new Action[]
         {
             Move(block, from, toBlock),
             MoveToTable(block, from),

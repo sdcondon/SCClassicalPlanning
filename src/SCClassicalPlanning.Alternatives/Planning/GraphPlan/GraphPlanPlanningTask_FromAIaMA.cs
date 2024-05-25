@@ -161,6 +161,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
         }
 
         /// <inheritdoc />
+        [SuppressMessage("CA", "CA1829", Justification = "False positive - this *is* the Count implementation")]
         public int Count => this.Count();
 
         /// <inheritdoc />
@@ -276,7 +277,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
         private readonly SearchNode source;
         private readonly Problem problem;
         private readonly HashSet<SearchState> noGoods;
-        private readonly Dictionary<SearchNode, SearchEdge> visited = new Dictionary<SearchNode, SearchEdge>();
+        private readonly Dictionary<SearchNode, SearchEdge> visited = new();
 
         public SolutionExtractionDFS(Problem problem, PlanningGraphPropositionLevel graphLevel, HashSet<SearchState> noGoods)
         {

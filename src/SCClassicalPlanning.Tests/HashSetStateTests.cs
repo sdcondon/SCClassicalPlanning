@@ -8,7 +8,7 @@ using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning;
 
-public static class StateTests
+public static class HashSetStateTests
 {
     private static readonly Constant element1 = new(nameof(element1));
     private static readonly Constant element2 = new(nameof(element2));

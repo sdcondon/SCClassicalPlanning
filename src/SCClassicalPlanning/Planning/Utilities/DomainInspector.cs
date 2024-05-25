@@ -35,7 +35,7 @@ public static class DomainInspector
     /// <param name="domain">The domain of the problem being solved.</param>
     /// <param name="goal">The goal to retrieve the relevant actions for.</param>
     /// <returns>The details of the actions that are relevant to the given state.</returns>
-    public static IEnumerable<(Action schema, VariableSubstitution substitution, Goal constraints)> GetRelevantActionDetails(Domain domain, Goal goal)
+    public static IEnumerable<(Action schema, VariableSubstitution substitution, Goal constraints)> GetRelevantActionDetails(IDomain domain, Goal goal)
     {
         // Local method to find any constraints that apply to a given substitution for none of the goal's elements to be negated.
         bool TryGetConstraints(IEnumerable<Literal> effectElements, VariableSubstitution substitution, [MaybeNullWhen(false)] out Goal constraints)
@@ -111,7 +111,7 @@ public static class DomainInspector
     /// <param name="domain">The domain of the problem being solved.</param>
     /// <param name="goal">The goal to retrieve the relevant actions for.</param>
     /// <returns>The actions that are relevant to the given state.</returns>
-    public static IEnumerable<Action> GetRelevantActions(Domain domain, Goal goal)
+    public static IEnumerable<Action> GetRelevantActions(IDomain domain, Goal goal)
     {
         foreach (var (Schema, Substitution, Constraints) in GetRelevantActionDetails(domain, goal))
         {
@@ -137,7 +137,7 @@ public static class DomainInspector
     /// </para>
     /// </summary>
     /// <returns>A <see cref="VariableSubstitution"/> that maps the variables as defined in the schema to the terms referred to in the provided action.</returns>
-    public static VariableSubstitution GetMappingFromSchema(Domain domain, Action action)
+    public static VariableSubstitution GetMappingFromSchema(IDomain domain, Action action)
     {
         // TODO: All rationalisations aside, this is a bit naff. Sort me out.
 

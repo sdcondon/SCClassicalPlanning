@@ -27,7 +27,7 @@ public static class PddlParser
     /// </summary>
     /// <param name="pddl">The PDDL domain definition.</param>
     /// <returns>A new <see cref="Domain"/> object.</returns>
-    public static Domain ParseDomain(string pddl)
+    public static HashSetDomain ParseDomain(string pddl)
     {
         return TransformDomain(MakeParser(pddl).singleDomain().domain());
     }
@@ -56,7 +56,7 @@ public static class PddlParser
     /// <param name="problemPddl">The PDDL problem definition.</param>
     /// <param name="domain">The domain that the problem resides in. NB with this method, no validation can occur that the problem matches the domain.</param>
     /// <returns>A new <see cref="Problem"/> instance.</returns>
-    public static Problem ParseProblem(string problemPddl, Domain domain)
+    public static Problem ParseProblem(string problemPddl, IDomain domain)
     {
         return ParseProblem(problemPddl, s => domain);
     }
@@ -67,7 +67,7 @@ public static class PddlParser
     /// <param name="problemPddl">The PDDL problem definition.</param>
     /// <param name="getDomain">A delegate to look up the problem's domain. Will be passed the name given in the <c>:domain</c> element.</param>
     /// <returns>A new <see cref="Problem"/> instance.</returns>
-    public static Problem ParseProblem(string problemPddl, Func<string, Domain> getDomain)
+    public static Problem ParseProblem(string problemPddl, Func<string, IDomain> getDomain)
     {
         return TransformProblem(MakeParser(problemPddl).singleProblem().problem(), getDomain);
     }
@@ -92,7 +92,7 @@ public static class PddlParser
         return parser;
     }
 
-    private static Domain TransformDomain(MinimalPDDLParser.DomainContext context)
+    private static HashSetDomain TransformDomain(MinimalPDDLParser.DomainContext context)
     {
         if (context.extendsDef() != null)
         {
@@ -135,7 +135,7 @@ public static class PddlParser
             }
         }
 
-        return new Domain(actions);
+        return new HashSetDomain(actions);
     }
 
     private static Action TransformAction(MinimalPDDLParser.ActionDefContext context)
@@ -156,7 +156,7 @@ public static class PddlParser
         return new Action(identifier, precondition, effect);
     }
 
-    private static Problem TransformProblem(MinimalPDDLParser.ProblemContext context, Func<string, Domain> getDomain)
+    private static Problem TransformProblem(MinimalPDDLParser.ProblemContext context, Func<string, IDomain> getDomain)
     {
         // NB: Ignore the problem name - it's not in our model, and I'd be very reluctant to add it.
         // Problems don't need to know the label(s) used to refer to them - that's a serialisation concern.
@@ -176,18 +176,18 @@ public static class PddlParser
         return new Problem(domain, initialState, goal, constants);
     }
 
-    private static State TransformState(MinimalPDDLParser.LiteralListContext? context)
+    private static IState TransformState(MinimalPDDLParser.LiteralListContext? context)
     {
         if (context != null)
         {
             // NB: PDDL init states allow literals rather than just predicates - that is, it does not
             // make the "closed-world" assumption. Our model has states as sets of predicates - implicitly
             // making the closed world assumption, so we only take the positive literals here.
-            return new State(context._elements.Select(e => TransformLiteral(e)).Where(l => l.IsPositive).Select(l => l.Predicate));
+            return new HashSetState(context._elements.Select(e => TransformLiteral(e)).Where(l => l.IsPositive).Select(l => l.Predicate));
         }
         else
         {
-            return State.Empty;
+            return HashSetState.Empty;
         }
     }
 

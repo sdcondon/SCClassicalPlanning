@@ -14,7 +14,7 @@ public static class SpareTire
         Domain = MakeDomain();
 
         ExampleProblem = MakeProblem(
-            initialState: new(
+            initialState: new HashSetState(
                 IsTire(Spare)
                 & IsTire(Flat)
                 & IsAt(Flat, Axle)
@@ -24,9 +24,9 @@ public static class SpareTire
     }
 
     /// <summary>
-    /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Spare Tire" domain.
+    /// Gets a <see cref="HashSetDomain"/ instance that encapsulates the "Spare Tire" domain.
     /// </summary>
-    public static Domain Domain { get; }
+    public static HashSetDomain Domain { get; }
 
     /// <summary>
     /// Gets an instance of the customary example problem in this domain.
@@ -72,12 +72,12 @@ public static class SpareTire
     /// <param name="initialState">The initial state of the problem.</param>
     /// <param name="goal">The initial state of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(State initialState, Goal goal) => new(Domain, initialState, goal);
+    public static Problem MakeProblem(IState initialState, Goal goal) => new(Domain, initialState, goal);
 
     // NB: This is in its own method rather than the static ctor just so that we can run tests against domain construction.
-    internal static Domain MakeDomain()
+    internal static HashSetDomain MakeDomain()
     {
-        return new Domain(new Action[]
+        return new(new Action[]
         {
             Remove(Var("object"), Var("location")),
             PutOn(Var("tire")),

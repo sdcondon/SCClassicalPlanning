@@ -22,13 +22,13 @@ namespace SCClassicalPlanning.Planning;
 /// </summary>
 public class PlanFormatter
 {
-    private readonly Domain domain;
+    private readonly IDomain domain;
 
     /// <summary>
     /// Initialises a new instance of the <see cref="PlanFormatter"/> class.
     /// </summary>
     /// <param name="domain">The domain of the plans that will be formatted by this instance. Used to establish succinct output for individual actions.</param>
-    public PlanFormatter(Domain domain) => this.domain = domain;
+    public PlanFormatter(IDomain domain) => this.domain = domain;
 
     /// <summary>
     /// Creates a human-readable string representation of a given plan.

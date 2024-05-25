@@ -96,7 +96,7 @@ public static class OperableProblemFactory
     }
 
     /// <summary>
-    /// Surrogate type for <see cref="State"/> that is implictly convertible from an <see cref="OperableSentence"/>. Also implicitly convertible to and from <see cref="State"/>.
+    /// Surrogate type for <see cref="HashSetState"/> that is implictly convertible from an <see cref="OperableSentence"/>. Also implicitly convertible to and from <see cref="HashSetState"/>.
     /// </summary>
     public class OperableState
     {
@@ -105,16 +105,16 @@ public static class OperableProblemFactory
         internal IReadOnlySet<Predicate> Elements { get; }
 
         /// <summary>
-        /// Defines the implicit conversion of an <see cref="State"/> instance to an <see cref="OperableState"/>.
+        /// Defines the implicit conversion of an <see cref="HashSetState"/> instance to an <see cref="OperableState"/>.
         /// </summary>
-        /// <param name="state">The <see cref="State"/> to convert.</param>
-        public static implicit operator OperableState(State state) => new(state.Elements);
+        /// <param name="state">The <see cref="HashSet"/> to convert.</param>
+        public static implicit operator OperableState(HashSetState state) => new(state.Elements);
 
         /// <summary>
-        /// Defines the implicit conversion of an <see cref="OperableState"/> instance to an <see cref="State"/>.
+        /// Defines the implicit conversion of an <see cref="OperableState"/> instance to an <see cref="HashSetState"/>.
         /// </summary>
         /// <param name="state">The <see cref="OperableState"/> to convert.</param>
-        public static implicit operator State(OperableState state) => new(state.Elements);
+        public static implicit operator HashSetState(OperableState state) => new(state.Elements);
 
         /// <summary>
         /// Defines the implicit conversion of an <see cref="OperableSentence"/> instance to an <see cref="OperableState"/>.

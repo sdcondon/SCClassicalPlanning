@@ -25,9 +25,9 @@ public abstract class RecursiveStateVisitor<TState>
     /// Visits a <see cref="State"/> instance.
     /// The default implementation just visits all of the state's elements.
     /// </summary>
-    /// <param name="state">The <see cref="State"/> instance to visit.</param>
+    /// <param name="state">The <see cref="IState"/> instance to visit.</param>
     /// <param name="visitState">The state of this visit.</param>
-    public virtual void Visit(State state, TState visitState)
+    public virtual void Visit(IState state, TState visitState)
     {
         foreach (var literal in state.Elements)
         {

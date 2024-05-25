@@ -29,14 +29,14 @@ public readonly struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, I
     /// <summary>
     /// The state represented by this node.
     /// </summary>
-    public readonly State State;
+    public readonly IState State;
 
     /// <summary>
     /// Initialises a new instance of the <see cref="StateSpaceNode"/> struct.
     /// </summary>
     /// <param name="problem">The problem whose state space this node is a member of.</param>
     /// <param name="state">The state represented by this node.</param>
-    public StateSpaceNode(Problem problem, State state) => (Problem, State) = (problem, state);
+    public StateSpaceNode(Problem problem, IState state) => (Problem, State) = (problem, state);
 
     /// <inheritdoc />
     public IReadOnlyCollection<StateSpaceEdge> Edges => new StateSpaceNodeEdges(Problem, State);

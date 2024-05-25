@@ -44,7 +44,7 @@ public class Plan
     /// An exception will be thrown if any of the actions in the plan are not applicable to the current state when they are applied.
     /// </para>
     /// </summary>
-    public State ApplyTo(State state)
+    public IState ApplyTo(IState state)
     {
         foreach (var action in Steps)
         {

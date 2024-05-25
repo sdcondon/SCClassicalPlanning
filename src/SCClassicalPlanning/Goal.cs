@@ -94,7 +94,7 @@ public class Goal
     /// </summary>
     /// <param name="state">The state to check.</param>
     /// <returns>True if this goal is satisifed by the given state; otherwise false.</returns>
-    public bool IsSatisfiedBy(State state) => state.Satisfies(this);
+    public bool IsSatisfiedBy(IState state) => state.Satisfies(this);
 
     /// <summary>
     /// <para>

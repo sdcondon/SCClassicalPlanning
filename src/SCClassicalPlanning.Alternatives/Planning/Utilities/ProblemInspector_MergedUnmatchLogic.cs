@@ -68,8 +68,11 @@ public static class ProblemInspector_MergedUnmatchLogic
                     {
                         allPossibleUnifiers = allPossibleUnifiers.SelectMany(u => problem.Constants.Select(o =>
                         {
-                            var newBindings = new Dictionary<VariableReference, Term>(u.Bindings);
-                            newBindings[unboundVariable] = o;
+                            var newBindings = new Dictionary<VariableReference, Term>(u.Bindings)
+                            {
+                                [unboundVariable] = o
+                            };
+
                             return new VariableSubstitution(newBindings);
                         }));
                     }
@@ -106,7 +109,7 @@ public static class ProblemInspector_MergedUnmatchLogic
                 // We return each unification we find immediately - for an effect to be relevant it only needs to match at least one element of the goal.
                 foreach (var goalElement in goal.Elements)
                 {
-                    // TODO: using LiteralUnifier is perhaps overkill given that we know we're functionless,
+                    // TODO: using Unifier is perhaps overkill given that we know we're functionless,
                     // but will do for now. (doesn't necessarily cost more..)
                     if (Unifier.TryCreate(goalElement, effectElement, out var unifier))
                     {

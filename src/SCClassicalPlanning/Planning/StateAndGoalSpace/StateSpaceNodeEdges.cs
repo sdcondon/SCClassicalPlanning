@@ -29,14 +29,14 @@ public readonly struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
     /// <summary>
     /// The state represented by the node that owns this collection.
     /// </summary>
-    public readonly State State;
+    public readonly IState State;
 
     /// <summary>
     /// Initialises a new instance of the <see cref="StateSpaceNodeEdges"/> struct.
     /// </summary>
     /// <param name="problem">The problem whose state space the node that owns this collection is a member of.</param>
     /// <param name="state">The state represented by the node that owns this collection.</param>
-    public StateSpaceNodeEdges(Problem problem, State state) => (Problem, State) = (problem, state);
+    public StateSpaceNodeEdges(Problem problem, IState state) => (Problem, State) = (problem, state);
 
     /// <inheritdoc />
     public int Count => ProblemInspector.GetApplicableActions(Problem, State).Count();

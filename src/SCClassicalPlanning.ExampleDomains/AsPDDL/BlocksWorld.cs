@@ -11,7 +11,7 @@ public static class BlocksWorld
     /// <summary>
     /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
     /// </summary>
-    public static Domain Domain { get; } = PddlParser.ParseDomain(DomainPDDL);
+    public static HashSetDomain Domain { get; } = PddlParser.ParseDomain(DomainPDDL);
 
     /// <summary>
     /// Gets a PDDL representation of the "Blocks World" domain.
@@ -39,10 +39,8 @@ public static class BlocksWorld
         var assembly = Assembly.GetExecutingAssembly();
         var fullResourceName = $"SCClassicalPlanning.ExampleDomains.AsPDDL.{resourceName}";
 
-        using (Stream stream = assembly.GetManifestResourceStream(fullResourceName)!)
-        using (StreamReader reader = new StreamReader(stream))
-        {
-            return reader.ReadToEnd();
-        }
+        using Stream stream = assembly.GetManifestResourceStream(fullResourceName)!;
+        using StreamReader reader = new(stream);
+        return reader.ReadToEnd();
     }
 }

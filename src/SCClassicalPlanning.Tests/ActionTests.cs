@@ -10,7 +10,7 @@ public static class ActionTests
     private static readonly Constant element1 = new(nameof(element1));
     private static readonly Constant element2 = new(nameof(element2));
 
-    private record IsApplicableToTestCase(State State, Action Action, bool ExpectedResult);
+    private record IsApplicableToTestCase(HashSetState State, Action Action, bool ExpectedResult);
 
     public static Test IsApplicableToBehaviour => TestThat
         .GivenEachOf<IsApplicableToTestCase>(() => (new IsApplicableToTestCase[]
@@ -21,7 +21,7 @@ public static class ActionTests
                 ExpectedResult: true),
 
             new( // Positive - negative precondition
-                State: State.Empty,
+                State: HashSetState.Empty,
                 Action: Add(element1),
                 ExpectedResult: true),
 
@@ -31,7 +31,7 @@ public static class ActionTests
                 ExpectedResult: false),
 
             new( // Negative - negative precondition
-                State: State.Empty,
+                State: HashSetState.Empty,
                 Action: Remove(element1),
                 ExpectedResult: false),
         }))
@@ -39,20 +39,20 @@ public static class ActionTests
         .ThenReturns()
         .And((tc, r) => r.Should().Be(tc.ExpectedResult));
 
-    private record ApplyToTestCase(State State, Action Action, State ExpectedState);
+    private record ApplyToTestCase(HashSetState State, Action Action, HashSetState ExpectedState);
 
     public static Test ApplyToBehaviour => TestThat
         .GivenEachOf<ApplyToTestCase>(() => (new ApplyToTestCase[]
         {
             new( // Adds atom
-                State: State.Empty,
+                State: HashSetState.Empty,
                 Action: Add(element1),
                 ExpectedState: new(IsPresent(element1))),
 
             new( // Removes atom
                 State: new(IsPresent(element1)),
                 Action: Remove(element1),
-                ExpectedState: State.Empty),
+                ExpectedState: HashSetState.Empty),
 
             new( // Doesn't add duplicate
                 State: new(IsPresent(element1)),
@@ -60,9 +60,9 @@ public static class ActionTests
                 ExpectedState: new(IsPresent(element1))),
 
             new( // Doesn't complain about removing non-present element
-                State: State.Empty,
+                State: HashSetState.Empty,
                 Action: Remove(element1),
-                ExpectedState: State.Empty),
+                ExpectedState: HashSetState.Empty),
         }))
         .When(tc => tc.Action.ApplyTo(tc.State))
         .ThenReturns()
