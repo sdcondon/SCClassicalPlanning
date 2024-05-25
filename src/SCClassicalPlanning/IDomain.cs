@@ -39,7 +39,7 @@ public interface IDomain
     /// <summary>
     /// Gets the set of constants that exist within the domain
     /// </summary>
-    // IKnowledgeBase? - only need to read..
+    // TODO: Could/should be folded into Invariants when we add that, with a particular predicate to indicate "existence".
     public IQueryable<Constant> Constants { get; }
 
     //// TODO-FEATURE: It is increasingly looking like adding the following would be useful.

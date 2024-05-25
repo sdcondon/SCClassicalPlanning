@@ -23,10 +23,10 @@ namespace SCClassicalPlanning.ProblemCreation;
 public static class PddlParser
 {
     /// <summary>
-    /// Parses a PDDL domain definition into a <see cref="Domain"/> object.
+    /// Parses a PDDL domain definition into a <see cref="HashSetDomain"/> object.
     /// </summary>
     /// <param name="pddl">The PDDL domain definition.</param>
-    /// <returns>A new <see cref="Domain"/> object.</returns>
+    /// <returns>A new <see cref="HashSetDomain"/> object.</returns>
     public static HashSetDomain ParseDomain(string pddl)
     {
         return TransformDomain(MakeParser(pddl).singleDomain().domain());

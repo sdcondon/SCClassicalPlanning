@@ -35,11 +35,6 @@ public class Problem
     /// <param name="domain">The domain in which this problem resides.</param>
     /// <param name="initialState">The initial state of the problem.</param>
     /// <param name="goal">The goal of the problem.</param>
-    // TODO-EXTENSIBILITY: Problematic.. Large state? IO? Fairly big deal because could have significant impact.
-    // Would just making State abstract or interface suffice?
-    // Or would we want state and state storage separately?
-    // Also worth bearing in mind that our Problem.Constants could also be large.
-    // Explore this. Later (prob last thing before v1 - want a 'complete' solution before looking at refactoring and abstractions).
     public Problem(IDomain domain, IState initialState, Goal goal)
     {
         Domain = domain;

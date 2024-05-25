@@ -157,7 +157,7 @@ public static class BlocksWorld
     /// <param name="initialState">The initial state of the problem.</param>
     /// <param name="goal">The initial state of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(IState initialState, Goal goal) => new Problem(Domain, initialState, goal);
+    public static Problem MakeProblem(IState initialState, Goal goal) => new(Domain, initialState, goal);
 
     // NB: This is in its own method rather than the static ctor just so that we can run tests against domain construction.
     internal static HashSetDomain MakeDomain()

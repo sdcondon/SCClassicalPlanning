@@ -18,12 +18,12 @@ using System.Collections.Immutable;
 namespace SCClassicalPlanning;
 
 /// <summary>
-/// Implementation of <see cref="IDomain"/> that stores everything in memory.
+/// Implementation of <see cref="IDomain"/> that just stores all of its elements in hash sets.
 /// </summary>
 public class HashSetDomain : IDomain
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Domain"/> class.
+    /// Initializes a new instance of the <see cref="HashSetDomain"/> class.
     /// </summary>
     /// <param name="actions">The set of actions that exist within the domain.</param>
     public HashSetDomain(IEnumerable<Action> actions) // TODO: perhaps allow for the specification of additional constants?
@@ -48,7 +48,7 @@ public class HashSetDomain : IDomain
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Domain"/> class.
+    /// Initializes a new instance of the <see cref="HashSetDomain"/> class.
     /// </summary>
     /// <param name="actions">The set of actions that exist within the domain.</param>
     public HashSetDomain(params Action[] actions) : this((IList<Action>)actions) { }
@@ -75,14 +75,7 @@ public class HashSetDomain : IDomain
     /// <summary>
     /// Gets the set of constants that exist within the domain
     /// </summary>
-    // IKnowledgeBase? - only need to read..
     public ImmutableHashSet<Constant> Constants { get; }
-
-    //// TODO-FEATURE: It is increasingly looking like adding the following would be useful.
-    //// This could be used to represent both the :timeless and :axioms of PDDL, possibly 
-    //// in addition to predicate typing (assuming we don't decide to do this via a richer
-    //// predicate-wrapping object) - for example, MyPredicate(x, y) => IsOfMyType(x) & IsOfMyOtherType(y).
-    //// public ImmutableHashSet<Sentence> Invariants { get; }
 
     private class PredicateFinder : RecursiveActionVisitor<HashSet<Predicate>>
     {

@@ -25,7 +25,7 @@ public static class AirCargoOneAtATime
         VariableDeclaration from = new(nameof(from));
         VariableDeclaration to = new(nameof(to));
 
-        Domain domain = new(new Action[]
+        HashSetDomain domain = new(new Action[]
         {
             Load(cargo, plane, airport),
             Unload(cargo, plane, airport),
@@ -34,7 +34,7 @@ public static class AirCargoOneAtATime
 
         Problem = new(
             domain: domain,
-            initialState: new(
+            initialState: new HashSetState(
                 IsCargo(Cargo1)
                 & IsCargo(Cargo2)
                 & IsCargo(Cargo3)

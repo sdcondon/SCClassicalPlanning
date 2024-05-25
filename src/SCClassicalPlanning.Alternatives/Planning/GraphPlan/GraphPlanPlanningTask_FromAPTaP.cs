@@ -196,13 +196,13 @@ public class GraphPlanPlanningTask_FromAPTaP : TemplatePlanningTask
      * Artificial Intelligence: A Modern Approach (Russel & Norvig)
      */
     // TODO: At some point, remove this hard-coding.
-    IEnumerable<Literal> SortGoalElements(Goal goal, PlanningGraphPropositionLevel graphLevel)
+    private static IEnumerable<Literal> SortGoalElements(Goal goal, PlanningGraphPropositionLevel graphLevel)
     {
         return goal.Elements
             .OrderByDescending(e => graphLevel.Graph.GetLevelCost(e));
     }
 
-    IEnumerable<PlanningGraphActionNode> GetRelevantActions(Literal goalElement, PlanningGraphPropositionLevel graphLevel)
+    private static IEnumerable<PlanningGraphActionNode> GetRelevantActions(Literal goalElement, PlanningGraphPropositionLevel graphLevel)
     {
         return graphLevel.NodesByProposition[goalElement].Causes
             .OrderBy(n => n.Preconditions.Sum(p => graphLevel.Graph.GetLevelCost(p.Proposition)));

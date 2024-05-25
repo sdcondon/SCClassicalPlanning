@@ -122,7 +122,7 @@ public static class DomainInspector
     /// <summary>
     /// <para>
     /// Gets the variable substitution that must be made to transform the matching action schema (with the matching identifier)
-    /// in the <see cref="Domain.Actions"/> of the given domain to the given action.
+    /// in the <see cref="IDomain.Actions"/> of the given domain to the given action.
     /// </para>
     /// <para>
     /// Intended to be useful for succinct output of plan steps. We don't want to "bloat" our action model with this

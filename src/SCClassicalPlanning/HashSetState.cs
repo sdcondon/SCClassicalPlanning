@@ -79,7 +79,7 @@ public class HashSetState : IState
     /// </summary>
     /// <param name="effect">The effect to apply.</param>
     /// <returns>The new state.</returns>
-    public HashSetState Apply(Effect effect) => new HashSetState(Elements.Except(effect.DeleteList).Union(effect.AddList));
+    public HashSetState Apply(Effect effect) => new(Elements.Except(effect.DeleteList).Union(effect.AddList));
 
     /// <inheritdoc />
     public bool Satisfies(Goal goal) => Elements.IsSupersetOf(goal.RequiredPredicates) && !Elements.Overlaps(goal.ForbiddenPredicates);

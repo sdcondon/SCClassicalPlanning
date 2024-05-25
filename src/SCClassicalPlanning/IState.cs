@@ -31,8 +31,6 @@ public interface IState
     /// <summary>
     /// Gets the set of predicates that comprise this state.
     /// </summary>
-    // TODO: is it viable/advisable to get rid of this entirely? For large states enumerating all elements
-    // isn't going to be viable - will require more methods here.
     IQueryable<Predicate> Elements { get; }
 
     /// <summary>
@@ -54,7 +52,7 @@ public interface IState
     /// </summary>
     /// <param name="goal">The goal to check.</param>
     /// <returns>A value indicating whether this state satisfies a given goal.</returns>
-    // TODO: if we're keeping Elements, not necessarily needed? Just needs Contains?
+    // TODO: if we're keeping Elements, not necessarily needed, because can do this with queries? Could add a default implementation, at least?
     bool Satisfies(Goal goal);
 
     /// <summary>
@@ -62,6 +60,6 @@ public interface IState
     /// </summary>
     /// <param name="goal">The goal to check.</param>
     /// <returns>An enumerable of substitutions that satisfy the goal.</returns>
-    // TODO: should have default impl that uses GetInstancesOf
+    // TODO: could also be done with queries..
     IEnumerable<VariableSubstitution> GetSatisfyingSubstitutions(Goal goal);
 }

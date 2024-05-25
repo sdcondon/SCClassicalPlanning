@@ -144,9 +144,9 @@ public class InvariantInspector
     /// <summary>
     /// Gets a value indicating whether the given literal is trivial - that is, if the invariants mean that it always holds.
     /// </summary>
-    /// <param name="literal"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
+    /// <param name="literal">The literal to check for triviality.</param>
+    /// <param name="cancellationToken">A token that, if cancelled, will cancel this operation.</param>
+    /// <returns>A (task that returns a) value indicating whether the passed literal is trivial.</returns>
     public async Task<bool> IsTrivial(Literal literal, CancellationToken cancellationToken = default)
     {
         if (!isTrivialElementResultCache.TryGetValue(literal, out bool isTrivialElement))
@@ -179,6 +179,11 @@ public class InvariantInspector
         return isTrivialElement;
     }
 
+    /// <summary>
+    /// Gets a value indicating whether the given literal is trivial - that is, if the invariants mean that it always holds.
+    /// </summary>
+    /// <param name="literal">The literal to check for triviality.</param>
+    /// <returns>A value indicating whether the passed literal is trivial.</returns>
     public bool IsTrivial(Literal literal)
     {
         return IsTrivial(literal, CancellationToken.None).GetAwaiter().GetResult();

@@ -138,7 +138,7 @@ public static class ProblemInspector
     /// </para>
     /// <para>
     /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
-    /// See <see cref="DomainInspector.GetRelevantActionDetails(Domain, Goal)"/> for a variable-preserving equivalent to this method.
+    /// See <see cref="DomainInspector.GetRelevantActionDetails(IDomain, Goal)"/> for a variable-preserving equivalent to this method.
     /// </para>
     /// </summary>
     /// <param name="problem">The problem being solved.</param>
@@ -218,7 +218,7 @@ public static class ProblemInspector
     /// </para>
     /// <para>
     /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
-    /// See <see cref="DomainInspector.GetRelevantActions(Domain, Goal)"/> for a variable-preserving equivalent to this method.
+    /// See <see cref="DomainInspector.GetRelevantActions(IDomain, Goal)"/> for a variable-preserving equivalent to this method.
     /// </para>
     /// </summary>
     /// <param name="problem">The problem being solved.</param>

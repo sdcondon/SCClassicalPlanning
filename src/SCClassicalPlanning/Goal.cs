@@ -23,9 +23,10 @@ namespace SCClassicalPlanning;
 /// Container for information about a goal.
 /// </para>
 /// <para>
-/// A <see cref="Goal"/> is essentially just a set of <see cref="Literal"/>s. The positive ones indicate predicates that must exist in a <see cref="State"/> for it 
-/// to satisfy the goal. The negative ones indicate predicates that must NOT exist in a state for it to satisfy the goal. Goals are used to describe the end goal of <see cref="Problem"/>
-/// instances, as well as the precondition of <see cref="Action"/> instances.
+/// A <see cref="Goal"/> is essentially just a set of <see cref="Literal"/>s. The positive ones indicate predicates that must exist
+/// in a <see cref="IState"/> for it to satisfy the goal. The negative ones indicate predicates that must NOT exist in a state for
+/// it to satisfy the goal. Goals are used to describe the end goal of <see cref="Problem"/> instances, as well as the precondition
+/// of <see cref="Action"/> instances.
 /// </para>
 /// </summary>
 public class Goal
@@ -59,8 +60,8 @@ public class Goal
 
     /// <summary>
     /// Gets the set of literals that comprise this goal.
-    /// The positive ones indicate predicates that must exist in a <see cref="State"/> in order for the goal to be satisfied.
-    /// The negative ones indicate predicates that must NOT exist in a <see cref="State"/> in order for the goal to be satisfied.
+    /// The positive ones indicate predicates that must exist in a <see cref="IState"/> in order for the goal to be satisfied.
+    /// The negative ones indicate predicates that must NOT exist in a <see cref="IState"/> in order for the goal to be satisfied.
     /// </summary>
     // One could perhaps argue that we should store positive and negative elements separately, for performance.
     // After all, application and Regression are going to be far more common than wanting to get all elements.
@@ -70,22 +71,22 @@ public class Goal
     public ImmutableHashSet<Literal> Elements { get; }
 
     /// <summary>
-    /// Gets the positive elements of the goal - those whose predicates must exist in a <see cref="State"/> in order for this goal to be satisfied.
+    /// Gets the positive elements of the goal - those whose predicates must exist in a <see cref="IState"/> in order for this goal to be satisfied.
     /// </summary>
     public IEnumerable<Literal> PositiveElements => Elements.Where(l => l.IsPositive);
 
     /// <summary>
-    /// Gets the negative elements of the goal - those whose predicates must NOT exist in a <see cref="State"/> in order for this goal to be satisfied.
+    /// Gets the negative elements of the goal - those whose predicates must NOT exist in a <see cref="IState"/> in order for this goal to be satisfied.
     /// </summary>
     public IEnumerable<Literal> NegativeElements => Elements.Where(l => l.IsNegated);
 
     /// <summary>
-    /// Gets the required predicates of the goal - those that must exist in a <see cref="State"/> in order for this goal to be satisfied.
+    /// Gets the required predicates of the goal - those that must exist in a <see cref="IState"/> in order for this goal to be satisfied.
     /// </summary>
     public IEnumerable<Predicate> RequiredPredicates => PositiveElements.Select(l => l.Predicate);
 
     /// <summary>
-    /// Gets the forbidden predicates of the goal - those that must NOT exist in a <see cref="State"/> in order for this goal to be satisfied.
+    /// Gets the forbidden predicates of the goal - those that must NOT exist in a <see cref="IState"/> in order for this goal to be satisfied.
     /// </summary>
     public IEnumerable<Predicate> ForbiddenPredicates => NegativeElements.Select(l => l.Predicate);
 
