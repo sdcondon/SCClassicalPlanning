@@ -253,7 +253,10 @@ public static class ProblemInspector
         foreach (var unboundVariable in unboundVariables)
         {
             allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(
-                u => problem.Constants.Select(o => new VariableSubstitution(new Dictionary<VariableReference, Term>(u.Bindings)
+                // NB the AsEnumerable here to reduce requirements on what the IQueryable
+                // implementation needs to support. Still unconvinced about using IQueryable, TBH.
+                // TODO* depending on what i do with Problem constants - might need to look in problem.Domain, too.
+                u => problem.Constants.AsEnumerable().Select(o => new VariableSubstitution(new Dictionary<VariableReference, Term>(u.Bindings)
                 {
                     { unboundVariable, o }
                 }))
