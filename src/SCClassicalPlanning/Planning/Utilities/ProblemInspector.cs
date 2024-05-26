@@ -234,7 +234,8 @@ public static class ProblemInspector
 
     /// <summary>
     /// <para>
-    /// Gets all possible variable substitutions that populate each of the arguments of a given predicate with a constant. Uses all constants of a given problem, and uses an existing substitution as a constraint.
+    /// Gets all possible variable substitutions that populate each of the arguments of a given predicate with a constant.
+    /// Uses all constants of a given problem, and uses an existing substitution as a constraint.
     /// </para>
     /// <para>
     /// NB: be careful - the risk of combinatorial explosion is significant here.
@@ -242,23 +243,21 @@ public static class ProblemInspector
     /// </summary>
     /// <param name="problem">The problem being solved.</param>
     /// <param name="predicate">The predicate to create all possible substitutions for.</param>
-    /// <param name="substitution">The substitution to use as a constraint.</param>
+    /// <param name="constraint">The substitution to use as a constraint.</param>
     /// <returns>All possible subsitutions that populate each of the arguments of the given predicate with a constant.</returns>
-    public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Problem problem, Predicate predicate, VariableSubstitution substitution)
+    public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Problem problem, Predicate predicate, VariableSubstitution constraint)
     {
-        IEnumerable<VariableSubstitution> allPossibleSubstitutions = new List<VariableSubstitution>() { substitution };
-        var unboundVariables = predicate.Arguments.OfType<VariableReference>().Except(substitution.Bindings.Keys);
+        IEnumerable<VariableSubstitution> allPossibleSubstitutions = new List<VariableSubstitution>() { constraint };
+        var unboundVariables = predicate.Arguments.OfType<VariableReference>().Except(constraint.Bindings.Keys);
+
         foreach (var unboundVariable in unboundVariables)
         {
-            allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(u => problem.Constants.Select(o =>
-            {
-                var newBindings = new Dictionary<VariableReference, Term>(u.Bindings)
+            allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(
+                u => problem.Constants.Select(o => new VariableSubstitution(new Dictionary<VariableReference, Term>(u.Bindings)
                 {
-                    [unboundVariable] = o
-                };
-
-                return new VariableSubstitution(newBindings);
-            }));
+                    { unboundVariable, o }
+                }))
+            );
         }
 
         return allPossibleSubstitutions;

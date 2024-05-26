@@ -15,7 +15,7 @@ public static class GoalInvariantCheckTests
     private static readonly Constant blockA = new(nameof(blockA));
     private static readonly Constant blockB = new(nameof(blockB));
 
-    private record TestCase(IEnumerable<Sentence> Invariants, OperableState State, OperableGoal Goal, float ExpectedCost);
+    private record TestCase(IEnumerable<Sentence> Invariants, IState State, OperableGoal Goal, float ExpectedCost);
 
     public static Test EstimateCostBehaviour => TestThat
         .GivenEachOf(() => new TestCase[]

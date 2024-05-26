@@ -66,15 +66,12 @@ public static class ProblemInspector_MergedUnmatchLogic
                     var unboundVariables = firstEffectElement.Predicate.Arguments.OfType<VariableReference>().Except(unifier.Bindings.Keys);
                     foreach (var unboundVariable in unboundVariables)
                     {
-                        allPossibleUnifiers = allPossibleUnifiers.SelectMany(u => problem.Constants.Select(o =>
-                        {
-                            var newBindings = new Dictionary<VariableReference, Term>(u.Bindings)
+                        allPossibleUnifiers = allPossibleUnifiers.SelectMany(
+                            u => problem.Constants.Select(o => new VariableSubstitution(new Dictionary<VariableReference, Term>(u.Bindings)
                             {
-                                [unboundVariable] = o
-                            };
-
-                            return new VariableSubstitution(newBindings);
-                        }));
+                                { unboundVariable,  o }
+                            })
+                        ));
                     }
 
                     foreach (var firstEffectElementUnifier in allPossibleUnifiers)

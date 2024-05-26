@@ -46,5 +46,8 @@ public interface IDomain
     //// This could be used to represent both the :timeless and :axioms of PDDL, possibly 
     //// in addition to predicate typing (assuming we don't decide to do this via a richer
     //// predicate-wrapping object) - for example, MyPredicate(x, y) => IsOfMyType(x) & IsOfMyOtherType(y).
-    //// public ImmutableHashSet<Sentence> Invariants { get; }
+    //// public IQueryable<Sentence> Invariants { get; }
+    //// though actually just public IKnowledgeBase Invariants { get; } might be a better call
+    //// (again because of potential IO - clauses might/probably will need to be in storage,
+    //// and SCFoL doesn't have a universal clause store - its specific to KB type..)
 }

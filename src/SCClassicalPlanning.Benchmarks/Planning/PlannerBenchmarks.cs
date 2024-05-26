@@ -35,7 +35,8 @@ public class PlannerBenchmarks
             CostStrategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
             InvariantsKB: MakeInvariantsKB(new Sentence[]
             {
-                // TODO: slicker support for unique names assumption worth looking into at some point.. 
+                // TODO: slicker support for unique names assumption worth looking into at some point..
+                // Probably via invariants KB.
                 Block(new Constant("blockA")),
                 Equal(new Constant("blockA"), new Constant("blockA")),
                 !Equal(new Constant("blockA"), new Constant("blockB")),

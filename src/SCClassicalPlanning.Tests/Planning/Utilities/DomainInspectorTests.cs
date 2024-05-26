@@ -129,7 +129,7 @@ public static class DomainInspectorTests
             .WhenTypeIs<VariableDeclaration>();
     }
 
-    private record GetRelevantActionsTestCase(Domain Domain, Goal Goal, Action[] ExpectedResult);
+    private record GetRelevantActionsTestCase(IDomain Domain, Goal Goal, Action[] ExpectedResult);
 
-    private record GetMappingFromSchemaTestCase(Domain Domain, Action Action, VariableSubstitution Expected);
+    private record GetMappingFromSchemaTestCase(IDomain Domain, Action Action, VariableSubstitution Expected);
 }

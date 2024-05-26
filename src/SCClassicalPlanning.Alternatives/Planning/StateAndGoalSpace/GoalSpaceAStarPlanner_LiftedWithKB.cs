@@ -72,7 +72,7 @@ public class GoalSpaceAStarPlanner_LiftedWithKB : IPlanner
             CheckForSearchCompletion();
         }
 
-        public Domain Domain { get; }
+        public IDomain Domain { get; }
 
         public InvariantInspector? InvariantInspector { get; }
 

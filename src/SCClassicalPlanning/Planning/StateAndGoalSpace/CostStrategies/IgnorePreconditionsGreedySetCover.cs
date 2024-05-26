@@ -87,7 +87,7 @@ public class IgnorePreconditionsGreedySetCover : ICostStrategy
         foreach (var goalElement in goal.Elements)
         {
             // Unifying here because positive elements of the goal can include variables..
-            if (goalElement.IsPositive && state.Elements.Any(e => Unifier.TryCreate(goalElement, e, out var _)))
+            if (goalElement.IsPositive && state.Elements.Any(e => Unifier.TryCreate(goalElement, e) != null))
             {
                 uncovered.Remove(goalElement);
             }

@@ -16,7 +16,7 @@ public static class IgnorePreconditionsGreedySetCoverTests
 
     private static readonly VariableDeclaration somePlane = new(nameof(somePlane));
 
-    private record TestCase(Domain Domain, State State, OperableGoal Goal, float ExpectedCost);
+    private record TestCase(IDomain Domain, IState State, OperableGoal Goal, float ExpectedCost);
 
     public static Test EstimateCostBehaviour => TestThat
         .GivenEachOf(() => new TestCase[]

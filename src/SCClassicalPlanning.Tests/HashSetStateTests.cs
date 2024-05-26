@@ -17,20 +17,20 @@ public static class HashSetStateTests
     private static readonly Constant plane1 = new(nameof(plane1));
     private static readonly Constant airport1 = new(nameof(airport1));
 
-    private record ApplyTestCase(State State, Effect Effect, State ExpectedResult);
+    private record ApplyTestCase(HashSetState State, Effect Effect, HashSetState ExpectedResult);
 
     public static Test ApplyBehaviour => TestThat
         .GivenEachOf(() => new ApplyTestCase[]
         {
             new( // Adds atom
-                State: State.Empty,
+                State: HashSetState.Empty,
                 Effect: new(IsPresent(element1)),
                 ExpectedResult: new(IsPresent(element1))),
 
             new( // Removes atom
                 State: new(IsPresent(element1)),
                 Effect: new(!IsPresent(element1)),
-                ExpectedResult: State.Empty),
+                ExpectedResult: HashSetState.Empty),
 
             new( // Doesn't add duplicate
                 State: new(IsPresent(element1)),
@@ -38,15 +38,15 @@ public static class HashSetStateTests
                 ExpectedResult: new(IsPresent(element1))),
 
             new( // Doesn't complain about removing non-present element
-                State: State.Empty,
+                State: HashSetState.Empty,
                 Effect: new(!IsPresent(element1)),
-                ExpectedResult: State.Empty),
+                ExpectedResult: HashSetState.Empty),
         })
         .When(tc => tc.State.Apply(tc.Effect))
         .ThenReturns()
         .And((tc, s) => s.Should().BeEquivalentTo(tc.ExpectedResult));
 
-    private record SatisfiesTestCase(State State, Goal Goal, bool ExpectedResult);
+    private record SatisfiesTestCase(HashSetState State, Goal Goal, bool ExpectedResult);
 
     public static Test IsSatisfiedByBehaviour => TestThat
         .GivenEachOf(() => new SatisfiesTestCase[]
@@ -72,7 +72,7 @@ public static class HashSetStateTests
                 ExpectedResult: false),
 
             new( // satisfied negative element, unsatisfied positive element
-                State: State.Empty,
+                State: HashSetState.Empty,
                 Goal: new(IsPresent(element1) & !IsPresent(element2)),
                 ExpectedResult: false),
         })
@@ -80,7 +80,7 @@ public static class HashSetStateTests
         .ThenReturns()
         .And((tc, r) => r.Should().Be(tc.ExpectedResult));
 
-    private record GetSatisfyingSubstitutionsTestCase(State State, Goal Goal, IEnumerable<VariableSubstitution> ExpectedResult);
+    private record GetSatisfyingSubstitutionsTestCase(HashSetState State, Goal Goal, IEnumerable<VariableSubstitution> ExpectedResult);
 
     public static Test GetSatisfyingSubstitutionsBehaviour => TestThat
         .GivenEachOf(() => new GetSatisfyingSubstitutionsTestCase[]
@@ -110,29 +110,29 @@ public static class HashSetStateTests
         .ThenReturns()
         .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult));
 
-    private record EqualityTestCase(State X, State Y, bool ExpectedEquality);
+    private record EqualityTestCase(HashSetState X, HashSetState Y, bool ExpectedEquality);
 
     public static Test EqualityBehaviour => TestThat
         .GivenEachOf(() => new EqualityTestCase[]
         {
             new(
-                X: State.Empty,
-                Y: new State(),
+                X: HashSetState.Empty,
+                Y: new HashSetState(),
                 ExpectedEquality: true),
 
             new(
-                X: new State(new Predicate("A"), new Predicate("B")),
-                Y: new State(new Predicate("A"), new Predicate("B")),
+                X: new HashSetState(new Predicate("A"), new Predicate("B")),
+                Y: new HashSetState(new Predicate("A"), new Predicate("B")),
                 ExpectedEquality: true),
 
             new(
-                X: new State(new Predicate("A"), new Predicate("B")),
-                Y: new State(new Predicate("B"), new Predicate("A")),
+                X: new HashSetState(new Predicate("A"), new Predicate("B")),
+                Y: new HashSetState(new Predicate("B"), new Predicate("A")),
                 ExpectedEquality: true),
 
             new(
-                X: new State(new Predicate("A"), new Predicate("B")),
-                Y: new State(new Predicate("A")),
+                X: new HashSetState(new Predicate("A"), new Predicate("B")),
+                Y: new HashSetState(new Predicate("A")),
                 ExpectedEquality: false),
         })
         .When(tc => (Equality: tc.X.Equals(tc.Y), HashCodeEquality: tc.X.GetHashCode() == tc.Y.GetHashCode()))

@@ -126,9 +126,9 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
 
     public readonly struct GoalSpaceNode : INode<GoalSpaceNode, GoalSpaceEdge>, IEquatable<GoalSpaceNode>
     {
-        private readonly Domain domain;
+        private readonly IDomain domain;
 
-        public GoalSpaceNode(Domain domain, Goal goal) => (this.domain, Goal) = (domain, goal);
+        public GoalSpaceNode(IDomain domain, Goal goal) => (this.domain, Goal) = (domain, goal);
 
         /// <summary>
         /// Gets the goal represented by this node.
@@ -155,10 +155,10 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
 
     public struct GoalSpaceNodeEdges : IReadOnlyCollection<GoalSpaceEdge>
     {
-        private readonly Domain domain;
+        private readonly IDomain domain;
         private readonly Goal goal;
 
-        public GoalSpaceNodeEdges(Domain domain, Goal goal) => (this.domain, this.goal) = (domain, goal);
+        public GoalSpaceNodeEdges(IDomain domain, Goal goal) => (this.domain, this.goal) = (domain, goal);
 
         /// <inheritdoc />
         public int Count => DomainInspector.GetRelevantActions(domain, goal).Count();
@@ -178,10 +178,10 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
 
     public struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
     {
-        private readonly Domain domain;
+        private readonly IDomain domain;
         private readonly Goal fromGoal;
 
-        public GoalSpaceEdge(Domain domain, Goal fromGoal, Action action)
+        public GoalSpaceEdge(IDomain domain, Goal fromGoal, Action action)
         {
             this.domain = domain;
             this.fromGoal = fromGoal;

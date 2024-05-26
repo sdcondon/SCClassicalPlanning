@@ -10,26 +10,26 @@ public static class ProblemInspectorTests
 {
     private static readonly Constant element1 = new(nameof(element1));
     private static readonly Constant element2 = new(nameof(element2));
-    private static readonly Problem containerProblem = new Problem(Container.Domain, State.Empty, Goal.Empty, new[] { element1, element2 });
+    private static readonly Problem containerProblem = new(Container.Domain, HashSetState.Empty, Goal.Empty, new[] { element1, element2 });
 
-    private record GetApplicableActionsTestCase(Problem Problem, State State, Action[] ExpectedResult);
+    private record GetApplicableActionsTestCase(Problem Problem, IState State, Action[] ExpectedResult);
 
     public static Test GetApplicableActionsBehaviour => TestThat
         .GivenEachOf(() => new GetApplicableActionsTestCase[]
         {
             new(
                 Problem: containerProblem,
-                State: State.Empty,
+                State: HashSetState.Empty,
                 ExpectedResult: new[] { Add(element1), Add(element2) }),
 
             new(
                 Problem: containerProblem,
-                State: new(IsPresent(element1)),
+                State: new HashSetState(IsPresent(element1)),
                 ExpectedResult: new[] { Remove(element1), Add(element2), Swap(element1, element2) }),
 
             new(
                 Problem: containerProblem,
-                State: new(IsPresent(element1) & IsPresent(element2)),
+                State: new HashSetState(IsPresent(element1) & IsPresent(element2)),
                 ExpectedResult: new[] { Remove(element1), Remove(element2) }),
         })
         .When(tc => ProblemInspector.GetApplicableActions(tc.Problem, tc.State))
