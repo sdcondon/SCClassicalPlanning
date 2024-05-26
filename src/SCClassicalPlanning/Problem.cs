@@ -60,6 +60,7 @@ public class Problem
         InitialState = initialState;
         Goal = goal;
 
+        // TODO*: this is bad. decide how to fix it.
         var constants = new HashSet<Constant>(additionalConstants);
         constants.UnionWith(domain.Constants);
         StateConstantFinder.Instance.Visit(initialState, constants);
