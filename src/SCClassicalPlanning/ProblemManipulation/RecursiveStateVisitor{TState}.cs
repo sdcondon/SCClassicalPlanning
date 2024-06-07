@@ -15,6 +15,7 @@ using SCFirstOrderLogic;
 
 namespace SCClassicalPlanning.ProblemManipulation;
 
+// TODO*: probably straight up remove this class. In general, iterating all elements of a state isn't going to be viable. 
 /// <summary>
 /// Base class for recursive visitors of <see cref="State"/> instances that reference external visitation state
 /// (as opposed to maintaining state as fields of the visitor).

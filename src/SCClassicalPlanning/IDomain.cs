@@ -39,7 +39,6 @@ public interface IDomain
     /// <summary>
     /// Gets the set of constants that exist within the domain
     /// </summary>
-    // TODO: Could/should be folded into Invariants when we add that, with a particular predicate to indicate "existence".
     public IQueryable<Constant> Constants { get; }
 
     //// TODO-FEATURE: It is increasingly looking like adding the following would be useful.
@@ -49,5 +48,6 @@ public interface IDomain
     //// public IQueryable<Sentence> Invariants { get; }
     //// though actually just public IKnowledgeBase Invariants { get; } might be a better call
     //// (again because of potential IO - clauses might/probably will need to be in storage,
-    //// and SCFoL doesn't have a universal clause store - its specific to KB type..)
+    //// and SCFoL doesn't have a universal clause store - its specific to KB type.. Of course,
+    //// issue disappears if we allow for IQueryable<CNFClause> clause stores in SCFoL)
 }
