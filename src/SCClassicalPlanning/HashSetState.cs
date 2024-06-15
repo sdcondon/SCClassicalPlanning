@@ -93,7 +93,7 @@ public class HashSetState : IState
 
             foreach (var goalElement in goal.ForbiddenPredicates)
             {
-                if (Elements.Contains((Predicate)substitution.ApplyTo(goalElement).ToSentence()))
+                if (Elements.Contains(substitution.ApplyTo(goalElement)))
                 {
                     return true;
                 }

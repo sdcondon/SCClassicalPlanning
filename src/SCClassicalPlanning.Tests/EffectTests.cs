@@ -20,18 +20,18 @@ public static class EffectTests
                 ExpectedEquality: true),
 
             new(
-                X: new Effect(new Predicate("A"), new Predicate("B")),
-                Y: new Effect(new Predicate("A"), new Predicate("B")),
+                X: new Effect(new(new("A")), new(new("B"))),
+                Y: new Effect(new(new("A")), new(new("B"))),
                 ExpectedEquality: true),
 
             new(
-                X: new Effect(new Predicate("A"), new Predicate("B")),
-                Y: new Effect(new Predicate("B"), new Predicate("A")),
+                X: new Effect(new(new("A")), new(new("B"))),
+                Y: new Effect(new(new("B")), new(new("A"))),
                 ExpectedEquality: true),
 
             new(
-                X: new Effect(new Predicate("A"), new Predicate("B")),
-                Y: new Effect((Sentence)new Predicate("A")),
+                X: new Effect(new(new("A")), new(new("B"))),
+                Y: new Effect(new Predicate("A")),
                 ExpectedEquality: false),
         })
         .When(tc => (Equality: tc.X.Equals(tc.Y), HashCodeEquality: tc.X.GetHashCode() == tc.Y.GetHashCode()))

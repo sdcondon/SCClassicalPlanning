@@ -99,7 +99,7 @@ public class Problem
     //// public ImmutableHashSet<CNFClause> Invariants { get; }
 
     /// <summary>
-    /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="State"/>, and add them to a given <see cref="HashSet{T}"/>.
+    /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="IState"/>, and add them to a given <see cref="HashSet{T}"/>.
     /// </summary>
     private class StateConstantFinder : RecursiveStateVisitor<HashSet<Constant>>
     {

@@ -59,7 +59,7 @@ public static class ProblemInspector
                     // For each unification found, we then recurse for the rest of the elements of the goal.
                     foreach (var stateElement in state.Elements)
                     {
-                        if (Unifier.TryUpdate(stateElement, firstGoalElement, unifier, out var firstGoalElementUnifier))
+                        if (Unifier.TryUpdate((Literal)stateElement, firstGoalElement, unifier, out var firstGoalElementUnifier))
                         {
                             foreach (var restOfGoalElementsUnifier in MatchWithState(goalElements.Skip(1), firstGoalElementUnifier))
                             {
@@ -81,7 +81,7 @@ public static class ProblemInspector
                     // clever indexing could help (support for indexing is TODO).
                     foreach (var firstGoalElementUnifier in GetAllPossibleSubstitutions(problem, firstGoalElement.Predicate, unifier))
                     {
-                        var possiblePredicate = firstGoalElementUnifier.ApplyTo(firstGoalElement.Predicate).Predicate;
+                        var possiblePredicate = firstGoalElementUnifier.ApplyTo(firstGoalElement.Predicate);
 
                         if (!state.Elements.Contains(possiblePredicate))
                         {
@@ -256,10 +256,7 @@ public static class ProblemInspector
                 // NB the AsEnumerable here to reduce requirements on what the IQueryable
                 // implementation needs to support. Still unconvinced about using IQueryable, TBH.
                 // TODO* depending on what i do with Problem constants - might need to look in problem.Domain, too.
-                u => problem.Constants.AsEnumerable().Select(o => new VariableSubstitution(new Dictionary<VariableReference, Term>(u.Bindings)
-                {
-                    { unboundVariable, o }
-                }))
+                u => problem.Constants.Select(o => u.CopyAndAdd(KeyValuePair.Create(unboundVariable, (Term)o)))
             );
         }
 

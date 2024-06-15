@@ -62,18 +62,18 @@ public static class GoalTests
                 ExpectedEquality: true),
 
             new(
-                X: new Goal(new Predicate("A"), new Predicate("B")),
-                Y: new Goal(new Predicate("A"), new Predicate("B")),
+                X: new Goal(new(new("A")), new(new("B"))),
+                Y: new Goal(new(new("A")), new(new("B"))),
                 ExpectedEquality: true),
 
             new(
-                X: new Goal(new Predicate("A"), new Predicate("B")),
-                Y: new Goal(new Predicate("B"), new Predicate("A")),
+                X: new Goal(new(new("B")), new(new("B"))),
+                Y: new Goal(new(new("B")), new(new("A"))),
                 ExpectedEquality: true),
 
             new(
-                X: new Goal(new Predicate("A"), new Predicate("B")),
-                Y: new Goal((Sentence)new Predicate("A")),
+                X: new Goal(new(new("A")), new(new("B"))),
+                Y: new Goal(new Predicate("A")),
                 ExpectedEquality: false),
         })
         .When(tc => (Equality: tc.X.Equals(tc.Y), HashCodeEquality: tc.X.GetHashCode() == tc.Y.GetHashCode()))

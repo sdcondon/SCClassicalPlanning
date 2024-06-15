@@ -56,9 +56,7 @@ public class PlanningGraph
         {
             foreach (var substitution in ProblemInspector.GetAllPossibleSubstitutions(problem, predicateTemplate, new VariableSubstitution()))
             {
-                // Ugh - compiler assuming wrong overload - perhaps because conversion is implicit and method is more concrete?
-                // TODO-SCFOL-BREAKING: Implicit conversion of predicate to literal a mistake, I think.
-                var predicate = (Predicate)substitution.ApplyTo(predicateTemplate).ToSentence();
+                var predicate = substitution.ApplyTo(predicateTemplate);
                 var proposition = new Literal(predicate, !problem.InitialState.Elements.Contains(predicate));
                 propositionLevel0.Add(proposition, new PlanningGraphPropositionNode(proposition));
             }
