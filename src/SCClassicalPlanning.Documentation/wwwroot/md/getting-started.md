@@ -89,7 +89,7 @@ Action moveToBlock = new(
         & !On(block, from)
         & !Clear(toBlock)));
 
-// The other action of our domain - 'moveToTable'.
+// Our second action schema - 'moveToTable'.
 // Separate from 'moveToBlock' because of the different behaviour of table and block w.r.t being Clear or not.
 Action moveToTable = new(
     identifier: nameof(moveToTable),
@@ -104,7 +104,7 @@ Action moveToTable = new(
         & !On(block, from)));
 
 // Note that problems require action schemas to be IQueryable - ultimately to allow
-// for efficent action lookup when there are a large numer of possible actions. This
+// for efficent action lookup when there are a large number of possible actions. This
 // might change by the time this package reaches v1.0..
 var actionSchemas = new[] { moveToBlock, moveToTable }.AsQueryable();
 
