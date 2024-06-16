@@ -27,7 +27,7 @@ using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.A
 // helper methods for your predicates, as we do below, is highly recommended.
 // NB #1: note that we're using OperablePredicate here. Its not required, but makes everything nice and succinct because
 // it means we can use & and ! to combine them. See the SCFirstOrderLogic docs for details.
-// NB #2: Also note the use of EqualitySymbol.Instance here to identify the equality predicate. While at present there's
+// NB #2: Also note the use of EqualityIdnetifier.Instance here to identify the equality predicate. While at present there's
 // no special handling of equality in any of the algorithms (in here or in SCFirstOrderLogic), its worth using this anyway
 // - even if only for future-proofing.
 OperablePredicate On(Term above, Term below) => new Predicate(nameof(On), above, below);
@@ -35,10 +35,11 @@ OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
 OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
 OperablePredicate Equal(Term x, Term y) => new Predicate(EqualityIdentifier.Instance, x, y);
 
-// First, let's declare the initial state of our problem. States are essentially just sets of predicates
-// that can be modified by applying Actions. For problems with large states, a state implementation that
-// is backed by a separate store might be required. The library includes HashSetState, for problems that
-// are small enough that we can just keep everything in memory.
+// First, let's declare the initial state of our problem. IState is an interface that represents a set of
+// predicates that can be modified by applying Actions. For problems with large states, a state implementation
+// that is backed by a separate store might be required, but here we have a small enough problem that just
+// keeping everything in memory is fine. The library includes an implementation of IState called HashSetState
+// that is intended for use in such scenarios.
 Constant table = new(nameof(table));
 Constant blockA = new(nameof(blockA));
 Constant blockB = new(nameof(blockB));
@@ -103,7 +104,7 @@ Action moveToTable = new(
         & Clear(from)
         & !On(block, from)));
 
-// Note that problems require action schemas to be IQueryable - ultimately to allow
+// Note that problems require action schemas to be IQueryable<Action> - ultimately to allow
 // for efficent action lookup when there are a large number of possible actions. This
 // might change by the time this package reaches v1.0..
 var actionSchemas = new[] { moveToBlock, moveToTable }.AsQueryable();
