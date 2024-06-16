@@ -24,7 +24,7 @@ using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.A
 
 // Our domain defines four predicates (essentially, facts about zero or more elements of the domain that,
 // in any given state, are either true or not). As mentioned in the user guide for SCFirstOrderLogic, creating
-// helper methods for your predicates, as we do below, is highly recommended.
+// helper methods for your predicates, as we do below, is highly recommended to avoid repetition.
 // NB #1: note that we're using OperablePredicate here. Its not required, but makes everything nice and succinct because
 // it means we can use & and ! to combine them. See the SCFirstOrderLogic docs for details.
 // NB #2: Also note the use of EqualityIdnetifier.Instance here to identify the equality predicate. While at present there's
