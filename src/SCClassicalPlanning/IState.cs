@@ -52,7 +52,7 @@ public interface IState
     /// </summary>
     /// <param name="goal">The goal to check.</param>
     /// <returns>A value indicating whether this state satisfies a given goal.</returns>
-    // TODO*: if we're keeping Elements, not necessarily needed, because can do this with queries? Could add a default implementation, at least?
+    // TODO*: not necessarily needed, because can do this with queries? Could add a default implementation, at least?
     bool Satisfies(Goal goal);
 
     /// <summary>

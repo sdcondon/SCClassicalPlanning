@@ -36,8 +36,7 @@ public class UnsatisfiedGoalCount : ICostStrategy
     /// <inheritdoc/>
     public float EstimateCost(IState state, Goal goal)
     {
-        // TODO: Do states need to be i(async)queryable?
-        //return 0f;
+        // TODO: leverage the fact that state.elements are iqueryable now
         return goal.RequiredPredicates.Except(state.Elements).Count()
             + goal.ForbiddenPredicates.Intersect(state.Elements).Count();
     }

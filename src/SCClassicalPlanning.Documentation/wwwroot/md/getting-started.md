@@ -17,8 +17,8 @@ In this section, we use the ['blocks world'](https://en.wikipedia.org/wiki/Block
 ### Defining Problems as Code
 
 ```
-using SCClassicalPlanning; // for Goal, Effect, Action, Problem, IState, HashSetState
-using SCFirstOrderLogic; // for Constant, Term, Predicate, VariableDeclaration, EqualitySymbol
+using SCClassicalPlanning; // for Problem, HashSetState, Goal, Action, Effect
+using SCFirstOrderLogic; // for Constant, Term, Predicate, VariableDeclaration, EqualityIdentifier
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // for OperablePredicate
 using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.Action. I'd rather not rename it..
 
@@ -27,7 +27,7 @@ using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.A
 // helper methods for your predicates, as we do below, is highly recommended to avoid repetition.
 // NB #1: note that we're using OperablePredicate here. Its not required, but makes everything nice and succinct because
 // it means we can use & and ! to combine them. See the SCFirstOrderLogic docs for details.
-// NB #2: Also note the use of EqualityIdnetifier.Instance here to identify the equality predicate. While at present there's
+// NB #2: Also note the use of EqualityIdentifier.Instance here to identify the equality predicate. While at present there's
 // no special handling of equality in any of the algorithms (in here or in SCFirstOrderLogic), its worth using this anyway
 // - even if only for future-proofing.
 OperablePredicate On(Term above, Term below) => new Predicate(nameof(On), above, below);
@@ -35,7 +35,7 @@ OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
 OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
 OperablePredicate Equal(Term x, Term y) => new Predicate(EqualityIdentifier.Instance, x, y);
 
-// First, let's declare the initial state of our problem. IState is an interface that represents a set of
+// First, let's define the initial state of our problem. IState is an interface that represents a set of
 // predicates that can be modified by applying Actions. For problems with large states, a state implementation
 // that is backed by a separate store might be required, but here we have a small enough problem that just
 // keeping everything in memory is fine. The library includes an implementation of IState called HashSetState
@@ -58,8 +58,8 @@ HashSetState initialState = new(
     & Clear(blockC));
 
 // Next, let's define the end goal of our problem. Goals are essentially sets of literals.
-// Note well that goals are sets of *literals*, not predicates. That is, we can require that
-// certain predicates do *not* hold. In this case though, both of our goal's elements are positive.
+// Note that, unlike states, that is sets of *literals*, not predicates. This is so that we can require
+// that certain predicates do *not* hold. In this case though, both of our goal's elements are positive.
 Goal endGoal = new(
     On(blockA, blockB)
     & On(blockB, blockC));

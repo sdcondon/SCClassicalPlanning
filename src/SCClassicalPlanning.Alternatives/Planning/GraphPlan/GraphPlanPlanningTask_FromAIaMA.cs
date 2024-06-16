@@ -199,7 +199,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
             var relevantActionNodes = goal.Elements
                 .SelectMany(e => graphLevel.NodesByProposition[e].Causes)
                 .OrderBy(n => n.Preconditions.Sum(p => graphLevel.Graph.GetLevelCost(p.Proposition)))
-                .Distinct(); // todo: can probably do this before order by? ref equality, but we take action to avoid dups.
+                .Distinct(); // TODO: can probably do this before order by? ref equality, but we take action to avoid dups.
 
             // Now (recursively) attempt to cover all elements of the goal, with no mutexes:
             // We go recursive to ensure that we ultimately find all combinations - but this is of course potentially expensive.

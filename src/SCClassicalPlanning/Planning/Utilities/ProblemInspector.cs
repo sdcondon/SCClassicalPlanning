@@ -81,7 +81,7 @@ public static class ProblemInspector
                     // one would hope that it is a very rare scenario to have a variable that doesn't occur in ANY positive goal elements (most
                     // will at least occur in e.g. a 'type' predicate). But this is obviously VERY expensive when it occurs - though I guess
                     // clever indexing could help (support for indexing is TODO).
-                    foreach (var firstGoalElementUnifier in GetAllPossibleSubstitutions(firstGoalElement.Predicate, unifier, state.GetAllConstants()))
+                    foreach (var firstGoalElementUnifier in GetAllPossibleSubstitutions(firstGoalElement.Predicate, state.GetAllConstants(), unifier))
                     {
                         var possiblePredicate = firstGoalElementUnifier.ApplyTo(firstGoalElement.Predicate);
 
@@ -169,7 +169,7 @@ public static class ProblemInspector
                 // do not occur, we need to check for the existence of the negation of the literal formed by substituting EVERY combination of
                 // objects in the problem for the as yet unbound variables. This is obviously VERY expensive for large problems with lots of objects -
                 // though I guess clever indexing could help (support for indexing is TODO).
-                foreach (var firstEffectElementUnifier in GetAllPossibleSubstitutions(firstEffectElement.Predicate, substitution, constants))
+                foreach (var firstEffectElementUnifier in GetAllPossibleSubstitutions(firstEffectElement.Predicate, constants, substitution))
                 {
                     var possibleLiteral = firstEffectElementUnifier.ApplyTo(firstEffectElement);
 
@@ -407,7 +407,7 @@ public static class ProblemInspector
     /// <returns>All possible subsitutions that populate each of the arguments of the given predicate with a constant.</returns>
     public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Predicate predicate, IEnumerable<Constant> constants)
     {
-        return GetAllPossibleSubstitutions(predicate, new VariableSubstitution(), constants);
+        return GetAllPossibleSubstitutions(predicate, constants, new VariableSubstitution());
     }
 
     /// <summary>
@@ -420,10 +420,10 @@ public static class ProblemInspector
     /// </para>
     /// </summary>
     /// <param name="predicate">The predicate to create all possible substitutions for.</param>
-    /// <param name="constraint">The substitution to use as a constraint.</param>
     /// <param name="constants">The available constants.</param>
+    /// <param name="constraint">The substitution to use as a constraint.</param>
     /// <returns>All possible subsitutions that populate each of the arguments of the given predicate with a constant.</returns>
-    public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Predicate predicate, VariableSubstitution constraint, IEnumerable<Constant> constants)
+    public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Predicate predicate, IEnumerable<Constant> constants, VariableSubstitution constraint)
     {
         IEnumerable<VariableSubstitution> allPossibleSubstitutions = new List<VariableSubstitution>() { constraint };
         var unboundVariables = predicate.Arguments.OfType<VariableReference>().Except(constraint.Bindings.Keys);
@@ -433,7 +433,6 @@ public static class ProblemInspector
             allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(
                 // NB the AsEnumerable here to reduce requirements on what the IQueryable
                 // implementation needs to support. Still unconvinced about using IQueryable, TBH.
-                // TODO* depending on what i do with Problem constants - might need to look in problem.Domain, too.
                 u => constants.Select(o => u.CopyAndAdd(KeyValuePair.Create(unboundVariable, (Term)o)))
             );
         }

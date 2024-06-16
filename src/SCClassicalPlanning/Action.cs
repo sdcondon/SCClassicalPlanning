@@ -68,7 +68,7 @@ public class Action
     /// </para>
     /// <para>
     /// NB: Does NOT validate preconditions - to be of use with particular planning heuristics.
-    /// TODO: Maybe rethink this. Any heuristic that wants to do this could just look at the effect and apply it..
+    /// TODO-ROBUSTNESS: Maybe rethink this. Any heuristic that wants to do this could just look at the effect and apply it..
     /// </para>
     /// </summary>
     /// <param name="state">The state to apply the action to.</param>

@@ -71,7 +71,7 @@ public class HashSetState : IState
     /// </summary>
     public ImmutableHashSet<Predicate> Elements { get; }
 
-    // TODO: at some point look at (test me!) efficiency here. ImmutableHashSet builder stuff might be of use?
+    // TODO-PERFORMANCE: at some point look at (test me!) efficiency here. ImmutableHashSet builder stuff might be of use?
     /// <inheritdoc />
     IState IState.Apply(Effect effect) => new HashSetState(Elements.Except(effect.DeleteList).Union(effect.AddList));
 

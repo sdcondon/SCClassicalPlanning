@@ -18,7 +18,7 @@ namespace SCClassicalPlanning;
 /// Encapsulates a planning problem.
 /// </para>
 /// <para>
-/// Problems consist of an initial <see cref="IState"/>, an end <see cref="Goal"/>, and a set of allowed <see cref="Action"/>s.
+/// Problems consist of an initial <see cref="IState"/>, an end <see cref="Goal"/>, and a set of schemas for allowed <see cref="Action"/>s.
 /// </para>
 /// </summary>
 public class Problem
