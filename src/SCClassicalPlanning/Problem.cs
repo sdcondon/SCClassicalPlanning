@@ -28,12 +28,12 @@ public class Problem
     /// </summary>
     /// <param name="initialState">The initial state of the problem.</param>
     /// <param name="endGoal">The end goal of the problem.</param>
-    /// <param name="actions">The actions that are available within the problem.</param>
-    public Problem(IState initialState, Goal endGoal, IQueryable<Action> actions)
+    /// <param name="actionSchemas">The schemas of the actions that are available within the problem.</param>
+    public Problem(IState initialState, Goal endGoal, IQueryable<Action> actionSchemas)
     {
         InitialState = initialState;
         EndGoal = endGoal;
-        ActionSchemas = actions;
+        ActionSchemas = actionSchemas;
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ public class Problem
     public Goal EndGoal { get; }
 
     /// <summary>
-    /// Gets the actions that are available.
+    /// Gets the schemas of the actions that are available within the problem.
     /// </summary>
     public IQueryable<Action> ActionSchemas { get; }
 

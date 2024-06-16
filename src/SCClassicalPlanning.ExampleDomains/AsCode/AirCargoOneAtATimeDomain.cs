@@ -50,7 +50,7 @@ public static class AirCargoOneAtATimeDomain
                 IsAt(Cargo1, Airport2)
                 & IsAt(Cargo2, Airport2)
                 & IsAt(Cargo3, Airport2)),
-            actions: actionSchemas);
+            actionSchemas: actionSchemas);
     }
 
     public static Problem Problem { get; }

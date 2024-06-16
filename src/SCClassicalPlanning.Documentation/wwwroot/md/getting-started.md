@@ -17,7 +17,7 @@ In this section, we use the ['blocks world'](https://en.wikipedia.org/wiki/Block
 ### Defining Problems as Code
 
 ```
-using SCClassicalPlanning; // for Problem, HashSetState, Goal, Action, Effect
+using SCClassicalPlanning; // for HashSetState, Goal, Action, Effect, Problem
 using SCFirstOrderLogic; // for Constant, Term, Predicate, VariableDeclaration, EqualityIdentifier
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // for OperablePredicate
 using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.Action. I'd rather not rename it..

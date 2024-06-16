@@ -210,7 +210,7 @@ public class HashSetState : IState
     }
 
     /// <summary>
-    /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="SCClassicalPlanning.Goal"/>, and add them to a given <see cref="HashSet{T}"/>.
+    /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="Goal"/>, and add them to a given <see cref="HashSet{T}"/>.
     /// </summary>
     private class GoalConstantFinder : RecursiveGoalVisitor<HashSet<Constant>>
     {
