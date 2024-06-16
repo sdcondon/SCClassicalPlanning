@@ -33,10 +33,39 @@ using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.A
 OperablePredicate On(Term above, Term below) => new Predicate(nameof(On), above, below);
 OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
 OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
-OperablePredicate Equal(Term x, Term y) => new Predicate(EqualitySymbol.Instance, x, y);
+OperablePredicate Equal(Term x, Term y) => new Predicate(EqualityIdentifier.Instance, x, y);
 
-// Now declare some constants and variables for use in our action schemas:
-Constant Table = new(nameof(Table));
+// First, let's declare the initial state of our problem. States are essentially just sets of predicates
+// that can be modified by applying Actions. For problems with large states, a state type that is backed
+// by a separate store might be required. The library includes HashSetState, for problems that are small
+// enough that we can just keep everything in memory.
+Constant table = new(nameof(table));
+Constant blockA = new(nameof(blockA));
+Constant blockB = new(nameof(blockB));
+Constant blockC = new(nameof(blockC));
+HashSetState initialState = new(
+    Block(blockA)
+    & Equal(blockA, blockA)
+    & Block(blockB)
+    & Equal(blockB, blockB)
+    & Block(blockC)
+    & Equal(blockC, blockC)
+    & On(blockA, table)
+    & On(blockB, table)
+    & On(blockC, blockA)
+    & Clear(blockB)
+    & Clear(blockC));
+
+// Next, let's define the end goal of our problem. Goals are essentially sets of literals.
+// Note well that goals are sets of *literals*, not predicates. That is, we can require that
+// certain predicates do *not* hold. In this case though, both of our goal's elements are positive.
+Goal endGoal = new(
+    On(blockA, blockB)
+    & On(blockB, blockC));
+
+// Thirdly, we define the schemas for the actions that are available to solve our problem.
+// Action schemas can include variables - that planners can substitute appropriate constants for
+// when creating a plan to solve the problem.
 VariableDeclaration block = new(nameof(block));
 VariableDeclaration from = new(nameof(from));
 VariableDeclaration toBlock = new(nameof(toBlock));
@@ -70,34 +99,17 @@ Action moveToTable = new(
         & Block(block)
         & !Equal(block, from)),
     effect: new Effect(
-        On(block, Table)
+        On(block, table)
         & Clear(from)
         & !On(block, from)));
 
-// Now we can declare our problem.
-// Problems consist of an initial state, an end goal, and set of available actions.
-Constant blockA = new(nameof(blockA));
-Constant blockB = new(nameof(blockB));
-Constant blockC = new(nameof(blockC));
+// Note that problems require action schemas to be IQueryable - ultimately to allow
+// for efficent action lookup when there are a large numer of possible actions. This
+// might change by the time this package reaches v1.0..
+var actionSchemas = new[] { moveToBlock, moveToTable }.AsQueryable();
 
-var problem = new Problem(
-    domain: domain,
-    initialState: new State(
-        Block(blockA)
-        & Equal(blockA, blockA)
-        & Block(blockB)
-        & Equal(blockB, blockB)
-        & Block(blockC)
-        & Equal(blockC, blockC)
-        & On(blockA, Table)
-        & On(blockB, Table)
-        & On(blockC, blockA)
-        & Clear(blockB)
-        & Clear(blockC)),
-    goal: new Goal(
-        On(blockA, blockB)
-        & On(blockB, blockC))
-    actionSchemas: [moveToBlock, moveToTable].AsQueryable());
+// Finally, all that is left to do is combine all of the above into a problem definition:
+var problem = new Problem(initialState, endGoal, actionSchemas);
 ```
 
 ### Defining Problems with PDDL
