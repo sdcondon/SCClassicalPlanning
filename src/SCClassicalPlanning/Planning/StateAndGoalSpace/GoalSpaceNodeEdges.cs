@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCClassicalPlanning.Planning.Utilities;
+using SCClassicalPlanning.ProblemManipulation;
 using System.Collections;
 
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
@@ -39,12 +40,12 @@ public readonly struct GoalSpaceNodeEdges : IReadOnlyCollection<GoalSpaceEdge>
     public GoalSpaceNodeEdges(Problem problem, Goal goal) => (Problem, Goal) = (problem, goal);
 
     /// <inheritdoc />
-    public int Count => ProblemInspector.GetRelevantActions(Problem, Goal).Count();
+    public int Count => ProblemInspector.GetRelevantGroundActions(Goal, Problem.ActionSchemas, Problem.InitialState.GetAllConstants()).Count();
 
     /// <inheritdoc />
     public IEnumerator<GoalSpaceEdge> GetEnumerator()
     {
-        foreach (var action in ProblemInspector.GetRelevantActions(Problem, Goal))
+        foreach (var action in ProblemInspector.GetRelevantGroundActions(Goal, Problem.ActionSchemas, Problem.InitialState.GetAllConstants()))
         {
             yield return new GoalSpaceEdge(Problem, Goal, action);
         }

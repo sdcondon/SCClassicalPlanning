@@ -2,9 +2,9 @@
 using FlUnit;
 using SCClassicalPlanning.ExampleDomains.AsCode;
 using SCFirstOrderLogic;
-using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorld;
-using static SCClassicalPlanning.ExampleDomains.AsCode.HaveCakeAndEatCakeToo;
-using static SCClassicalPlanning.ExampleDomains.AsCode.SpareTire;
+using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
+using static SCClassicalPlanning.ExampleDomains.AsCode.HaveCakeAndEatCakeTooDomain;
+using static SCClassicalPlanning.ExampleDomains.AsCode.SpareTireDomain;
 
 namespace SCClassicalPlanning.Planning.GraphPlan;
 
@@ -21,7 +21,7 @@ public static class PlanningGraphTests
         .GivenEachOf(() => new ConstructionTestCase[]
         {
             new(
-                Problem: BlocksWorld.ExampleProblem,
+                Problem: BlocksWorldDomain.ExampleProblem,
                 ExpectedLayer0Propositions: new Sentence[]
                 {
                     Block(blockA),
@@ -74,7 +74,7 @@ public static class PlanningGraphTests
         .And((tc, rv) => rv.GetLevel(0).Propositions.Should().BeEquivalentTo(tc.ExpectedLayer0Propositions.OfType<Literal>()));
 
     public static Test SpareTireScenario => TestThat
-        .Given(() => new PlanningGraph(SpareTire.ExampleProblem))
+        .Given(() => new PlanningGraph(SpareTireDomain.ExampleProblem))
         .When(g =>
         {
             static IEnumerable<Predicate> GetPositiveTireIsAtPropositions(PlanningGraph g, int level)

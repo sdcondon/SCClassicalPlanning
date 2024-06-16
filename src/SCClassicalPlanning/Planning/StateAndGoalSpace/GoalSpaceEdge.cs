@@ -60,7 +60,7 @@ public readonly struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
     /// Returns a string that represents the current object.
     /// </summary>
     /// <returns>A string that represents the current object.</returns>
-    public override string ToString() => new PlanFormatter(Problem.Domain).Format(Action);
+    public override string ToString() => new PlanFormatter(Problem).Format(Action);
 
     
 }

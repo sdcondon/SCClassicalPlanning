@@ -22,13 +22,13 @@ namespace SCClassicalPlanning.Planning;
 /// </summary>
 public class PlanFormatter
 {
-    private readonly IDomain domain;
+    private readonly Problem problem;
 
     /// <summary>
     /// Initialises a new instance of the <see cref="PlanFormatter"/> class.
     /// </summary>
-    /// <param name="domain">The domain of the plans that will be formatted by this instance. Used to establish succinct output for individual actions.</param>
-    public PlanFormatter(IDomain domain) => this.domain = domain;
+    /// <param name="problem">The problem of the plans that will be formatted by this instance. Used to establish succinct output for individual actions.</param>
+    public PlanFormatter(Problem problem) => this.problem = problem;
 
     /// <summary>
     /// Creates a human-readable string representation of a given plan.
@@ -54,7 +54,7 @@ public class PlanFormatter
     /// <returns></returns>
     public string Format(Action action)
     {
-        VariableSubstitution substitution = DomainInspector.GetMappingFromSchema(domain, action);
+        VariableSubstitution substitution = ProblemInspector.GetMappingFromSchema(action, problem.ActionSchemas);
         var orderedBindings = substitution.Bindings.OrderBy(b => b.Key.Identifier.ToString());
         return $"{action.Identifier}({string.Join(", ", orderedBindings.Select(b => b.Key.ToString() + ": " + b.Value.ToString()))})";
     }

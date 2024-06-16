@@ -55,7 +55,7 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
         internal PlanningTask(Problem problem, ICostStrategy costStrategy)
         {
             search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
-                source: new GoalSpaceNode(problem.Domain, problem.Goal),
+                source: new GoalSpaceNode(problem, problem.EndGoal),
                 isTarget: n => problem.InitialState.GetSatisfyingSubstitutions(n.Goal).Any(),
                 getEdgeCost: e => costStrategy.GetCost(e.Action),
                 getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));
@@ -126,9 +126,9 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
 
     public readonly struct GoalSpaceNode : INode<GoalSpaceNode, GoalSpaceEdge>, IEquatable<GoalSpaceNode>
     {
-        private readonly IDomain domain;
+        private readonly Problem problem;
 
-        public GoalSpaceNode(IDomain domain, Goal goal) => (this.domain, Goal) = (domain, goal);
+        public GoalSpaceNode(Problem problem, Goal goal) => (this.problem, Goal) = (problem, goal);
 
         /// <summary>
         /// Gets the goal represented by this node.
@@ -136,7 +136,7 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
         public Goal Goal { get; }
 
         /// <inheritdoc />
-        public IReadOnlyCollection<GoalSpaceEdge> Edges => new GoalSpaceNodeEdges(domain, Goal);
+        public IReadOnlyCollection<GoalSpaceEdge> Edges => new GoalSpaceNodeEdges(problem, Goal);
 
         /// <inheritdoc />
         public override bool Equals(object? obj) => obj is GoalSpaceNode node && Equals(node);
@@ -153,46 +153,46 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
         public override string ToString() => Goal.ToString();
     }
 
-    public struct GoalSpaceNodeEdges : IReadOnlyCollection<GoalSpaceEdge>
+    public readonly struct GoalSpaceNodeEdges : IReadOnlyCollection<GoalSpaceEdge>
     {
-        private readonly IDomain domain;
+        private readonly Problem problem;
         private readonly Goal goal;
 
-        public GoalSpaceNodeEdges(IDomain domain, Goal goal) => (this.domain, this.goal) = (domain, goal);
+        public GoalSpaceNodeEdges(Problem problem, Goal goal) => (this.problem, this.goal) = (problem, goal);
 
         /// <inheritdoc />
-        public int Count => DomainInspector.GetRelevantActions(domain, goal).Count();
+        public readonly int Count => ProblemInspector.GetRelevantLiftedActions(goal, problem.ActionSchemas).Count();
 
         /// <inheritdoc />
-        public IEnumerator<GoalSpaceEdge> GetEnumerator()
+        public readonly IEnumerator<GoalSpaceEdge> GetEnumerator()
         {
-            foreach (var action in DomainInspector.GetRelevantActions(domain, goal))
+            foreach (var action in ProblemInspector.GetRelevantLiftedActions(goal, problem.ActionSchemas))
             {
-                yield return new GoalSpaceEdge(domain, goal, action);
+                yield return new GoalSpaceEdge(problem, goal, action);
             }
         }
 
         /// <inheritdoc />
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        readonly IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
+    public readonly struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
     {
-        private readonly IDomain domain;
+        private readonly Problem problem;
         private readonly Goal fromGoal;
 
-        public GoalSpaceEdge(IDomain domain, Goal fromGoal, Action action)
+        public GoalSpaceEdge(Problem problem, Goal fromGoal, Action action)
         {
-            this.domain = domain;
+            this.problem = problem;
             this.fromGoal = fromGoal;
             this.Action = action;
         }
 
         /// <inheritdoc />
-        public GoalSpaceNode From => new(domain, fromGoal);
+        public readonly GoalSpaceNode From => new(problem, fromGoal);
 
         /// <inheritdoc />
-        public GoalSpaceNode To => new(domain, Action.Regress(fromGoal));
+        public readonly GoalSpaceNode To => new(problem, Action.Regress(fromGoal));
 
         /// <summary>
         /// Gets the action that is regressed over to achieve this goal transition.
@@ -200,6 +200,6 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
         public Action Action { get; }
 
         /// <inheritdoc />
-        public override string ToString() => new PlanFormatter(domain).Format(Action);
+        public override readonly string ToString() => new PlanFormatter(problem).Format(Action);
     }
 }

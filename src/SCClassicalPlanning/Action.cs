@@ -20,7 +20,7 @@ namespace SCClassicalPlanning;
 /// <para>
 /// Actions can be applied to <see cref="IState"/>s to create new states (via the action's Effect),
 /// provided that the action's Precondition (which is a <see cref="Goal"/>) is satisfied by the current state.
-/// <see cref="IDomain"/>s include a description of all actions that are valid in the domain.
+/// <see cref="Problem"/>s include a description of all available actions.
 /// </para>
 /// </summary>
 public class Action

@@ -7,11 +7,11 @@ namespace SCClassicalPlanning.ExampleDomains.AsCode;
 /// <summary>
 /// The "have cake and eat cake too" domain used to demonstrate planning graphs in AIaMA.
 /// </summary>
-public class HaveCakeAndEatCakeToo
+public class HaveCakeAndEatCakeTooDomain
 {
-    static HaveCakeAndEatCakeToo()
+    static HaveCakeAndEatCakeTooDomain()
     {
-        Domain = MakeDomain();
+        ActionSchemas = MakeActionSchemas();
 
         Constant cake = new(nameof(cake));
 
@@ -21,9 +21,9 @@ public class HaveCakeAndEatCakeToo
     }
 
     /// <summary>
-    /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the domain.
+    /// Gets the actions that are available in the domain.
     /// </summary>
-    public static HashSetDomain Domain { get; }
+    public static IQueryable<Action> ActionSchemas { get; }
 
     /// <summary>
     /// Gets an instance of the example problem for this domain.
@@ -52,8 +52,7 @@ public class HaveCakeAndEatCakeToo
     /// <param name="initialState">The initial state of the problem.</param>
     /// <param name="goal">The initial state of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(IState initialState, Goal goal) => new(Domain, initialState, goal);
+    public static Problem MakeProblem(IState initialState, Goal goal) => new(initialState, goal, ActionSchemas);
 
-    // NB: This is in its own method rather than the static ctor just so that we can run tests against domain construction.
-    internal static HashSetDomain MakeDomain() => new(Eat(C), Bake(C));
+    private static IQueryable<Action> MakeActionSchemas() => new[] { Eat(C), Bake(C) }.AsQueryable();
 }

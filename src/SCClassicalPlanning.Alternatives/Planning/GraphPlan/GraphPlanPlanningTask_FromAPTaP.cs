@@ -42,7 +42,7 @@ public class GraphPlanPlanningTask_FromAPTaP : TemplatePlanningTask
         // levels until all goal elements are present and pairwise non-mutex, or the graph
         // has levelled off:
         var currentGraphLevel = PlanningGraph.GetLevel(0);
-        while (!currentGraphLevel.ContainsNonMutex(problem.Goal.Elements) && !currentGraphLevel.IsLevelledOff)
+        while (!currentGraphLevel.ContainsNonMutex(problem.EndGoal.Elements) && !currentGraphLevel.IsLevelledOff)
         {
             currentGraphLevel = currentGraphLevel.NextLevel;
             noGoods[currentGraphLevel.Index] = new();
@@ -50,13 +50,13 @@ public class GraphPlanPlanningTask_FromAPTaP : TemplatePlanningTask
 
         // If the graph levelled off before all elements were non-mutex,
         // then we can't solve the problem:
-        if (!currentGraphLevel.ContainsNonMutex(problem.Goal.Elements))
+        if (!currentGraphLevel.ContainsNonMutex(problem.EndGoal.Elements))
         {
             throw new InvalidOperationException("Problem is unsolvable");
         }
 
         // Try to extract a plan ending at the current level.
-        var plan = Extract(problem.Goal, currentGraphLevel);
+        var plan = Extract(problem.EndGoal, currentGraphLevel);
         var previousFixedPointNoGoodCount = currentGraphLevel.IsLevelledOff ? noGoods[currentGraphLevel.Graph.LevelsOffAtLevel + 1].Count : 0;
 
         // While we couldn't extract a plan, step forward through the
@@ -69,7 +69,7 @@ public class GraphPlanPlanningTask_FromAPTaP : TemplatePlanningTask
             currentGraphLevel = currentGraphLevel.NextLevel;
             noGoods[currentGraphLevel.Index] = new();
 
-            plan = Extract(problem.Goal, currentGraphLevel);
+            plan = Extract(problem.EndGoal, currentGraphLevel);
             if (plan == null && currentGraphLevel.IsLevelledOff)
             {
                 var currentFixedPointNoGoodCount = noGoods[currentGraphLevel.Graph.LevelsOffAtLevel + 1].Count;

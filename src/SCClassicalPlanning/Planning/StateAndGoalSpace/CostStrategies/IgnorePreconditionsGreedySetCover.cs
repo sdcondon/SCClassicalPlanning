@@ -32,13 +32,13 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 /// </summary>
 public class IgnorePreconditionsGreedySetCover : ICostStrategy
 {
-    private readonly IDomain domain;
+    private readonly IQueryable<Action> actions;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="IgnorePreconditionsGreedySetCover"/> class.
     /// </summary>
-    /// <param name="domain">The domain of the problem being solved.</param>
-    public IgnorePreconditionsGreedySetCover(IDomain domain) => this.domain = domain;
+    /// <param name="actions">The available actions.</param>
+    public IgnorePreconditionsGreedySetCover(IQueryable<Action> actions) => this.actions = actions;
 
     /// <inheritdoc/>
     public float GetCost(Action action) => 1f;
@@ -105,7 +105,7 @@ public class IgnorePreconditionsGreedySetCover : ICostStrategy
     {
         foreach (var goalElement in goalElements)
         {
-            foreach (var actionSchema in domain.Actions)
+            foreach (var actionSchema in actions)
             {
                 foreach (var effectElement in actionSchema.Effect.Elements)
                 {

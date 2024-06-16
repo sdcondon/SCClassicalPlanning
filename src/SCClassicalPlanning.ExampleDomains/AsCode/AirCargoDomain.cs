@@ -7,18 +7,18 @@ namespace SCClassicalPlanning.ExampleDomains.AsCode;
 /// <summary>
 /// The "Air Cargo" example from §10.1.1 of "Artificial Intelligence: A Modern Approach".
 /// </summary>
-public static class AirCargo
+public static class AirCargoDomain
 {
-    static AirCargo()
+    static AirCargoDomain()
     {
-        Domain = MakeDomain();
+        ActionSchemas = MakeActionSchemas();
         ExampleProblem = MakeExampleProblem();
     }
 
     /// <summary>
-    /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the Air Cargo domain.
+    /// Gets the actions that are available in the Air Cargo domain.
     /// </summary>
-    public static HashSetDomain Domain { get; }
+    public static IQueryable<Action> ActionSchemas { get; }
 
     /// <summary>
     /// Gets an instance of the customary example problem in this domain.
@@ -128,10 +128,9 @@ public static class AirCargo
     /// <param name="initialState">The initial state of the problem.</param>
     /// <param name="goal">The initial state of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(IState initialState, Goal goal) => new(Domain, initialState, goal);
+    public static Problem MakeProblem(IState initialState, Goal goal) => new(initialState, goal, ActionSchemas);
 
-    // NB: This is in its own method rather than the static ctor just so that we can run tests against domain construction.
-    internal static HashSetDomain MakeDomain()
+    private static IQueryable<Action> MakeActionSchemas()
     {
         VariableDeclaration cargo = new(nameof(cargo));
         VariableDeclaration plane = new(nameof(plane));
@@ -139,12 +138,12 @@ public static class AirCargo
         VariableDeclaration from = new(nameof(from));
         VariableDeclaration to = new(nameof(to));
 
-        return new HashSetDomain(new Action[]
+        return new[]
         {
             Load(cargo, plane, airport),
             Unload(cargo, plane, airport),
             Fly(plane, from, to),
-        });
+        }.AsQueryable();
     }
 
     private static Problem MakeExampleProblem()

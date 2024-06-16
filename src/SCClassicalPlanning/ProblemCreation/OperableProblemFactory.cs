@@ -107,7 +107,7 @@ public static class OperableProblemFactory
         /// <summary>
         /// Defines the implicit conversion of an <see cref="HashSetState"/> instance to an <see cref="OperableState"/>.
         /// </summary>
-        /// <param name="state">The <see cref="HashSet"/> to convert.</param>
+        /// <param name="state">The <see cref="HashSetState"/> to convert.</param>
         public static implicit operator OperableState(HashSetState state) => new(state.Elements);
 
         /// <summary>

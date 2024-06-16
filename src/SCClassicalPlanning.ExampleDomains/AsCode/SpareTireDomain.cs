@@ -7,11 +7,11 @@ namespace SCClassicalPlanning.ExampleDomains.AsCode;
 /// <summary>
 /// The "Spare Tire" example from §10.1.2 of "Artificial Intelligence: A Modern Approach".
 /// </summary>
-public static class SpareTire
+public static class SpareTireDomain
 {
-    static SpareTire()
+    static SpareTireDomain()
     {
-        Domain = MakeDomain();
+        ActionSchemas = MakeActionSchemas();
 
         ExampleProblem = MakeProblem(
             initialState: new HashSetState(
@@ -24,9 +24,9 @@ public static class SpareTire
     }
 
     /// <summary>
-    /// Gets a <see cref="HashSetDomain"/ instance that encapsulates the "Spare Tire" domain.
+    /// Gets the actions that are available in the "Spare Tire" domain.
     /// </summary>
-    public static HashSetDomain Domain { get; }
+    public static IQueryable<Action> ActionSchemas { get; }
 
     /// <summary>
     /// Gets an instance of the customary example problem in this domain.
@@ -72,16 +72,15 @@ public static class SpareTire
     /// <param name="initialState">The initial state of the problem.</param>
     /// <param name="goal">The initial state of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(IState initialState, Goal goal) => new(Domain, initialState, goal);
+    public static Problem MakeProblem(IState initialState, Goal goal) => new(initialState, goal, ActionSchemas);
 
-    // NB: This is in its own method rather than the static ctor just so that we can run tests against domain construction.
-    internal static HashSetDomain MakeDomain()
+    private static IQueryable<Action> MakeActionSchemas()
     {
-        return new(new Action[]
+        return new[]
         {
             Remove(Var("object"), Var("location")),
             PutOn(Var("tire")),
             LeaveOvernight(),
-        });
+        }.AsQueryable();
     }
 }

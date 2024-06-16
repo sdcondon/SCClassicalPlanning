@@ -5,8 +5,8 @@ using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
-using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargo;
-using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorld;
+using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargoDomain;
+using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
@@ -20,8 +20,8 @@ public static class GoalSpaceAStarPlannerTests
         .AndEachOfAsync<TestCase>(async () => new TestCase[]
         {
             new(
-                Problem: AirCargo.ExampleProblem,
-                Strategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
+                Problem: AirCargoDomain.ExampleProblem,
+                Strategy: new IgnorePreconditionsGreedySetCover(AirCargoDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Cargo(new Constant("cargo1")),
@@ -39,8 +39,8 @@ public static class GoalSpaceAStarPlannerTests
                 })),
 
             new(
-                Problem: BlocksWorld.ExampleProblem,
-                Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                Problem: BlocksWorldDomain.ExampleProblem,
+                Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Block(new Constant("blockA")),
@@ -51,13 +51,13 @@ public static class GoalSpaceAStarPlannerTests
                 })),
 
             new(
-                Problem: SpareTire.ExampleProblem,
-                Strategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
+                Problem: SpareTireDomain.ExampleProblem,
+                Strategy: new IgnorePreconditionsGreedySetCover(SpareTireDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(Array.Empty<Sentence>())),
 
             new(
-                Problem: BlocksWorld.LargeExampleProblem,
-                Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                Problem: BlocksWorldDomain.LargeExampleProblem,
+                Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Block(new Constant("blockA")),
@@ -75,16 +75,16 @@ public static class GoalSpaceAStarPlannerTests
             return await planner.CreatePlanAsync(tc.Problem);
         })
         .ThenReturns()
-        .And((_, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
-        .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
+        .And((_, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.EndGoal).Should().BeTrue())
+        .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem).Format(pl)));
 
     public static Test CreatedPlanValidity_AlternativeImplementations => TestThat
         .GivenTestContext()
         .AndEachOfAsync<TestCase>(async () => new TestCase[]
         {
             new(
-                Problem: AirCargo.ExampleProblem,
-                Strategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
+                Problem: AirCargoDomain.ExampleProblem,
+                Strategy: new IgnorePreconditionsGreedySetCover(AirCargoDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Cargo(new Constant("cargo1")),
@@ -102,8 +102,8 @@ public static class GoalSpaceAStarPlannerTests
                 })),
 
             new(
-                Problem: BlocksWorld.ExampleProblem,
-                Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                Problem: BlocksWorldDomain.ExampleProblem,
+                Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Block(new Constant("blockA")),
@@ -114,13 +114,13 @@ public static class GoalSpaceAStarPlannerTests
                 })),
 
             new(
-                Problem: SpareTire.ExampleProblem,
-                Strategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
+                Problem: SpareTireDomain.ExampleProblem,
+                Strategy: new IgnorePreconditionsGreedySetCover(SpareTireDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(Array.Empty<Sentence>())),
 
             new(
-                Problem: BlocksWorld.LargeExampleProblem,
-                Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+                Problem: BlocksWorldDomain.LargeExampleProblem,
+                Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
                     Block(new Constant("blockA")),
@@ -141,8 +141,8 @@ public static class GoalSpaceAStarPlannerTests
         })
         .When((_, tc, makePlanner) => makePlanner(tc).CreatePlan(tc.Problem))
         .ThenReturns()
-        .And((_, tc, _, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.Goal).Should().BeTrue())
-        .And((cxt, tc, _, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem.Domain).Format(pl)));
+        .And((_, tc, _, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.EndGoal).Should().BeTrue())
+        .And((cxt, tc, _, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem).Format(pl)));
 
     private static async Task<IKnowledgeBase> MakeResolutionKBAsync(IEnumerable<Sentence> invariants)
     {

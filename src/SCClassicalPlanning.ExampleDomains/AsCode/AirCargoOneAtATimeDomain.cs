@@ -8,9 +8,9 @@ namespace SCClassicalPlanning.ExampleDomains.AsCode;
 /// The "one at a time" variant "Air Cargo" example from §10.3.3 of "Artificial Intelligence: A Modern Approach"
 /// that is used as an illustrative example while explaining termination of the GraphPlan algorithm.  
 /// </summary>
-public static class AirCargoOneAtATime
+public static class AirCargoOneAtATimeDomain
 {
-    static AirCargoOneAtATime()
+    static AirCargoOneAtATimeDomain()
     {
         Cargo1 = new(nameof(Cargo1));
         Cargo2 = new(nameof(Cargo2));
@@ -25,15 +25,14 @@ public static class AirCargoOneAtATime
         VariableDeclaration from = new(nameof(from));
         VariableDeclaration to = new(nameof(to));
 
-        HashSetDomain domain = new(new Action[]
+        var actionSchemas = new[]
         {
             Load(cargo, plane, airport),
             Unload(cargo, plane, airport),
             Fly(plane, from, to),
-        });
+        }.AsQueryable();
 
         Problem = new(
-            domain: domain,
             initialState: new HashSetState(
                 IsCargo(Cargo1)
                 & IsCargo(Cargo2)
@@ -47,10 +46,11 @@ public static class AirCargoOneAtATime
                 & IsAt(Cargo2, Airport1)
                 & IsAt(Cargo3, Airport1)
                 & IsAt(Plane, Airport1)),
-            goal: new(
+            endGoal: new(
                 IsAt(Cargo1, Airport2)
                 & IsAt(Cargo2, Airport2)
-                & IsAt(Cargo3, Airport2)));
+                & IsAt(Cargo3, Airport2)),
+            actions: actionSchemas);
     }
 
     public static Problem Problem { get; }

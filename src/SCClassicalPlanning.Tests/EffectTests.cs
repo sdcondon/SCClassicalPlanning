@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCFirstOrderLogic;
-using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargo;
-using static SCClassicalPlanning.ExampleDomains.AsCode.Container;
+using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargoDomain;
+using static SCClassicalPlanning.ExampleDomains.AsCode.ContainerDomain;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning;

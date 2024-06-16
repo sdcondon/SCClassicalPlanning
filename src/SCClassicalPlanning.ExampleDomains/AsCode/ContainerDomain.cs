@@ -12,12 +12,12 @@ namespace SCClassicalPlanning.ExampleDomains.AsCode;
 /// The idea is that we have some kind of (global) container that objects (the elements of the domain) can be added to and removed from.
 /// </para>
 /// </summary>
-public static class Container
+public static class ContainerDomain
 {
     /// <summary>
-    /// Gets a <see cref="SCClassicalPlanning.Domain"/> instance that encapsulates the "Container" domain.
+    /// Gets the actions that are available in the "Container" domain.
     /// </summary>
-    public static HashSetDomain Domain { get; } = MakeDomain();
+    public static IQueryable<Action> ActionSchemas { get; } = MakeActionSchemas();
 
     /// <summary>
     /// Constructs an <see cref="OperablePredicate"/> instance for indicating that a given domain element is present within the container.
@@ -63,16 +63,15 @@ public static class Container
     /// <param name="initialState">The initial state of the problem.</param>
     /// <param name="goal">The initial state of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(IState initialState, Goal goal) => new(Domain, initialState, goal);
+    public static Problem MakeProblem(IState initialState, Goal goal) => new(initialState, goal, ActionSchemas);
 
-    // NB: This is in its own method so that we can run tests against domain construction.
-    internal static HashSetDomain MakeDomain()
+    public static IQueryable<Action> MakeActionSchemas()
     {
-        return new(new Action[]
+        return new[]
         {
             Add(A),
             Remove(R),
             Swap(R, A),
-        });
+        }.AsQueryable();
     }
 }

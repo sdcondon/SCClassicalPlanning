@@ -7,7 +7,7 @@ using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
-using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorld;
+using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
 namespace SCClassicalPlanning.Benchmarks.Planning;
@@ -25,14 +25,14 @@ public class PlannerBenchmarks
     {
         new(
             Label: "Air Cargo",
-            Problem: AirCargo.ExampleProblem,
-            CostStrategy: new IgnorePreconditionsGreedySetCover(AirCargo.Domain),
+            Problem: AirCargoDomain.ExampleProblem,
+            CostStrategy: new IgnorePreconditionsGreedySetCover(AirCargoDomain.ActionSchemas),
             InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
         new(
             Label: "Blocks - Small",
-            Problem: BlocksWorld.ExampleProblem,
-            CostStrategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
+            Problem: BlocksWorldDomain.ExampleProblem,
+            CostStrategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
             InvariantsKB: MakeInvariantsKB(new Sentence[]
             {
                 // TODO: slicker support for unique names assumption worth looking into at some point..
@@ -54,8 +54,8 @@ public class PlannerBenchmarks
 
         new(
             Label: "Spare Tire",
-            Problem: SpareTire.ExampleProblem,
-            CostStrategy: new IgnorePreconditionsGreedySetCover(SpareTire.Domain),
+            Problem: SpareTireDomain.ExampleProblem,
+            CostStrategy: new IgnorePreconditionsGreedySetCover(SpareTireDomain.ActionSchemas),
             InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
 
         ////new(
@@ -104,7 +104,7 @@ public class PlannerBenchmarks
     [Benchmark]
     public Plan GraphPlan()
     {
-        return new GraphPlanPlanner().CreatePlan(CurrentTestCase.Problem);
+        return new GraphPlanPlanner().CreatePlan(CurrentTestCase?.Problem ?? throw new InvalidOperationException());
     }
 
     [Benchmark]

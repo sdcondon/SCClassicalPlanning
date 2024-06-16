@@ -6,12 +6,11 @@ namespace SCClassicalPlanning.ExampleDomains.AsPDDL;
 /// <summary>
 /// The "Blocks World" example from §10.1.3 of "Artificial Intelligence: A Modern Approach".
 /// </summary>
-public static class BlocksWorld
+public static class BlocksWorldDomain
 {
-    /// <summary>
-    /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Blocks World" domain.
-    /// </summary>
-    public static HashSetDomain Domain { get; } = PddlParser.ParseDomain(DomainPDDL);
+    private static readonly PddlDomain domain = PddlParser.ParseDomain(DomainPDDL);
+
+    public static IQueryable<Action> ActionSchemas => domain.ActionSchemas;
 
     /// <summary>
     /// Gets a PDDL representation of the "Blocks World" domain.
@@ -24,7 +23,7 @@ public static class BlocksWorld
     /// In the initial state, blocks A and B are on the table and block C is on top of block A.
     /// The goal is to get block B on top of block C, and block A on top of block B.
     /// </summary>
-    public static Problem ExampleProblem { get; } = PddlParser.ParseProblem(ExampleProblemPDDL, DomainPDDL);
+    public static Problem ExampleProblem { get; } = PddlParser.ParseProblem(ExampleProblemPDDL, domain);
 
     /// <summary>
     /// Gets a PDDL representation of the customary example problem in this domain.

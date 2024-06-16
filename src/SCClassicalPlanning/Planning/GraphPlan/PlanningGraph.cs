@@ -52,9 +52,9 @@ public class PlanningGraph
         // So here we iterate every possible ground predicate (by substituting every combination of known constants
         // for its arguments - add positive if it's in the initial state, otherwise negative)
         var propositionLevel0 = new Dictionary<Literal, PlanningGraphPropositionNode>();
-        foreach (var predicateTemplate in problem.Domain.Predicates)
+        foreach (var predicateTemplate in problem.ActionSchemas.GetAllPredicates())
         {
-            foreach (var substitution in ProblemInspector.GetAllPossibleSubstitutions(problem, predicateTemplate, new VariableSubstitution()))
+            foreach (var substitution in ProblemInspector.GetAllPossibleSubstitutions(predicateTemplate, problem.InitialState.GetAllConstants()))
             {
                 var predicate = substitution.ApplyTo(predicateTemplate);
                 var proposition = new Literal(predicate, !problem.InitialState.Elements.Contains(predicate));
@@ -315,7 +315,7 @@ public class PlanningGraph
         // The overall task to be accomplished here is to find (action schema, variable substitution) pairings such that
         // some subset of the possible propositions matches the action precondition (after the variable substitution is
         // applied to it). First, we iterate the action schemas:
-        foreach (var actionSchema in problem.Domain.Actions)
+        foreach (var actionSchema in problem.ActionSchemas)
         {
             // For each, we try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
             foreach (var substitution in MatchWithPossiblePropositions(actionSchema.Precondition.Elements, new VariableSubstitution()))

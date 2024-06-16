@@ -34,7 +34,7 @@ public class GoalSpaceAStarPlanningTask : SteppablePlanningTask<GoalSpaceEdge>
     public GoalSpaceAStarPlanningTask(Problem problem, ICostStrategy costStrategy)
     {
         search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
-            source: new GoalSpaceNode(problem, problem.Goal),
+            source: new GoalSpaceNode(problem, problem.EndGoal),
             isTarget: n => problem.InitialState.Satisfies(n.Goal),
             getEdgeCost: e => costStrategy.GetCost(e.Action),
             getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));

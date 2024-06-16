@@ -27,13 +27,13 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 /// </summary>
 public class PlanningGraphLevelSum : ICostStrategy
 {
-    private readonly IDomain domain;
+    private readonly IQueryable<Action> actions;
 
     /// <summary>
     /// Initialises a new instance of the <see cref="PlanningGraphMaxLevel"/> class.
     /// </summary>
-    /// <param name="domain">The relevant domain.</param>
-    public PlanningGraphLevelSum(IDomain domain) => this.domain = domain;
+    /// <param name="actions">The available actions.</param>
+    public PlanningGraphLevelSum(IQueryable<Action> actions) => this.actions = actions;
 
     /// <inheritdoc/>
     public float GetCost(Action action) => 1f;
@@ -41,7 +41,7 @@ public class PlanningGraphLevelSum : ICostStrategy
     /// <inheritdoc/>
     public float EstimateCost(IState state, Goal goal)
     {
-        var planningGraph = new PlanningGraph(new(domain, state, goal));
+        var planningGraph = new PlanningGraph(new(state, goal, actions));
 
         return goal.Elements.Sum(e =>
         {

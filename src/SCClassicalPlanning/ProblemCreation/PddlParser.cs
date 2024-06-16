@@ -1,4 +1,17 @@
-﻿using Antlr4.Runtime;
+﻿// Copyright 2022-2024 Simon Condon
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+using Antlr4.Runtime;
 using SCClassicalPlanning.ProblemCreation.Antlr;
 using SCFirstOrderLogic;
 using System.Diagnostics.CodeAnalysis;
@@ -23,17 +36,17 @@ namespace SCClassicalPlanning.ProblemCreation;
 public static class PddlParser
 {
     /// <summary>
-    /// Parses a PDDL domain definition into a <see cref="HashSetDomain"/> object.
+    /// Parses a PDDL domain definition into a <see cref="PddlDomain"/> instance.
     /// </summary>
     /// <param name="pddl">The PDDL domain definition.</param>
-    /// <returns>A new <see cref="HashSetDomain"/> object.</returns>
-    public static HashSetDomain ParseDomain(string pddl)
+    /// <returns>A new <see cref="PddlDomain"/> instance.</returns>
+    public static PddlDomain ParseDomain(string pddl)
     {
         return TransformDomain(MakeParser(pddl).singleDomain().domain());
     }
 
     //// Perhaps at some point (for supporting :extends):
-    //// public static Domain ParseDomain(string pddl, Func<string, Domain> domainLookup)
+    //// public static PddlDomain ParseDomain(string pddl, Func<string, PddlDomain> getDomain)
 
     /// <summary>
     /// Parses a PDDL problem and domain definition pair into a new <see cref="Problem"/> instance.
@@ -43,11 +56,7 @@ public static class PddlParser
     /// <returns>A new <see cref="Problem"/> instance.</returns>
     public static Problem ParseProblem(string problemPddl, string domainPddl)
     {
-        // NB: doesn't verify problem's :domain element against domain's name, but probably should.
-        // Somehow return domain name, then use the callback-accepting overload of ParseProblem, and 
-        // use that to validate.
-        var domain = ParseDomain(domainPddl);
-        return ParseProblem(problemPddl, domain);
+        return ParseProblem(problemPddl, ParseDomain(domainPddl));
     }
 
     /// <summary>
@@ -56,9 +65,10 @@ public static class PddlParser
     /// <param name="problemPddl">The PDDL problem definition.</param>
     /// <param name="domain">The domain that the problem resides in. NB with this method, no validation can occur that the problem matches the domain.</param>
     /// <returns>A new <see cref="Problem"/> instance.</returns>
-    public static Problem ParseProblem(string problemPddl, IDomain domain)
+    public static Problem ParseProblem(string problemPddl, PddlDomain domain)
     {
-        return ParseProblem(problemPddl, s => domain);
+        // NB: doesn't verify problem's :domain element against domain's name, but probably should.
+        return TransformProblem(MakeParser(problemPddl).singleProblem().problem(), s => domain);
     }
 
     /// <summary>
@@ -67,7 +77,7 @@ public static class PddlParser
     /// <param name="problemPddl">The PDDL problem definition.</param>
     /// <param name="getDomain">A delegate to look up the problem's domain. Will be passed the name given in the <c>:domain</c> element.</param>
     /// <returns>A new <see cref="Problem"/> instance.</returns>
-    public static Problem ParseProblem(string problemPddl, Func<string, IDomain> getDomain)
+    public static Problem ParseProblem(string problemPddl, Func<string, PddlDomain> getDomain)
     {
         return TransformProblem(MakeParser(problemPddl).singleProblem().problem(), getDomain);
     }
@@ -92,8 +102,10 @@ public static class PddlParser
         return parser;
     }
 
-    private static HashSetDomain TransformDomain(MinimalPDDLParser.DomainContext context)
+    private static PddlDomain TransformDomain(MinimalPDDLParser.DomainContext context)
     {
+        var name = context.NAME().Symbol.Text;
+
         if (context.extendsDef() != null)
         {
             throw new NotSupportedException(":extends is not yet supported");
@@ -135,7 +147,7 @@ public static class PddlParser
             }
         }
 
-        return new HashSetDomain(actions);
+        return new PddlDomain(name, actions);
     }
 
     private static Action TransformAction(MinimalPDDLParser.ActionDefContext context)
@@ -156,7 +168,7 @@ public static class PddlParser
         return new Action(identifier, precondition, effect);
     }
 
-    private static Problem TransformProblem(MinimalPDDLParser.ProblemContext context, Func<string, IDomain> getDomain)
+    private static Problem TransformProblem(MinimalPDDLParser.ProblemContext context, Func<string, PddlDomain> getDomain)
     {
         // NB: Ignore the problem name - it's not in our model, and I'd be very reluctant to add it.
         // Problems don't need to know the label(s) used to refer to them - that's a serialisation concern.
@@ -171,9 +183,15 @@ public static class PddlParser
 
         var initialState = TransformState(context.initDef()?.literalList());
         var goal = GoalTransformation.Instance.Visit(context.goalDef().goal());
-        var constants = context.objectsDef()?.constantDecList()._elements.Select(e => new Constant(e.Text)) ?? Enumerable.Empty<Constant>();
+        
+        // TODO: add typing support - allow specification of predicate identifiers for "IsOfType" and factory for types
+        // as domain elements. as it stands, there's not much to do with predicates. our model doesn't care about constants
+        // on their own - and I'm now happy that it shouldn't. Existence is just a predicate, after all - just part of state
+        // We *could* optionally allow for specification of a predicate identifier to attach to constants,
+        // but wouldn't be much use if pddl doesn't use it. Obv becomes more relevant once
+        //var constants = context.objectsDef()?.constantDecList()._elements.Select(e => new Constant(e.Text)) ?? Enumerable.Empty<Constant>();
 
-        return new Problem(domain, initialState, goal, constants);
+        return new Problem(initialState, goal, domain.ActionSchemas);
     }
 
     private static IState TransformState(MinimalPDDLParser.LiteralListContext? context)

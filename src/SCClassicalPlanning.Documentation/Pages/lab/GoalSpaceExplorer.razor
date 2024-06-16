@@ -114,7 +114,7 @@
     {
         <ol class="mt-4">
             @{
-                RenderListItem(null, new GoalSpaceNode(problem, problem.Goal), path.First?.Value);
+                RenderListItem(null, new GoalSpaceNode(problem, problem.EndGoal), path.First?.Value);
             }
 
             @for (var n = path.First; n != null; n = n.Next)
@@ -133,12 +133,12 @@
                 problemPddl: string.Empty),
 
             ["Blocks World"] = () => new(
-                domainPddl: BlocksWorld.DomainPDDL,
-                problemPddl: BlocksWorld.ExampleProblemPDDL),
+                domainPddl: BlocksWorldDomain.DomainPDDL,
+                problemPddl: BlocksWorldDomain.ExampleProblemPDDL),
 
             ["Air Cargo"] = () => new(
-                domainPddl: AirCargo.DomainPDDL,
-                problemPddl: AirCargo.ExampleProblemPDDL),
+                domainPddl: AirCargoDomain.DomainPDDL,
+                problemPddl: AirCargoDomain.ExampleProblemPDDL),
         };
 
     private FormData formData = Presets["Blocks World"].Invoke();
@@ -194,7 +194,7 @@
             // Yes, could cache the parse results to avoid parsing multiple times, but not worth it for now at least.
             // TODO: Some "TryParse.." methods might be useful - they'd certainly make this method a bit cleaner.
             // TODO: If we had a ParseError exception type, we could perhaps highlight the offending text..
-            HashSetDomain? domain = null;
+            PddlDomain? domain = null;
             Problem? problem = null;
             List<ValidationResult> errors = new();
             try

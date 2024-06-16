@@ -4,7 +4,7 @@ using SCClassicalPlanning.ExampleDomains.AsCode;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
-using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorld;
+using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
@@ -22,31 +22,31 @@ public static class GoalInvariantCheckTests
         {
             new TestCase(
                 Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
-                State: BlocksWorld.ExampleProblem.InitialState,
+                State: BlocksWorldDomain.ExampleProblem.InitialState,
                 Goal: Goal.Empty, // Fine
                 ExpectedCost: 0),
 
             new TestCase(
                 Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
-                State: BlocksWorld.ExampleProblem.InitialState,
+                State: BlocksWorldDomain.ExampleProblem.InitialState,
                 Goal: Block(Table), // Fine
                 ExpectedCost: 0),
 
             new TestCase(
                 Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
-                State: BlocksWorld.ExampleProblem.InitialState,
+                State: BlocksWorldDomain.ExampleProblem.InitialState,
                 Goal: !Block(blockA), // Violates Block(blockA)
                 ExpectedCost: float.PositiveInfinity),
 
             new TestCase(
                 Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
-                State: BlocksWorld.ExampleProblem.InitialState,
+                State: BlocksWorldDomain.ExampleProblem.InitialState,
                 Goal: On(blockA, blockB) & Clear(blockB), // Violates on/clear relationship
                 ExpectedCost: float.PositiveInfinity),
 
             new TestCase(
                 Invariants: new Sentence[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
-                State: BlocksWorld.ExampleProblem.InitialState,
+                State: BlocksWorldDomain.ExampleProblem.InitialState,
                 Goal: On(blockB, blockA) & Clear(blockB), // Fine
                 ExpectedCost: 0),
         })

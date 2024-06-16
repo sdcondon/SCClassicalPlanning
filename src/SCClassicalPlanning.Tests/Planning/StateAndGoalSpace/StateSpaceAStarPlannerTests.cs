@@ -11,18 +11,18 @@ public static class StateSpaceAStarPlannerTests
         .GivenTestContext()
         .AndEachOf(() => new Problem[]
         {
-            AirCargo.ExampleProblem,
-            BlocksWorld.ExampleProblem,
-            BlocksWorld.LargeExampleProblem,
-            SpareTire.ExampleProblem,
+            AirCargoDomain.ExampleProblem,
+            BlocksWorldDomain.ExampleProblem,
+            BlocksWorldDomain.LargeExampleProblem,
+            SpareTireDomain.ExampleProblem,
         })
         .When((_, problem) =>
         {
-            var costStrategy = new IgnorePreconditionsGreedySetCover(problem.Domain);
+            var costStrategy = new IgnorePreconditionsGreedySetCover(problem.ActionSchemas);
             var planner = new StateSpaceAStarPlanner(costStrategy);
             return planner.CreatePlan(problem);
         })
         .ThenReturns()
-        .And((_, pr, pl) => pl.ApplyTo(pr.InitialState).Satisfies(pr.Goal).Should().BeTrue())
-        .And((cxt, pr, pl) => cxt.WriteOutputLine(new PlanFormatter(pr.Domain).Format(pl)));
+        .And((_, pr, pl) => pl.ApplyTo(pr.InitialState).Satisfies(pr.EndGoal).Should().BeTrue())
+        .And((cxt, pr, pl) => cxt.WriteOutputLine(new PlanFormatter(pr).Format(pl)));
 }

@@ -60,11 +60,11 @@ public class GoalSpaceAStarPlanner_LiftedWithKB : IPlanner
 
         internal PlanningTask(Problem problem, ICostStrategy costStrategy, InvariantInspector? invariantInspector)
         {
-            Domain = problem.Domain;
+            Problem = problem;
             InvariantInspector = invariantInspector;
 
             search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
-                source: new GoalSpaceNode(this, problem.Goal),
+                source: new GoalSpaceNode(this, problem.EndGoal),
                 isTarget: n => problem.InitialState.GetSatisfyingSubstitutions(n.Goal).Any(),
                 getEdgeCost: e => costStrategy.GetCost(e.Action),
                 getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));
@@ -72,7 +72,7 @@ public class GoalSpaceAStarPlanner_LiftedWithKB : IPlanner
             CheckForSearchCompletion();
         }
 
-        public IDomain Domain { get; }
+        public Problem Problem { get; }
 
         public InvariantInspector? InvariantInspector { get; }
 
@@ -174,14 +174,14 @@ public class GoalSpaceAStarPlanner_LiftedWithKB : IPlanner
         public GoalSpaceNodeEdges(PlanningTask planningTask, Goal goal) => (this.planningTask, this.goal) = (planningTask, goal);
 
         /// <inheritdoc />
-        public int Count => DomainInspector.GetRelevantActions(planningTask.Domain, goal).Count();
+        public int Count => ProblemInspector.GetRelevantLiftedActions(goal, planningTask.Problem.ActionSchemas).Count();
 
         /// <inheritdoc />
         public IEnumerator<GoalSpaceEdge> GetEnumerator()
         {
             if (planningTask.InvariantInspector != null)
             {
-                foreach (var action in DomainInspector.GetRelevantActions(planningTask.Domain, goal))
+                foreach (var action in ProblemInspector.GetRelevantLiftedActions(goal, planningTask.Problem.ActionSchemas))
                 {
                     var effectiveAction = action;
 
@@ -199,7 +199,7 @@ public class GoalSpaceAStarPlanner_LiftedWithKB : IPlanner
             }
             else
             {
-                foreach (var action in DomainInspector.GetRelevantActions(planningTask.Domain, goal))
+                foreach (var action in ProblemInspector.GetRelevantLiftedActions(goal, planningTask.Problem.ActionSchemas))
                 {
                     yield return new GoalSpaceEdge(planningTask, goal, action);
                 }
@@ -234,6 +234,6 @@ public class GoalSpaceAStarPlanner_LiftedWithKB : IPlanner
         public Action Action { get; }
 
         /// <inheritdoc />
-        public override string ToString() => new PlanFormatter(planningTask.Domain).Format(Action);
+        public override string ToString() => new PlanFormatter(planningTask.Problem).Format(Action);
     }
 }

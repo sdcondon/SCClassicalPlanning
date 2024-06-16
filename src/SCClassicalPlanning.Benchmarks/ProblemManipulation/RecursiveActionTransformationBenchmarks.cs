@@ -19,12 +19,12 @@ public class RecursiveActionTransformationBenchmarks
         new(
             Label: "BlocksWorld Move NO-OP",
             DoSomething: false,
-            Action: BlocksWorld.Move(new VariableDeclaration("b"), new VariableDeclaration("f"), new VariableDeclaration("t"))),
+            Action: BlocksWorldDomain.Move(new VariableDeclaration("b"), new VariableDeclaration("f"), new VariableDeclaration("t"))),
 
         new(
             Label: "BlocksWorld Move ALL-LEAFS-OP",
             DoSomething: true,
-            Action: BlocksWorld.Move(new VariableDeclaration("b"), new VariableDeclaration("f"), new VariableDeclaration("t"))),
+            Action: BlocksWorldDomain.Move(new VariableDeclaration("b"), new VariableDeclaration("f"), new VariableDeclaration("t"))),
     };
 
     [ParamsSource(nameof(TestCases))]

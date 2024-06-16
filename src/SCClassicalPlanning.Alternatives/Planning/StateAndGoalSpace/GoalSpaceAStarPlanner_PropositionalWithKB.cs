@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCClassicalPlanning.Planning.Utilities;
+using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic.Inference;
 using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
@@ -64,7 +65,7 @@ public class GoalSpaceAStarPlanner_PropositionalWithKB : IPlanner
             InvariantInspector = invariantInspector;
 
             search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
-                source: new GoalSpaceNode(this, problem.Goal),
+                source: new GoalSpaceNode(this, problem.EndGoal),
                 isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
                 getEdgeCost: e => costStrategy.GetCost(e.Action),
                 getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));
@@ -174,14 +175,14 @@ public class GoalSpaceAStarPlanner_PropositionalWithKB : IPlanner
         public GoalSpaceNodeEdges(PlanningTask planningTask, Goal goal) => (this.planningTask, this.goal) = (planningTask, goal);
 
         /// <inheritdoc />
-        public int Count => ProblemInspector.GetRelevantActions(planningTask.Problem, goal).Count();
+        public int Count => ProblemInspector.GetRelevantGroundActions(goal, planningTask.Problem.ActionSchemas, planningTask.Problem.InitialState.GetAllConstants()).Count();
 
         /// <inheritdoc />
         public IEnumerator<GoalSpaceEdge> GetEnumerator()
         {
             if (planningTask.InvariantInspector != null)
             {
-                foreach (var action in ProblemInspector.GetRelevantActions(planningTask.Problem, goal))
+                foreach (var action in ProblemInspector.GetRelevantGroundActions(goal, planningTask.Problem.ActionSchemas, planningTask.Problem.InitialState.GetAllConstants()))
                 {
                     var effectiveAction = action;
 
@@ -199,7 +200,7 @@ public class GoalSpaceAStarPlanner_PropositionalWithKB : IPlanner
             }
             else
             {
-                foreach (var action in ProblemInspector.GetRelevantActions(planningTask.Problem, goal))
+                foreach (var action in ProblemInspector.GetRelevantGroundActions(goal, planningTask.Problem.ActionSchemas, planningTask.Problem.InitialState.GetAllConstants()))
                 {
                     yield return new GoalSpaceEdge(planningTask, goal, action);
                 }
@@ -234,6 +235,6 @@ public class GoalSpaceAStarPlanner_PropositionalWithKB : IPlanner
         public Action Action { get; }
 
         /// <inheritdoc />
-        public override string ToString() => new PlanFormatter(planningTask.Problem.Domain).Format(Action);
+        public override string ToString() => new PlanFormatter(planningTask.Problem).Format(Action);
     }
 }

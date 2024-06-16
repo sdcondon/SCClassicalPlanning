@@ -56,5 +56,5 @@ public readonly struct StateSpaceNode : INode<StateSpaceNode, StateSpaceEdge>, I
     /// Returns a string that represents the current object.
     /// </summary>
     /// <returns>A string that represents the current object.</returns>
-    public override string ToString() => State.ToString();
+    public override string? ToString() => State.ToString();
 }

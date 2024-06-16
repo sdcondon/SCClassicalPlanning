@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCClassicalPlanning.Planning.Utilities;
+using SCClassicalPlanning.ProblemManipulation;
 using SCGraphTheory;
 using SCGraphTheory.Search.Classic;
 using System.Collections;
@@ -61,7 +62,7 @@ public class GoalSpaceAStarPlanner_PropositionalWithoutKB : IPlanner
         internal PlanningTask(Problem problem, ICostStrategy costStrategy)
         {
             search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
-                source: new GoalSpaceNode(problem, problem.Goal),
+                source: new GoalSpaceNode(problem, problem.EndGoal),
                 isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
                 getEdgeCost: e => costStrategy.GetCost(e.Action),
                 getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));
@@ -167,12 +168,12 @@ public class GoalSpaceAStarPlanner_PropositionalWithoutKB : IPlanner
         public GoalSpaceNodeEdges(Problem problem, Goal goal) => (this.problem, this.goal) = (problem, goal);
 
         /// <inheritdoc />
-        public int Count => ProblemInspector.GetRelevantActions(problem, goal).Count();
+        public int Count => ProblemInspector.GetRelevantGroundActions(goal, problem.ActionSchemas, problem.InitialState.GetAllConstants()).Count();
 
         /// <inheritdoc />
         public IEnumerator<GoalSpaceEdge> GetEnumerator()
         {
-            foreach (var action in ProblemInspector.GetRelevantActions(problem, goal))
+            foreach (var action in ProblemInspector.GetRelevantGroundActions(goal, problem.ActionSchemas, problem.InitialState.GetAllConstants()))
             {
                 yield return new GoalSpaceEdge(problem, goal, action);
             }
@@ -206,6 +207,6 @@ public class GoalSpaceAStarPlanner_PropositionalWithoutKB : IPlanner
         public Action Action { get; }
 
         /// <inheritdoc />
-        public override string ToString() => new PlanFormatter(problem.Domain).Format(Action);
+        public override string ToString() => new PlanFormatter(problem).Format(Action);
     }
 }

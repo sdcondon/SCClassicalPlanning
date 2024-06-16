@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
@@ -67,7 +68,7 @@ public static class ProblemInspector_MergedUnmatchLogic
                     foreach (var unboundVariable in unboundVariables)
                     {
                         allPossibleUnifiers = allPossibleUnifiers.SelectMany(
-                            u => problem.Constants.Select(o => new VariableSubstitution(new Dictionary<VariableReference, Term>(u.Bindings)
+                            u => problem.InitialState.GetAllConstants().Select(o => new VariableSubstitution(new Dictionary<VariableReference, Term>(u.Bindings)
                             {
                                 { unboundVariable,  o }
                             })
@@ -116,7 +117,7 @@ public static class ProblemInspector_MergedUnmatchLogic
             }
         }
 
-        foreach (var schema in problem.Domain.Actions)
+        foreach (var schema in problem.ActionSchemas)
         {
             foreach (var potentialSubsitution in MatchWithGoal(schema.Effect.Elements))
             {

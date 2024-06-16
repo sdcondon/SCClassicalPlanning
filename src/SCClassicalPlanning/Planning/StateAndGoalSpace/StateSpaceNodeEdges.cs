@@ -39,12 +39,12 @@ public readonly struct StateSpaceNodeEdges : IReadOnlyCollection<StateSpaceEdge>
     public StateSpaceNodeEdges(Problem problem, IState state) => (Problem, State) = (problem, state);
 
     /// <inheritdoc />
-    public int Count => ProblemInspector.GetApplicableActions(Problem, State).Count();
+    public int Count => ProblemInspector.GetApplicableActions(State, Problem.ActionSchemas).Count();
 
     /// <inheritdoc />
     public IEnumerator<StateSpaceEdge> GetEnumerator()
     {
-        foreach (var action in ProblemInspector.GetApplicableActions(Problem, State))
+        foreach (var action in ProblemInspector.GetApplicableActions(State, Problem.ActionSchemas))
         {
             yield return new StateSpaceEdge(Problem, State, action);
         }

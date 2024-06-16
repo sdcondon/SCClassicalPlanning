@@ -17,13 +17,13 @@ namespace SCClassicalPlanning.ProblemManipulation;
 
 // TODO*: probably straight up remove this class. In general, iterating all elements of a state isn't going to be viable. 
 /// <summary>
-/// Base class for recursive visitors of <see cref="State"/> instances that reference external visitation state
+/// Base class for recursive visitors of <see cref="IState"/> instances that reference external visitation state
 /// (as opposed to maintaining state as fields of the visitor).
 /// </summary>
 public abstract class RecursiveStateVisitor<TState>
 {
     /// <summary>
-    /// Visits a <see cref="State"/> instance.
+    /// Visits a <see cref="IState"/> instance.
     /// The default implementation just visits all of the state's elements.
     /// </summary>
     /// <param name="state">The <see cref="IState"/> instance to visit.</param>

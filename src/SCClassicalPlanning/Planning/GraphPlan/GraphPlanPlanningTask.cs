@@ -50,7 +50,7 @@ internal class GraphPlanPlanningTask : TemplatePlanningTask
         // levels until all goal elements are present and pairwise non-mutex
         // (initialising the no-goods table HashSets as we go):
         var currentGraphLevel = PlanningGraph.GetLevel(0);
-        while (!currentGraphLevel.ContainsNonMutex(problem.Goal.Elements))
+        while (!currentGraphLevel.ContainsNonMutex(problem.EndGoal.Elements))
         {
             // If the graph levels off before all elements are present and non-mutex,
             // then the problem is unsolvable:
@@ -70,7 +70,7 @@ internal class GraphPlanPlanningTask : TemplatePlanningTask
         var previousFixedPointNoGoodCount = currentGraphLevel.IsLevelledOff ? noGoods[currentGraphLevel.Graph.LevelsOffAtLevel].Count : 0;
         do
         {
-            plan = Extract(problem.Goal, currentGraphLevel);
+            plan = Extract(problem.EndGoal, currentGraphLevel);
 
             if (plan == null)
             {

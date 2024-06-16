@@ -10,21 +10,21 @@ public static class GraphPlanPlannerTests
         .GivenTestContext()
         .AndEachOf(() => new Problem[]
         {
-            SpareTire.ExampleProblem,
-            AirCargo.ExampleProblem,
-            BlocksWorld.ExampleProblem,
-            BlocksWorld.LargeExampleProblem,
-            AirCargoOneAtATime.Problem,
+            SpareTireDomain.ExampleProblem,
+            AirCargoDomain.ExampleProblem,
+            BlocksWorldDomain.ExampleProblem,
+            BlocksWorldDomain.LargeExampleProblem,
+            AirCargoOneAtATimeDomain.Problem,
         })
         .When((_, tc) => new GraphPlanPlanner().CreatePlan(tc))
         .ThenReturns()
-        .And((_, tc, pl) => tc.Goal.IsSatisfiedBy(pl.ApplyTo(tc.InitialState)).Should().BeTrue())
-        .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Domain).Format(pl)));
+        .And((_, tc, pl) => tc.EndGoal.IsSatisfiedBy(pl.ApplyTo(tc.InitialState)).Should().BeTrue())
+        .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc).Format(pl)));
 
     public static Test Termination => TestThat
         .GivenEachOf(() => new Problem[]
         {
-            BlocksWorld.UnsolvableExampleProblem,
+            BlocksWorldDomain.UnsolvableExampleProblem,
         })
         .When(p =>
         {

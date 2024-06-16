@@ -1,7 +1,4 @@
-﻿using SCFirstOrderLogic;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
-using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
-using SCClassicalPlanning.ProblemCreation;
+﻿using SCClassicalPlanning.ProblemCreation;
 using System.Reflection;
 
 namespace SCClassicalPlanning.ExampleDomains.AsPDDL;
@@ -9,12 +6,11 @@ namespace SCClassicalPlanning.ExampleDomains.AsPDDL;
 /// <summary>
 /// The "Air Cargo" example from §10.1.1 of "Artificial Intelligence: A Modern Approach".
 /// </summary>
-public static class AirCargo
+public static class AirCargoDomain
 {
-    /// <summary>
-    /// Gets a <see cref="SCClassicalPlanning.Domain"/ instance that encapsulates the "Air Cargo" domain.
-    /// </summary>
-    public static HashSetDomain Domain { get; } = PddlParser.ParseDomain(DomainPDDL);
+    private static readonly PddlDomain domain = PddlParser.ParseDomain(DomainPDDL);
+
+    public static IQueryable<Action> ActionSchemas => domain.ActionSchemas;
 
     /// <summary>
     /// Gets a PDDL representation of the "Air Cargo" domain.
@@ -27,7 +23,7 @@ public static class AirCargo
     /// In the initial state, plane1 and cargo1 are at airport1; plane2 and cargo2 are at airport2.
     /// The goal is to get cargo2 to airport1 and cargo1 to airport2.
     /// </summary>
-    public static Problem ExampleProblem { get; } = PddlParser.ParseProblem(ExampleProblemPDDL, DomainPDDL);
+    public static Problem ExampleProblem { get; } = PddlParser.ParseProblem(ExampleProblemPDDL, domain);
 
     /// <summary>
     /// Gets a PDDL representation of the customary example problem in this domain.

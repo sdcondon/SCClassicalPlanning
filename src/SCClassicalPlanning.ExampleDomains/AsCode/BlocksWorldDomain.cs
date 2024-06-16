@@ -7,11 +7,11 @@ namespace SCClassicalPlanning.ExampleDomains.AsCode;
 /// <summary>
 /// The "Blocks World" example from §10.1.3 of "Artificial Intelligence: A Modern Approach".
 /// </summary>
-public static class BlocksWorld
+public static class BlocksWorldDomain
 {
-    static BlocksWorld()
+    static BlocksWorldDomain()
     {
-        Domain = MakeDomain();
+        ActionSchemas = MakeActionSchemas();
 
         Constant blockA = new(nameof(blockA));
         Constant blockB = new(nameof(blockB));
@@ -110,9 +110,9 @@ public static class BlocksWorld
     public static Problem UnsolvableExampleProblem { get; }
 
     /// <summary>
-    /// Gets a <see cref="HashSetDomain"/ instance that encapsulates the "Blocks World" domain.
+    /// Gets the actions that are available in the "Blocks World" domain.
     /// </summary>
-    public static HashSetDomain Domain { get; }
+    public static IQueryable<Action> ActionSchemas { get; }
 
     public static Constant Table { get; } = new(nameof(Table));
 
@@ -157,19 +157,18 @@ public static class BlocksWorld
     /// <param name="initialState">The initial state of the problem.</param>
     /// <param name="goal">The initial state of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(IState initialState, Goal goal) => new(Domain, initialState, goal);
+    public static Problem MakeProblem(IState initialState, Goal goal) => new(initialState, goal, ActionSchemas);
 
-    // NB: This is in its own method rather than the static ctor just so that we can run tests against domain construction.
-    internal static HashSetDomain MakeDomain()
+    private static IQueryable<Action> MakeActionSchemas()
     {
         VariableDeclaration block = new(nameof(block));
         VariableDeclaration from = new(nameof(from));
         VariableDeclaration toBlock = new(nameof(toBlock));
 
-        return new(new Action[]
+        return new[]
         {
             Move(block, from, toBlock),
             MoveToTable(block, from),
-        });
+        }.AsQueryable();
     }
 }

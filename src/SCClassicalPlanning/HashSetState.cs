@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCClassicalPlanning.InternalUtilities;
+using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
@@ -191,5 +192,34 @@ public class HashSetState : IState
                 throw new ArgumentException("States must be a conjunction of predicates");
             }
         }
+    }
+
+
+    /// <summary>
+    /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="IState"/>, and add them to a given <see cref="HashSet{T}"/>.
+    /// </summary>
+    private class StateConstantFinder : RecursiveStateVisitor<HashSet<Constant>>
+    {
+        /// <summary>
+        /// Gets a singleton instance of the <see cref="StateConstantFinder"/> class.
+        /// </summary>
+        public static StateConstantFinder Instance { get; } = new();
+
+        /// <inheritdoc/>
+        public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
+    }
+
+    /// <summary>
+    /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="SCClassicalPlanning.Goal"/>, and add them to a given <see cref="HashSet{T}"/>.
+    /// </summary>
+    private class GoalConstantFinder : RecursiveGoalVisitor<HashSet<Constant>>
+    {
+        /// <summary>
+        /// Gets a singleton instance of the <see cref="GoalConstantFinder"/> class.
+        /// </summary>
+        public static GoalConstantFinder Instance { get; } = new();
+
+        /// <inheritdoc/>
+        public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
     }
 }

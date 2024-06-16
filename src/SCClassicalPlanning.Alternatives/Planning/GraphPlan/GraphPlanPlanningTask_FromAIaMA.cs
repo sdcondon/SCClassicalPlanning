@@ -58,7 +58,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
 
             // ..check if all of the goal's elements occur at this level, with no pair mutually exclusive. If so..
             // (NB: we don't need to keep checking this once its true for a level - because mutexes decrease monotonically)
-            if (goalElementsPresentAndNonMutex || (goalElementsPresentAndNonMutex = graphLevel.ContainsNonMutex(problem.Goal.Elements)))
+            if (goalElementsPresentAndNonMutex || (goalElementsPresentAndNonMutex = graphLevel.ContainsNonMutex(problem.EndGoal.Elements)))
             {
                 var priorNoGoodsCount = noGoods.Count;
 
@@ -282,7 +282,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
         public SolutionExtractionDFS(Problem problem, PlanningGraphPropositionLevel graphLevel, HashSet<SearchState> noGoods)
         {
             this.problem = problem;
-            this.source = new SearchNode(graphLevel, problem.Goal);
+            this.source = new SearchNode(graphLevel, problem.EndGoal);
             this.noGoods = noGoods;
 
             Visited = new ReadOnlyDictionary<SearchNode, SearchEdge>(visited);

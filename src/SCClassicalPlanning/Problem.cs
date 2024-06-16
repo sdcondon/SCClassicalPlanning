@@ -11,9 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using SCClassicalPlanning.ProblemManipulation;
-using SCFirstOrderLogic;
-
 namespace SCClassicalPlanning;
 
 /// <summary>
@@ -21,57 +18,23 @@ namespace SCClassicalPlanning;
 /// Encapsulates a planning problem.
 /// </para>
 /// <para>
-/// Problems exist within a <see cref="IDomain"/>, and consist of an initial <see cref="IState"/>,
-/// an end <see cref="SCClassicalPlanning.Goal"/>, and a set of domain elements (represented by <see cref="Constant"/>s
-/// from the SCFirstOrderLogic library) that exist within the scope of the problem.
+/// Problems consist of an initial <see cref="IState"/>, an end <see cref="Goal"/>, and a set of allowed <see cref="Action"/>s.
 /// </para>
 /// </summary>
 public class Problem
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Problem"/> class, in which the domain elements that exist
-    /// are inferred from the constants that are present in the domain, the initial state and the goal.
-    /// </summary>
-    /// <param name="domain">The domain in which this problem resides.</param>
-    /// <param name="initialState">The initial state of the problem.</param>
-    /// <param name="goal">The goal of the problem.</param>
-    
-    public Problem(IDomain domain, IState initialState, Goal goal)
-        : this(domain, initialState, goal, Array.Empty<Constant>())
-    {
-    }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="Problem"/> class.
     /// </summary>
-    /// <param name="domain">The domain in which this problem resides.</param>
     /// <param name="initialState">The initial state of the problem.</param>
-    /// <param name="goal">The goal of the problem.</param>
-    /// <param name="additionalConstants">
-    /// Any constants that exist in the problem other than those defined by the domain, initial state and goal.
-    /// Yes, this is unusual - but we shouldn't preclude objects that serve as 'catalysts' (so don't feature
-    /// in initial state or goal) and are used in actions that place no pre-conditions on them. (Very - most action params
-    /// will at least have a 'type' constraint placed on them) unlikely but possible. Algorithms that can deal with
-    /// variables don't need to know about such objects, but e.g. GraphPlan needs to know.
-    /// </param>
-    public Problem(IDomain domain, IState initialState, Goal goal, IEnumerable<Constant> additionalConstants)
+    /// <param name="endGoal">The end goal of the problem.</param>
+    /// <param name="actions">The actions that are available within the problem.</param>
+    public Problem(IState initialState, Goal endGoal, IQueryable<Action> actions)
     {
-        Domain = domain;
         InitialState = initialState;
-        Goal = goal;
-
-        // TODO*: this is bad. decide how to fix it.
-        var constants = new HashSet<Constant>(additionalConstants);
-        constants.UnionWith(domain.Constants);
-        StateConstantFinder.Instance.Visit(initialState, constants);
-        GoalConstantFinder.Instance.Visit(goal, constants);
-        Constants = constants.AsQueryable();
+        EndGoal = endGoal;
+        ActionSchemas = actions;
     }
-
-    /// <summary>
-    /// Gets the domain in which this problem resides.
-    /// </summary>
-    public IDomain Domain { get; }
 
     /// <summary>
     /// Gets the initial state of the problem.
@@ -79,50 +42,28 @@ public class Problem
     public IState InitialState { get; }
 
     /// <summary>
-    /// Gets the objects that exist in the problem.
+    /// Gets the end goal of the problem.
     /// </summary>
-    public IQueryable<Constant> Constants { get; }
+    public Goal EndGoal { get; }
 
     /// <summary>
-    /// Gets the goal of the problem.
+    /// Gets the actions that are available.
     /// </summary>
-    public Goal Goal { get; }
+    public IQueryable<Action> ActionSchemas { get; }
 
     //// TODO-FEATURE: It is increasingly looking like adding the following would be useful.
-    //// The Domain's Invariants are relevant of course, but you also have things like certain
-    //// predicates that never change as a result of actions (e.g. "typing" predicates) - so the subset
-    //// of initial state that refers to these predicates is invariant. E.g. IsOfMyType(MyObject).
-    //// And of course predicates that change "together" in certain ways.
+    //// This could be used to represent both the :timeless and :axioms of PDDL, possibly 
+    //// in addition to predicate typing (assuming we don't decide to do this via a richer
+    //// predicate-wrapping object) - for example, MyPredicate(x, y) => IsOfMyType(x) & IsOfMyOtherType(y).
+    //// You also have things like certain predicates that never change as a result of actions (e.g. "typing"
+    //// predicates) - so the subset of initial state that refers to these predicates is invariant.
+    //// E.g. IsOfMyType(MyObject). And of course predicates that change "together" in certain ways.
     //// Having said this, I worry a little about SoC..
     //// public ImmutableHashSet<Sentence> Invariants { get; }
     //// or (to ease duplication concerns):
     //// public ImmutableHashSet<CNFClause> Invariants { get; }
-
-    /// <summary>
-    /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="IState"/>, and add them to a given <see cref="HashSet{T}"/>.
-    /// </summary>
-    private class StateConstantFinder : RecursiveStateVisitor<HashSet<Constant>>
-    {
-        /// <summary>
-        /// Gets a singleton instance of the <see cref="StateConstantFinder"/> class.
-        /// </summary>
-        public static StateConstantFinder Instance { get; } = new();
-
-        /// <inheritdoc/>
-        public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
-    }
-
-    /// <summary>
-    /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="SCClassicalPlanning.Goal"/>, and add them to a given <see cref="HashSet{T}"/>.
-    /// </summary>
-    private class GoalConstantFinder : RecursiveGoalVisitor<HashSet<Constant>>
-    {
-        /// <summary>
-        /// Gets a singleton instance of the <see cref="GoalConstantFinder"/> class.
-        /// </summary>
-        public static GoalConstantFinder Instance { get; } = new();
-
-        /// <inheritdoc/>
-        public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
-    }
+    //// though actually just public IKnowledgeBase Invariants { get; } might be a better call
+    //// (again because of potential IO - clauses might/probably will need to be in storage,
+    //// and SCFoL doesn't have a universal clause store - its specific to KB type.. Of course,
+    //// issue disappears if we allow for IQueryable<CNFClause> clause stores in SCFoL)
 }

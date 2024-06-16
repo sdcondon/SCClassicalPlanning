@@ -13,10 +13,10 @@ public class PlanningGraphSetLevelTests
         .GivenEachOf(() => new TestCase[]
         {
             new(
-                Problem: HaveCakeAndEatCakeToo.ExampleProblem,
+                Problem: HaveCakeAndEatCakeTooDomain.ExampleProblem,
                 ExpectedCost: 2),
         })
-        .When(tc => new PlanningGraphSetLevel(tc.Problem.Domain).EstimateCost(tc.Problem.InitialState, tc.Problem.Goal))
+        .When(tc => new PlanningGraphSetLevel(tc.Problem.ActionSchemas).EstimateCost(tc.Problem.InitialState, tc.Problem.EndGoal))
         .ThenReturns()
         .And((tc, rv) => rv.Should().Be(tc.ExpectedCost));
 }
