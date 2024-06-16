@@ -115,7 +115,7 @@ var problem = new Problem(initialState, endGoal, actionSchemas);
 
 ### Defining Problems with PDDL
 
-As of v0.9, you can express problems as PDDL, like this:
+As of v0.9, you can express problems as [PDDL](https://www.google.com/search?q=pddl), like this:
 
 ```
 using SCClassicalPlanning.ProblemCreation; // For PddlParser
