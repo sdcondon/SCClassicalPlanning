@@ -206,8 +206,8 @@ Once you have a problem, the types in the `SCClassicalPlanning.Planning` namespa
 
 ```
 using SCClassicalPlanning.Planning; // for PlanFormatter and CreatePlan extension method (plan creation is async by default)
-using SCClassicalPlanning.Planning.Search; // for StateSpaceAStarPlanner
-using SCClassicalPlanning.Planning.Search.CostStrategies; // for UnsatisfiedGoalCount
+using SCClassicalPlanning.Planning.StateAndGoalSpace; // for StateSpaceAStarPlanner
+using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies; // for UnsatisfiedGoalCount
 
 // First instantiate a StateSpaceAStarPlanner, specifying a strategy to use (an object that gives
 // the cost of actions, and estimates the total cost of getting from a given state to a state
@@ -225,7 +225,7 @@ var plan = planner.CreatePlan(problem);
 
 // Now let's verify that applying the plan results in a state that satisfies the goal,
 // printing out the actions included in the plan in the process:
-var planFormatter = new PlanFormatter(problem.Domain);
+var planFormatter = new PlanFormatter(problem);
 var state = problem.InitialState;
 foreach (var action in plan.Steps)
 {
@@ -240,7 +240,7 @@ foreach (var action in plan.Steps)
     state = action.ApplyTo(state);
 }
 
-Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.Goal)}!");
+Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.EndGoal)}!");
 ```
 
 ### Using Goal Space Search
