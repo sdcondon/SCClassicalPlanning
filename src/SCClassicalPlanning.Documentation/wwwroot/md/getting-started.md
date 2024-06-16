@@ -36,9 +36,9 @@ OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
 OperablePredicate Equal(Term x, Term y) => new Predicate(EqualityIdentifier.Instance, x, y);
 
 // First, let's declare the initial state of our problem. States are essentially just sets of predicates
-// that can be modified by applying Actions. For problems with large states, a state type that is backed
-// by a separate store might be required. The library includes HashSetState, for problems that are small
-// enough that we can just keep everything in memory.
+// that can be modified by applying Actions. For problems with large states, a state implementation that
+// is backed by a separate store might be required. The library includes HashSetState, for problems that
+// are small enough that we can just keep everything in memory.
 Constant table = new(nameof(table));
 Constant blockA = new(nameof(blockA));
 Constant blockB = new(nameof(blockB));
