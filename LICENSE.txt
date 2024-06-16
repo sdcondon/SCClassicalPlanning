@@ -1,4 +1,4 @@
-Copyright 2022-2023 Simon Condon
+Copyright 2022-2024 Simon Condon
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use any of the files in this repository except in compliance with the License.
