@@ -251,5 +251,6 @@ domain, or wait until I implement some better generic ones.
 
 ### Using Graphplan
 
-As above, but using `var planner = new GraphPlanPlanner();`. N.B. for the moment this planner has no configurability. 
+As above, but using `var planner = new GraphPlanPlanner();` (this type resides in SCClassicalPlanning.Planning.GraphPlan).
+N.B. for the moment this planner has no configurability. 
 This will likely change pre-v1 to add some configurability of the heuristic used during the backward search part.
