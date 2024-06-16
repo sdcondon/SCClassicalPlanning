@@ -11,22 +11,20 @@ public static class SpareTireDomain
 {
     static SpareTireDomain()
     {
-        ActionSchemas = MakeActionSchemas();
-
         ExampleProblem = MakeProblem(
             initialState: new HashSetState(
                 IsTire(Spare)
                 & IsTire(Flat)
                 & IsAt(Flat, Axle)
                 & IsAt(Spare, Trunk)),
-            goal: new(
+            endGoal: new(
                 IsAt(Spare, Axle)));
     }
 
     /// <summary>
     /// Gets the actions that are available in the "Spare Tire" domain.
     /// </summary>
-    public static IQueryable<Action> ActionSchemas { get; }
+    public static IQueryable<Action> ActionSchemas { get; } = MakeActionSchemas();
 
     /// <summary>
     /// Gets an instance of the customary example problem in this domain.
@@ -70,9 +68,9 @@ public static class SpareTireDomain
     /// Creates a new <see cref="Problem"/> instance that refers to this domain.
     /// </summary>
     /// <param name="initialState">The initial state of the problem.</param>
-    /// <param name="goal">The initial state of the problem.</param>
+    /// <param name="endGoal">The end goal of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(IState initialState, Goal goal) => new(initialState, goal, ActionSchemas);
+    public static Problem MakeProblem(IState initialState, Goal endGoal) => new(initialState, endGoal, ActionSchemas);
 
     private static IQueryable<Action> MakeActionSchemas()
     {

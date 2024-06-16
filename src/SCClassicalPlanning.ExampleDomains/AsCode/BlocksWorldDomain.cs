@@ -11,7 +11,15 @@ public static class BlocksWorldDomain
 {
     static BlocksWorldDomain()
     {
-        ActionSchemas = MakeActionSchemas();
+        VariableDeclaration block = new(nameof(block));
+        VariableDeclaration from = new(nameof(from));
+        VariableDeclaration toBlock = new(nameof(toBlock));
+
+        ActionSchemas = new[]
+        {
+            Move(block, from, toBlock),
+            MoveToTable(block, from),
+        }.AsQueryable();
 
         Constant blockA = new(nameof(blockA));
         Constant blockB = new(nameof(blockB));
@@ -31,7 +39,7 @@ public static class BlocksWorldDomain
                 & On(blockC, blockA)
                 & Clear(blockB)
                 & Clear(blockC)),
-            goal: new(
+            endGoal: new(
                 On(blockA, blockB)
                 & On(blockB, blockC)));
 
@@ -59,7 +67,7 @@ public static class BlocksWorldDomain
                 & Clear(blockD)
                 & Clear(blockE)
                 & Clear(blockC)),
-            goal: new(
+            endGoal: new(
                 On(blockA, blockB)
                 & On(blockB, blockC)
                 & On(blockC, blockD)
@@ -80,7 +88,7 @@ public static class BlocksWorldDomain
                 & Clear(blockA)
                 & Clear(blockB)
                 & Clear(blockC)),
-            goal: new(
+            endGoal: new(
                 On(blockA, blockB)
                 & On(blockB, blockC)
                 & On(blockC, blockA)));
@@ -155,20 +163,7 @@ public static class BlocksWorldDomain
     /// Creates a new <see cref="Problem"/> instance that refers to this domain.
     /// </summary>
     /// <param name="initialState">The initial state of the problem.</param>
-    /// <param name="goal">The initial state of the problem.</param>
+    /// <param name="endGoal">The end goal of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(IState initialState, Goal goal) => new(initialState, goal, ActionSchemas);
-
-    private static IQueryable<Action> MakeActionSchemas()
-    {
-        VariableDeclaration block = new(nameof(block));
-        VariableDeclaration from = new(nameof(from));
-        VariableDeclaration toBlock = new(nameof(toBlock));
-
-        return new[]
-        {
-            Move(block, from, toBlock),
-            MoveToTable(block, from),
-        }.AsQueryable();
-    }
+    public static Problem MakeProblem(IState initialState, Goal endGoal) => new(initialState, endGoal, ActionSchemas);
 }

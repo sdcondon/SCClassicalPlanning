@@ -17,7 +17,12 @@ public static class ContainerDomain
     /// <summary>
     /// Gets the actions that are available in the "Container" domain.
     /// </summary>
-    public static IQueryable<Action> ActionSchemas { get; } = MakeActionSchemas();
+    public static IQueryable<Action> ActionSchemas { get; } = new[]
+    {
+        Add(A),
+        Remove(R),
+        Swap(R, A),
+    }.AsQueryable();
 
     /// <summary>
     /// Constructs an <see cref="OperablePredicate"/> instance for indicating that a given domain element is present within the container.
@@ -61,17 +66,7 @@ public static class ContainerDomain
     /// Creates a new <see cref="Problem"/> instance that refers to this domain.
     /// </summary>
     /// <param name="initialState">The initial state of the problem.</param>
-    /// <param name="goal">The initial state of the problem.</param>
+    /// <param name="endGoal">The end goal of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(IState initialState, Goal goal) => new(initialState, goal, ActionSchemas);
-
-    public static IQueryable<Action> MakeActionSchemas()
-    {
-        return new[]
-        {
-            Add(A),
-            Remove(R),
-            Swap(R, A),
-        }.AsQueryable();
-    }
+    public static Problem MakeProblem(IState initialState, Goal endGoal) => new(initialState, endGoal, ActionSchemas);
 }

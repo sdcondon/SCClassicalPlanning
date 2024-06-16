@@ -11,13 +11,17 @@ public class HaveCakeAndEatCakeTooDomain
 {
     static HaveCakeAndEatCakeTooDomain()
     {
-        ActionSchemas = MakeActionSchemas();
+        ActionSchemas = new[]
+        {
+            Eat(C),
+            Bake(C)
+        }.AsQueryable();
 
         Constant cake = new(nameof(cake));
 
         ExampleProblem = MakeProblem(
             initialState: new HashSetState(Have(cake)),
-            goal: new(Have(cake) & Eaten(cake)));
+            endGoal: new(Have(cake) & Eaten(cake)));
     }
 
     /// <summary>
@@ -50,9 +54,7 @@ public class HaveCakeAndEatCakeTooDomain
     /// Creates a new <see cref="Problem"/> instance that refers to this domain.
     /// </summary>
     /// <param name="initialState">The initial state of the problem.</param>
-    /// <param name="goal">The initial state of the problem.</param>
+    /// <param name="endGoal">The end goal of the problem.</param>
     /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(IState initialState, Goal goal) => new(initialState, goal, ActionSchemas);
-
-    private static IQueryable<Action> MakeActionSchemas() => new[] { Eat(C), Bake(C) }.AsQueryable();
+    public static Problem MakeProblem(IState initialState, Goal endGoal) => new(initialState, endGoal, ActionSchemas);
 }

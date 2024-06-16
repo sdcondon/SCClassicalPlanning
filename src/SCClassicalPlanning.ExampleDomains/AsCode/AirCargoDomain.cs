@@ -9,16 +9,10 @@ namespace SCClassicalPlanning.ExampleDomains.AsCode;
 /// </summary>
 public static class AirCargoDomain
 {
-    static AirCargoDomain()
-    {
-        ActionSchemas = MakeActionSchemas();
-        ExampleProblem = MakeExampleProblem();
-    }
-
     /// <summary>
     /// Gets the actions that are available in the Air Cargo domain.
     /// </summary>
-    public static IQueryable<Action> ActionSchemas { get; }
+    public static IQueryable<Action> ActionSchemas { get; } = MakeActionSchemas();
 
     /// <summary>
     /// Gets an instance of the customary example problem in this domain.
@@ -26,7 +20,7 @@ public static class AirCargoDomain
     /// In the initial state, plane1 and cargo1 are at airport1; plane2 and cargo2 are at airport2.
     /// The goal is to get cargo2 to airport1 and cargo1 to airport2.
     /// </summary>
-    public static Problem ExampleProblem { get; }
+    public static Problem ExampleProblem { get; } = MakeExampleProblem();
 
     /// <summary>
     /// Constructs an <see cref="OperablePredicate"/> instance for indicating that a given domain element is a piece of cargo.
@@ -126,9 +120,9 @@ public static class AirCargoDomain
     /// Creates a new <see cref="Problem"/> instance that refers to this domain.
     /// </summary>
     /// <param name="initialState">The initial state of the problem.</param>
-    /// <param name="goal">The initial state of the problem.</param>
-    /// <returns>A new <see cref="Problem"/> instance that refers to this domain.</returns>
-    public static Problem MakeProblem(IState initialState, Goal goal) => new(initialState, goal, ActionSchemas);
+    /// <param name="endGoal">The end goal of the problem.</param>
+    /// <returns>A new <see cref="Problem"/> instance.</returns>
+    public static Problem MakeProblem(IState initialState, Goal endGoal) => new(initialState, endGoal, ActionSchemas);
 
     private static IQueryable<Action> MakeActionSchemas()
     {
@@ -169,7 +163,7 @@ public static class AirCargoDomain
                 & At(cargo2, airport2)
                 & At(plane1, airport1)
                 & At(plane2, airport2)),
-            goal: new(
+            endGoal: new(
                 At(cargo2, airport1)
                 & At(cargo1, airport2)));
     }
