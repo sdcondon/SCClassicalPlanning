@@ -17,15 +17,10 @@ In this section, we use the ['blocks world'](https://en.wikipedia.org/wiki/Block
 ### Defining Problems as Code
 
 ```
-using SCClassicalPlanning; // for Goal, Effect, Action, Domain, Problem, State
+using SCClassicalPlanning; // for Goal, Effect, Action, Problem, IState, HashSetState
 using SCFirstOrderLogic; // for Constant, Term, Predicate, VariableDeclaration, EqualitySymbol
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // for OperablePredicate
 using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.Action. I'd rather not rename it..
-
-// First, we need to create everything that our domain definition will refer to.
-
-// Our domain refers to a single constant - the table on which our blocks are placed:
-Constant Table = new(nameof(Table));
 
 // Our domain defines four predicates (essentially, facts about zero or more elements of the domain that,
 // in any given state, are either true or not). As mentioned in the user guide for SCFirstOrderLogic, creating
@@ -40,7 +35,8 @@ OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);
 OperablePredicate Clear(Term surface) => new Predicate(nameof(Clear), surface);
 OperablePredicate Equal(Term x, Term y) => new Predicate(EqualitySymbol.Instance, x, y);
 
-// Now declare some variables for use in our action schemas:
+// Now declare some constants and variables for use in our action schemas:
+Constant Table = new(nameof(Table));
 VariableDeclaration block = new(nameof(block));
 VariableDeclaration from = new(nameof(from));
 VariableDeclaration toBlock = new(nameof(toBlock));
@@ -78,15 +74,8 @@ Action moveToTable = new(
         & Clear(from)
         & !On(block, from)));
 
-// We are now ready to declare our domain.
-// A domain defines the common aspects of all problems that occur within it.
-// Minimally, what actions are available:
-var domain = new Domain(moveToBlock, moveToTable);
-
-// Finally, we can declare our problem.
-// Problems exist in a given domain, and consist of an initial state, an end goal,
-// and a collection available domain elements (though NB the domain elements *can*
-// be implicit based on what constants appear in the initial state and end goal).
+// Now we can declare our problem.
+// Problems consist of an initial state, an end goal, and set of available actions.
 Constant blockA = new(nameof(blockA));
 Constant blockB = new(nameof(blockB));
 Constant blockC = new(nameof(blockC));
@@ -107,7 +96,8 @@ var problem = new Problem(
         & Clear(blockC)),
     goal: new Goal(
         On(blockA, blockB)
-        & On(blockB, blockC)));
+        & On(blockB, blockC))
+    actionSchemas: [moveToBlock, moveToTable].AsQueryable());
 ```
 
 ### Defining Problems with PDDL
