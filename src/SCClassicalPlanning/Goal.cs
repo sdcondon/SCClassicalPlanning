@@ -98,10 +98,10 @@ public class Goal
     public bool IsMetBy(IState state) => state.Meets(this);
 
     /// <summary>
-    /// Gets the substitutions (if any) that can be applied to this goal so that a given state meets it.
+    /// Gets the variable substitutions that can be applied to this goal so that a given state meets it.
     /// </summary>
     /// <param name="state">The state to check.</param>
-    /// <returns>An enumerable of substitutions that cause the state to meet the goal.</returns>
+    /// <returns>An enumerable of variable substitutions that can be made to this goal to give a goal that the given state meets.</returns>
     public IEnumerable<VariableSubstitution> GetSubstitutionsToBeMetBy(IState state) => state.GetSubstitutionsToMeet(this);
 
     /// <summary>

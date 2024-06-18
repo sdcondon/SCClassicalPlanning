@@ -191,15 +191,15 @@ public static class ProblemInspectorTests
                 Action: new("Bad Action Identifier", new(), new()),
                 ActionSchemas: ContainerDomain.ActionSchemas),
 
-            new( // Extra effect elements should cause failure
+            new( // Extra effect elements should cause failure (or should we succeed as long as we can consistently bind all the vars in the schema? because Postel)
                 Action: ContainerDomain.Add(Var("myObject")).WithExpandedEffect(AreEqual(Var("myObject"), Var("something"))),
                 ActionSchemas: ContainerDomain.ActionSchemas),
 
-            ////new( // Missing effect elements should cause failure
+            ////new( // Missing effect elements should cause failure, perhaps? (or should we succeed as long as we can consistently bind all the vars in the schema? because Postel)
             ////    Action: ContainerDomain.Add(Var("myObject")).WithReducedEffect(IsPresent(Var("myObject"))),
             ////    ActionSchemas: ContainerDomain.ActionSchemas),
 
-            ////new( // Missing prerequisite elements should cause failure
+            ////new( // Missing prerequisite elements should cause failure, perhaps? (or should we succeed as long as we can consistently bind all the vars in the schema? because Postel)
             ////    Action: ContainerDomain.Add(Var("myObject")).WithReducedPrecondition(!IsPresent(Var("myObject"))),
             ////    ActionSchemas: ContainerDomain.ActionSchemas),
         })

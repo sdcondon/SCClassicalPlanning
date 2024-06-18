@@ -51,7 +51,7 @@ public interface IState
     /// </para>
     /// </summary>
     /// <param name="goal">The goal to check.</param>
-    /// <returns>A value indicating whether this state meets a given goal.</returns>
+    /// <returns>A value indicating whether this state meets the given goal.</returns>
     // TODO*: not necessarily needed, because can do this with queries? Could add a default implementation, at least?
     bool Meets(Goal goal);
 
@@ -59,7 +59,7 @@ public interface IState
     /// Gets the substitutions (if any) that can be applied to a given goal so that this state meets it.
     /// </summary>
     /// <param name="goal">The goal to check.</param>
-    /// <returns>An enumerable of substitutions that meet the goal.</returns>
+    /// <returns>An enumerable of variable substitutions that can be made to the given goal to give a goal that this state meets.</returns>
     // TODO*: could also be done with queries..
     IEnumerable<VariableSubstitution> GetSubstitutionsToMeet(Goal goal);
 }
