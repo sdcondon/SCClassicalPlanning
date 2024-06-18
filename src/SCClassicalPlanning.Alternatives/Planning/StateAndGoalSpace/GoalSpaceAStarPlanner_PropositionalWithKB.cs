@@ -66,7 +66,7 @@ public class GoalSpaceAStarPlanner_PropositionalWithKB : IPlanner
 
             search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
                 source: new GoalSpaceNode(this, problem.EndGoal),
-                isTarget: n => n.Goal.IsSatisfiedBy(problem.InitialState),
+                isTarget: n => n.Goal.IsMetBy(problem.InitialState),
                 getEdgeCost: e => costStrategy.GetCost(e.Action),
                 getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));
 

@@ -23,6 +23,6 @@ public static class StateSpaceAStarPlannerTests
             return planner.CreatePlan(problem);
         })
         .ThenReturns()
-        .And((_, pr, pl) => pl.ApplyTo(pr.InitialState).Satisfies(pr.EndGoal).Should().BeTrue())
+        .And((_, pr, pl) => pl.ApplyTo(pr.InitialState).Meets(pr.EndGoal).Should().BeTrue())
         .And((cxt, pr, pl) => cxt.WriteOutputLine(new PlanFormatter(pr).Format(pl)));
 }

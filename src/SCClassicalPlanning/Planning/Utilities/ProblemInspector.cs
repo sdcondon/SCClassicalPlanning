@@ -41,7 +41,7 @@ public static class ProblemInspector
         // Local method to (recursively) match a set of (remaining) goal elements to the given state.
         // goalElements: The remaining elements of the goal to be matched
         // unifier: The VariableSubstitution established so far (by matching earlier goal elements)
-        // returns: An enumerable of VariableSubstitutions that can be applied to the goal elements to make them satisfied by the given state
+        // returns: An enumerable of VariableSubstitutions that can be applied to the goal elements to make the given state meet them 
         IEnumerable<VariableSubstitution> MatchWithState(IEnumerable<Literal> goalElements, VariableSubstitution unifier)
         {
             if (!goalElements.Any())
@@ -97,7 +97,7 @@ public static class ProblemInspector
         }
 
         // The overall task to be accomplished here is to find (action schema, variable substitution) pairings such that
-        // the state's elements satisfy the action precondition (after the variable substitution is applied to it).
+        // the state's elements meet the action precondition (after the variable substitution is applied to it).
         // First, we iterate the action schemas:
         foreach (var actionSchema in actionSchemas)
         {
@@ -347,7 +347,7 @@ public static class ProblemInspector
     {
         // TODO: All rationalisations aside, this is a bit naff. Sort me out.
 
-        // Note that this is mostly awkward due to the unordered nature of elements. if we preserved the order of things in our model classes then
+        // Note that this is mostly awkward due to the unordered nature of elements. If we preserved the order of things in our model classes then
         // matching would of course be much easier. HOWEVER, of course when it comes to equality (super important) we need order NOT to matter.
         // We could of course offer the best of both worlds, but I'm not ready to add any more complexity than is absolutely needed to our model just yet..
         IEnumerable<VariableSubstitution> MatchWithSchemaElements(IEnumerable<Literal> actionElements, IEnumerable<Literal> schemaElements, VariableSubstitution unifier)

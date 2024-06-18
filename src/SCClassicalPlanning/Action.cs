@@ -19,7 +19,7 @@ namespace SCClassicalPlanning;
 /// </para>
 /// <para>
 /// Actions can be applied to <see cref="IState"/>s to create new states (via the action's Effect),
-/// provided that the action's Precondition (which is a <see cref="Goal"/>) is satisfied by the current state.
+/// provided that the action's Precondition (which is a <see cref="Goal"/>) is met by the current state.
 /// <see cref="Problem"/>s include a description of all available actions.
 /// </para>
 /// </summary>
@@ -40,7 +40,7 @@ public class Action
 
     /// <summary>
     /// Gets the precondition for the action.
-    /// This must be satisfied by a <see cref="IState"/> for an action to be applicable in that state.
+    /// This must be met by a <see cref="IState"/> for an action to be applicable in that state.
     /// </summary>
     public Goal Precondition { get; }
 
@@ -55,12 +55,12 @@ public class Action
     /// Gets a value indicating whether the action is applicable in a given state.
     /// </para>
     /// <para>
-    /// An action is applicable in a state if its <see cref="Precondition"/> is satisfied by that state.
+    /// An action is applicable in a state if its <see cref="Precondition"/> is met by that state.
     /// </para>
     /// </summary>
     /// <param name="state">The state to examine.</param>
     /// <returns>A value indicating whether the action is applicable in a given state.</returns>
-    public bool IsApplicableTo(IState state) => state.Satisfies(Precondition);
+    public bool IsApplicableTo(IState state) => state.Meets(Precondition);
 
     /// <summary>
     /// <para>
@@ -88,10 +88,10 @@ public class Action
     public bool IsRelevantTo(Goal goal) => goal.IsRelevant(Effect);
 
     /// <summary>
-    /// Returns the goal that must be satisfied prior to performing this action, in order to ensure that a given goal is satisfied after the action is performed. 
+    /// Returns the goal that must be met prior to performing this action, in order to ensure that a given goal is met after the action is performed. 
     /// </summary>
-    /// <param name="goal">The goal that must be satisfied after performing this action.</param>
-    /// <returns>The goal that must be satisfied prior to performing this action.</returns>
+    /// <param name="goal">The goal that must be met after performing this action.</param>
+    /// <returns>The goal that must be met prior to performing this action.</returns>
     public Goal Regress(Goal goal) => goal.Regress(this);
 
     /// <summary>

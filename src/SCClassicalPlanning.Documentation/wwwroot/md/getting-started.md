@@ -208,23 +208,23 @@ Once you have a problem, the types in the `SCClassicalPlanning.Planning` namespa
 ```
 using SCClassicalPlanning.Planning; // for PlanFormatter and CreatePlan extension method (plan creation is async by default)
 using SCClassicalPlanning.Planning.StateAndGoalSpace; // for StateSpaceAStarPlanner
-using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies; // for UnsatisfiedGoalCount
+using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies; // for UnmetGoalCount
 
 // First instantiate a StateSpaceAStarPlanner, specifying a strategy to use (an object that gives
 // the cost of actions, and estimates the total cost of getting from a given state to a state
-// that satisfies a given goal). You can create a strategy specific to the domain, or you can use a
+// that meets a given goal). You can create a strategy specific to the domain, or you can use a
 // generic one provided by the library. Here we use one provided by the library.
-// NB: here we use the UnsatisfiedGoalCount strategy - which (gives all actions a cost of 1 and) just 
-// counts the number of elements of the goal that are not satisfied in the current state. It's totally
-// useless for goal space searches (because it can't rule out unsatisfiable goals) and isn't that great
+// NB: here we use the UnmetGoalCount strategy - which (gives all actions a cost of 1 and) just 
+// counts the number of elements of the goal that are not met in the current state. It's totally
+// useless for goal space searches (because it can't rule out unmeetable goals) and isn't that great
 // for most state space searches either (note it's not admissable, so can give non-optimal plans). 
 // However, it suffices for the very simple problem we are trying to solve here:
-var planner = new StateSpaceAStarPlanner(new UnsatisfiedGoalCount());
+var planner = new StateSpaceAStarPlanner(new UnmetGoalCount());
 
 // Tell the planner to create a plan for our problem:
 var plan = planner.CreatePlan(problem);
 
-// Now let's verify that applying the plan results in a state that satisfies the goal,
+// Now let's verify that applying the plan results in a state that meets the goal,
 // printing out the actions included in the plan in the process:
 var planFormatter = new PlanFormatter(problem);
 var state = problem.InitialState;
@@ -241,13 +241,13 @@ foreach (var action in plan.Steps)
     state = action.ApplyTo(state);
 }
 
-Console.WriteLine($"Goal satisfied: {state.Satisfies(problem.EndGoal)}!");
+Console.WriteLine($"Goal met: {state.Meets(problem.EndGoal)}!");
 ```
 
 ### Using Goal Space Search
 
 As above, but using `var planner = new GoalSpaceAStarPlanner(strategy);`, where strategy is an `IStrategy`.
-As mentioned above, UnsatisfiedGoalCount is useless for this. Either create one specifically for your
+As mentioned above, UnmetGoalCount is useless for this. Either create one specifically for your
 domain, or wait until I implement some better generic ones.
 
 ### Using Graphplan

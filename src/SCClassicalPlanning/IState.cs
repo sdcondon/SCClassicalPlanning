@@ -42,24 +42,24 @@ public interface IState
 
     /// <summary>
     /// <para>
-    /// Gets a value indicating whether this state satisfies a given goal.
+    /// Gets a value indicating whether this state meets a given goal.
     /// </para>
     /// <para>
-    /// A goal is satisfied by a state if all of its positive elements and none of its negative elements are present in the state.
-    /// NB: This methods checks only if the goal is satisfied by the state exactly - meaning that it'll never return true if the goal
-    /// has variables in it. See <see cref="GetSatisfyingSubstitutions(Goal)"/> for an alternative that allows for non-ground goals.
+    /// A goal is met by a state if all of its positive elements and none of its negative elements are present in the state.
+    /// NB: This methods checks only if the goal is met by the state exactly - meaning that it'll never return true if the goal
+    /// has variables in it. See <see cref="GetSubstitutionsToMeet(Goal)"/> for an alternative that allows for non-ground goals.
     /// </para>
     /// </summary>
     /// <param name="goal">The goal to check.</param>
-    /// <returns>A value indicating whether this state satisfies a given goal.</returns>
+    /// <returns>A value indicating whether this state meets a given goal.</returns>
     // TODO*: not necessarily needed, because can do this with queries? Could add a default implementation, at least?
-    bool Satisfies(Goal goal);
+    bool Meets(Goal goal);
 
     /// <summary>
-    /// Gets the substitutions (if any) that can be applied to a given goal so that this state satisfies it.
+    /// Gets the substitutions (if any) that can be applied to a given goal so that this state meets it.
     /// </summary>
     /// <param name="goal">The goal to check.</param>
-    /// <returns>An enumerable of substitutions that satisfy the goal.</returns>
+    /// <returns>An enumerable of substitutions that meet the goal.</returns>
     // TODO*: could also be done with queries..
-    IEnumerable<VariableSubstitution> GetSatisfyingSubstitutions(Goal goal);
+    IEnumerable<VariableSubstitution> GetSubstitutionsToMeet(Goal goal);
 }

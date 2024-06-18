@@ -56,7 +56,7 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
         {
             search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
                 source: new GoalSpaceNode(problem, problem.EndGoal),
-                isTarget: n => problem.InitialState.GetSatisfyingSubstitutions(n.Goal).Any(),
+                isTarget: n => problem.InitialState.GetSubstitutionsToMeet(n.Goal).Any(),
                 getEdgeCost: e => costStrategy.GetCost(e.Action),
                 getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));
 

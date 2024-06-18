@@ -83,10 +83,10 @@ public class HashSetState : IState
     public HashSetState Apply(Effect effect) => new(Elements.Except(effect.DeleteList).Union(effect.AddList));
 
     /// <inheritdoc />
-    public bool Satisfies(Goal goal) => Elements.IsSupersetOf(goal.RequiredPredicates) && !Elements.Overlaps(goal.ForbiddenPredicates);
+    public bool Meets(Goal goal) => Elements.IsSupersetOf(goal.RequiredPredicates) && !Elements.Overlaps(goal.ForbiddenPredicates);
 
     /// <inheritdoc />
-    public IEnumerable<VariableSubstitution> GetSatisfyingSubstitutions(Goal goal)
+    public IEnumerable<VariableSubstitution> GetSubstitutionsToMeet(Goal goal)
     {
         bool UnifiesNegativeGoalElement(VariableSubstitution substitution)
         {

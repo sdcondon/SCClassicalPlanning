@@ -23,7 +23,7 @@
                 </p>
                 <ul>
                     <li>
-                        Not advertising this until "lifted" goal space is working, and/or making use of invariants to prune obviously unsatisfiable goals.
+                        Not advertising this until "lifted" goal space is working, and/or making use of invariants to prune obviously unmeetable goals.
                         If you've found it anyway.. well done, I guess.
                     </li>
                     <li>
@@ -81,9 +81,9 @@
     void RenderListItem(LinkedListNode<GoalSpaceEdge>? lastPathNode, GoalSpaceNode goalNode, GoalSpaceEdge? nextExploredEdge)
     {
         <li>
-            @if (goalNode.Goal.IsSatisfiedBy(problem.InitialState))
+            @if (goalNode.Goal.IsMetBy(problem.InitialState))
             {
-                <b>INITIAL STATE SATISFIES THIS! </b>
+                <b>INITIAL STATE MEETS THIS! </b>
             }
             @{
                 // richer formatting functionality could make this more succinct, which would be nice..

@@ -142,7 +142,7 @@ public static class ProblemInspectorTests
                     [
                         Unload(cargo, Var("plane"), sfo),
 
-                        // obviously unsatisfiable because non-planes can't become planes, but spotting that is not this method's job:
+                        // obviously unmeetable because non-planes can't become planes, but spotting that is not this method's job:
                         Fly(cargo, Var("from"), sfo).WithExpandedPrecondition(!AreEqual(Var("from"), sfo)),
                     ]),
         })

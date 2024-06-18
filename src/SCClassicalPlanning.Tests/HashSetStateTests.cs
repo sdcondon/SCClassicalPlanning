@@ -46,46 +46,46 @@ public static class HashSetStateTests
         .ThenReturns()
         .And((tc, s) => s.Should().BeEquivalentTo(tc.ExpectedResult));
 
-    private record SatisfiesTestCase(HashSetState State, Goal Goal, bool ExpectedResult);
+    private record MeetsTestCase(HashSetState State, Goal Goal, bool ExpectedResult);
 
-    public static Test IsSatisfiedByBehaviour => TestThat
-        .GivenEachOf(() => new SatisfiesTestCase[]
+    public static Test MeetsBehaviour => TestThat
+        .GivenEachOf(() => new MeetsTestCase[]
         {
-            new( // satisfied positive element
+            new( // met positive element
                 State: new(IsPresent(element1)),
                 Goal: new(IsPresent(element1)),
                 ExpectedResult: true),
 
-            new( // satisfied negative element, present irrelevant element
+            new( // met negative element, present irrelevant element
                 State: new(IsPresent(element2)),
                 Goal: new(!IsPresent(element1)),
                 ExpectedResult: true),
 
-            new( // satisfied positive & negative element
+            new( // met positive & negative element
                 State: new(IsPresent(element2)),
                 Goal: new(!IsPresent(element1) & IsPresent(element2)),
                 ExpectedResult: true),
 
-            new( // satisfied positive element, unsatisfied negative element
+            new( // met positive element, unmet negative element
                 State: new(IsPresent(element1) & IsPresent(element2)),
                 Goal: new(IsPresent(element1) & !IsPresent(element2)),
                 ExpectedResult: false),
 
-            new( // satisfied negative element, unsatisfied positive element
+            new( // met negative element, unmet positive element
                 State: HashSetState.Empty,
                 Goal: new(IsPresent(element1) & !IsPresent(element2)),
                 ExpectedResult: false),
         })
-        .When(tc => tc.State.Satisfies(tc.Goal))
+        .When(tc => tc.State.Meets(tc.Goal))
         .ThenReturns()
         .And((tc, r) => r.Should().Be(tc.ExpectedResult));
 
-    private record GetSatisfyingSubstitutionsTestCase(HashSetState State, Goal Goal, IEnumerable<VariableSubstitution> ExpectedResult);
+    private record GetSubstitutionsToMeetTestCase(HashSetState State, Goal Goal, IEnumerable<VariableSubstitution> ExpectedResult);
 
-    public static Test GetSatisfyingSubstitutionsBehaviour => TestThat
-        .GivenEachOf(() => new GetSatisfyingSubstitutionsTestCase[]
+    public static Test GetSubstitutionsToMeetBehaviour => TestThat
+        .GivenEachOf(() => new GetSubstitutionsToMeetTestCase[]
         {
-            new( // satisfied positive element - ground
+            new( // met positive element - ground
                 State: new(IsPresent(element1)),
                 Goal: new(IsPresent(element1)),
                 ExpectedResult: new VariableSubstitution[]
@@ -93,7 +93,7 @@ public static class HashSetStateTests
                     new()
                 }),
 
-            new( // satisfied positive element - variable
+            new( // met positive element - variable
                 State: new(IsPresent(element1)),
                 Goal: new(IsPresent(E)),
                 ExpectedResult: new VariableSubstitution[]
@@ -101,12 +101,12 @@ public static class HashSetStateTests
                     new(new Dictionary<VariableReference, Term>() { [E] = element1 })
                 }),
 
-            new( // satisfied positive element, unsatisfied negative element
+            new( // met positive element, unmet negative element
                 State: new(In(cargo1, plane1) & At(plane1, airport1)),
                 Goal: new(In(cargo1, P) & !At(P, airport1)),
                 ExpectedResult: Array.Empty<VariableSubstitution>()),
         })
-        .When(tc => tc.State.GetSatisfyingSubstitutions(tc.Goal))
+        .When(tc => tc.State.GetSubstitutionsToMeet(tc.Goal))
         .ThenReturns()
         .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult));
 

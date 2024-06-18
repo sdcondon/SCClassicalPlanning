@@ -66,7 +66,7 @@ public class GoalInvariantCheck : ICostStrategy
     public float GetCost(Action action) => innerStrategy.GetCost(action);
 
     /// <summary>
-    /// Estimates the cost of getting from the given state to a state that satisfies the given goal.
+    /// Estimates the cost of getting from the given state to a state that meets the given goal.
     /// </summary>
     /// <param name="state">The state.</param>
     /// <param name="goal">The goal.</param>

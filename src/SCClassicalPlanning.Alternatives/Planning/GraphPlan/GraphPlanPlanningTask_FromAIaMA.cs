@@ -94,8 +94,8 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
         [MaybeNullWhen(false)] out Plan plan,
         CancellationToken cancellationToken)
     {
-        // NB: AIaMA says that the target is *level is zero* and initial state satisfies the goal.
-        // Don't actually need to check for level being zero. If we satisfy the goal at level n > 0, we can just
+        // NB: AIaMA says that the target is *level is zero* and initial state meets the goal.
+        // Don't actually need to check for level being zero. If we meet the goal at level n > 0, we can just
         // use no-op actions to get to that level then execute the plan.
         // In practice this won't happen because we'd have found the target at an earlier step anyway. 
         // So, what the book is trying (fairly badly..) to say is that when we first find the target, it'll be
@@ -125,7 +125,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
     // A node in the solution extraction search represents having a particular goal at a particular
     // level of the planning graph. The outbound edges of this node each represent sets of actions
     // applicable to the previous level (no pair of which are mutually exclusive) that collectively
-    // satisfy the goal.
+    // meet the goal.
     [DebuggerDisplay("{Goal} @ L{graphLevel.Index}")]
     private readonly struct SearchNode : INode<SearchNode, SearchEdge>, IEquatable<SearchNode>
     {
@@ -193,7 +193,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
             var goalElements = goal.Elements
                 .OrderByDescending(e => graphLevel.Graph.GetLevelCost(e));
 
-            // Find all of the actions that satisfy at least one element of the goal and order by sum of precondition level costs:
+            // Find all of the actions that meet at least one element of the goal and order by sum of precondition level costs:
             // NB: While we use the term "relevant" here, note that we're not discounting those that clash with the goal - that will 
             // be dealt with by mutex checks.
             var relevantActionNodes = goal.Elements
@@ -211,7 +211,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         private IEnumerable<SearchEdge> FindCoveringActionSets(
-            IEnumerable<Literal> unsatisfiedGoalElements,
+            IEnumerable<Literal> unmetGoalElements,
             ImmutableHashSet<PlanningGraphActionNode> unselectedActionNodes,
             ImmutableHashSet<PlanningGraphActionNode> selectedActionNodes)
         {
@@ -219,7 +219,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
             // We could eliminate the duplication by creating a tree instead, or even just some kind
             // of bit-vector struct to indicate selection. Meh, lets get it working first, then at
             // least we have a baseline for improvements.
-            if (!unsatisfiedGoalElements.Any())
+            if (!unmetGoalElements.Any())
             {
                 yield return new SearchEdge(graphLevel, goal, selectedActionNodes.Select(n => n.Action));
             }
@@ -229,10 +229,10 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
                 // then recurse for the other actions and remaining uncovered goal elements.
                 foreach (var actionNode in unselectedActionNodes)
                 {
-                    if (actionNode.Action.Effect.Elements.Contains(unsatisfiedGoalElements.First()) && !actionNode.IsMutexWithAny(selectedActionNodes))
+                    if (actionNode.Action.Effect.Elements.Contains(unmetGoalElements.First()) && !actionNode.IsMutexWithAny(selectedActionNodes))
                     {
                         foreach (var edge in FindCoveringActionSets(
-                            unsatisfiedGoalElements.Except(actionNode.Action.Effect.Elements),
+                            unmetGoalElements.Except(actionNode.Action.Effect.Elements),
                             unselectedActionNodes.Remove(actionNode),
                             selectedActionNodes.Add(actionNode)))
                         {
@@ -320,7 +320,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (problem.InitialState.Satisfies(node.Goal))
+            if (problem.InitialState.Meets(node.Goal))
             {
                 Target = node;
                 IsSucceeded = true;

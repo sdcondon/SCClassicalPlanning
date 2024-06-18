@@ -25,7 +25,7 @@ public class DelegateCostStrategy : ICostStrategy
     /// Initialises a new instance of the <see cref="DelegateCostStrategy"/> class.
     /// </summary>
     /// <param name="getCost">The delegate to invoke to get the cost of an action.</param>
-    /// <param name="estimateCost">The delegate to invoke to estimate the total cost of getting from a given state to a state that satisfies a given goal.</param>
+    /// <param name="estimateCost">The delegate to invoke to estimate the total cost of getting from a given state to a state that meets a given goal.</param>
     public DelegateCostStrategy(Func<Action, float> getCost, Func<IState, Goal, float> estimateCost)
     {
         this.getCost = getCost;

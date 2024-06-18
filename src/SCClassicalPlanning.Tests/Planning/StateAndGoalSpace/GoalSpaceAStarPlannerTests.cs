@@ -75,7 +75,7 @@ public static class GoalSpaceAStarPlannerTests
             return await planner.CreatePlanAsync(tc.Problem);
         })
         .ThenReturns()
-        .And((_, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.EndGoal).Should().BeTrue())
+        .And((_, tc, pl) => pl.ApplyTo(tc.Problem.InitialState).Meets(tc.Problem.EndGoal).Should().BeTrue())
         .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem).Format(pl)));
 
     public static Test CreatedPlanValidity_AlternativeImplementations => TestThat
@@ -141,7 +141,7 @@ public static class GoalSpaceAStarPlannerTests
         })
         .When((_, tc, makePlanner) => makePlanner(tc).CreatePlan(tc.Problem))
         .ThenReturns()
-        .And((_, tc, _, pl) => pl.ApplyTo(tc.Problem.InitialState).Satisfies(tc.Problem.EndGoal).Should().BeTrue())
+        .And((_, tc, _, pl) => pl.ApplyTo(tc.Problem.InitialState).Meets(tc.Problem.EndGoal).Should().BeTrue())
         .And((cxt, tc, _, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem).Format(pl)));
 
     private static async Task<IKnowledgeBase> MakeResolutionKBAsync(IEnumerable<Sentence> invariants)

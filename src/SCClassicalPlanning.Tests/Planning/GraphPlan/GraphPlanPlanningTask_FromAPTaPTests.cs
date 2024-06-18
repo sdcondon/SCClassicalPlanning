@@ -18,7 +18,7 @@ public static class GraphPlanPlanningTask_FromAPTaPTests
         })
         .When((_, tc) => new GraphPlanPlanningTask_FromAPTaP(tc).Execute())
         .ThenReturns()
-        .And((_, tc, pl) => tc.EndGoal.IsSatisfiedBy(pl.ApplyTo(tc.InitialState)).Should().BeTrue())
+        .And((_, tc, pl) => tc.EndGoal.IsMetBy(pl.ApplyTo(tc.InitialState)).Should().BeTrue())
         .And((cxt, tc, pl) => cxt.WriteOutputLine(new PlanFormatter(tc).Format(pl)));
 
     public static Test Termination => TestThat

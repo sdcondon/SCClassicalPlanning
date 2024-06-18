@@ -46,19 +46,19 @@ public class IgnorePreconditionsGreedySetCover : ICostStrategy
     /// <inheritdoc/>
     public float EstimateCost(IState state, Goal goal)
     {
-        var unsatisfiedGoalElements = GetUnsatisfiedGoalElements(state, goal);
-        if (!unsatisfiedGoalElements.Any())
+        var unmetGoalElements = GetUnmetGoalElements(state, goal);
+        if (!unmetGoalElements.Any())
         {
             return 0;
         }
 
-        var relevantEffects = GetRelevantEffects(unsatisfiedGoalElements, state.Elements);
+        var relevantEffects = GetRelevantEffects(unmetGoalElements, state.Elements);
         if (!relevantEffects.Any())
         {
             return float.PositiveInfinity;
         }
 
-        var coveringActionCount = GetCoveringActionCount(unsatisfiedGoalElements, relevantEffects);
+        var coveringActionCount = GetCoveringActionCount(unmetGoalElements, relevantEffects);
         if (coveringActionCount == -1)
         {
             return float.PositiveInfinity;
@@ -69,7 +69,7 @@ public class IgnorePreconditionsGreedySetCover : ICostStrategy
         }
     }
 
-    private static HashSet<Literal> GetUnsatisfiedGoalElements(IState state, Goal goal)
+    private static HashSet<Literal> GetUnmetGoalElements(IState state, Goal goal)
     {
         ////// At some point might want to test whether the cost of keeping elements ordered outweighs the cost of having to do stuff like this the long way..
         ////var uncovered = new HashSet<Literal>();
@@ -122,7 +122,7 @@ public class IgnorePreconditionsGreedySetCover : ICostStrategy
                 }
             }
 
-            ////// could of course do this in getunsatisfied goal elements - but having experimented with it a bit,
+            ////// could of course do this in getunmet goal elements - but having experimented with it a bit,
             ////// it really feels like they should count against the cost.. todo: alternative and benchmarking..
             ////foreach (var stateElement in stateElements)
             ////{

@@ -105,11 +105,11 @@ internal class GraphPlanPlanningTask : TemplatePlanningTask
     private Plan? Extract(Goal goal, PlanningGraphPropositionLevel level)
     {
         // If we've reached level 0 (i.e. the initial state of the problem), we're done.
-        // NB: there's no need to consider the goal here. The initial state MUST satisfy
+        // NB: there's no need to consider the goal here. The initial state MUST meet
         // whatever goal we are left with at this point - because the initial state determines
         // what actions were available for selection in GPSearch at level 1. (and we
         // could have only hit this method direct from ExecuteAsyncCore at level 0 if the
-        // initial state satisfies the goal).
+        // initial state meets the goal).
         if (level.Index == 0)
         {
             return Plan.Empty;

@@ -20,7 +20,7 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
 /// <para>
 /// Implementations of this interface provide the "cost" (whatever that means in the context of the
 /// problem being solved) of any given action, and can also estimate the total cost of getting from
-/// a given state to a state that satisfies a given goal.
+/// a given state to a state that meets a given goal.
 /// </para>
 /// </summary>
 public interface ICostStrategy
@@ -33,10 +33,10 @@ public interface ICostStrategy
     float GetCost(Action action);
 
     /// <summary>
-    /// Estimates the total cost of getting from a given state to a state that satisfies a given goal.
+    /// Estimates the total cost of getting from a given state to a state that meets a given goal.
     /// </summary>
     /// <param name="state">The start state.</param>
-    /// <param name="goal">The goal to be satisfied.</param>
+    /// <param name="goal">The goal to be met.</param>
     /// <returns>The estimated cost.</returns>
     float EstimateCost(IState state, Goal goal);
 }
