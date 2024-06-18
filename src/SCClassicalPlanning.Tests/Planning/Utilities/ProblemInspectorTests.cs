@@ -25,17 +25,17 @@ public static class ProblemInspectorTests
             new(
                 State: new HashSetState(new("Exists", element1), new("Exists", element2)),
                 ActionSchemas: ContainerDomain.ActionSchemas,
-                ExpectedResult: new[] { Add(element1), Add(element2) }),
+                ExpectedResult: [Add(element1), Add(element2)]),
 
             new(
                 State: new HashSetState(IsPresent(element1), new("Exists", element2)),
                 ActionSchemas: ContainerDomain.ActionSchemas,
-                ExpectedResult: new[] { Remove(element1), Add(element2), Swap(element1, element2) }),
+                ExpectedResult: [Remove(element1), Add(element2), Swap(element1, element2)]),
 
             new(
                 State: new HashSetState(IsPresent(element1) & IsPresent(element2)),
                 ActionSchemas: ContainerDomain.ActionSchemas,
-                ExpectedResult: new[] { Remove(element1), Remove(element2) }),
+                ExpectedResult: [Remove(element1), Remove(element2)]),
         })
         .When(tc => ProblemInspector.GetApplicableActions(tc.State, tc.ActionSchemas))
         .ThenReturns()
@@ -47,44 +47,44 @@ public static class ProblemInspectorTests
             new(
                 Goal: new(IsPresent(element1)),
                 ActionSchemas: ContainerDomain.ActionSchemas,
-                Constants: new[] { element1, element2 },
-                ExpectedResult: new[]
-                {
+                Constants: [element1, element2],
+                ExpectedResult:
+                [
                     Add(element1),
                     Swap(element2, element1),
-                }),
+                ]),
 
             new(
                 Goal: new(IsPresent(element1) & IsPresent(element2)),
                 ActionSchemas: ContainerDomain.ActionSchemas,
-                Constants: new[] { element1, element2 },
-                ExpectedResult: new[]
-                {
+                Constants: [element1, element2],
+                ExpectedResult:
+                [
                     Add(element1),
                     Add(element2),
-                }),
+                ]),
 
             new(
                 Goal: new(IsPresent(element1) & !IsPresent(element2)),
                 ActionSchemas: ContainerDomain.ActionSchemas,
-                Constants: new[] { element1, element2 },
-                ExpectedResult: new[]
-                {
+                Constants: [element1, element2],
+                ExpectedResult:
+                [
                     Add(element1),
                     Remove(element2),
                     Swap(element2, element1),
                     Swap(element2, element1), // TODO-BUG: yeah, hits twice - once for the element1 presence and again for the element2 non-presence. dedupe should probably be expected.
-                }),
+                ]),
 
             new(
                 Goal: new(!IsPresent(element1) & !IsPresent(element2)),
                 ActionSchemas: ContainerDomain.ActionSchemas,
-                Constants: new[] { element1, element2 },
-                ExpectedResult: new[]
-                {
+                Constants: [element1, element2],
+                ExpectedResult:
+                [
                     Remove(element1),
                     Remove(element2),
-                }),
+                ]),
         })
         .When(tc => ProblemInspector.GetRelevantGroundActions(tc.Goal, tc.ActionSchemas, tc.Constants))
         .ThenReturns()
@@ -96,83 +96,115 @@ public static class ProblemInspectorTests
                 new(
                     Goal: new(IsPresent(element1)),
                     ActionSchemas: ContainerDomain.ActionSchemas,
-                    ExpectedResult: new[]
-                    {
+                    ExpectedResult:
+                    [
                         Add(element1),
-                        Swap(R, element1).WithAdditionalPreconditions(!AreEqual(R, element1)),
-                    }),
+                        Swap(R, element1).WithExpandedPrecondition(!AreEqual(R, element1)),
+                    ]),
 
                 new(
                     Goal: new(IsPresent(element1) & IsPresent(element2)),
                     ActionSchemas: ContainerDomain.ActionSchemas,
-                    ExpectedResult: new[]
-                    {
+                    ExpectedResult:
+                    [
                         Add(element1),
                         Add(element2),
-                        Swap(R, element1).WithAdditionalPreconditions(!AreEqual(R, element1) & !AreEqual(R, element2)),
-                        Swap(R, element2).WithAdditionalPreconditions(!AreEqual(R, element1) & !AreEqual(R, element2)),
-                    }),
+                        Swap(R, element1).WithExpandedPrecondition(!AreEqual(R, element1) & !AreEqual(R, element2)),
+                        Swap(R, element2).WithExpandedPrecondition(!AreEqual(R, element1) & !AreEqual(R, element2)),
+                    ]),
 
                 new(
                     Goal: new(IsPresent(element1) & !IsPresent(element2)),
                     ActionSchemas: ContainerDomain.ActionSchemas,
-                    ExpectedResult: new[]
-                    {
+                    ExpectedResult:
+                    [
                         Add(element1),
                         Remove(element2),
-                        Swap(R, element1).WithAdditionalPreconditions(!AreEqual(R, element1)),
-                        Swap(element2, A).WithAdditionalPreconditions(!AreEqual(A, element2)),
-                    }),
+                        Swap(R, element1).WithExpandedPrecondition(!AreEqual(R, element1)),
+                        Swap(element2, A).WithExpandedPrecondition(!AreEqual(A, element2)),
+                    ]),
 
                 new(
                     Goal: new(!IsPresent(element1) & !IsPresent(element2)),
                     ActionSchemas: ContainerDomain.ActionSchemas,
-                    ExpectedResult: new[]
-                    {
+                    ExpectedResult:
+                    [
                         Remove(element1),
                         Remove(element2),
-                        Swap(element1, A).WithAdditionalPreconditions(!AreEqual(A, element1) & !AreEqual(A, element2)),
-                        Swap(element2, A).WithAdditionalPreconditions(!AreEqual(A, element1) & !AreEqual(A, element2)),
-                    }),
+                        Swap(element1, A).WithExpandedPrecondition(!AreEqual(A, element1) & !AreEqual(A, element2)),
+                        Swap(element2, A).WithExpandedPrecondition(!AreEqual(A, element1) & !AreEqual(A, element2)),
+                    ]),
 
                 new(
                     Goal: new(At(cargo, sfo)),
                     ActionSchemas: AirCargoDomain.ActionSchemas,
-                    ExpectedResult: new Action[]
-                    {
+                    ExpectedResult:
+                    [
                         Unload(cargo, Var("plane"), sfo),
 
                         // obviously unsatisfiable because non-planes can't become planes, but spotting that is not this method's job:
-                        Fly(cargo, Var("from"), sfo).WithAdditionalPreconditions(!AreEqual(Var("from"), sfo)),
-                    }),
+                        Fly(cargo, Var("from"), sfo).WithExpandedPrecondition(!AreEqual(Var("from"), sfo)),
+                    ]),
         })
         .When(tc => ProblemInspector.GetRelevantLiftedActions(tc.Goal, tc.ActionSchemas))
         .ThenReturns()
         .And((tc, r) => r.Should().BeEquivalentTo(tc.ExpectedResult, ExpectVariablesToBeStandardised));
 
-    public static Test GetMappingFromSchemaBehaviour => TestThat
-        .GivenEachOf(() => new GetMappingFromSchemaTestCase[]
+    public static Test GetMappingFromSchemaPositiveBehaviour => TestThat
+        .GivenEachOf(() => new GetMappingFromSchemaPositiveTestCase[]
         {
-            new(
-                Action: ContainerDomain.Add(new VariableReference("myObject")),
+            new( // Basic case should work
+                Action: ContainerDomain.Add(Var("myObject")),
                 ActionSchemas: ContainerDomain.ActionSchemas,
-                ExpectedResult: new VariableSubstitution(new Dictionary<VariableReference, Term>()
+                ExpectedBindings: new()
                 {
                     [Var("A")] = Var("myObject"),
-                })),
+                }),
 
             new( // Repeated vars shouldn't cause an issue
                 Action: AirCargoDomain.Fly(Var("plane1"), Var("airport1"), Var("airport1")),
                 ActionSchemas: AirCargoDomain.ActionSchemas,
-                ExpectedResult: new VariableSubstitution(new Dictionary<VariableReference, Term>()
+                ExpectedBindings: new()
                 {
                     [Var("plane")] = Var("plane1"),
                     [Var("from")] = Var("airport1"),
                     [Var("to")] = Var("airport1"),
-                })),
+                }),
+
+            new( // Extra preconditions should be allowed
+                Action: ContainerDomain
+                    .Add(Var("myObject"))
+                    .WithExpandedPrecondition(!AreEqual(Var("myObject"), Var("otherObject"))),
+                ActionSchemas: ContainerDomain.ActionSchemas,
+                ExpectedBindings: new()
+                {
+                    [Var("A")] = Var("myObject"),
+                }),
         })
         .When(tc => ProblemInspector.GetMappingFromSchema(tc.Action, tc.ActionSchemas))
-        .ThenReturns((tc, rv) => rv.Should().Be(tc.ExpectedResult));
+        .ThenReturns((tc, rv) => rv.Should().Be(new VariableSubstitution(tc.ExpectedBindings)));
+
+    public static Test GetMappingFromSchemaNegativeBehaviour => TestThat
+        .GivenEachOf(() => new GetMappingFromSchemaNegativeTestCase[]
+        {
+            new( // No matching identifier should cause failure
+                Action: new("Bad Action Identifier", new(), new()),
+                ActionSchemas: ContainerDomain.ActionSchemas),
+
+            new( // Extra effect elements should cause failure
+                Action: ContainerDomain.Add(Var("myObject")).WithExpandedEffect(AreEqual(Var("myObject"), Var("something"))),
+                ActionSchemas: ContainerDomain.ActionSchemas),
+
+            new( // Missing effect elements should cause failure
+                Action: ContainerDomain.Add(Var("myObject")).WithReducedEffect(IsPresent(Var("myObject"))),
+                ActionSchemas: ContainerDomain.ActionSchemas),
+
+            new( // Missing prerequisite elements should cause failure
+                Action: ContainerDomain.Add(Var("myObject")).WithReducedPrecondition(!IsPresent(Var("myObject"))),
+                ActionSchemas: ContainerDomain.ActionSchemas),
+        })
+        .When(tc => ProblemInspector.GetMappingFromSchema(tc.Action, tc.ActionSchemas))
+        .ThenThrows();
 
     private static EquivalencyAssertionOptions<Action> ExpectVariablesToBeStandardised(this EquivalencyAssertionOptions<Action> opts)
     {
@@ -203,5 +235,6 @@ public static class ProblemInspectorTests
     private record GetApplicableActionsTestCase(IState State, IQueryable<Action> ActionSchemas, Action[] ExpectedResult);
     private record GetRelevantGroundActionsTestCase(Goal Goal, IQueryable<Action> ActionSchemas, IEnumerable<Constant> Constants, Action[] ExpectedResult);
     private record GetRelevantLiftedActionsTestCase(Goal Goal, IQueryable<Action> ActionSchemas, Action[] ExpectedResult);
-    private record GetMappingFromSchemaTestCase(Action Action, IQueryable<Action> ActionSchemas, VariableSubstitution ExpectedResult);
+    private record GetMappingFromSchemaPositiveTestCase(Action Action, IQueryable<Action> ActionSchemas, Dictionary<VariableReference, Term> ExpectedBindings);
+    private record GetMappingFromSchemaNegativeTestCase(Action Action, IQueryable<Action> ActionSchemas);
 }

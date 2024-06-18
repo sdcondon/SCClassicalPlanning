@@ -1,11 +1,9 @@
 ﻿using FluentAssertions;
 using FlUnit;
-using SCClassicalPlanning._TestUtilities;
 using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
-using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Resolution;
 
 namespace SCClassicalPlanning.Planning.Utilities;
@@ -15,77 +13,64 @@ public static class InvariantInspectorTests
     private static readonly Constant blockA = new(nameof(blockA));
     private static readonly Constant blockB = new(nameof(blockB));
 
-    private record TestCase(IKnowledgeBase KnowledgeBase, OperableGoal Goal, bool ExpectedResult);
+    private record TestCase(OperableGoal Goal, IEnumerable<Sentence> Knowledge, bool ExpectedResult);
 
     public static Test IsGoalPrecludedByInvariantsBehaviour => TestThat
         .GivenEachOf(() => new TestCase[]
         {
-            new TestCase( // Empty goal
-                KnowledgeBase: new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
-                    new HashSetClauseStore(),
-                    DelegateResolutionStrategy.Filters.None,
-                    DelegateResolutionStrategy.PriorityComparisons.UnitPreference)),
+            new( // Empty goal
                 Goal: Goal.Empty,
+                Knowledge: [],
                 ExpectedResult: false),
 
-            new TestCase( // Trivial goal, invariants not violated
-                KnowledgeBase: new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
-                    new HashSetClauseStore(new Sentence[]
-                    {
-                        Block(blockA)
-                    }),
-                    DelegateResolutionStrategy.Filters.None,
-                    DelegateResolutionStrategy.PriorityComparisons.UnitPreference)),
+            new( // Trivial goal, invariants not violated
                 Goal: Block(blockA),
+                Knowledge:
+                [
+                    Block(blockA)
+                ],
                 ExpectedResult: false),
 
-            new TestCase( // Trivial goal, invariant violated
-                KnowledgeBase: new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
-                    new HashSetClauseStore(new Sentence[]
-                    {
-                        !Block(Table)
-                    }),
-                    DelegateResolutionStrategy.Filters.None,
-                    DelegateResolutionStrategy.PriorityComparisons.UnitPreference)),
+            new( // Trivial goal, invariant violated
                 Goal: Block(Table),
+                Knowledge:
+                [
+                    !Block(Table)
+                ],
                 ExpectedResult: true),
 
-            new TestCase( // Non-trivial goal - invariants not violated
-                KnowledgeBase: new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
-                    new HashSetClauseStore(new Sentence[]
-                    {
-                        ForAll(X, Y, If(On(X, Y), !Clear(Y))),
-                    }),
-                    DelegateResolutionStrategy.Filters.None,
-                    DelegateResolutionStrategy.PriorityComparisons.UnitPreference)),
+            new( // Non-trivial goal - invariants not violated
                 Goal: On(blockB, blockA) & Clear(blockB),
+                Knowledge:
+                [
+                    ForAll(X, Y, If(On(X, Y), !Clear(Y))),
+                ],
                 ExpectedResult: false),
 
-            new TestCase( // Non-trivial goal - invariant violated
-                KnowledgeBase: new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
-                    new HashSetClauseStore(new Sentence[]
-                    {
-                        ForAll(X, Y, If(On(X, Y), !Clear(Y))),
-                    }),
-                    DelegateResolutionStrategy.Filters.None,
-                    DelegateResolutionStrategy.PriorityComparisons.UnitPreference)),
+            new( // Non-trivial goal - invariant violated
                 Goal: On(blockA, blockB) & Clear(blockB),
+                Knowledge:
+                [
+                    ForAll(X, Y, If(On(X, Y), !Clear(Y))),
+                ],
                 ExpectedResult: true),
 
-            new TestCase( // Non-trivial goal - with variables
-                KnowledgeBase: new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
-                    new HashSetClauseStore(new Sentence[]
-                    {
-                        ForAll(X, Y, If(On(X, Y), !Clear(Y))),
-                    }),
-                    DelegateResolutionStrategy.Filters.None,
-                    DelegateResolutionStrategy.PriorityComparisons.UnitPreference)),
+            new( // Non-trivial goal - with variables
                 Goal: On(X, Y) & Clear(Y),
+                Knowledge:
+                [
+                    ForAll(X, Y, If(On(X, Y), !Clear(Y))),
+                ],
                 ExpectedResult: true),
         })
         .When(tc =>
         {
-            return new InvariantInspector(tc.KnowledgeBase).IsGoalPrecludedByInvariants(tc.Goal);
+            var kb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
+                new HashSetClauseStore(tc.Knowledge.Select(s => (Sentence)s)),
+                DelegateResolutionStrategy.Filters.None,
+                DelegateResolutionStrategy.PriorityComparisons.UnitPreference));
+
+            return new InvariantInspector(kb).IsGoalPrecludedByInvariants(tc.Goal);
         })
         .ThenReturns()
         .And((tc, rv) => rv.Should().Be(tc.ExpectedResult));
