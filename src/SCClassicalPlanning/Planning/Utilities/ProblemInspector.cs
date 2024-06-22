@@ -352,21 +352,21 @@ public static class ProblemInspector
         // We could of course offer the best of both worlds, but I'm not ready to add any more complexity than is absolutely needed to our model just yet..
         IEnumerable<VariableSubstitution> MatchWithSchemaElements(IEnumerable<Literal> actionElements, IEnumerable<Literal> schemaElements, VariableSubstitution unifier)
         {
-            if (!actionElements.Any())
+            if (!schemaElements.Any())
             {
                 yield return unifier;
             }
             else
             {
-                var firstActionElement = actionElements.First();
+                var firstSchemaElement = schemaElements.First();
 
-                foreach (var schemaElement in schemaElements)
+                foreach (var actionElement in actionElements)
                 {
-                    if (Unifier.TryUpdate(schemaElement, firstActionElement, unifier, out var firstActionElementUnifier))
+                    if (Unifier.TryUpdate(firstSchemaElement, actionElement, unifier, out var firstSchemaElementUnifier))
                     {
-                        foreach (var restOfActionElementsUnifier in MatchWithSchemaElements(actionElements.Skip(1), schemaElements.Except(new[] { schemaElement }), firstActionElementUnifier))
+                        foreach (var restOfSchemaElementsUnifier in MatchWithSchemaElements(actionElements, schemaElements.Skip(1), firstSchemaElementUnifier))
                         {
-                            yield return restOfActionElementsUnifier;
+                            yield return restOfSchemaElementsUnifier;
                         }
                     }
                 }

@@ -171,15 +171,25 @@ public static class ProblemInspectorTests
                     [Var("to")] = Var("airport1"),
                 }),
 
-            ////new( // Extra preconditions should be allowed
-            ////    Action: ContainerDomain
-            ////        .Add(Var("myObject"))
-            ////        .WithExpandedPrecondition(!AreEqual(Var("myObject"), Var("otherObject"))),
-            ////    ActionSchemas: ContainerDomain.ActionSchemas,
-            ////    ExpectedBindings: new()
-            ////    {
-            ////        [Var("A")] = Var("myObject"),
-            ////    }),
+            new( // Extra preconditions should be allowed
+                Action: ContainerDomain
+                    .Add(Var("myObject"))
+                    .WithExpandedPrecondition(!AreEqual(Var("myObject"), Var("otherObject"))),
+                ActionSchemas: ContainerDomain.ActionSchemas,
+                ExpectedBindings: new()
+                {
+                    [Var("A")] = Var("myObject"),
+                }),
+
+            new( // Extra effect elements should also be allowed
+                Action: ContainerDomain
+                    .Add(Var("myObject"))
+                    .WithExpandedEffect(AreEqual(Var("myObject"), Var("something"))),
+                ActionSchemas: ContainerDomain.ActionSchemas,
+                ExpectedBindings: new()
+                {
+                    [Var("A")] = Var("myObject"),
+                }),
         })
         .When(tc => ProblemInspector.GetMappingFromSchema(tc.Action, tc.ActionSchemas))
         .ThenReturns((tc, rv) => rv.Should().Be(new VariableSubstitution(tc.ExpectedBindings)));
@@ -191,17 +201,13 @@ public static class ProblemInspectorTests
                 Action: new("Bad Action Identifier", new(), new()),
                 ActionSchemas: ContainerDomain.ActionSchemas),
 
-            new( // Extra effect elements should cause failure (or should we succeed as long as we can consistently bind all the vars in the schema? because Postel)
-                Action: ContainerDomain.Add(Var("myObject")).WithExpandedEffect(AreEqual(Var("myObject"), Var("something"))),
+            new( // Missing effect elements should cause failure, perhaps?
+                Action: ContainerDomain.Add(Var("myObject")).WithReducedEffect(IsPresent(Var("myObject"))),
                 ActionSchemas: ContainerDomain.ActionSchemas),
 
-            ////new( // Missing effect elements should cause failure, perhaps? (or should we succeed as long as we can consistently bind all the vars in the schema? because Postel)
-            ////    Action: ContainerDomain.Add(Var("myObject")).WithReducedEffect(IsPresent(Var("myObject"))),
-            ////    ActionSchemas: ContainerDomain.ActionSchemas),
-
-            ////new( // Missing prerequisite elements should cause failure, perhaps? (or should we succeed as long as we can consistently bind all the vars in the schema? because Postel)
-            ////    Action: ContainerDomain.Add(Var("myObject")).WithReducedPrecondition(!IsPresent(Var("myObject"))),
-            ////    ActionSchemas: ContainerDomain.ActionSchemas),
+            new( // Missing prerequisite elements should cause failure, perhaps?
+                Action: ContainerDomain.Add(Var("myObject")).WithReducedPrecondition(!IsPresent(Var("myObject"))),
+                ActionSchemas: ContainerDomain.ActionSchemas),
         })
         .When(tc => ProblemInspector.GetMappingFromSchema(tc.Action, tc.ActionSchemas))
         .ThenThrows();
