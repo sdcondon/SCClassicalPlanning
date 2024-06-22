@@ -11,6 +11,8 @@ public static class SpareTireDomain
 {
     static SpareTireDomain()
     {
+        ActionSchemas = MakeActionSchemas();
+
         ExampleProblem = MakeProblem(
             initialState: new HashSetState(
                 IsTire(Spare)
@@ -24,7 +26,7 @@ public static class SpareTireDomain
     /// <summary>
     /// Gets the actions that are available in the "Spare Tire" domain.
     /// </summary>
-    public static IQueryable<Action> ActionSchemas { get; } = MakeActionSchemas();
+    public static IQueryable<Action> ActionSchemas { get; }
 
     /// <summary>
     /// Gets an instance of the customary example problem in this domain.
