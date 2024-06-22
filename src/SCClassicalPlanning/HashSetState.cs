@@ -71,7 +71,6 @@ public class HashSetState : IState
     /// </summary>
     public ImmutableHashSet<Predicate> Elements { get; }
 
-    // TODO-PERFORMANCE: at some point look at (test me!) efficiency here. ImmutableHashSet builder stuff might be of use?
     /// <inheritdoc />
     IState IState.Apply(Effect effect) => new HashSetState(Elements.Except(effect.DeleteList).Union(effect.AddList));
 
@@ -150,7 +149,6 @@ public class HashSetState : IState
     {
         var hashCode = new HashCode();
         
-        // Again, terrible for large states.
         foreach (var element in Elements.OrderBy(e => e.GetHashCode()))
         {
             hashCode.Add(element);
