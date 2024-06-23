@@ -430,8 +430,6 @@ public static class ProblemInspector
         foreach (var unboundVariable in unboundVariables)
         {
             allPossibleSubstitutions = allPossibleSubstitutions.SelectMany(
-                // NB the AsEnumerable here to reduce requirements on what the IQueryable
-                // implementation needs to support. Still unconvinced about using IQueryable, TBH.
                 u => constants.Select(o => u.CopyAndAdd(KeyValuePair.Create(unboundVariable, (Term)o)))
             );
         }
