@@ -54,8 +54,17 @@ public class PlanFormatter
     /// <returns></returns>
     public string Format(Action action)
     {
-        VariableSubstitution substitution = ProblemInspector.GetMappingFromSchema(action, problem.ActionSchemas);
+        VariableSubstitution substitution = ProblemInspector.GetMappingFromSchema(action, problem.ActionSchemas, out var extraPreconditions);
         var orderedBindings = substitution.Bindings.OrderBy(b => b.Key.Identifier.ToString());
-        return $"{action.Identifier}({string.Join(", ", orderedBindings.Select(b => b.Key.ToString() + ": " + b.Value.ToString()))})";
+        var formattedBindings = $"{action.Identifier}({string.Join(", ", orderedBindings.Select(b => b.Key.ToString() + ": " + b.Value.ToString()))})";
+
+        if (extraPreconditions.Any())
+        {
+            return $"{formattedBindings} where {string.Join(" ∧ ", extraPreconditions)}";
+        }
+        else
+        {
+            return formattedBindings;
+        }
     }
 }

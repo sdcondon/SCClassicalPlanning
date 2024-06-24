@@ -15,6 +15,7 @@ using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
 using SCFirstOrderLogic.SentenceManipulation.Unification;
+using System.CodeDom;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SCClassicalPlanning.Planning.Utilities;
@@ -30,6 +31,22 @@ namespace SCClassicalPlanning.Planning.Utilities;
 /// </summary>
 public static class ProblemInspector
 {
+    /// <summary>
+    /// Gets the ground actions that are applicable from a given state in a given problem.
+    /// </summary>
+    /// <param name="actionSchemas">The available action schemas.</param>
+    /// <param name="state">The state to retrieve the applicable actions for.</param>
+    /// <returns>The actions that are applicable from the given state.</returns>
+    public static IEnumerable<Action> GetApplicableActions(IState state, IQueryable<Action> actionSchemas)
+    {
+        // Now we can try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
+        foreach (var (Schema, Substitution) in GetApplicableActionDetails(state, actionSchemas))
+        {
+            // For each substitution, apply it to the action schema and return it:
+            yield return new VariableSubstitutionActionTransformation(Substitution).ApplyTo(Schema);
+        }
+    }
+
     /// <summary>
     /// Gets the (action schema, ground variable substitution) pairings that represent actions that are applicable from a given state in a given problem.
     /// </summary>
@@ -118,17 +135,22 @@ public static class ProblemInspector
     }
 
     /// <summary>
-    /// Gets the ground actions that are applicable from a given state in a given problem.
+    /// <para>
+    /// Gets the *ground* actions that are relevant to a given goal in a given problem.
+    /// </para>
+    /// <para>
+    /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
+    /// See <see cref="GetRelevantLiftedActions"/> for a variable-preserving equivalent to this method.
+    /// </para>
     /// </summary>
-    /// <param name="actionSchemas">The available action schemas.</param>
-    /// <param name="state">The state to retrieve the applicable actions for.</param>
-    /// <returns>The actions that are applicable from the given state.</returns>
-    public static IEnumerable<Action> GetApplicableActions(IState state, IQueryable<Action> actionSchemas)
+    /// <param name="goal">The goal to retrieve the relevant actions for.</param>
+    /// <param name="actionSchemas">The available actions.</param>
+    /// <param name="constants">The available constants.</param>
+    /// <returns>The actions that are relevant to the given state.</returns>
+    public static IEnumerable<Action> GetRelevantGroundActions(Goal goal, IQueryable<Action> actionSchemas, IEnumerable<Constant> constants)
     {
-        // Now we can try to find appropriate variable substitutions, which is what this (recursive) MatchWithState method does:
-        foreach (var (Schema, Substitution) in GetApplicableActionDetails(state, actionSchemas))
+        foreach (var (Schema, Substitution) in GetRelevantGroundActionDetails(goal, actionSchemas, constants))
         {
-            // For each substitution, apply it to the action schema and return it:
             yield return new VariableSubstitutionActionTransformation(Substitution).ApplyTo(Schema);
         }
     }
@@ -215,23 +237,16 @@ public static class ProblemInspector
     }
 
     /// <summary>
-    /// <para>
-    /// Gets the *ground* actions that are relevant to a given goal in a given problem.
-    /// </para>
-    /// <para>
-    /// NB: All the results here are ground results - which is of course rather (potentially extremely) inefficient if the problem is large.
-    /// See <see cref="GetRelevantLiftedActions"/> for a variable-preserving equivalent to this method.
-    /// </para>
+    /// Gets the actions that are relevant to a given goal in a given problem.
     /// </summary>
     /// <param name="goal">The goal to retrieve the relevant actions for.</param>
-    /// <param name="actionSchemas">The available actions.</param>
-    /// <param name="constants">The available constants.</param>
+    /// <param name="actionSchemas">The available action schemas.</param>
     /// <returns>The actions that are relevant to the given state.</returns>
-    public static IEnumerable<Action> GetRelevantGroundActions(Goal goal, IQueryable<Action> actionSchemas, IEnumerable<Constant> constants)
+    public static IEnumerable<Action> GetRelevantLiftedActions(Goal goal, IQueryable<Action> actionSchemas)
     {
-        foreach (var (Schema, Substitution) in GetRelevantGroundActionDetails(goal, actionSchemas, constants))
+        foreach (var (Schema, Substitution, Constraints) in GetRelevantLiftedActionDetails(goal, actionSchemas))
         {
-            yield return new VariableSubstitutionActionTransformation(Substitution).ApplyTo(Schema);
+            yield return new SchemaTransformation(Substitution, Constraints).ApplyTo(Schema);
         }
     }
 
@@ -312,20 +327,6 @@ public static class ProblemInspector
     }
 
     /// <summary>
-    /// Gets the actions that are relevant to a given goal in a given problem.
-    /// </summary>
-    /// <param name="goal">The goal to retrieve the relevant actions for.</param>
-    /// <param name="actionSchemas">The available action schemas.</param>
-    /// <returns>The actions that are relevant to the given state.</returns>
-    public static IEnumerable<Action> GetRelevantLiftedActions(Goal goal, IQueryable<Action> actionSchemas)
-    {
-        foreach (var (Schema, Substitution, Constraints) in GetRelevantLiftedActionDetails(goal, actionSchemas))
-        {
-            yield return new SchemaTransformation(Substitution, Constraints).ApplyTo(Schema);
-        }
-    }
-
-    /// <summary>
     /// <para>
     /// Gets the variable substitution that must be made to transform the matching action schema (with the matching identifier)
     /// in the <see cref="Problem.ActionSchemas"/> of the given problem to the given action.
@@ -335,21 +336,29 @@ public static class ProblemInspector
     /// information (planners won't and shouldn't care what the original variable name was), but it is useful when
     /// producing human-readable information.
     /// </para>
-    /// <para>
-    /// Note that we are effectively recreating the substitutions built by the relevant <see cref="ProblemInspector"/> methods, here.
-    /// An alternative approach would of course be for those methods to return both the schema and the substitution (rather than just the
-    /// transformed action), so that the algorithm can keep track itself if it wants to. For now at least though, I'm prioritising keep the
-    /// actual planning as lean and mean as possible over making the action formatting super snappy.
-    /// </para>
     /// </summary>
     /// <returns>A <see cref="VariableSubstitution"/> that maps the variables as defined in the schema to the terms referred to in the provided action.</returns>
     public static VariableSubstitution GetMappingFromSchema(Action action, IQueryable<Action> actionSchemas)
     {
-        // TODO: All rationalisations aside, this is a bit naff. Sort me out.
+        return GetMappingFromSchema(action, actionSchemas, out _);
+    }
+
+    public static VariableSubstitution GetMappingFromSchema(Action action, IQueryable<Action> actionSchemas, out IEnumerable<Literal> extraPreconditionElements)
+    {
+        IEnumerable<VariableSubstitution> MatchWithSchema(Action action, Action schema, VariableSubstitution unifier)
+        {
+            foreach (var preconditionSub in MatchWithSchemaElements(action.Precondition.Elements, schema.Precondition.Elements, unifier))
+            {
+                foreach (var sub in MatchWithSchemaElements(action.Effect.Elements, schema.Effect.Elements, unifier))
+                {
+                    yield return sub;
+                }
+            }
+        }
 
         // Note that this is mostly awkward due to the unordered nature of elements. If we preserved the order of things in our model classes then
         // matching would of course be much easier. HOWEVER, of course when it comes to equality (super important) we need order NOT to matter.
-        // We could of course offer the best of both worlds, but I'm not ready to add any more complexity than is absolutely needed to our model just yet..
+        // We could of course offer the best of both worlds - but doing so 
         IEnumerable<VariableSubstitution> MatchWithSchemaElements(IEnumerable<Literal> actionElements, IEnumerable<Literal> schemaElements, VariableSubstitution unifier)
         {
             if (!schemaElements.Any())
@@ -373,24 +382,35 @@ public static class ProblemInspector
             }
         }
 
-        IEnumerable<VariableSubstitution> MatchWithSchema(Action action, Action schema, VariableSubstitution unifier)
+        IEnumerable<Literal> GetExtraElements(IEnumerable<Literal> actionElements, IEnumerable<Literal> schemaElements)
         {
-            foreach (var preconditionSub in MatchWithSchemaElements(action.Precondition.Elements, schema.Precondition.Elements, unifier))
+            foreach (var actionElement in actionElements)
             {
-                foreach (var sub in MatchWithSchemaElements(action.Effect.Elements, schema.Effect.Elements, unifier))
+                if (!schemaElements.Contains(actionElement))
                 {
-                    yield return sub;
+                    yield return actionElement;
                 }
             }
         }
 
-        var schema =
-            actionSchemas.SingleOrDefault(a => a.Identifier.Equals(action.Identifier))
+        var matchingSchema = actionSchemas.SingleOrDefault(a => a.Identifier.Equals(action.Identifier))
             ?? throw new ArgumentException($"Action not found! There is no action in the domain with identifier '{action.Identifier}'");
 
-        // It's possible for more than one entry here - but where they do exist they will be duplicates
+        // It's possible for more than one entry here - but where they do exist they will essentially be duplicates.
         // Probably worth an investigation into performance here, but just returning the first hit is fine.
-        return MatchWithSchema(action, schema, new VariableSubstitution()).First();
+        var mappingFromSchema = MatchWithSchema(action, matchingSchema, new VariableSubstitution()).First();
+
+        var transformedSchema = new VariableSubstitutionActionTransformation(mappingFromSchema).ApplyTo(matchingSchema);
+
+        var extraEffectElements = GetExtraElements(action.Effect.Elements, transformedSchema.Effect.Elements);
+        if (extraEffectElements.Any())
+        {
+            throw new ArgumentException($"Action contains extra effect element(s): {string.Join(", ", extraEffectElements)}");
+        }
+
+        extraPreconditionElements = GetExtraElements(action.Precondition.Elements, transformedSchema.Precondition.Elements);
+
+        return mappingFromSchema;
     }
 
     /// <summary>
@@ -443,6 +463,11 @@ public static class ProblemInspector
 
         public override VariableDeclaration ApplyTo(VariableDeclaration variableDeclaration)
         {
+            if (variableDeclaration.Identifier is StandardisedVariableSymbol)
+            {
+                return variableDeclaration;
+            }
+
             if (!mapping.TryGetValue(variableDeclaration, out var standardisedVariableDeclaration))
             {
                 standardisedVariableDeclaration = mapping[variableDeclaration] = new VariableDeclaration(new StandardisedVariableSymbol(variableDeclaration.Identifier));
@@ -456,14 +481,15 @@ public static class ProblemInspector
     // This is important to be able to use the same action more than once in a plan.
     // TODO-BUG-MAJOR: Probable issue - when identifying distinct goals in state space search,
     // some degree of recognition of variables being the same would be useful.
-    // Might need to be logic in Goal, not here..
     internal class StandardisedVariableSymbol
     {
+        private static int nextIndex = 0; // very temp, just to make it clear how wrong this is as yet..
+
         public StandardisedVariableSymbol(object originalSymbol) => OriginalSymbol = originalSymbol;
 
         internal object OriginalSymbol { get; }
 
-        public override string ToString() => $"<{OriginalSymbol}>";
+        public override string ToString() => $"<{OriginalSymbol}-{Interlocked.Increment(ref nextIndex)}>";
     }
 
     private class SchemaTransformation : RecursiveActionTransformation
