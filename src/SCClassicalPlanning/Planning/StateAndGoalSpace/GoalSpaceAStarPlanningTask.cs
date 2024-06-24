@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using SCClassicalPlanning.Planning.Utilities;
 using SCGraphTheory.Search.Classic;
 
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
@@ -31,10 +32,10 @@ public class GoalSpaceAStarPlanningTask : SteppablePlanningTask<GoalSpaceEdge>
     /// </summary>
     /// <param name="problem">The problem to solve.</param>
     /// <param name="costStrategy">The cost strategy to use.</param>
-    public GoalSpaceAStarPlanningTask(Problem problem, ICostStrategy costStrategy)
+    public GoalSpaceAStarPlanningTask(Problem problem, ICostStrategy costStrategy, InvariantInspector invariantInspector)
     {
         search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
-            source: new GoalSpaceNode(problem, problem.EndGoal),
+            source: new GoalSpaceNode(Tuple.Create(problem, invariantInspector), problem.EndGoal),
             isTarget: n => problem.InitialState.Meets(n.Goal),
             getEdgeCost: e => costStrategy.GetCost(e.Action),
             getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));

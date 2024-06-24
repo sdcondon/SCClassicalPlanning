@@ -3,8 +3,15 @@
 @using SCClassicalPlanning;
 @using SCClassicalPlanning.ExampleDomains.AsPDDL;
 @using SCClassicalPlanning.Planning.StateAndGoalSpace;
+@using SCClassicalPlanning.Planning.Utilities
 @using SCClassicalPlanning.ProblemCreation;
 @using System.ComponentModel.DataAnnotations;
+@using SCFirstOrderLogic
+@using SCFirstOrderLogic.Inference
+@using SCFirstOrderLogic.Inference.BackwardChaining
+@using SCFirstOrderLogic.Inference.ForwardChaining
+@using SCFirstOrderLogic.Inference.Resolution
+@using SCFirstOrderLogic.SentenceCreation
 
 <h3>Goal Space Explorer <a data-bs-toggle="modal" data-bs-target="#explanationModal" href="#"><span class="bi bi-info-circle" aria-hidden="true"></span></a></h3>
 
@@ -72,6 +79,20 @@
         <InputTextArea class="form-control small" id="factsTextArea" @bind-Value=formData.ProblemPDDL rows="12" />
         <ValidationMessage For="@(() => formData.ProblemPDDL)" />
     </div>
+    <div class="form-group col-12">
+        <label for="kbTypeSelect">Invariants Knowledge Base Type</label>
+        <InputSelect class="form-control" id="kbTypeSelect" @bind-Value=formData.KnowledgeBaseDescription>
+            @foreach (var key in KnowledgeBaseOptions.Keys)
+            {
+                <option>@key</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="form-group col-12">
+        <label for="factsTextArea">Invariants Knowledge</label>
+        <InputTextArea class="form-control" id="factsTextArea" @bind-Value=formData.Knowledge rows="8" />
+        <ValidationMessage For="@(() => formData.Knowledge)" />
+    </div>
     <div class="form-group mt-2 col-12">
         <button type="submit" class="btn btn-primary">Submit / Reset</button>
     </div>
@@ -114,7 +135,7 @@
     {
         <ol class="mt-4">
             @{
-                RenderListItem(null, new GoalSpaceNode(problem, problem.EndGoal), path.First?.Value);
+                RenderListItem(null, new GoalSpaceNode(Tuple.Create(problem, (InvariantInspector?)null), problem.EndGoal), path.First?.Value);
             }
 
             @for (var n = path.First; n != null; n = n.Next)
@@ -127,27 +148,55 @@
 
 @code {
     private static Dictionary<string, Func<FormData>> Presets = new()
-        {
-            ["[Empty]"] = () => new(
-                domainPddl: string.Empty,
-                problemPddl: string.Empty),
+    {
+        ["[Empty]"] = () => new(
+            domainPddl: string.Empty,
+            problemPddl: string.Empty,
+            knowledgeBaseDescription: string.Empty,
+            knowledge: []),
 
-            ["Blocks World"] = () => new(
-                domainPddl: BlocksWorldDomain.DomainPDDL,
-                problemPddl: BlocksWorldDomain.ExampleProblemPDDL),
+        ["Blocks World"] = () => new(
+            domainPddl: BlocksWorldDomain.DomainPDDL,
+            problemPddl: BlocksWorldDomain.ExampleProblemPDDL,
+            knowledgeBaseDescription: "Backward Chaining",
+            knowledge: 
+            [
+                "Block(blockA)",
+                "Block(blockB)",
+                "Block(blockC)",
+                "!Block(Table)",
+                "forall a, b, On(a, b) => !Clear(b)"
+            ]),
 
-            ["Air Cargo"] = () => new(
-                domainPddl: AirCargoDomain.DomainPDDL,
-                problemPddl: AirCargoDomain.ExampleProblemPDDL),
-        };
+        ["Air Cargo"] = () => new(
+            domainPddl: AirCargoDomain.DomainPDDL,
+            problemPddl: AirCargoDomain.ExampleProblemPDDL,
+            knowledgeBaseDescription: "Resolution (Unit Preference)",
+            knowledge: []),
+    };
+
+    private static Dictionary<string, Func<IKnowledgeBase>> KnowledgeBaseOptions = new()
+    {
+        ["Backward Chaining"] = () => new BackwardChainingKnowledgeBase(
+            new BlazorWasmBCClauseStore()),
+
+        ["Forward Chaining"] = () => new ForwardChainingKnowledgeBase(
+            new BlazorWasmFCClauseStore()),
+
+        ["Resolution (Unit Preference)"] = () => new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
+            new BlazorWasmResClauseStore(),
+            DelegateResolutionStrategy.Filters.None,
+            DelegateResolutionStrategy.PriorityComparisons.UnitPreference)),
+    };
 
     private FormData formData = Presets["Blocks World"].Invoke();
 
     private Exception? parseError = null; // TODO: should be done via form validation instead.. tidy me!
     private Problem? problem = null;
+    private InvariantInspector? invariantInspector = null;
     private LinkedList<GoalSpaceEdge> path = new();
 
-    private void HandleFormSubmission(EditContext editContext)
+    private async Task HandleFormSubmission(EditContext editContext)
     {
         problem = null;
         path.Clear();
@@ -155,6 +204,10 @@
         if (editContext.Validate())
         {
             problem = PddlParser.ParseProblem(formData.ProblemPDDL, formData.DomainPDDL);
+
+            IKnowledgeBase knowledgeBase = KnowledgeBaseOptions[formData.KnowledgeBaseDescription].Invoke();
+            await knowledgeBase.TellAsync(SentenceParser.BasicParser.ParseList(formData.Knowledge));
+            invariantInspector = new InvariantInspector(knowledgeBase);
         }
     }
 
@@ -179,15 +232,21 @@
 
     private class FormData : IValidatableObject
     {
-        public FormData(string domainPddl, string problemPddl)
+        public FormData(string domainPddl, string problemPddl, string knowledgeBaseDescription, string[] knowledge)
         {
             this.DomainPDDL = domainPddl;
             this.ProblemPDDL = problemPddl;
+            this.KnowledgeBaseDescription = knowledgeBaseDescription;
+            this.Knowledge = string.Join(Environment.NewLine, knowledge);
         }
 
         public string DomainPDDL { get; set; }
 
         public string ProblemPDDL { get; set; }
+
+        public string KnowledgeBaseDescription { get; set; }
+
+        public string Knowledge { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -213,6 +272,16 @@
             catch (Exception e)
             {
                 errors.Add(new ValidationResult(e.Message, new[] { nameof(DomainPDDL) }));
+            }
+
+            Sentence[] knowledge;
+            try
+            {
+                knowledge = SentenceParser.BasicParser.ParseList(Knowledge);
+            }
+            catch (Exception e)
+            {
+                errors.Add(new ValidationResult(e.Message, new[] { nameof(Knowledge) }));
             }
 
             return errors;
