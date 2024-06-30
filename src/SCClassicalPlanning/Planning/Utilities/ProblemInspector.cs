@@ -312,9 +312,11 @@ public static class ProblemInspector
             }
         }
 
+        var standardisation = new Standardisation(goal);
+
         foreach (var schema in actionSchemas)
         {
-            var standardisedSchema = new Standardisation().ApplyTo(schema);
+            var standardisedSchema = standardisation.ApplyTo(schema);
 
             foreach (var substitution in MatchWithGoal(standardisedSchema.Effect.Elements).Distinct())
             {
@@ -459,21 +461,25 @@ public static class ProblemInspector
 
     private class Standardisation : RecursiveActionTransformation
     {
-        private readonly Dictionary<VariableDeclaration, VariableDeclaration> mapping = new();
+        private readonly Goal goal;
+        private readonly Dictionary<VariableReference, VariableReference> mapping = new();
 
-        public override VariableDeclaration ApplyTo(VariableDeclaration variableDeclaration)
+        public Standardisation(Goal goal) => this.goal = goal;
+
+        public override VariableReference ApplyTo(VariableReference variableReference)
         {
-            if (variableDeclaration.Identifier is StandardisedVariableSymbol)
+            // should never happen - only applied to schemas..
+            if (variableReference.Declaration.Identifier is StandardisedVariableSymbol)
             {
-                return variableDeclaration;
+                return variableReference;
             }
 
-            if (!mapping.TryGetValue(variableDeclaration, out var standardisedVariableDeclaration))
+            if (!mapping.TryGetValue(variableReference, out var mappedReference))
             {
-                standardisedVariableDeclaration = mapping[variableDeclaration] = new VariableDeclaration(new StandardisedVariableSymbol(variableDeclaration.Identifier));
+                mappedReference = mapping[variableReference] = new VariableReference(new StandardisedVariableSymbol(goal, variableReference.Declaration.Identifier));
             }
 
-            return standardisedVariableDeclaration;
+            return mappedReference;
         }
     }
 
@@ -483,13 +489,25 @@ public static class ProblemInspector
     // some degree of recognition of variables being the same would be useful.
     internal class StandardisedVariableSymbol
     {
-        private static int nextIndex = 0; // very temp, just to make it clear how wrong this is as yet..
+        public StandardisedVariableSymbol(Goal goal, object originalSymbol) => (Goal, OriginalSymbol) = (goal, originalSymbol);
 
-        public StandardisedVariableSymbol(object originalSymbol) => OriginalSymbol = originalSymbol;
+        internal Goal Goal { get; }
 
         internal object OriginalSymbol { get; }
 
-        public override string ToString() => $"<{OriginalSymbol}-{Interlocked.Increment(ref nextIndex)}>";
+        public override string ToString() => $"<{OriginalSymbol}-{Convert.ToBase64String(BitConverter.GetBytes(GetHashCode())).TrimEnd('=')}>";
+
+        public override bool Equals(object? obj)
+        {
+            return obj is StandardisedVariableSymbol otherSymbol
+                && Goal.Equals(otherSymbol.Goal)
+                && OriginalSymbol.Equals(otherSymbol.OriginalSymbol);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Goal.GetHashCode(), OriginalSymbol.GetHashCode());
+        }
     }
 
     private class SchemaTransformation : RecursiveActionTransformation
