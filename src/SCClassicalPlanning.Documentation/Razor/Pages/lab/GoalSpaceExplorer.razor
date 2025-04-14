@@ -6,7 +6,7 @@
 @using SCClassicalPlanning.ProblemCreation;
 @using System.ComponentModel.DataAnnotations;
 
-<h3>Lab - Goal Space Explorer <Button Clicked="ShowExplanationModal" Size="Size.Small" Color="Color.Primary"><Icon Name="@("bi-info-circle")"></Icon></Button></h3>
+<h3>Lab - Goal Space Explorer <Button Clicked="ShowExplanationModal" Size="Size.Small" Color="Color.Primary"><Icon Name="IconName.InfoCircle"></Icon></Button></h3>
 
 <Modal @ref="explanationModal">
     <ModalContent>
@@ -62,12 +62,12 @@
     </div>
     <div class="form-group col-md-6">
         <label for="domainPddlTextArea">Domain PDDL</label>
-        <InputTextArea class="form-control small" id="domainPddlTextArea" @bind-Value=formData.DomainPDDL rows="12" />
+        <InputTextArea class="form-control small" id="domainPddlTextArea" spellcheck="false" @bind-Value=formData.DomainPDDL rows="12" />
         <ValidationMessage For="@(() => formData.DomainPDDL)" />
     </div>
     <div class="form-group col-md-6">
         <label for="problemPddlTextArea">Problem PDDL</label>
-        <InputTextArea class="form-control small" id="factsTextArea" @bind-Value=formData.ProblemPDDL rows="12" />
+        <InputTextArea class="form-control small" id="factsTextArea" spellcheck="false" @bind-Value=formData.ProblemPDDL rows="12" />
         <ValidationMessage For="@(() => formData.ProblemPDDL)" />
     </div>
     <div class="form-group mt-2 col-12">
