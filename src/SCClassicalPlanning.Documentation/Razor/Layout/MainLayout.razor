@@ -1,0 +1,66 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
+
+<Layout Sider ElementId="page">
+
+    <LayoutSider>
+        <LayoutSiderContent ElementId="sidebar" Width="Width.Is100">
+            <Div Class="top-row navbar navbar-dark" Padding="Padding.Is1.OnX">
+                <Dropdown>
+                    <DropdownToggle Color="Color.Primary" Background="Background.Transparent" Style="font-size: 1.1rem">
+                        <Image Source="img/SCClassicalPlanning-32.png" Text="SCClassicalPlanning icon" /> SCClassicalPlanning
+                    </DropdownToggle>
+                    <DropdownMenu>
+                        <NavDropdownItem TargetUri="https://sdcondon.net/FlUnit" IconUri="https://sdcondon.net/FlUnit/img/FlUnit-32.png" Text="FlUnit" />
+                        <NavDropdownItem TargetUri="https://sdcondon.net/SCFirstOrderLogic" IconUri="https://sdcondon.net/SCFirstOrderLogic/img/SCFirstOrderLogic-32.png" Text="SCFirstOrderLogic" />
+                        <NavDropdownItem TargetUri="https://sdcondon.net/SCGraphTheory" IconUri="https://sdcondon.net/SCGraphTheory/img/SCGraphTheoryIcon-32.png" Text="SCGraphTheory" />
+                        <NavDropdownItem TargetUri="https://sdcondon.net/SCSetTrie" IconUri="https://sdcondon.net/SCSetTrie/img/SCSetTrie-32.png" Text="SCSetTrie" />
+                        <DropdownDivider />
+                        <NavDropdownItem TargetUri="https://sdcondon.net/" IconUri="https://sdcondon.net/favicon.ico" Text="Personal Homepage" />
+                    </DropdownMenu>
+                </Dropdown>
+
+                <Button title="Navigation menu" ElementId="navbar-toggler" Clicked="ToggleNavMenu" Padding="Padding.Is2.FromEnd">
+                    <Span Class="navbar-toggler-icon"></Span>
+                </Button>
+            </Div>
+
+            <Div Class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+                <nav class="flex-column">
+                    <NavItem Href="" IconClass="bi-house-door-fill" Text="Home" Match="NavLinkMatch.All" />
+                    <NavItem Href="library-overview" IconClass="bi-braces" Text="Library Overview" />
+                    <NavItem Href="getting-started" IconClass="bi-info-circle" Text="Getting Started" />
+                    <NavItem Href="lab" IconClass="bi-tools" Text="Lab" />
+                    <NavItem Href="roadmap" IconClass="bi-signpost-split-fill" Text="Roadmap" />
+                    <NavItem Href="see-also" IconClass="bi-box-arrow-up-right" Text="See Also" />
+                </nav>
+            </Div>
+        </LayoutSiderContent>
+    </LayoutSider>
+
+    <Layout ElementId="main">
+        <LayoutHeader Fixed>
+            <Div ElementId="main-header">
+                <a href="https://www.nuget.org/packages/SCClassicalPlanning/"><img src="https://img.shields.io/nuget/v/SCClassicalPlanning.svg?style=flat-square" alt="NuGet version (SCClassicalPlanning)" /></a>
+                <a href="https://github.com/sdcondon/SCClassicalPlanning">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8" />
+                    </svg>
+                </a>
+            </Div>
+        </LayoutHeader>
+        <LayoutContent Padding="Padding.Is4.OnX" ElementId="main-content">
+            @Body
+        </LayoutContent>
+    </Layout>
+
+</Layout>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+}

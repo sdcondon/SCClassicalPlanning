@@ -1,4 +1,4 @@
-﻿@page "/lab/state-space-explorer"
+﻿@page "/lab/goal-space-explorer"
 
 @using SCClassicalPlanning;
 @using SCClassicalPlanning.ExampleDomains.AsPDDL;
@@ -6,47 +6,47 @@
 @using SCClassicalPlanning.ProblemCreation;
 @using System.ComponentModel.DataAnnotations;
 
-<h3>State Space Explorer <a data-bs-toggle="modal" data-bs-target="#explanationModal" href="#"><span class="bi bi-info-circle" aria-hidden="true"></span></a></h3>
+<h3>Lab - Goal Space Explorer <Button Clicked="ShowExplanationModal" Size="Size.Small" Color="Color.Primary"><Icon Name="@("bi-info-circle")"></Icon></Button></h3>
 
-<div class="modal fade" id="explanationModal" tabindex="-1" aria-labelledby="explanationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="explanationModalLabel">Explanation</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>
-                    This page is an interactive demonstration of (PDDL parsing and) the state space representation types found in the <a href="https://github.com/sdcondon/SCClassicalPlanning/tree/main/src/SCClassicalPlanning/Planning/StateAndGoalSpace">SCClassicalPlanning.Planning.StateAndGoalSpace</a> namespace.
-                    It runs entirely in your browser.
-                    Notes:
-                </p>
-                <ul>
-                    <li>
-                        Use the buttons at the top of the form to populate it with example domain and problem definitions,
-                        using a minimal version of <a href="https://www.google.com/search?q=planning+domain+definition+language">PDDL</a>.
-                    </li>
-                    <li>
-                        Some guidance for defining problems as PDDL will be added to the getting started page at some point before v1.
-                        For now, consult the presets and Internet resources about PDDL.
-                        Note that we use an absolutely minimal version of the earliest public version of PDDL (1.2).
-                        Absolutely no extensions are supported - not even typing.
-                        Yet.
-                    </li>
-                    <li>
-                        Once the problem definition has been submitted, a representation of the initial state of the problem will appear below the form, along with a link for each applicable action.
-                        You can explore the state space by clicking on the action to apply.
-                        Prior states will remain visible, to show the path you have taken from the initial state.
-                        A "GOAL MET!" message will be shown if you reach a state that meets the goal.
-                    </li>
-                    <li>
-                        The source code for this page can be found <a href="https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning.Documentation/Pages/lab/StateSpaceExplorer.razor">here</a>.
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+<Modal @ref="explanationModal">
+    <ModalContent>
+        <ModalHeader>
+            <ModalTitle>Lab Explanation</ModalTitle>
+            <CloseButton />
+        </ModalHeader>
+        <ModalBody>
+            <p>
+                This page is an interactive demonstration of (PDDL parsing and) the goal space representation types found in the <a href="https://github.com/sdcondon/SCClassicalPlanning/tree/main/src/SCClassicalPlanning/Planning/StateAndGoalSpace">SCClassicalPlanning.Planning.StateAndGoalSpace</a> namespace.
+                It runs entirely in your browser.
+                Notes:
+            </p>
+            <ul>
+                <li>
+                    Not advertising this until "lifted" goal space is working, and/or making use of invariants to prune obviously unmeetable goals.
+                    If you've found it anyway.. well done, I guess.
+                </li>
+                <li>
+                    Use the buttons at the top of the form to populate it with example domain and problem definitions,
+                    using a minimal version of <a href="https://www.google.com/search?q=planning+domain+definition+language">PDDL</a>.
+                </li>
+                <li>
+                    Some guidance for defining problems as PDDL will be added to the getting started page at some point before v1.
+                    For now, consult the presets and Internet resources about PDDL.
+                    Note that we use an absolutely minimal version of the earliest public version of PDDL (1.2).
+                    Absolutely no extensions are supported - not even typing.
+                    Yet.
+                </li>
+                <li>
+                    Once the problem definition has been submitted, a representation of the goal of the problem will appear below the form.
+                    You can explore the goal space by clicking on the action to regress.
+                </li>
+                <li>
+                    The source code for this page can be found <a href="https://github.com/sdcondon/SCClassicalPlanning/blob/main/src/SCClassicalPlanning.Documentation/Razor/Pages/lab/GoalSpaceExplorer.razor">here</a>.
+                </li>
+            </ul>
+        </ModalBody>
+    </ModalContent>
+</Modal>
 
 <EditForm Model=@formData OnSubmit=@HandleFormSubmission class="row" style="font-family: monospace">
     <DataAnnotationsValidator />
@@ -75,25 +75,24 @@
     </div>
 </EditForm>
 
-@if (problem != null)
-{
-    void RenderListItem(LinkedListNode<StateSpaceEdge>? lastPathNode, StateSpaceNode stateNode, StateSpaceEdge? nextExploredEdge)
+@{
+    void RenderListItem(LinkedListNode<GoalSpaceEdge>? lastPathNode, GoalSpaceNode goalNode, GoalSpaceEdge? nextExploredEdge)
     {
         <li>
-            @if (stateNode.State.Meets(problem.EndGoal))
+            @if (goalNode.Goal.IsMetBy(problem.InitialState))
             {
-                <b>GOAL MET! </b>
+                <b>INITIAL STATE MEETS THIS! </b>
             }
             @{
                 // richer formatting functionality could make this more succinct, which would be nice..
-                var stateElements = stateNode.State.Elements
-                    .OrderBy(e => e.Identifier.ToString())
-                    .ThenBy(e => string.Join(",", e.Arguments.Select(a => a.ToString())));
+                var goalElements = goalNode.Goal.Elements
+                .OrderBy(e => e.Predicate.Identifier.ToString())
+                .ThenBy(e => string.Join(",", e.Predicate.Arguments.Select(a => a.ToString())));
             }
-            @string.Join(" ∧ ", stateElements)
+            @string.Join(" ∧ ", goalElements);
 
             <ul>
-                @foreach (var edge in stateNode.Edges)
+                @foreach (var edge in goalNode.Edges)
                 {
                     <li>
                         <!-- yeah, should be a button not an anchor, but all of bootstrap's classes make it look rubbish.. -->
@@ -109,38 +108,45 @@
         </li>
     }
 
-    <ol class="mt-4">
-        @{
-            RenderListItem(null, new StateSpaceNode(problem, problem.InitialState), path.First?.Value);
-        }
+    if (problem != null)
+    {
+        <ol class="mt-4">
+            @{
+                RenderListItem(null, new GoalSpaceNode(problem, problem.EndGoal), path.First?.Value);
+            }
 
-        @for (var n = path.First; n != null; n = n.Next)
-        {
-            RenderListItem(n, n.Value.To, n.Next?.Value);
-        }
-    </ol>
+            @for (var n = path.First; n != null; n = n.Next)
+            {
+                RenderListItem(n, n.Value.To, n.Next?.Value);
+            }
+        </ol>
+    }
 }
 
 @code {
     private static Dictionary<string, Func<FormData>> Presets = new()
-    {
-        ["[Empty]"] = () => new(
-            domainPddl: string.Empty,
-            problemPddl: string.Empty),
+        {
+            ["[Empty]"] = () => new(
+                domainPddl: string.Empty,
+                problemPddl: string.Empty),
 
-        ["Blocks World"] = () => new(
-            domainPddl: BlocksWorldDomain.DomainPDDL,
-            problemPddl: BlocksWorldDomain.ExampleProblemPDDL),
+            ["Blocks World"] = () => new(
+                domainPddl: BlocksWorldDomain.DomainPDDL,
+                problemPddl: BlocksWorldDomain.ExampleProblemPDDL),
 
-        ["Air Cargo"] = () => new(
-            domainPddl: AirCargoDomain.DomainPDDL,
-            problemPddl: AirCargoDomain.ExampleProblemPDDL),
-    };
+            ["Air Cargo"] = () => new(
+                domainPddl: AirCargoDomain.DomainPDDL,
+                problemPddl: AirCargoDomain.ExampleProblemPDDL),
+        };
 
+    private Modal? explanationModal;
     private FormData formData = Presets["Blocks World"].Invoke();
 
+    private Exception? parseError = null; // TODO: should be done via form validation instead.. tidy me!
     private Problem? problem = null;
-    private LinkedList<StateSpaceEdge> path = new();
+    private LinkedList<GoalSpaceEdge> path = new();
+
+    private Task ShowExplanationModal() => explanationModal!.Show();
 
     private void HandleFormSubmission(EditContext editContext)
     {
@@ -153,7 +159,7 @@
         }
     }
 
-    private void ExploreEdge(LinkedListNode<StateSpaceEdge>? lastPathNode, StateSpaceEdge edge)
+    private void ExploreEdge(LinkedListNode<GoalSpaceEdge>? lastPathNode, GoalSpaceEdge edge)
     {
         if (lastPathNode != null)
         {
