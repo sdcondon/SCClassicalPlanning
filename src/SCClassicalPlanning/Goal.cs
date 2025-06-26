@@ -25,8 +25,8 @@ namespace SCClassicalPlanning;
 /// <para>
 /// A <see cref="Goal"/> is essentially just a set of <see cref="Literal"/>s. The positive ones indicate predicates that must exist
 /// in a <see cref="IState"/> for it to meet the goal. The negative ones indicate predicates that must NOT exist in a state for
-/// it to meet the goal. Goals are used to describe the end goal of <see cref="Problem"/> instances, as well as the precondition
-/// of <see cref="Action"/> instances.
+/// it to meet the goal. Goals are used to describe the end goal of <see cref="Problem"/>s, as well as the precondition
+/// of <see cref="Action"/>s.
 /// </para>
 /// </summary>
 public class Goal
