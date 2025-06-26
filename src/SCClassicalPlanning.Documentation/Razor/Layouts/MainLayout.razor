@@ -1,7 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject NavigationManager NavigationManager
 
-
 <Layout Sider ElementId="page">
 
     <LayoutSider>
@@ -25,7 +24,6 @@
                     <Span Class="navbar-toggler-icon"></Span>
                 </Button>
             </Div>
-
             <Div Class="@NavMenuCssClass" @onclick="ToggleNavMenu">
                 <nav class="flex-column">
                     @NavLink(new { Href = "", IconClass = "bi-house-door-fill", Text = "Home", Match=NavLinkMatch.All })
