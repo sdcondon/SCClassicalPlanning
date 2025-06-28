@@ -10,10 +10,10 @@ namespace SCClassicalPlanning.Planning.GraphPlan;
 
 public static class PlanningGraphTests
 {
-    private static readonly Constant blockA = new(nameof(blockA));
-    private static readonly Constant blockB = new(nameof(blockB));
-    private static readonly Constant blockC = new(nameof(blockC));
-    private static readonly Constant Table = new(nameof(Table));
+    private static readonly Function blockA = new(nameof(blockA));
+    private static readonly Function blockB = new(nameof(blockB));
+    private static readonly Function blockC = new(nameof(blockC));
+    private static readonly Function Table = new(nameof(Table));
 
     private record ConstructionTestCase(Problem Problem, ISet<Literal> ExpectedLayer0Propositions);
 

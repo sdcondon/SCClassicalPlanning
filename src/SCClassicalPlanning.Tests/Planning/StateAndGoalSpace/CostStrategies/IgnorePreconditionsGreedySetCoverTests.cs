@@ -9,10 +9,10 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 
 public static class IgnorePreconditionsGreedySetCoverTests
 {
-    private static readonly Constant cargo1 = new(nameof(cargo1));
-    private static readonly Constant cargo2 = new(nameof(cargo2));
-    private static readonly Constant airport1 = new(nameof(airport1));
-    private static readonly Constant airport2 = new(nameof(airport2));
+    private static readonly Function cargo1 = new(nameof(cargo1));
+    private static readonly Function cargo2 = new(nameof(cargo2));
+    private static readonly Function airport1 = new(nameof(airport1));
+    private static readonly Function airport2 = new(nameof(airport2));
 
     private static readonly VariableDeclaration somePlane = new(nameof(somePlane));
 

@@ -18,7 +18,7 @@ namespace SCClassicalPlanning.ProblemManipulation;
 
 public static class IStateExtensions
 {
-    public static IEnumerable<Constant> GetAllConstants(this IState state)
+    public static IEnumerable<Function> GetAllConstants(this IState state)
     {
         return state.Elements.SelectMany(p => ConstantFinder.GetAllConstants(p)).Distinct();
     }
@@ -29,23 +29,29 @@ public static class IStateExtensions
     }
 
     /// <summary>
-    /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="IState"/>, and add them to a given <see cref="HashSet{T}"/>.
+    /// Utility class to find constants within the elements of a <see cref="IState"/>, and add them to a given <see cref="HashSet{T}"/>.
     /// </summary>
-    private class ConstantFinder : RecursiveSentenceVisitor<HashSet<Constant>>
+    private class ConstantFinder : RecursiveSentenceVisitor<HashSet<Function>>
     {
         private static readonly ConstantFinder _instance = new();
 
         private ConstantFinder() { }
 
-        public static IEnumerable<Constant> GetAllConstants(Predicate predicate)
+        public static IEnumerable<Function> GetAllConstants(Predicate predicate)
         {
-            HashSet<Constant> result = new();
+            HashSet<Function> result = new();
             _instance.Visit(predicate, result);
             return result;
         }
 
         /// <inheritdoc/>
-        public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
+        public override void Visit(Function function, HashSet<Function> constants)
+        {
+            if (function.IsGroundTerm)
+            {
+                constants.Add(function);
+            }
+        }
     }
 
     private class PredicateFinder : RecursiveActionVisitor<HashSet<Predicate>>

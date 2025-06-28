@@ -7,8 +7,8 @@ namespace SCClassicalPlanning;
 
 public static class ActionTests
 {
-    private static readonly Constant element1 = new(nameof(element1));
-    private static readonly Constant element2 = new(nameof(element2));
+    private static readonly Function element1 = new(nameof(element1));
+    private static readonly Function element2 = new(nameof(element2));
 
     private record IsApplicableToTestCase(HashSetState State, Action Action, bool ExpectedResult);
 

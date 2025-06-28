@@ -15,7 +15,7 @@ using SCClassicalPlanning.InternalUtilities;
 using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation;
-using SCFirstOrderLogic.SentenceManipulation.Unification;
+using SCFirstOrderLogic.SentenceManipulation.VariableManipulation;
 using System.Collections.Immutable;
 
 namespace SCClassicalPlanning;
@@ -194,9 +194,9 @@ public class HashSetState : IState
 
 
     /// <summary>
-    /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="IState"/>, and add them to a given <see cref="HashSet{T}"/>.
+    /// Utility class to find constants within the elements of a <see cref="IState"/>, and add them to a given <see cref="HashSet{T}"/>.
     /// </summary>
-    private class StateConstantFinder : RecursiveStateVisitor<HashSet<Constant>>
+    private class StateConstantFinder : RecursiveStateVisitor<HashSet<Function>>
     {
         /// <summary>
         /// Gets a singleton instance of the <see cref="StateConstantFinder"/> class.
@@ -204,13 +204,19 @@ public class HashSetState : IState
         public static StateConstantFinder Instance { get; } = new();
 
         /// <inheritdoc/>
-        public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
+        public override void Visit(Function function, HashSet<Function> constants)
+        {
+            if (function.IsGroundTerm)
+            {
+                constants.Add(function);
+            }
+        }
     }
 
     /// <summary>
-    /// Utility class to find <see cref="Constant"/> instances within the elements of a <see cref="Goal"/>, and add them to a given <see cref="HashSet{T}"/>.
+    /// Utility class to find constants within the elements of a <see cref="Goal"/>, and add them to a given <see cref="HashSet{T}"/>.
     /// </summary>
-    private class GoalConstantFinder : RecursiveGoalVisitor<HashSet<Constant>>
+    private class GoalConstantFinder : RecursiveGoalVisitor<HashSet<Function>>
     {
         /// <summary>
         /// Gets a singleton instance of the <see cref="GoalConstantFinder"/> class.
@@ -218,6 +224,12 @@ public class HashSetState : IState
         public static GoalConstantFinder Instance { get; } = new();
 
         /// <inheritdoc/>
-        public override void Visit(Constant constant, HashSet<Constant> constants) => constants.Add(constant);
+        public override void Visit(Function function, HashSet<Function> constants)
+        {
+            if (function.IsGroundTerm)
+            {
+                constants.Add(function);
+            }
+        }
     }
 }

@@ -4,7 +4,8 @@ using SCClassicalPlanning.ExampleDomains.AsCode;
 using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
-using SCFirstOrderLogic.Inference.Resolution;
+using SCFirstOrderLogic.Inference.Basic.KnowledgeBaseDecoration;
+using SCFirstOrderLogic.Inference.Basic.Resolution;
 using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargoDomain;
 using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
@@ -24,12 +25,12 @@ public static class GoalSpaceAStarPlannerTests
                 Strategy: new IgnorePreconditionsGreedySetCover(AirCargoDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
-                    Cargo(new Constant("cargo1")),
-                    Cargo(new Constant("cargo2")),
-                    Plane(new Constant("plane1")),
-                    Plane(new Constant("plane2")),
-                    Airport(new Constant("airport1")),
-                    Airport(new Constant("airport2")),
+                    Cargo(new Function("cargo1")),
+                    Cargo(new Function("cargo2")),
+                    Plane(new Function("plane1")),
+                    Plane(new Function("plane2")),
+                    Airport(new Function("airport1")),
+                    Airport(new Function("airport2")),
                     ForAll(A, If(Cargo(A), !Plane(A))),
                     ForAll(A, If(Cargo(A), !Airport(A))),
                     ForAll(A, If(Plane(A), !Cargo(A))),
@@ -43,9 +44,9 @@ public static class GoalSpaceAStarPlannerTests
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
-                    Block(new Constant("blockA")),
-                    Block(new Constant("blockB")),
-                    Block(new Constant("blockC")),
+                    Block(new Function("blockA")),
+                    Block(new Function("blockB")),
+                    Block(new Function("blockC")),
                     !Block(Table),
                     ForAll(A, B, If(On(A, B), !Clear(B))),
                 })),
@@ -60,11 +61,11 @@ public static class GoalSpaceAStarPlannerTests
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
-                    Block(new Constant("blockA")),
-                    Block(new Constant("blockB")),
-                    Block(new Constant("blockC")),
-                    Block(new Constant("blockD")),
-                    Block(new Constant("blockE")),
+                    Block(new Function("blockA")),
+                    Block(new Function("blockB")),
+                    Block(new Function("blockC")),
+                    Block(new Function("blockD")),
+                    Block(new Function("blockE")),
                     !Block(Table),
                     ForAll(A, B, If(On(A, B), !Clear(B))),
                 })),
@@ -87,12 +88,12 @@ public static class GoalSpaceAStarPlannerTests
                 Strategy: new IgnorePreconditionsGreedySetCover(AirCargoDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
-                    Cargo(new Constant("cargo1")),
-                    Cargo(new Constant("cargo2")),
-                    Plane(new Constant("plane1")),
-                    Plane(new Constant("plane2")),
-                    Airport(new Constant("airport1")),
-                    Airport(new Constant("airport2")),
+                    Cargo(new Function("cargo1")),
+                    Cargo(new Function("cargo2")),
+                    Plane(new Function("plane1")),
+                    Plane(new Function("plane2")),
+                    Airport(new Function("airport1")),
+                    Airport(new Function("airport2")),
                     ForAll(A, If(Cargo(A), !Plane(A))),
                     ForAll(A, If(Cargo(A), !Airport(A))),
                     ForAll(A, If(Plane(A), !Cargo(A))),
@@ -106,9 +107,9 @@ public static class GoalSpaceAStarPlannerTests
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
-                    Block(new Constant("blockA")),
-                    Block(new Constant("blockB")),
-                    Block(new Constant("blockC")),
+                    Block(new Function("blockA")),
+                    Block(new Function("blockB")),
+                    Block(new Function("blockC")),
                     !Block(Table),
                     ForAll(A, B, If(On(A, B), !Clear(B))),
                 })),
@@ -123,11 +124,11 @@ public static class GoalSpaceAStarPlannerTests
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
                 InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
                 {
-                    Block(new Constant("blockA")),
-                    Block(new Constant("blockB")),
-                    Block(new Constant("blockC")),
-                    Block(new Constant("blockD")),
-                    Block(new Constant("blockE")),
+                    Block(new Function("blockA")),
+                    Block(new Function("blockB")),
+                    Block(new Function("blockC")),
+                    Block(new Function("blockD")),
+                    Block(new Function("blockE")),
                     !Block(Table),
                     ForAll(A, B, If(On(A, B), !Clear(B))),
                 })),
@@ -148,8 +149,8 @@ public static class GoalSpaceAStarPlannerTests
     {
         var resolutionKb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
             new HashSetClauseStore(),
-            DelegateResolutionStrategy.Filters.None,
-            DelegateResolutionStrategy.PriorityComparisons.UnitPreference));
+            ClauseResolutionFilters.None,
+            ClauseResolutionPriorityComparisons.UnitPreference));
 
         var invariantKb = new UniqueNamesAxiomisingKnowledgeBase(await EqualityAxiomisingKnowledgeBase.CreateAsync(resolutionKb));
         invariantKb.Tell(invariants);

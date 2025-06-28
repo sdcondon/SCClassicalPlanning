@@ -73,9 +73,6 @@ public abstract class RecursiveGoalVisitor<TState>
             case VariableReference variableReference:
                 Visit(variableReference, visitState);
                 break;
-            case Constant constant:
-                Visit(constant, visitState);
-                break;
             case Function function:
                 Visit(function, visitState);
                 break;
@@ -93,16 +90,6 @@ public abstract class RecursiveGoalVisitor<TState>
     public virtual void Visit(VariableReference variableReference, TState visitState)
     {
         Visit(variableReference.Declaration, visitState);
-    }
-
-    /// <summary>
-    /// Visits a <see cref="Constant"/> instance.
-    /// The default implementation doesn't do anything.
-    /// </summary>
-    /// <param name="constant">The constant to visit.</param>
-    /// <param name="visitState">The state of this visit.</param>
-    public virtual void Visit(Constant constant, TState visitState)
-    {
     }
 
     /// <summary>

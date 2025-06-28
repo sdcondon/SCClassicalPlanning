@@ -35,11 +35,11 @@ public static class SpareTireDomain
     /// </summary>
     public static Problem ExampleProblem { get; }
 
-    public static Constant Spare { get; } = new(nameof(Spare));
-    public static Constant Flat { get; } = new(nameof(Flat));
-    public static Constant Ground { get; } = new(nameof(Ground));
-    public static Constant Axle { get; } = new(nameof(Axle));
-    public static Constant Trunk { get; } = new(nameof(Trunk));
+    public static Function Spare { get; } = new(nameof(Spare));
+    public static Function Flat { get; } = new(nameof(Flat));
+    public static Function Ground { get; } = new(nameof(Ground));
+    public static Function Axle { get; } = new(nameof(Axle));
+    public static Function Trunk { get; } = new(nameof(Trunk));
 
     public static OperablePredicate IsTire(Term tire) => new Predicate(nameof(IsTire), tire);
 

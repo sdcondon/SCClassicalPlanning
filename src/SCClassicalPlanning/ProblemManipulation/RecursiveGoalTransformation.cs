@@ -109,7 +109,6 @@ public abstract class RecursiveGoalTransformation
         return term switch
         {
             VariableReference variable => ApplyTo(variable),
-            Constant constant => ApplyTo(constant),
             Function function => ApplyTo(function),
             _ => throw new ArgumentException($"Unsupported Term type '{term.GetType()}'", nameof(term))
         };
@@ -130,17 +129,6 @@ public abstract class RecursiveGoalTransformation
         }
 
         return variable;
-    }
-
-    /// <summary>
-    /// Applies this transformation to a <see cref="Constant"/> instance.
-    /// The default implementation simply returns the constant unchanged.
-    /// </summary>
-    /// <param name="constant">The constant to transform.</param>
-    /// <returns>The transformed term.</returns>
-    public virtual Term ApplyTo(Constant constant)
-    {
-        return constant;
     }
 
     /// <summary>

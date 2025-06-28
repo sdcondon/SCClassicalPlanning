@@ -13,8 +13,7 @@
 // limitations under the License.
 using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
-using SCFirstOrderLogic.SentenceManipulation.Unification;
+using SCFirstOrderLogic.SentenceManipulation.VariableManipulation;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SCClassicalPlanning.Planning.Utilities;
@@ -146,7 +145,7 @@ public static class ProblemInspector
     /// <param name="actionSchemas">The available actions.</param>
     /// <param name="constants">The available constants.</param>
     /// <returns>The actions that are relevant to the given state.</returns>
-    public static IEnumerable<(Action schema, VariableSubstitution substitution)> GetRelevantGroundActionDetails(Goal goal, IQueryable<Action> actionSchemas, IEnumerable<Constant> constants)
+    public static IEnumerable<(Action schema, VariableSubstitution substitution)> GetRelevantGroundActionDetails(Goal goal, IQueryable<Action> actionSchemas, IEnumerable<Function> constants)
     {
         // Local method to create variable subsitutions such that the negation of the effects elements transformed by the substitution do not match any of the goal's elements.
         // effectElements: The (remaining) elements of the effect to be matched.
@@ -227,7 +226,7 @@ public static class ProblemInspector
     /// <param name="actionSchemas">The available actions.</param>
     /// <param name="constants">The available constants.</param>
     /// <returns>The actions that are relevant to the given state.</returns>
-    public static IEnumerable<Action> GetRelevantGroundActions(Goal goal, IQueryable<Action> actionSchemas, IEnumerable<Constant> constants)
+    public static IEnumerable<Action> GetRelevantGroundActions(Goal goal, IQueryable<Action> actionSchemas, IEnumerable<Function> constants)
     {
         foreach (var (Schema, Substitution) in GetRelevantGroundActionDetails(goal, actionSchemas, constants))
         {
@@ -404,7 +403,7 @@ public static class ProblemInspector
     /// <param name="predicate">The predicate to create all possible substitutions for.</param>
     /// <param name="constants">The available constants.</param>
     /// <returns>All possible subsitutions that populate each of the arguments of the given predicate with a constant.</returns>
-    public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Predicate predicate, IEnumerable<Constant> constants)
+    public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Predicate predicate, IEnumerable<Function> constants)
     {
         return GetAllPossibleSubstitutions(predicate, constants, new VariableSubstitution());
     }
@@ -422,7 +421,7 @@ public static class ProblemInspector
     /// <param name="constants">The available constants.</param>
     /// <param name="constraint">The substitution to use as a constraint.</param>
     /// <returns>All possible subsitutions that populate each of the arguments of the given predicate with a constant.</returns>
-    public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Predicate predicate, IEnumerable<Constant> constants, VariableSubstitution constraint)
+    public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Predicate predicate, IEnumerable<Function> constants, VariableSubstitution constraint)
     {
         IEnumerable<VariableSubstitution> allPossibleSubstitutions = new List<VariableSubstitution>() { constraint };
         var unboundVariables = predicate.Arguments.OfType<VariableReference>().Except(constraint.Bindings.Keys);

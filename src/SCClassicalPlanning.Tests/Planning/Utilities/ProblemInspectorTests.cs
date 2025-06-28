@@ -1,23 +1,23 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Equivalency;
 using FlUnit;
 using SCClassicalPlanning._TestUtilities;
 using SCClassicalPlanning.ExampleDomains.AsCode;
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
-using static SCClassicalPlanning.ExampleDomains.AsCode.ContainerDomain;
+using SCFirstOrderLogic.SentenceManipulation.VariableManipulation;
 using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargoDomain;
+using static SCClassicalPlanning.ExampleDomains.AsCode.ContainerDomain;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
-using FluentAssertions.Equivalency;
 
 namespace SCClassicalPlanning.Planning.Utilities;
 
 public static class ProblemInspectorTests
 {
-    private static readonly Constant element1 = new(nameof(element1));
-    private static readonly Constant element2 = new(nameof(element2));
+    private static readonly Function element1 = new(nameof(element1));
+    private static readonly Function element2 = new(nameof(element2));
 
-    private static readonly Constant sfo = new(nameof(sfo));
-    private static readonly Constant cargo = new(nameof(cargo));
+    private static readonly Function sfo = new(nameof(sfo));
+    private static readonly Function cargo = new(nameof(cargo));
 
     public static Test GetApplicableActionsBehaviour => TestThat
         .GivenEachOf(() => new GetApplicableActionsTestCase[]
@@ -239,7 +239,7 @@ public static class ProblemInspectorTests
     }
 
     private record GetApplicableActionsTestCase(IState State, IQueryable<Action> ActionSchemas, Action[] ExpectedResult);
-    private record GetRelevantGroundActionsTestCase(Goal Goal, IQueryable<Action> ActionSchemas, IEnumerable<Constant> Constants, Action[] ExpectedResult);
+    private record GetRelevantGroundActionsTestCase(Goal Goal, IQueryable<Action> ActionSchemas, IEnumerable<Function> Constants, Action[] ExpectedResult);
     private record GetRelevantLiftedActionsTestCase(Goal Goal, IQueryable<Action> ActionSchemas, Action[] ExpectedResult);
     private record GetMappingFromSchemaPositiveTestCase(Action Action, IQueryable<Action> ActionSchemas, Dictionary<VariableReference, Term> ExpectedBindings);
     private record GetMappingFromSchemaNegativeTestCase(Action Action, IQueryable<Action> ActionSchemas);

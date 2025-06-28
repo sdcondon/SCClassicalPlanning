@@ -231,7 +231,7 @@ public static class PddlParser
         // should probably validate terms are in scope, given that PDDL expects stuff to be declared..
         var arguments = context.termList()._elements.Select<MinimalPDDLParser.TermContext, Term>(t => t switch
         {
-            MinimalPDDLParser.ConstantTermContext ctc => new Constant(ctc.NAME().Symbol.Text),
+            MinimalPDDLParser.ConstantTermContext ctc => new Function(ctc.NAME().Symbol.Text),
             MinimalPDDLParser.VariableTermContext vtc => new VariableReference(vtc.VARIABLE_NAME().Symbol.Text.TrimStart('?')),
             _ => throw new ArgumentException($"Unexpected TermContext type encountered: {context.GetType()}", nameof(context))
         });

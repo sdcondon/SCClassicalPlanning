@@ -9,8 +9,8 @@ namespace SCClassicalPlanning;
 
 public static class GoalTests
 {
-    private static readonly Constant element1 = new(nameof(element1));
-    private static readonly Constant element2 = new(nameof(element2));
+    private static readonly Function element1 = new(nameof(element1));
+    private static readonly Function element2 = new(nameof(element2));
 
     private record IsRelevantTestCase(Goal Goal, Effect Effect, bool ExpectedResult);
 
@@ -43,8 +43,8 @@ public static class GoalTests
                 ExpectedResult: false),
 
             new( // Variable doesn't confuse matters..
-                Goal: new(At(new Constant("C2"), new Constant("JFK"))),
-                Effect: new(At(new Constant("C2"), new Constant("JFK")) & !In(new Constant("C2"), P)),
+                Goal: new(At(new Function("C2"), new Function("JFK"))),
+                Effect: new(At(new Function("C2"), new Function("JFK")) & !In(new Function("C2"), P)),
                 ExpectedResult: true),
         })
         .When(tc => tc.Goal.IsRelevant(tc.Effect))

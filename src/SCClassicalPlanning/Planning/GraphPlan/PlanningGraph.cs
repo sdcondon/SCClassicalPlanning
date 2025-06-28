@@ -14,8 +14,7 @@
 using SCClassicalPlanning.Planning.Utilities;
 using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
-using SCFirstOrderLogic.SentenceManipulation.Unification;
+using SCFirstOrderLogic.SentenceManipulation.VariableManipulation;
 
 namespace SCClassicalPlanning.Planning.GraphPlan;
 

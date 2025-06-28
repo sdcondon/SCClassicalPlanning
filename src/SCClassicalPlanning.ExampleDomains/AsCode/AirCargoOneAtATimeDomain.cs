@@ -55,17 +55,17 @@ public static class AirCargoOneAtATimeDomain
 
     public static Problem Problem { get; }
 
-    public static Constant Cargo1 { get; }
+    public static Function Cargo1 { get; }
 
-    public static Constant Cargo2 { get; }
+    public static Function Cargo2 { get; }
 
-    public static Constant Cargo3 { get; }
+    public static Function Cargo3 { get; }
 
-    public static Constant Plane { get; }
+    public static Function Plane { get; }
 
-    public static Constant Airport1 { get; }
+    public static Function Airport1 { get; }
 
-    public static Constant Airport2 { get; }
+    public static Function Airport2 { get; }
 
     public static OperablePredicate IsCargo(Term cargo) => new Predicate(nameof(IsCargo), cargo);
     public static OperablePredicate IsPlane(Term plane) => new Predicate(nameof(IsPlane), plane);

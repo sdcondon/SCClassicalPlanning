@@ -3,7 +3,7 @@ using FlUnit;
 using SCClassicalPlanning.ExampleDomains.AsCode;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
-using SCFirstOrderLogic.Inference.Resolution;
+using SCFirstOrderLogic.Inference.Basic.Resolution;
 using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
@@ -12,8 +12,8 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 
 public static class GoalInvariantCheckTests
 {
-    private static readonly Constant blockA = new(nameof(blockA));
-    private static readonly Constant blockB = new(nameof(blockB));
+    private static readonly Function blockA = new(nameof(blockA));
+    private static readonly Function blockB = new(nameof(blockB));
 
     private record TestCase(IEnumerable<Sentence> Invariants, IState State, OperableGoal Goal, float ExpectedCost);
 
@@ -54,8 +54,8 @@ public static class GoalInvariantCheckTests
         {
             var kb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
                 new HashSetClauseStore(),
-                DelegateResolutionStrategy.Filters.None,
-                DelegateResolutionStrategy.PriorityComparisons.None)); // No point in unitpreference, 'cos query is *all* unit clauses..
+                ClauseResolutionFilters.None,
+                ClauseResolutionPriorityComparisons.None)); // No point in unitpreference, 'cos query is *all* unit clauses..
             kb.Tell(tc.Invariants);
 
             var nullStrategy = new DelegateCostStrategy(a => 0f, (s, g) => 0f);

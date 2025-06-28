@@ -21,9 +21,9 @@ public static class BlocksWorldDomain
             MoveToTable(block, from),
         }.AsQueryable();
 
-        Constant blockA = new(nameof(blockA));
-        Constant blockB = new(nameof(blockB));
-        Constant blockC = new(nameof(blockC));
+        Function blockA = new(nameof(blockA));
+        Function blockB = new(nameof(blockB));
+        Function blockC = new(nameof(blockC));
 
         ExampleProblem = MakeProblem(
             initialState: new HashSetState(
@@ -43,8 +43,8 @@ public static class BlocksWorldDomain
                 On(blockA, blockB)
                 & On(blockB, blockC)));
 
-        Constant blockD = new(nameof(blockD));
-        Constant blockE = new(nameof(blockE));
+        Function blockD = new(nameof(blockD));
+        Function blockE = new(nameof(blockE));
 
         LargeExampleProblem = MakeProblem(
             initialState: new HashSetState(
@@ -122,7 +122,7 @@ public static class BlocksWorldDomain
     /// </summary>
     public static IQueryable<Action> ActionSchemas { get; }
 
-    public static Constant Table { get; } = new(nameof(Table));
+    public static Function Table { get; } = new(nameof(Table));
 
     public static OperablePredicate On(Term above, Term below) => new Predicate(nameof(On), above, below);
     public static OperablePredicate Block(Term block) => new Predicate(nameof(Block), block);

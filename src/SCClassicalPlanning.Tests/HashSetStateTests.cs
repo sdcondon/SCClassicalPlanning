@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using FlUnit;
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
+using SCFirstOrderLogic.SentenceManipulation.VariableManipulation;
 using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargoDomain;
 using static SCClassicalPlanning.ExampleDomains.AsCode.ContainerDomain;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
@@ -10,12 +10,12 @@ namespace SCClassicalPlanning;
 
 public static class HashSetStateTests
 {
-    private static readonly Constant element1 = new(nameof(element1));
-    private static readonly Constant element2 = new(nameof(element2));
+    private static readonly Function element1 = new(nameof(element1));
+    private static readonly Function element2 = new(nameof(element2));
 
-    private static readonly Constant cargo1 = new(nameof(cargo1));
-    private static readonly Constant plane1 = new(nameof(plane1));
-    private static readonly Constant airport1 = new(nameof(airport1));
+    private static readonly Function cargo1 = new(nameof(cargo1));
+    private static readonly Function plane1 = new(nameof(plane1));
+    private static readonly Function airport1 = new(nameof(airport1));
 
     private record ApplyTestCase(HashSetState State, Effect Effect, HashSetState ExpectedResult);
 

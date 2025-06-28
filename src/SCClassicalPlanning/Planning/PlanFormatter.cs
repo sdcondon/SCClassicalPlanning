@@ -13,6 +13,7 @@
 // limitations under the License.
 using SCClassicalPlanning.Planning.Utilities;
 using SCFirstOrderLogic.SentenceManipulation;
+using SCFirstOrderLogic.SentenceManipulation.VariableManipulation;
 using System.Text;
 
 namespace SCClassicalPlanning.Planning;

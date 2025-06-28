@@ -4,14 +4,14 @@ using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
-using SCFirstOrderLogic.Inference.Resolution;
+using SCFirstOrderLogic.Inference.Basic.Resolution;
 
 namespace SCClassicalPlanning.Planning.Utilities;
 
 public static class InvariantInspectorTests
 {
-    private static readonly Constant blockA = new(nameof(blockA));
-    private static readonly Constant blockB = new(nameof(blockB));
+    private static readonly Function blockA = new(nameof(blockA));
+    private static readonly Function blockB = new(nameof(blockB));
 
     private record TestCase(OperableGoal Goal, IEnumerable<Sentence> Knowledge, bool ExpectedResult);
 
@@ -67,8 +67,8 @@ public static class InvariantInspectorTests
         {
             var kb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
                 new HashSetClauseStore(tc.Knowledge.Select(s => (Sentence)s)),
-                DelegateResolutionStrategy.Filters.None,
-                DelegateResolutionStrategy.PriorityComparisons.UnitPreference));
+                ClauseResolutionFilters.None,
+                ClauseResolutionPriorityComparisons.UnitPreference));
 
             return new InvariantInspector(kb).IsGoalPrecludedByInvariants(tc.Goal);
         })

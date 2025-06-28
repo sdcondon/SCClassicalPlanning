@@ -17,7 +17,7 @@ public class HaveCakeAndEatCakeTooDomain
             Bake(C)
         }.AsQueryable();
 
-        Constant cake = new(nameof(cake));
+        Function cake = new(nameof(cake));
 
         ExampleProblem = MakeProblem(
             initialState: new HashSetState(Have(cake)),

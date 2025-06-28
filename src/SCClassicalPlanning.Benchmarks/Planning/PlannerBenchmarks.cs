@@ -6,7 +6,7 @@ using SCClassicalPlanning.Planning.StateAndGoalSpace;
 using SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
-using SCFirstOrderLogic.Inference.Resolution;
+using SCFirstOrderLogic.Inference.Basic.Resolution;
 using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
 
@@ -37,18 +37,18 @@ public class PlannerBenchmarks
             {
                 // TODO: slicker support for unique names assumption worth looking into at some point..
                 // Probably via invariants KB.
-                Block(new Constant("blockA")),
-                Equal(new Constant("blockA"), new Constant("blockA")),
-                !Equal(new Constant("blockA"), new Constant("blockB")),
-                !Equal(new Constant("blockA"), new Constant("blockC")),
-                Block(new Constant("blockB")),
-                !Equal(new Constant("blockB"), new Constant("blockA")),
-                Equal(new Constant("blockB"), new Constant("blockB")),
-                !Equal(new Constant("blockB"), new Constant("blockC")),
-                Block(new Constant("blockC")),
-                !Equal(new Constant("blockC"), new Constant("blockA")),
-                !Equal(new Constant("blockC"), new Constant("blockB")),
-                Equal(new Constant("blockC"), new Constant("blockC")),
+                Block(new Function("blockA")),
+                Equal(new Function("blockA"), new Function("blockA")),
+                !Equal(new Function("blockA"), new Function("blockB")),
+                !Equal(new Function("blockA"), new Function("blockC")),
+                Block(new Function("blockB")),
+                !Equal(new Function("blockB"), new Function("blockA")),
+                Equal(new Function("blockB"), new Function("blockB")),
+                !Equal(new Function("blockB"), new Function("blockC")),
+                Block(new Function("blockC")),
+                !Equal(new Function("blockC"), new Function("blockA")),
+                !Equal(new Function("blockC"), new Function("blockB")),
+                Equal(new Function("blockC"), new Function("blockC")),
                 ForAll(A, B, If(On(A, B), !Clear(B))),
             })),
 
@@ -135,8 +135,8 @@ public class PlannerBenchmarks
     {
         var invariantKb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
             new HashSetClauseStore(invariants),
-            DelegateResolutionStrategy.Filters.None,
-            DelegateResolutionStrategy.PriorityComparisons.UnitPreference));
+            ClauseResolutionFilters.None,
+            ClauseResolutionPriorityComparisons.UnitPreference));
 
         return invariantKb;
     }

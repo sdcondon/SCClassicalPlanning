@@ -142,12 +142,12 @@ public static class AirCargoDomain
 
     private static Problem MakeExampleProblem()
     {
-        Constant cargo1 = new(nameof(cargo1));
-        Constant cargo2 = new(nameof(cargo2));
-        Constant plane1 = new(nameof(plane1));
-        Constant plane2 = new(nameof(plane2));
-        Constant airport1 = new(nameof(airport1));
-        Constant airport2 = new(nameof(airport2));
+        Function cargo1 = new(nameof(cargo1));
+        Function cargo2 = new(nameof(cargo2));
+        Function plane1 = new(nameof(plane1));
+        Function plane2 = new(nameof(plane2));
+        Function airport1 = new(nameof(airport1));
+        Function airport2 = new(nameof(airport2));
 
         return MakeProblem(
             initialState: new HashSetState(
