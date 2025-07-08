@@ -75,52 +75,16 @@
     </div>
 </EditForm>
 
-@{
-    void RenderListItem(LinkedListNode<GoalSpaceEdge>? lastPathNode, GoalSpaceNode goalNode, GoalSpaceEdge? nextExploredEdge)
-    {
-        <li>
-            @if (goalNode.Goal.IsMetBy(problem.InitialState))
-            {
-                <b>INITIAL STATE MEETS THIS! </b>
-            }
-            @{
-                // richer formatting functionality could make this more succinct, which would be nice..
-                var goalElements = goalNode.Goal.Elements
-                .OrderBy(e => e.Predicate.Identifier.ToString())
-                .ThenBy(e => string.Join(",", e.Predicate.Arguments.Select(a => a.ToString())));
-            }
-            @string.Join(" ∧ ", goalElements);
+@if (problem != null)
+{
+    <ol class="mt-4">
+        @RenderListItem(null, new GoalSpaceNode(problem, problem.EndGoal), path.First?.Value)
 
-            <ul>
-                @foreach (var edge in goalNode.Edges)
-                {
-                    <li>
-                        <!-- yeah, should be a button not an anchor, but all of bootstrap's classes make it look rubbish.. -->
-                        <!-- disclaimer: the author doesn't consider themselves a front-end dev.. -->
-                        <a href="#"
-                            role="button"
-                            style="@(edge.Equals(nextExploredEdge) ? "font-weight:bold" : "")"
-                            @onclick="@(() => ExploreEdge(lastPathNode, edge))"
-                            @onclick:preventDefault>@edge.ToString()</a>
-                    </li>
-                }
-            </ul>
-        </li>
-    }
-
-    if (problem != null)
-    {
-        <ol class="mt-4">
-            @{
-                RenderListItem(null, new GoalSpaceNode(problem, problem.EndGoal), path.First?.Value);
-            }
-
-            @for (var n = path.First; n != null; n = n.Next)
-            {
-                RenderListItem(n, n.Value.To, n.Next?.Value);
-            }
-        </ol>
-    }
+        @for (var n = path.First; n != null; n = n.Next)
+        {
+            @RenderListItem(n, n.Value.To, n.Next?.Value)
+        }
+    </ol>
 }
 
 @code {
@@ -157,6 +121,38 @@
         {
             problem = PddlParser.ParseProblem(formData.ProblemPDDL, formData.DomainPDDL);
         }
+    }
+
+    private RenderFragment RenderListItem(LinkedListNode<GoalSpaceEdge>? lastPathNode, GoalSpaceNode goalNode, GoalSpaceEdge? nextExploredEdge)
+    {
+        return@<li>
+            @if (goalNode.Goal.IsMetBy(problem.InitialState))
+            {
+                <b>INITIAL STATE MEETS THIS! </b>
+            }
+            @{
+                // richer formatting functionality could make this more succinct, which would be nice..
+                var goalElements = goalNode.Goal.Elements
+                    .OrderBy(e => e.Predicate.Identifier.ToString())
+                    .ThenBy(e => string.Join(",", e.Predicate.Arguments.Select(a => a.ToString())));
+            }
+            @string.Join(" ∧ ", goalElements);
+
+            <ul>
+                @foreach (var edge in goalNode.Edges)
+                {
+                    <li>
+                        <!-- yeah, should be a button not an anchor, but all of bootstrap's classes make it look rubbish.. -->
+                        <!-- disclaimer: the author doesn't consider themselves a front-end dev.. -->
+                        <a href="#"
+                           role="button"
+                           style="@(edge.Equals(nextExploredEdge) ? "font-weight:bold" : "")"
+                           @onclick="@(() => ExploreEdge(lastPathNode, edge))"
+                           @onclick:preventDefault>@edge.ToString()</a>
+                    </li>
+                }
+            </ul>
+        </li>;
     }
 
     private void ExploreEdge(LinkedListNode<GoalSpaceEdge>? lastPathNode, GoalSpaceEdge edge)
