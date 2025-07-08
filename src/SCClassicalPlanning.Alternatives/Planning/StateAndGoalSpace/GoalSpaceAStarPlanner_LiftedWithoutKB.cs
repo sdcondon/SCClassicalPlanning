@@ -90,7 +90,7 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
         }
 
         /// <inheritdoc />
-        public override (Goal, Action, Goal) NextStep()
+        public override Task<(Goal, Action, Goal)> NextStepAsync(CancellationToken cancellationToken)
         {
             if (IsComplete)
             {
@@ -100,7 +100,7 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
             var edge = search.NextStep();
             CheckForSearchCompletion();
 
-            return (edge.From.Goal, edge.Action, edge.To.Goal);
+            return Task.FromResult((edge.From.Goal, edge.Action, edge.To.Goal));
         }
 
         /// <inheritdoc />

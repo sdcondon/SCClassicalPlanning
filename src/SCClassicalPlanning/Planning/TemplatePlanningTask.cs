@@ -21,6 +21,7 @@ namespace SCClassicalPlanning.Planning;
 /// </summary>
 public abstract class TemplatePlanningTask : IPlanningTask
 {
+    private int executeCount = 0;
     private Task<Plan>? execution;
 
     /// <inheritdoc />
@@ -38,7 +39,18 @@ public abstract class TemplatePlanningTask : IPlanningTask
     /// <inheritdoc />
     public Task<Plan> ExecuteAsync(CancellationToken cancellationToken)
     {
-        // TODO: multi-invocation protection
+        // ..while it might be nice to allow for other threads to just get the existing task back
+        // if its already been started, the possibility of the cancellation token being different
+        // makes it awkward. The complexity added by dealing with that simply isn't worth it.
+        // (at a push could PERHAPS just throw if the CT is different - see CT equality remarks).
+        // So, we just throw if the query is already in progress. Messing about with a query from
+        // multiple threads is fairly unlikely anyway (as opposed to wanting an individual query to
+        // parallelise itself - which is definitely something I want to look at).
+        if (Interlocked.Exchange(ref executeCount, 1) == 1)
+        {
+            throw new InvalidOperationException("Planning task execution has already begun via a prior ExecuteAsync invocation");
+        }
+
         return execution = ExecuteAsyncCore(cancellationToken);
     }
 

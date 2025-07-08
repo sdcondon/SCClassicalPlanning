@@ -118,7 +118,7 @@ public class Effect
     {
         var hashCode = new HashCode();
 
-        // As with Equals, asserting that this is okay given that effects should be small-ish.
+        // As with Equals, I'm asserting that this is okay given that effects should be small-ish.
         // Though worth noting we'd avoid it if using e.g. ImmutableSortedSet for the elements.
         foreach (var element in Elements.OrderBy(e => e.GetHashCode()))
         {

@@ -25,7 +25,7 @@ internal class GraphPlanPlanningTask : TemplatePlanningTask
     private readonly Problem problem;
 
     // Is a dictionary because its described as a hashtable in the listing.
-    // Seems like a List'd do the job just fine (and obv be faster; okay, index 0 is unneeded, but..)?
+    // Seems like a List'd do the job just fine (and obv be faster/require less mem; okay, index 0 is unneeded, but..)?
     private readonly Dictionary<int, HashSet<Goal>> noGoods = new();
 
     /// <summary>

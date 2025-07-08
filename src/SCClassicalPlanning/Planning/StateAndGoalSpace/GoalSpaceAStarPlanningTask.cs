@@ -69,7 +69,7 @@ public class GoalSpaceAStarPlanningTask : SteppablePlanningTask<GoalSpaceEdge>
     }
 
     /// <inheritdoc />
-    public override GoalSpaceEdge NextStep()
+    public override Task<GoalSpaceEdge> NextStepAsync(CancellationToken cancellationToken = default)
     {
         if (IsComplete)
         {
@@ -78,7 +78,7 @@ public class GoalSpaceAStarPlanningTask : SteppablePlanningTask<GoalSpaceEdge>
 
         var edge = search.NextStep();
         CheckForSearchCompletion();
-        return edge;
+        return Task.FromResult(edge);
     }
 
     /// <inheritdoc />

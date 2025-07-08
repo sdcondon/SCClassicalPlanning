@@ -19,6 +19,12 @@ namespace SCClassicalPlanning.Planning;
 /// <typeparam name="TStepResult">The type of the result of each step. This type should be a container for information on what happened during the step.</typeparam>
 public abstract class SteppablePlanningTask<TStepResult> : IPlanningTask
 {
+    private int executeCount = 0;
+
+    // TODO-BREAKING: No real point in making this or Result abstract - only one kind of
+    // implementation makes much sense - e.g. IsComplete returns if result (nullable bool)
+    // has a value. Result throws InvalidOperationEx if not complete. Add protected
+    // SetResult(bool) method.
     /// <inheritdoc />
     public abstract bool IsComplete { get; }
 
@@ -33,21 +39,32 @@ public abstract class SteppablePlanningTask<TStepResult> : IPlanningTask
     /// Executes the next step of the planning task.
     /// </para>
     /// <para>
-    /// Calling <see cref="NextStep"/> on a completed planning task should result in an <see cref="InvalidOperationException"/>.
+    /// Calling <see cref="NextStepAsync"/> on a completed planning task should result in an <see cref="InvalidOperationException"/>.
     /// </para>
     /// </summary>
     /// <returns>A container for information about what happened during the step.</returns>
-    public abstract TStepResult NextStep();
+    // NB: While this is a rather low-level method, and some scenarios/planners might not do anything async,
+    // some cursory performance testing shows that using ValueTask here tends to (slightly reduce GC pressure, sure, but) slow things down a bit overall.
+    public abstract Task<TStepResult> NextStepAsync(CancellationToken cancellationToken = default);
 
     /// <inheritdoc />
     public async Task<Plan> ExecuteAsync(CancellationToken cancellationToken = default)
     {
-        // TODO: decide on thread-safety, if any
+        // ..while it might be nice to allow for other threads to just get the existing task back
+        // if its already been started, the possibility of the cancellation token being different
+        // makes it awkward. The complexity added by dealing with that simply isn't worth it.
+        // (at a push could PERHAPS just throw if the CT is different - see CT equality remarks).
+        // So, we just throw if the query is already in progress. Messing about with a query from
+        // multiple threads is fairly unlikely anyway (as opposed to wanting an individual query to
+        // parallelise itself - which is definitely something I want to look at).
+        if (Interlocked.Exchange(ref executeCount, 1) == 1)
+        {
+            throw new InvalidOperationException("Planning task execution has already begun via a prior ExecuteAsync invocation");
+        }
+
         while (!IsComplete)
         {
-            NextStep();
-            cancellationToken.ThrowIfCancellationRequested();
-            await Task.Yield();
+            await NextStepAsync(cancellationToken);
         }
 
         return Result;
