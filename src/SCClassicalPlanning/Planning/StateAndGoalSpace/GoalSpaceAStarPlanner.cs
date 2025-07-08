@@ -31,8 +31,8 @@ public class GoalSpaceAStarPlanner : IPlanner
     /// </summary>
     /// <param name="problem">The problem to create a plan for.</param>
     /// <returns>A new <see cref="GoalSpaceAStarPlanningTask"/> instance.</returns>
-    public GoalSpaceAStarPlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy);
+    public Task<GoalSpaceAStarPlanningTask> CreatePlanningTaskAsync(Problem problem) => Task.FromResult(new GoalSpaceAStarPlanningTask(problem, costStrategy));
 
     /// <inheritdoc />
-    IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
+    async Task<IPlanningTask> IPlanner.CreatePlanningTaskAsync(Problem problem) => await CreatePlanningTaskAsync(problem);
 }

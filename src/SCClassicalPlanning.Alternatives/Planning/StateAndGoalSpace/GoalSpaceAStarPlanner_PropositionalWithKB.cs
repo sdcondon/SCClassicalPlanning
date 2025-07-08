@@ -44,10 +44,10 @@ public class GoalSpaceAStarPlanner_PropositionalWithKB : IPlanner
     /// </summary>
     /// <param name="problem">The problem to create a plan for.</param>
     /// <returns></returns>
-    public PlanningTask CreatePlanningTask(Problem problem) => new(problem, costStrategy, invariantInspector);
+    public Task<PlanningTask> CreatePlanningTaskAsync(Problem problem) => Task.FromResult(new PlanningTask(problem, costStrategy, invariantInspector));
 
     /// <inheritdoc />
-    IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
+    async Task<IPlanningTask> IPlanner.CreatePlanningTaskAsync(Problem problem) => await CreatePlanningTaskAsync(problem);
 
     /// <summary>
     /// The implementation of <see cref="IPlanningTask"/> used by <see cref="GoalSpaceAStarPlanner_PropositionalWithKB"/>.

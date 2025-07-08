@@ -57,7 +57,7 @@ public abstract class TemplatePlanningTask : IPlanningTask
     /// <summary>
     /// When implemented in a derived class, contains the core execution logic for the task.
     /// The <see cref="TemplatePlanningTask"/> class delegates to the returned task to provide
-    /// the values of the various <see cref="IPlanner"/> properties.
+    /// the values of the various <see cref="IPlanningTask"/> properties.
     /// </summary>
     /// <param name="cancellationToken">A cancellation token to respect.</param>
     /// <returns>A task representing the planning process.</returns>

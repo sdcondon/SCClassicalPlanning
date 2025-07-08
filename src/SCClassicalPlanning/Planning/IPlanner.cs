@@ -29,5 +29,5 @@ public interface IPlanner
     /// </summary>
     /// <param name="problem">The problem to create a plan for.</param>
     /// <returns>An <see cref="IPlanningTask"/> representing the process of creating a plan that solves the problem.</returns>
-    IPlanningTask CreatePlanningTask(Problem problem);
+    Task<IPlanningTask> CreatePlanningTaskAsync(Problem problem);
 }

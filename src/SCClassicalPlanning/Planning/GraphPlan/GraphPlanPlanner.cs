@@ -23,8 +23,8 @@ internal class GraphPlanPlanner : IPlanner
     /// </summary>
     /// <param name="problem">The problem to create a plan for.</param>
     /// <returns>A new <see cref="GraphPlanPlanningTask"/> for solving the problem.</returns>
-    public static GraphPlanPlanningTask CreatePlanningTask(Problem problem) => new(problem);
+    public static Task<GraphPlanPlanningTask> CreatePlanningTaskAsync(Problem problem) => Task.FromResult(new GraphPlanPlanningTask(problem));
 
     /// <inheritdoc />
-    IPlanningTask IPlanner.CreatePlanningTask(Problem problem) => CreatePlanningTask(problem);
+    async Task<IPlanningTask> IPlanner.CreatePlanningTaskAsync(Problem problem) => await CreatePlanningTaskAsync(problem);
 }

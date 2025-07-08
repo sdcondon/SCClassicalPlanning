@@ -24,7 +24,7 @@ public abstract class SteppablePlanningTask<TStepResult> : IPlanningTask
     // TODO-BREAKING: No real point in making this or Result abstract - only one kind of
     // implementation makes much sense - e.g. IsComplete returns if result (nullable bool)
     // has a value. Result throws InvalidOperationEx if not complete. Add protected
-    // SetResult(bool) method.
+    // SetSucceeded(Plan) & SetFailed() methods.
     /// <inheritdoc />
     public abstract bool IsComplete { get; }
 

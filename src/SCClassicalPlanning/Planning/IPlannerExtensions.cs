@@ -19,6 +19,17 @@ namespace SCClassicalPlanning.Planning;
 public static class IPlannerExtensions
 {
     /// <summary>
+    /// Creates a planning task to work on solving a given problem.
+    /// </summary>
+    /// <param name="planner">The planner to use to create the plan.</param>
+    /// <param name="problem">The problem to create a plan for.</param>
+    /// <returns>An <see cref="IPlanningTask"/> representing the process of creating a plan that solves the problem.</returns>
+    public static IPlanningTask CreatePlanningTask(this IPlanner planner, Problem problem)
+    {
+        return planner.CreatePlanningTaskAsync(problem).GetAwaiter().GetResult();
+    }
+
+    /// <summary>
     /// Asynchronously creates a plan to solve a given problem.
     /// </summary>
     /// <param name="planner">The planner to use to create the plan.</param>
