@@ -90,7 +90,7 @@ public class GoalSpaceAStarPlanner_LiftedWithoutKB : IPlanner
         }
 
         /// <inheritdoc />
-        public override Task<(Goal, Action, Goal)> NextStepAsync(CancellationToken cancellationToken)
+        public override Task<(Goal, Action, Goal)> NextStepAsync(CancellationToken cancellationToken = default)
         {
             if (IsComplete)
             {
