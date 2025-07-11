@@ -3,8 +3,16 @@
 @using SCClassicalPlanning;
 @using SCClassicalPlanning.ExampleDomains.AsPDDL;
 @using SCClassicalPlanning.Planning.StateAndGoalSpace;
+@using SCClassicalPlanning.Planning.Utilities
 @using SCClassicalPlanning.ProblemCreation;
 @using System.ComponentModel.DataAnnotations;
+@using SCFirstOrderLogic
+@using SCFirstOrderLogic.ClauseIndexing.Features
+@using SCFirstOrderLogic.Inference
+@using SCFirstOrderLogic.Inference.Basic.BackwardChaining
+@using SCFirstOrderLogic.Inference.Basic.ForwardChaining
+@using SCFirstOrderLogic.Inference.Basic.Resolution
+@using SCFirstOrderLogic.SentenceCreation
 
 <h3>Lab - Goal Space Explorer <Button Clicked="ShowExplanationModal" Size="Size.Small" Color="Color.Primary"><Icon Name="IconName.InfoCircle"></Icon></Button></h3>
 
@@ -70,6 +78,20 @@
         <InputTextArea class="form-control small" id="factsTextArea" spellcheck="false" @bind-Value=formData.ProblemPDDL rows="12" />
         <ValidationMessage For="@(() => formData.ProblemPDDL)" />
     </div>
+    <div class="form-group col-12">
+        <label for="kbTypeSelect">Invariants Knowledge Base Type</label>
+        <InputSelect class="form-control" id="kbTypeSelect" @bind-Value=formData.KnowledgeBaseDescription>
+            @foreach (var key in KnowledgeBaseOptions.Keys)
+            {
+                <option>@key</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="form-group col-12">
+        <label for="factsTextArea">Invariants Knowledge</label>
+        <InputTextArea class="form-control" id="factsTextArea" @bind-Value=formData.Knowledge rows="8" />
+        <ValidationMessage For="@(() => formData.Knowledge)" />
+    </div>
     <div class="form-group mt-2 col-12">
         <button type="submit" class="btn btn-primary">Submit / Reset</button>
     </div>
@@ -78,41 +100,62 @@
 @if (problem != null)
 {
     <ol class="mt-4">
-        @RenderListItem(null, new GoalSpaceNode(problem, problem.EndGoal), path.First?.Value)
-
         @for (var n = path.First; n != null; n = n.Next)
         {
-            @RenderListItem(n, n.Value.To, n.Next?.Value)
+            @RenderListItem(n)
         }
     </ol>
 }
 
 @code {
     private static Dictionary<string, Func<FormData>> Presets = new()
-        {
-            ["[Empty]"] = () => new(
-                domainPddl: string.Empty,
-                problemPddl: string.Empty),
+    {
+        ["[Empty]"] = () => new(
+            domainPddl: string.Empty,
+            problemPddl: string.Empty,
+            knowledgeBaseDescription: string.Empty,
+            knowledge: []),
 
-            ["Blocks World"] = () => new(
-                domainPddl: BlocksWorldDomain.DomainPDDL,
-                problemPddl: BlocksWorldDomain.ExampleProblemPDDL),
+        ["Blocks World"] = () => new(
+            domainPddl: BlocksWorldDomain.DomainPDDL,
+            problemPddl: BlocksWorldDomain.ExampleProblemPDDL,
+            knowledgeBaseDescription: "Resolution (Linear, Feature Vector Index Clause Storage)",
+            knowledge: 
+            [
+                "Block(blockA)",
+                "Block(blockB)",
+                "Block(blockC)",
+                "!Block(Table)",
+                "forall a, b, On(a, b) => !Clear(b)"
+            ]),
 
-            ["Air Cargo"] = () => new(
-                domainPddl: AirCargoDomain.DomainPDDL,
-                problemPddl: AirCargoDomain.ExampleProblemPDDL),
-        };
+        ["Air Cargo"] = () => new(
+            domainPddl: AirCargoDomain.DomainPDDL,
+            problemPddl: AirCargoDomain.ExampleProblemPDDL,
+            knowledgeBaseDescription: "Resolution (Linear, Feature Vector Index Clause Storage)",
+            knowledge: []),
+    };
+
+    private static Dictionary<string, Func<IKnowledgeBase>> KnowledgeBaseOptions = new()
+    {
+        ["Resolution (Linear, Feature Vector Index Clause Storage)"] = () => new ResolutionKnowledgeBase(new LinearResolutionStrategy(
+            new BlazorWasmFVIResClauseStore<MaxDepthFeature>(
+                MaxDepthFeature.MakeFeatureVector,
+                new ClauseStoreFVIListNode<MaxDepthFeature>(MaxDepthFeature.MakeFeatureComparer())),
+            ClauseResolutionPriorityComparisons.UnitPreference)),
+    };
 
     private Modal? explanationModal;
     private FormData formData = Presets["Blocks World"].Invoke();
 
     private Exception? parseError = null; // TODO: should be done via form validation instead.. tidy me!
     private Problem? problem = null;
-    private LinkedList<GoalSpaceEdge> path = new();
+    private InvariantInspector? invariantInspector = null;
+    private LinkedList<PathNode> path = new();
 
     private Task ShowExplanationModal() => explanationModal!.Show();
 
-    private void HandleFormSubmission(EditContext editContext)
+    private async Task HandleFormSubmission(EditContext editContext)
     {
         problem = null;
         path.Clear();
@@ -120,42 +163,16 @@
         if (editContext.Validate())
         {
             problem = PddlParser.ParseProblem(formData.ProblemPDDL, formData.DomainPDDL);
+
+            IKnowledgeBase knowledgeBase = KnowledgeBaseOptions[formData.KnowledgeBaseDescription].Invoke();
+            await knowledgeBase.TellAsync(SentenceParser.Default.ParseList(formData.Knowledge));
+            invariantInspector = new InvariantInspector(knowledgeBase);
+
+            path.AddLast(await PathNode.CreateAsync(new GoalSpaceNode(Tuple.Create(problem!, invariantInspector!), problem.EndGoal)));
         }
     }
 
-    private RenderFragment RenderListItem(LinkedListNode<GoalSpaceEdge>? lastPathNode, GoalSpaceNode goalNode, GoalSpaceEdge? nextExploredEdge)
-    {
-        return@<li>
-            @if (goalNode.Goal.IsMetBy(problem.InitialState))
-            {
-                <b>INITIAL STATE MEETS THIS! </b>
-            }
-            @{
-                // richer formatting functionality could make this more succinct, which would be nice..
-                var goalElements = goalNode.Goal.Elements
-                    .OrderBy(e => e.Predicate.Identifier.ToString())
-                    .ThenBy(e => string.Join(",", e.Predicate.Arguments.Select(a => a.ToString())));
-            }
-            @string.Join(" ∧ ", goalElements);
-
-            <ul>
-                @foreach (var edge in goalNode.Edges)
-                {
-                    <li>
-                        <!-- yeah, should be a button not an anchor, but all of bootstrap's classes make it look rubbish.. -->
-                        <!-- disclaimer: the author doesn't consider themselves a front-end dev.. -->
-                        <a href="#"
-                           role="button"
-                           style="@(edge.Equals(nextExploredEdge) ? "font-weight:bold" : "")"
-                           @onclick="@(() => ExploreEdge(lastPathNode, edge))"
-                           @onclick:preventDefault>@edge.ToString()</a>
-                    </li>
-                }
-            </ul>
-        </li>;
-    }
-
-    private void ExploreEdge(LinkedListNode<GoalSpaceEdge>? lastPathNode, GoalSpaceEdge edge)
+    private async Task HandleEdgeExplorationAsync(LinkedListNode<PathNode>? lastPathNode, GoalSpaceEdge edge)
     {
         if (lastPathNode != null)
         {
@@ -171,20 +188,58 @@
             path.Clear();
         }
 
-        path.AddLast(edge);
+        path.AddLast(await PathNode.CreateAsync(edge));
+    }
+
+    private RenderFragment RenderListItem(LinkedListNode<PathNode> pathNode)
+    {
+        return @<li>
+            @if (pathNode.Value.Node.Goal.IsMetBy(problem!.InitialState))
+            {
+                    <b>INITIAL STATE MEETS THIS! </b>
+            }
+            @{
+                // richer formatting functionality could make this more succinct, which would be nice..
+                var goalElements = pathNode.Value.Node.Goal.Elements
+                    .OrderBy(e => e.Predicate.Identifier.ToString())
+                    .ThenBy(e => string.Join(",", e.Predicate.Arguments.Select(a => a.ToString())));
+            }
+            @string.Join(" ∧ ", goalElements);
+
+            <ul>
+                @foreach (var edge in pathNode.Value.OutboundEdges)
+                {
+                    <li>
+                        <!-- yeah, should be a button not an anchor, but all of bootstrap's classes make it look rubbish.. -->
+                        <!-- disclaimer: the author doesn't consider themselves a front-end dev.. -->
+                        <a href="#"
+                           role="button"
+                           style="@(edge.Equals(pathNode.Next?.Value.InboundEdge) ? "font-weight:bold" : "")"
+                           @onclick="@(() => HandleEdgeExplorationAsync(pathNode, edge))"
+                           @onclick:preventDefault>@edge.ToString()</a>
+                    </li>
+                }
+            </ul>
+        </li>;
     }
 
     private class FormData : IValidatableObject
     {
-        public FormData(string domainPddl, string problemPddl)
+        public FormData(string domainPddl, string problemPddl, string knowledgeBaseDescription, string[] knowledge)
         {
             this.DomainPDDL = domainPddl;
             this.ProblemPDDL = problemPddl;
+            this.KnowledgeBaseDescription = knowledgeBaseDescription;
+            this.Knowledge = string.Join(Environment.NewLine, knowledge);
         }
 
         public string DomainPDDL { get; set; }
 
         public string ProblemPDDL { get; set; }
+
+        public string KnowledgeBaseDescription { get; set; }
+
+        public string Knowledge { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
@@ -212,7 +267,45 @@
                 errors.Add(new ValidationResult(e.Message, new[] { nameof(DomainPDDL) }));
             }
 
+            Sentence[] knowledge;
+            try
+            {
+                knowledge = SentenceParser.Default.ParseList(Knowledge);
+            }
+            catch (Exception e)
+            {
+                errors.Add(new ValidationResult(e.Message, new[] { nameof(Knowledge) }));
+            }
+
             return errors;
+        }
+    }
+
+    // NB: Can't do async stuff (i.e. enumerating an async enum during rendering) during rendering,
+    // so need to do it ahead of time (i.e. on form submission & handling of link click).
+    // That's pretty much the only reason this class exists - otherwise could just store goal space nodes
+    // and enumerate outbound edges during rendering.
+    private record PathNode(GoalSpaceEdge? InboundEdge, GoalSpaceNode Node, GoalSpaceEdge[] OutboundEdges)
+    {
+        public static async Task<PathNode> CreateAsync(GoalSpaceEdge InboundEdge)
+        {
+            return new(InboundEdge, InboundEdge.To, await CreateEdgesArray(InboundEdge.To.Edges));
+        }
+
+        public static async Task<PathNode> CreateAsync(GoalSpaceNode SourceNode)
+        {
+            return new(null, SourceNode, await CreateEdgesArray(SourceNode.Edges));
+        }
+
+        private static async Task<GoalSpaceEdge[]> CreateEdgesArray(IAsyncEnumerable<GoalSpaceEdge> edges)
+        {
+            List<GoalSpaceEdge> edgeList = new();
+            await foreach(var edge in edges)
+            {
+                edgeList.Add(edge);
+            }
+
+            return edgeList.ToArray();
         }
     }
 }

@@ -11,6 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using SCClassicalPlanning.Planning.Utilities;
+using SCFirstOrderLogic.Inference;
+
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
 
 /// <summary>
@@ -19,19 +22,24 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
 public class GoalSpaceAStarPlanner : IPlanner
 {
     private readonly ICostStrategy costStrategy;
+    private readonly InvariantInspector? invariantInspector;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GoalSpaceAStarPlanner"/> class.
     /// </summary>
     /// <param name="costStrategy">The cost strategy to use.</param>
-    public GoalSpaceAStarPlanner(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
+    public GoalSpaceAStarPlanner(ICostStrategy costStrategy, IKnowledgeBase? invariantsKB = null)
+    {
+        this.costStrategy = costStrategy;
+        this.invariantInspector = invariantsKB != null ? new InvariantInspector(invariantsKB) : null;
+    }
 
     /// <summary>
-    /// Creates a (specifically-typed) planning task to work on solving a given problem.
+    /// Creates a (concretely-typed) planning task to work on solving a given problem.
     /// </summary>
     /// <param name="problem">The problem to create a plan for.</param>
     /// <returns>A new <see cref="GoalSpaceAStarPlanningTask"/> instance.</returns>
-    public Task<GoalSpaceAStarPlanningTask> CreatePlanningTaskAsync(Problem problem) => Task.FromResult(new GoalSpaceAStarPlanningTask(problem, costStrategy));
+    public Task<GoalSpaceAStarPlanningTask> CreatePlanningTaskAsync(Problem problem) => GoalSpaceAStarPlanningTask.CreateAsync(problem, costStrategy, invariantInspector);
 
     /// <inheritdoc />
     async Task<IPlanningTask> IPlanner.CreatePlanningTaskAsync(Problem problem) => await CreatePlanningTaskAsync(problem);

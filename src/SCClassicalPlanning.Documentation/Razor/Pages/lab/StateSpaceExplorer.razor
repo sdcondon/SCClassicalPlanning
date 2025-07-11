@@ -122,8 +122,8 @@
 
     private RenderFragment RenderListItem(LinkedListNode<StateSpaceEdge>? lastPathNode, StateSpaceNode stateNode, StateSpaceEdge? nextExploredEdge)
     {
-        return@<li>
-            @if (stateNode.State.Meets(problem.EndGoal))
+        return @<li>
+            @if (stateNode.State.Meets(problem!.EndGoal))
             {
                 <b>GOAL MET! </b>
             }

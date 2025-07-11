@@ -18,7 +18,7 @@ In this section, we use the ['blocks world'](https://en.wikipedia.org/wiki/Block
 
 ```
 using SCClassicalPlanning; // for HashSetState, Goal, Action, Effect, Problem
-using SCFirstOrderLogic; // for Constant, Term, Predicate, VariableDeclaration, EqualityIdentifier
+using SCFirstOrderLogic; // for Function, Term, Predicate, VariableDeclaration, EqualityIdentifier
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // for OperablePredicate
 using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.Action. I'd rather not rename it..
 
@@ -37,13 +37,13 @@ OperablePredicate Equal(Term x, Term y) => new Predicate(EqualityIdentifier.Inst
 
 // First, let's define the initial state of our problem. IState is an interface that represents a set of
 // predicates that can be modified by applying Actions. For problems with large states, a state implementation
-// that is backed by a separate store might be required, but here we have a small enough problem that just
+// that is backed by a external storage might be required, but here we have a small enough problem that just
 // keeping everything in memory is fine. The library includes an implementation of IState called HashSetState
 // that is intended for use in such scenarios.
-Constant table = new(nameof(table));
-Constant blockA = new(nameof(blockA));
-Constant blockB = new(nameof(blockB));
-Constant blockC = new(nameof(blockC));
+Function table = new(nameof(table));
+Function blockA = new(nameof(blockA));
+Function blockB = new(nameof(blockB));
+Function blockC = new(nameof(blockC));
 HashSetState initialState = new(
     Block(blockA)
     & Equal(blockA, blockA)

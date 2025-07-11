@@ -113,7 +113,7 @@ public class InvariantInspector
 
         foreach (var element in goal.Elements)
         {
-            if (await IsTrivial(element, cancellationToken))
+            if (await IsTrivialAsync(element, cancellationToken))
             {
                 remainingElements = remainingElements.Remove(element);
                 modified = true;
@@ -147,7 +147,7 @@ public class InvariantInspector
     /// <param name="literal">The literal to check for triviality.</param>
     /// <param name="cancellationToken">A token that, if cancelled, will cancel this operation.</param>
     /// <returns>A (task that returns a) value indicating whether the passed literal is trivial.</returns>
-    public async Task<bool> IsTrivial(Literal literal, CancellationToken cancellationToken = default)
+    public async Task<bool> IsTrivialAsync(Literal literal, CancellationToken cancellationToken = default)
     {
         if (!isTrivialElementResultCache.TryGetValue(literal, out bool isTrivialElement))
         {
@@ -186,7 +186,7 @@ public class InvariantInspector
     /// <returns>A value indicating whether the passed literal is trivial.</returns>
     public bool IsTrivial(Literal literal)
     {
-        return IsTrivial(literal, CancellationToken.None).GetAwaiter().GetResult();
+        return IsTrivialAsync(literal, CancellationToken.None).GetAwaiter().GetResult();
     }
 
     private class GoalVariableFinder : RecursiveGoalVisitor<HashSet<VariableDeclaration>>

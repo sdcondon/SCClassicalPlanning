@@ -3,6 +3,7 @@ using FluentAssertions.Equivalency;
 using FlUnit;
 using SCClassicalPlanning._TestUtilities;
 using SCClassicalPlanning.ExampleDomains.AsCode;
+using SCClassicalPlanning.ProblemCreation;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.SentenceManipulation.VariableManipulation;
 using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargoDomain;
@@ -93,58 +94,58 @@ public static class ProblemInspectorTests
     public static Test GetRelevantLiftedActionsBehaviour => TestThat
         .GivenEachOf(() => new GetRelevantLiftedActionsTestCase[]
         {
-                new(
-                    Goal: new(IsPresent(element1)),
-                    ActionSchemas: ContainerDomain.ActionSchemas,
-                    ExpectedResult:
-                    [
-                        Add(element1),
-                        Swap(R, element1).WithExpandedPrecondition(!AreEqual(R, element1)),
-                    ]),
+            new(
+                Goal: new(IsPresent(element1)),
+                ActionSchemas: ContainerDomain.ActionSchemas,
+                ExpectedResult:
+                [
+                    Add(element1),
+                    Swap(R, element1).WithExpandedPrecondition(!AreEqual(R, element1)),
+                ]),
 
-                new(
-                    Goal: new(IsPresent(element1) & IsPresent(element2)),
-                    ActionSchemas: ContainerDomain.ActionSchemas,
-                    ExpectedResult:
-                    [
-                        Add(element1),
-                        Add(element2),
-                        Swap(R, element1).WithExpandedPrecondition(!AreEqual(R, element1) & !AreEqual(R, element2)),
-                        Swap(R, element2).WithExpandedPrecondition(!AreEqual(R, element1) & !AreEqual(R, element2)),
-                    ]),
+            new(
+                Goal: new(IsPresent(element1) & IsPresent(element2)),
+                ActionSchemas: ContainerDomain.ActionSchemas,
+                ExpectedResult:
+                [
+                    Add(element1),
+                    Add(element2),
+                    Swap(R, element1).WithExpandedPrecondition(!AreEqual(R, element1) & !AreEqual(R, element2)),
+                    Swap(R, element2).WithExpandedPrecondition(!AreEqual(R, element1) & !AreEqual(R, element2)),
+                ]),
 
-                new(
-                    Goal: new(IsPresent(element1) & !IsPresent(element2)),
-                    ActionSchemas: ContainerDomain.ActionSchemas,
-                    ExpectedResult:
-                    [
-                        Add(element1),
-                        Remove(element2),
-                        Swap(R, element1).WithExpandedPrecondition(!AreEqual(R, element1)),
-                        Swap(element2, A).WithExpandedPrecondition(!AreEqual(A, element2)),
-                    ]),
+            new(
+                Goal: new(IsPresent(element1) & !IsPresent(element2)),
+                ActionSchemas: ContainerDomain.ActionSchemas,
+                ExpectedResult:
+                [
+                    Add(element1),
+                    Remove(element2),
+                    Swap(R, element1).WithExpandedPrecondition(!AreEqual(R, element1)),
+                    Swap(element2, A).WithExpandedPrecondition(!AreEqual(A, element2)),
+                ]),
 
-                new(
-                    Goal: new(!IsPresent(element1) & !IsPresent(element2)),
-                    ActionSchemas: ContainerDomain.ActionSchemas,
-                    ExpectedResult:
-                    [
-                        Remove(element1),
-                        Remove(element2),
-                        Swap(element1, A).WithExpandedPrecondition(!AreEqual(A, element1) & !AreEqual(A, element2)),
-                        Swap(element2, A).WithExpandedPrecondition(!AreEqual(A, element1) & !AreEqual(A, element2)),
-                    ]),
+            new(
+                Goal: new(!IsPresent(element1) & !IsPresent(element2)),
+                ActionSchemas: ContainerDomain.ActionSchemas,
+                ExpectedResult:
+                [
+                    Remove(element1),
+                    Remove(element2),
+                    Swap(element1, A).WithExpandedPrecondition(!AreEqual(A, element1) & !AreEqual(A, element2)),
+                    Swap(element2, A).WithExpandedPrecondition(!AreEqual(A, element1) & !AreEqual(A, element2)),
+                ]),
 
-                new(
-                    Goal: new(At(cargo, sfo)),
-                    ActionSchemas: AirCargoDomain.ActionSchemas,
-                    ExpectedResult:
-                    [
-                        Unload(cargo, Var("plane"), sfo),
+            new(
+                Goal: new(At(cargo, sfo)),
+                ActionSchemas: AirCargoDomain.ActionSchemas,
+                ExpectedResult:
+                [
+                    Unload(cargo, Var("plane"), sfo),
 
-                        // obviously unmeetable because non-planes can't become planes, but spotting that is not this method's job:
-                        Fly(cargo, Var("from"), sfo).WithExpandedPrecondition(!AreEqual(Var("from"), sfo)),
-                    ]),
+                    // obviously unmeetable because non-planes can't become planes, but spotting that is not this method's job:
+                    Fly(cargo, Var("from"), sfo).WithExpandedPrecondition(!AreEqual(Var("from"), sfo)),
+                ]),
         })
         .When(tc => ProblemInspector.GetRelevantLiftedActions(tc.Goal, tc.ActionSchemas))
         .ThenReturns()
@@ -211,6 +212,41 @@ public static class ProblemInspectorTests
         })
         .When(tc => ProblemInspector.GetMappingFromSchema(tc.Action, tc.ActionSchemas))
         .ThenThrows();
+
+    public static Test Temp_POS => TestThat
+        .GivenTestContext()
+        .When(cxt =>
+        {
+            var actions = ProblemInspector.GetRelevantLiftedActions(
+                BlocksWorldDomain.ExampleProblem.EndGoal,
+                BlocksWorldDomain.ExampleProblem.ActionSchemas);
+
+            foreach (var action in actions)
+            {
+                var mapping = ProblemInspector.GetMappingFromSchema(action, BlocksWorldDomain.ActionSchemas, out var extras);
+                cxt.WriteOutputLine(string.Join(", ", mapping.Bindings.Select(kvp => $"{kvp.Key}: {kvp.Value}")) + ". CONSTRAINTS: " + string.Join(", ", extras));
+            }
+        })
+        .ThenReturns();
+
+    public static Test Temp => TestThat
+        .GivenTestContext()
+        .When(cxt =>
+        {
+            var domain = PddlParser.ParseDomain(ExampleDomains.AsPDDL.BlocksWorldDomain.DomainPDDL);
+            var problem = PddlParser.ParseProblem(ExampleDomains.AsPDDL.BlocksWorldDomain.ExampleProblemPDDL, domain);
+
+            var actions = ProblemInspector.GetRelevantLiftedActions(
+                problem.EndGoal,
+                domain.ActionSchemas);
+
+            foreach (var action in actions)
+            {
+                var mapping = ProblemInspector.GetMappingFromSchema(action, BlocksWorldDomain.ActionSchemas, out var extras);
+                cxt.WriteOutputLine(string.Join(", ", mapping.Bindings.Select(kvp => $"{kvp.Key}: {kvp.Value}")) + ". CONSTRAINTS: " + string.Join(", ", extras));
+            }
+        })
+        .ThenReturns();
 
     private static EquivalencyAssertionOptions<Action> ExpectVariablesToBeStandardised(this EquivalencyAssertionOptions<Action> opts)
     {

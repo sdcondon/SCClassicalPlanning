@@ -12,45 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCClassicalPlanning.Planning.Utilities;
-using SCClassicalPlanning.ProblemManipulation;
-using System.Collections;
 
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
 
 /// <summary>
 /// Represents the collection of outbound edges of a node in the goal space of a planning problem. 
 /// </summary>
-public readonly struct GoalSpaceNodeEdges : IReadOnlyCollection<GoalSpaceEdge>
+public readonly struct GoalSpaceNodeEdges : IAsyncEnumerable<GoalSpaceEdge>
 {
-    /// <summary>
-    /// The problem whose goal space the node that owns this collection is a member of.
-    /// </summary>
-    public readonly Problem Problem;
+    private readonly Tuple<Problem, InvariantInspector> problemAndInvariants;
+    private readonly Goal goal;
 
-    /// <summary>
-    /// The goal represented by the node that owns this collection.
-    /// </summary>
-    public readonly Goal Goal;
-
-    /// <summary>
-    /// Initialises a new instance of the <see cref="GoalSpaceNodeEdges"/> struct.
-    /// </summary>
-    /// <param name="problem">The problem whose goal space the node that owns this collection is a member of.</param>
-    /// <param name="goal">The goal represented by the node that owns this collection.</param>
-    public GoalSpaceNodeEdges(Problem problem, Goal goal) => (Problem, Goal) = (problem, goal);
+    public GoalSpaceNodeEdges(Tuple<Problem, InvariantInspector> problemAndInvariants, Goal goal) => (this.problemAndInvariants, this.goal) = (problemAndInvariants, goal);
 
     /// <inheritdoc />
-    public int Count => ProblemInspector.GetRelevantGroundActions(Goal, Problem.ActionSchemas, Problem.InitialState.GetAllConstants()).Count();
-
-    /// <inheritdoc />
-    public IEnumerator<GoalSpaceEdge> GetEnumerator()
+    public async IAsyncEnumerator<GoalSpaceEdge> GetAsyncEnumerator(CancellationToken cancellationToken)
     {
-        foreach (var action in ProblemInspector.GetRelevantGroundActions(Goal, Problem.ActionSchemas, Problem.InitialState.GetAllConstants()))
+        if (problemAndInvariants.Item2 != null)
         {
-            yield return new GoalSpaceEdge(Problem, Goal, action);
+            foreach (var action in ProblemInspector.GetRelevantLiftedActions(goal, problemAndInvariants.Item1.ActionSchemas))
+            {
+                var effectiveAction = action;
+
+                var nonTrivialPreconditions = await problemAndInvariants.Item2.RemoveTrivialElementsAsync(action.Precondition);
+                if (nonTrivialPreconditions != action.Precondition)
+                {
+                    effectiveAction = new(action.Identifier, nonTrivialPreconditions, action.Effect);
+                }
+
+                if (!await problemAndInvariants.Item2.IsGoalPrecludedByInvariantsAsync(effectiveAction.Regress(goal)))
+                {
+                    yield return new GoalSpaceEdge(problemAndInvariants, goal, effectiveAction);
+                }
+            }
+        }
+        else
+        {
+            foreach (var action in ProblemInspector.GetRelevantLiftedActions(goal, problemAndInvariants.Item1.ActionSchemas))
+            {
+                yield return new GoalSpaceEdge(problemAndInvariants, goal, action);
+            }
         }
     }
-
-    /// <inheritdoc />
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using SCClassicalPlanning.Planning.Utilities;
 using SCGraphTheory.Search.Classic;
 
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
@@ -21,24 +22,14 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
 /// </summary>
 public class GoalSpaceAStarPlanningTask : SteppablePlanningTask<GoalSpaceEdge>
 {
-    private readonly AStarSearch<GoalSpaceNode, GoalSpaceEdge> search;
+    private readonly AStarAsyncSearch<GoalSpaceNode, GoalSpaceEdge> search;
 
     private bool isComplete;
     private Plan? result;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GoalSpaceAStarPlanningTask"/> class.
-    /// </summary>
-    /// <param name="problem">The problem to solve.</param>
-    /// <param name="costStrategy">The cost strategy to use.</param>
-    public GoalSpaceAStarPlanningTask(Problem problem, ICostStrategy costStrategy)
+    private GoalSpaceAStarPlanningTask(AStarAsyncSearch<GoalSpaceNode, GoalSpaceEdge> search)
     {
-        search = new AStarSearch<GoalSpaceNode, GoalSpaceEdge>(
-            source: new GoalSpaceNode(problem, problem.EndGoal),
-            isTarget: n => problem.InitialState.Meets(n.Goal),
-            getEdgeCost: e => costStrategy.GetCost(e.Action),
-            getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal));
-
+        this.search = search;
         CheckForSearchCompletion();
     }
 
@@ -68,17 +59,32 @@ public class GoalSpaceAStarPlanningTask : SteppablePlanningTask<GoalSpaceEdge>
         }
     }
 
+    /// <summary>
+    /// Creates a new instance of the <see cref="GoalSpaceAStarPlanningTask"/> class.
+    /// </summary>
+    /// <param name="problem">The problem to solve.</param>
+    /// <param name="costStrategy">The cost strategy to use.</param>
+    /// <param name="invariantInspector"></param>
+    public static async Task<GoalSpaceAStarPlanningTask> CreateAsync(Problem problem, ICostStrategy costStrategy, InvariantInspector invariantInspector)
+    {
+        return new(await AStarAsyncSearch<GoalSpaceNode, GoalSpaceEdge>.CreateAsync(
+            source: new GoalSpaceNode(Tuple.Create(problem, invariantInspector), problem.EndGoal),
+            isTarget: n => problem.InitialState.Meets(n.Goal),
+            getEdgeCost: e => costStrategy.GetCost(e.Action),
+            getEstimatedCostToTarget: n => costStrategy.EstimateCost(problem.InitialState, n.Goal)));
+    }
+
     /// <inheritdoc />
-    public override Task<GoalSpaceEdge> NextStepAsync(CancellationToken cancellationToken = default)
+    public override async Task<GoalSpaceEdge> NextStepAsync(CancellationToken cancellationToken = default)
     {
         if (IsComplete)
         {
             throw new InvalidOperationException("Task is already complete");
         }
 
-        var edge = search.NextStep();
+        var edge = await search.NextStepAsync(cancellationToken);
         CheckForSearchCompletion();
-        return Task.FromResult(edge);
+        return edge;
     }
 
     /// <inheritdoc />

@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using SCClassicalPlanning.Planning.Utilities;
 using SCGraphTheory;
 
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
@@ -20,47 +21,31 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
 /// </summary>
 // NB: three ref-valued fields puts this on the verge of being too large for a struct.
 // Probably worth comparing performance with a class-based graph at some point, but meh, it'll do for now.
-public readonly struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
+public readonly struct GoalSpaceEdge : IAsyncEdge<GoalSpaceNode, GoalSpaceEdge>
 {
-    /// <summary>
-    /// The problem whose goal space this edge is a member of.
-    /// </summary>
-    public readonly Problem Problem;
+    private readonly Tuple<Problem, InvariantInspector> problemAndInvariants;
+    private readonly Goal fromGoal;
 
-    /// <summary>
-    /// The goal represented by the node that this edge connects from.
-    /// </summary>
-    public readonly Goal FromGoal;
-
-    /// <summary>
-    /// The action that this edge represents the regression of.
-    /// </summary>
-    public readonly Action Action;
-
-    /// <summary>
-    /// Initialises a new instance of the <see cref="GoalSpaceEdge"/> struct.
-    /// </summary>
-    /// <param name="problem">The problem whose goal space this edge is a member of.</param>
-    /// <param name="fromGoal">The goal represented by the node that this edge connects from.</param>
-    /// <param name="action">The action that this edge represents the regression of.</param>
-    public GoalSpaceEdge(Problem problem, Goal fromGoal, Action action)
+    public GoalSpaceEdge(Tuple<Problem, InvariantInspector> problemAndInvariants, Goal fromGoal, Action action)
     {
-        Problem = problem;
-        FromGoal = fromGoal;
-        Action = action;
+        this.problemAndInvariants = problemAndInvariants;
+        this.fromGoal = fromGoal;
+        this.Action = action;
     }
 
     /// <inheritdoc />
-    public GoalSpaceNode From => new(Problem, FromGoal);
+    public GoalSpaceNode From => new(problemAndInvariants, fromGoal);
 
     /// <inheritdoc />
-    public GoalSpaceNode To => new(Problem, Action.Regress(FromGoal));
+    public GoalSpaceNode To => new(problemAndInvariants, Action.Regress(fromGoal));
 
     /// <summary>
-    /// Returns a string that represents the current object.
+    /// Gets the action that is regressed over to achieve this goal transition.
     /// </summary>
-    /// <returns>A string that represents the current object.</returns>
-    public override string ToString() => new PlanFormatter(Problem).Format(Action);
+    public Action Action { get; }
 
-    
+    /// <inheritdoc />
+    public override string ToString() => new PlanFormatter(problemAndInvariants.Item1).Format(Action);
+
+
 }
