@@ -138,9 +138,8 @@ public class HashSetState : IState
     /// <inheritdoc />
     public override bool Equals(object? obj)
     {
-        // Obviously unworkable if the state is large. However, if the state is large then this isn't
-        // the only problematic thing. So let's revisit this when we look at abstracting state to allow 
-        // for secondary storage and indexing. It may be that for the "in-mem" version, this is fine..
+        // Obviously unworkable if the state is large. However, if the state is large then other
+        // state implementations would likely be in use rather than this in-mem version.
         return obj is HashSetState state && state.Elements.SetEquals<Predicate>(Elements);
     }
 

@@ -18,7 +18,7 @@ In this section, we use the ['blocks world'](https://en.wikipedia.org/wiki/Block
 
 ```
 using SCClassicalPlanning; // for HashSetState, Goal, Action, Effect, Problem
-using SCFirstOrderLogic; // for Constant, Term, Predicate, VariableDeclaration, EqualityIdentifier
+using SCFirstOrderLogic; // for Function, Term, Predicate, VariableDeclaration, EqualityIdentifier
 using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory; // for OperablePredicate
 using Action = SCClassicalPlanning.Action; // an unfortunate clash with System.Action. I'd rather not rename it..
 
@@ -40,10 +40,15 @@ OperablePredicate Equal(Term x, Term y) => new Predicate(EqualityIdentifier.Inst
 // that is backed by a separate store might be required, but here we have a small enough problem that just
 // keeping everything in memory is fine. The library includes an implementation of IState called HashSetState
 // that is intended for use in such scenarios.
-Constant table = new(nameof(table));
-Constant blockA = new(nameof(blockA));
-Constant blockB = new(nameof(blockB));
-Constant blockC = new(nameof(blockC));
+// NB: For the unfamiliar with first-order logic - don't get confused the "Functions" here (from the SCFirstOrderLogic
+// namespace). A function in FoL is just a label for a specific domain element, potentially defined relative to
+// another domain element or elements. For example, if we wanted to refer to Bob's maternal grandfather in a domain about
+// people, we might have a function that is Father(Mother(Bob())). The functions here are obviously much more straightforward
+// than that - they're just the "constants" of our domain.
+Function table = new(nameof(table));
+Function blockA = new(nameof(blockA));
+Function blockB = new(nameof(blockB));
+Function blockC = new(nameof(blockC));
 HashSetState initialState = new(
     Block(blockA)
     & Equal(blockA, blockA)
