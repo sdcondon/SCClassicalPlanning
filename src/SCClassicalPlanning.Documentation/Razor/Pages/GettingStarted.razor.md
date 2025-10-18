@@ -40,11 +40,11 @@ OperablePredicate Equal(Term x, Term y) => new Predicate(EqualityIdentifier.Inst
 // that is backed by a separate store might be required, but here we have a small enough problem that just
 // keeping everything in memory is fine. The library includes an implementation of IState called HashSetState
 // that is intended for use in such scenarios.
-// NB: For the unfamiliar with first-order logic - don't get confused the "Functions" here (from the SCFirstOrderLogic
+// NB: For the unfamiliar with first-order logic - don't get confused by the "Functions" here (from the SCFirstOrderLogic
 // namespace). A function in FoL is just a label for a specific domain element, potentially defined relative to
 // another domain element or elements. For example, if we wanted to refer to Bob's maternal grandfather in a domain about
 // people, we might have a function that is Father(Mother(Bob())). The functions here are obviously much more straightforward
-// than that - they're just the "constants" of our domain.
+// than that - they're just the "constants" of our domain - our table and blocks.
 Function table = new(nameof(table));
 Function blockA = new(nameof(blockA));
 Function blockB = new(nameof(blockB));
