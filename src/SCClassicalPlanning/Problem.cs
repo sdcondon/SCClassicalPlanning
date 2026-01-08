@@ -59,7 +59,7 @@ public class Problem
     //// predicates) - so the subset of initial state that refers to these predicates is invariant.
     //// E.g. IsOfMyType(MyObject). And of course predicates that change "together" in certain ways.
     //// Having said this, I worry a little about SoC..
-    //// public ImmutableHashSet<Sentence> Invariants { get; }
+    //// public ImmutableHashSet<Formula> Invariants { get; }
     //// or (to ease duplication concerns):
     //// public ImmutableHashSet<CNFClause> Invariants { get; }
     //// though actually just public IKnowledgeBase Invariants { get; } might be a better call

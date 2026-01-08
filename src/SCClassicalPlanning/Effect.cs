@@ -42,10 +42,10 @@ public class Effect
     public Effect(params Literal[] elements) : this((IEnumerable<Literal>)elements) { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Effect" /> class from a sentence of first order logic. The sentence must be a conjunction of literals, or an exception will be thrown.
+    /// Initializes a new instance of the <see cref="Effect" /> class from a formula of first order logic. The formula must be a conjunction of literals, or an exception will be thrown.
     /// </summary>
-    /// <param name="sentence">The sentence that expresses the effect.</param>
-    public Effect(Formula sentence) : this(ConstructionVisitor.Visit(sentence)) { }
+    /// <param name="formula">The formula that expresses the effect.</param>
+    public Effect(Formula formula) : this(ConstructionVisitor.Visit(formula)) { }
 
     // NB: uses argument directly, unlike public ctors. This is to avoid unnecessary GC pressure.
     internal Effect(ImmutableHashSet<Literal> elements) => Elements = elements;
@@ -132,26 +132,26 @@ public class Effect
     public override string ToString() => string.Join(" ∧ ", Elements.Select(a => a.ToString()));
 
     /// <summary>
-    /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Formula"/> that is a conjunction of them.
+    /// Formula visitor class that extracts <see cref="Literal"/>s from a <see cref="Formula"/> that is a conjunction of them.
     /// Used by the <see cref="Effect(Formula)"/> constructor.
     /// </summary>
     private class ConstructionVisitor : RecursiveFormulaVisitor<HashSet<Literal>>
     {
         private static readonly ConstructionVisitor Instance = new();
 
-        public static HashSet<Literal> Visit(Formula sentence)
+        public static HashSet<Literal> Visit(Formula formula)
         {
             var elements = new HashSet<Literal>();
-            Instance.Visit(sentence, elements);
+            Instance.Visit(formula, elements);
             return elements;
         }
 
         /// <inheritdoc/>
-        public override void Visit(Formula sentence, HashSet<Literal> literals)
+        public override void Visit(Formula formula, HashSet<Literal> literals)
         {
-            if (sentence is Conjunction conjunction)
+            if (formula is Conjunction conjunction)
             {
-                // The sentence is assumed to be a conjunction of literals - so just skip past all the conjunctions at the root.
+                // The formula is assumed to be a conjunction of literals - so just skip past all the conjunctions at the root.
                 base.Visit(conjunction, literals);
             }
             else
@@ -159,7 +159,7 @@ public class Effect
                 // Assume we've hit a literal. NB: ctor will throw if its not actually a literal.
                 // Afterwards, we don't need to look any further down the tree for the purposes of this class (though the Literal ctor that
                 // we invoke here does so to figure out the details of the literal). So we can just return rather than invoking base.Visit.
-                literals.Add(new Literal(sentence));
+                literals.Add(new Literal(formula));
             }
         }
     }

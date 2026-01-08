@@ -122,14 +122,14 @@ public static class PddlParser
 
         // NB: ignore :predicates for now - without typing, its not useful anyway (existing predicates implicit based on actions), so all we'd be do is validating.
         // Might need richer model to support this (predicates with typed params essentially imply extra preconds on all actions that feature them in their preconds).
-        // A few ways to go about that, but.. perhaps something like PredicateSchema(Predicate prototype, Sentence[] constraints)?
+        // A few ways to go about that, but.. perhaps something like PredicateSchema(Predicate prototype, Formula[] constraints)?
         // Something to consider AFTER v1.0 (and would be a breaking change to the model, so.. v2.0 or beyond).
         // ALTERNATIVELY, could perhaps be done with Domain.Invariants (see below for more on Invariants): e.g. MyPredicate(x, y) => IsOfThisType(x).. Hmm..
 
         if (context.timelessDef() != null)
         {
             // This is something else that would require a change (addition) to the model to support. 
-            // Something like a Sentence-collection-valued "Invariants" property on the Domain class
+            // Something like a Formula-collection-valued "Invariants" property on the Domain class
             // (which would cover both ":timeless" and ":axioms").
             throw new NotSupportedException(":timeless is not yet supported");
         }
@@ -247,7 +247,7 @@ public static class PddlParser
 
         public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
-            throw new ArgumentException("line " + line + ":" + charPositionInLine + " " + msg, "sentence", e);
+            throw new ArgumentException("line " + line + ":" + charPositionInLine + " " + msg, "formula", e);
         }
     }
 

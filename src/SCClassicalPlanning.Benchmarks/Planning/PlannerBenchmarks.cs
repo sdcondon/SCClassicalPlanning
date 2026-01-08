@@ -62,7 +62,7 @@ public class PlannerBenchmarks
         ////    Label: "Blocks - Large",
         ////    Problem: BlocksWorld.LargeExampleProblem,
         ////    Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorld.Domain),
-        ////    InvariantsKB: MakeInvariantsKB(new Sentence[]
+        ////    InvariantsKB: MakeInvariantsKB(new Formula[]
         ////    {
         ////        Block(new Constant("blockA")),
         ////        Equal(new Constant("blockA"), new Constant("blockA")),

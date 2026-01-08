@@ -28,7 +28,7 @@ public abstract class RecursiveGoalTransformation
     /// The default implementation returns a <see cref="Goal"/> with an element list that is the result of calling <see cref="ApplyTo(Literal)"/> on all of the existing elements.
     /// </para>
     /// </summary>
-    /// <param name="goal">The sentence to visit.</param>
+    /// <param name="goal">The goal to visit.</param>
     /// <returns>The transformed <see cref="Goal"/>.</returns>
     public virtual Goal ApplyTo(Goal goal)
     {

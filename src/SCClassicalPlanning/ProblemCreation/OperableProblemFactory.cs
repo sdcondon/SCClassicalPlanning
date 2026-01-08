@@ -86,11 +86,11 @@ public static class OperableProblemFactory
         /// <summary>
         /// Defines the implicit conversion of an <see cref="OperableFormula"/> instance to an <see cref="OperableGoal"/>.
         /// </summary>
-        /// <param name="sentence">The <see cref="Formula"/> to convert.</param>
-        public static implicit operator OperableGoal(OperableFormula sentence)
+        /// <param name="formula">The <see cref="Formula"/> to convert.</param>
+        public static implicit operator OperableGoal(OperableFormula formula)
         {
             var literals = new HashSet<Literal>();
-            LiteralConjunctionVisitor.Instance.Visit(sentence, literals);
+            LiteralConjunctionVisitor.Instance.Visit(formula, literals);
             return new(literals);
         }
     }
@@ -119,11 +119,11 @@ public static class OperableProblemFactory
         /// <summary>
         /// Defines the implicit conversion of an <see cref="OperableFormula"/> instance to an <see cref="OperableState"/>.
         /// </summary>
-        /// <param name="sentence">The <see cref="Formula"/> to convert.</param>
-        public static implicit operator OperableState(OperableFormula sentence)
+        /// <param name="formula">The <see cref="Formula"/> to convert.</param>
+        public static implicit operator OperableState(OperableFormula formula)
         {
             var predicates = new HashSet<Predicate>();
-            PredicateConjunctionVisitor.Instance.Visit(sentence, predicates);
+            PredicateConjunctionVisitor.Instance.Visit(formula, predicates);
             return new(predicates);
         }
     }
@@ -152,17 +152,17 @@ public static class OperableProblemFactory
         /// <summary>
         /// Defines the implicit conversion of an <see cref="OperableFormula"/> instance to an <see cref="OperableEffect"/>.
         /// </summary>
-        /// <param name="sentence">The <see cref="Formula"/> to convert.</param>
-        public static implicit operator OperableEffect(OperableFormula sentence)
+        /// <param name="formula">The <see cref="Formula"/> to convert.</param>
+        public static implicit operator OperableEffect(OperableFormula formula)
         {
             var literals = new HashSet<Literal>();
-            LiteralConjunctionVisitor.Instance.Visit(sentence, literals);
+            LiteralConjunctionVisitor.Instance.Visit(formula, literals);
             return new(literals);
         }
     }
 
     /// <summary>
-    /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Formula"/> that is a conjunction of them.
+    /// Formula visitor class that extracts <see cref="Literal"/>s from a <see cref="Formula"/> that is a conjunction of them.
     /// </summary>
     private class LiteralConjunctionVisitor : RecursiveFormulaVisitor<HashSet<Literal>>
     {
@@ -172,11 +172,11 @@ public static class OperableProblemFactory
         public static LiteralConjunctionVisitor Instance { get; } = new LiteralConjunctionVisitor();
 
         /// <inheritdoc/>
-        public override void Visit(Formula sentence, HashSet<Literal> literals)
+        public override void Visit(Formula formula, HashSet<Literal> literals)
         {
-            if (sentence is Conjunction conjunction)
+            if (formula is Conjunction conjunction)
             {
-                // The sentence is assumed to be a conjunction of literals - so just skip past all the conjunctions at the root.
+                // The formula is assumed to be a conjunction of literals - so just skip past all the conjunctions at the root.
                 base.Visit(conjunction, literals);
             }
             else
@@ -184,13 +184,13 @@ public static class OperableProblemFactory
                 // Assume we've hit a literal. NB: ctor will throw if its not actually a literal.
                 // Afterwards, we don't need to look any further down the tree for the purposes of this class (though the Literal ctor that
                 // we invoke here does so to figure out the details of the literal). So we can just return rather than invoking base.Visit.
-                literals.Add(new Literal(sentence));
+                literals.Add(new Literal(formula));
             }
         }
     }
 
     /// <summary>
-    /// Sentence visitor class that extracts <see cref="Predicate"/>s from a <see cref="Formula"/> that is a conjunction of them.
+    /// Formula visitor class that extracts <see cref="Predicate"/>s from a <see cref="Formula"/> that is a conjunction of them.
     /// </summary>
     private class PredicateConjunctionVisitor : RecursiveFormulaVisitor<HashSet<Predicate>>
     {
@@ -200,13 +200,13 @@ public static class OperableProblemFactory
         public static PredicateConjunctionVisitor Instance { get; } = new PredicateConjunctionVisitor();
 
         /// <inheritdoc/>
-        public override void Visit(Formula sentence, HashSet<Predicate> predicates)
+        public override void Visit(Formula formula, HashSet<Predicate> predicates)
         {
-            if (sentence is Conjunction conjunction)
+            if (formula is Conjunction conjunction)
             {
                 base.Visit(conjunction, predicates);
             }
-            else if (sentence is Predicate predicate)
+            else if (formula is Predicate predicate)
             {
                 if (predicate.Arguments.Any(a => !a.IsGroundTerm))
                 {

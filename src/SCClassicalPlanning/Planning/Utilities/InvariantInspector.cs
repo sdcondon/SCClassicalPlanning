@@ -60,22 +60,22 @@ public class InvariantInspector
             // the result cache with the empty goal - so the TryGetValue above would have succeeded.
             // TODO-SCFIRSTORDERLOGIC-MAYBE: Annoying performance hit - goals are essentially already in CNF,
             // but our knowledge bases want to do the conversion themselves.. Meh, never mind.
-            // TODO: Perhaps a ToSentence in Goal? (and others..)
-            var goalSentence = goal.Elements.Skip(1).Aggregate(goal.Elements.First().ToFormula(), (c, e) => new Conjunction(c, e.ToFormula()));
+            // TODO: Perhaps a ToFormula in Goal? (and others..)
+            var goalFormula = goal.Elements.Skip(1).Aggregate(goal.Elements.First().ToFormula(), (c, e) => new Conjunction(c, e.ToFormula()));
 
             foreach (var variable in variables)
             {
-                goalSentence = new ExistentialQuantification(variable, goalSentence);
+                goalFormula = new ExistentialQuantification(variable, goalFormula);
             }
 
             // Note the negation here. We're not asking if the invariants mean that the goal MUST
             // be true (that will of course generally not be the case!), we're asking if the goal
             // CANNOT be true - that is, if its NEGATION must be true.
 #if true
-            isPrecludedGoal = isPrecludedGoalResultCache[goal] = await invariantsKB.AskAsync(new Negation(goalSentence), cancellationToken);
+            isPrecludedGoal = isPrecludedGoalResultCache[goal] = await invariantsKB.AskAsync(new Negation(goalFormula), cancellationToken);
 #else // temp...
             Stopwatch sw = Stopwatch.StartNew();
-            var query = await invariantsKB.CreateQueryAsync(new Negation(goalSentence), cancellationToken);
+            var query = await invariantsKB.CreateQueryAsync(new Negation(goalFormula), cancellationToken);
             isPrecludedGoal = isPrecludedGoalResultCache[goal] = await query.ExecuteAsync(cancellationToken);
             sw.Stop();
             if (isPrecludedGoal)
@@ -151,21 +151,21 @@ public class InvariantInspector
     {
         if (!isTrivialElementResultCache.TryGetValue(literal, out bool isTrivialElement))
         {
-            var elementSentence = literal.ToFormula();
+            var elementFormula = literal.ToFormula();
 
             var variables = new HashSet<VariableDeclaration>();
             GoalVariableFinder.Instance.Visit(literal, variables);
 
             foreach (var variable in variables)
             {
-                elementSentence = new UniversalQuantification(variable, elementSentence);
+                elementFormula = new UniversalQuantification(variable, elementFormula);
             }
 
 #if true
-            isTrivialElement = isTrivialElementResultCache[literal] = await invariantsKB.AskAsync(elementSentence, cancellationToken);
+            isTrivialElement = isTrivialElementResultCache[literal] = await invariantsKB.AskAsync(elementFormula, cancellationToken);
 #else // temp...
             Stopwatch sw = Stopwatch.StartNew();
-            var query = await invariantsKB.CreateQueryAsync(elementSentence, cancellationToken);
+            var query = await invariantsKB.CreateQueryAsync(elementFormula, cancellationToken);
             isTrivialElement = await query.ExecuteAsync(cancellationToken);
             sw.Stop();
             if (isTrivialElement)

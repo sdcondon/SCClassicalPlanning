@@ -46,11 +46,11 @@ public class HashSetState : IState
     public HashSetState(params Predicate[] elements) : this((IEnumerable<Predicate>)elements) { }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="HashSetState"/> class from a sentence of first order logic.
-    /// The sentence must be a conjunction of predicates, or an exception will be thrown.
+    /// Initializes a new instance of the <see cref="HashSetState"/> class from a formula of first order logic.
+    /// The formula must be a conjunction of predicates, or an exception will be thrown.
     /// </summary>
-    /// <param name="sentence">The sentence that expresses the state.</param>
-    public HashSetState(Formula sentence) : this(ConstructionVisitor.Visit(sentence)) { }
+    /// <param name="formula">The formula that expresses the state.</param>
+    public HashSetState(Formula formula) : this(ConstructionVisitor.Visit(formula)) { }
 
     // NB: uses argument directly, unlike public ctors. This is to avoid unnecessary GC pressure.
     // Also allows the public ctors apply validation, without forcing said validation to occur at every step of a planning process.
@@ -160,27 +160,27 @@ public class HashSetState : IState
     public override string ToString() => string.Join(" ∧ ", Elements.Select(a => a.ToString()));
 
     /// <summary>
-    /// Sentence visitor class that extracts <see cref="Predicate"/>s from a <see cref="Formula"/> that is a conjunction of them.
+    /// Formula visitor class that extracts <see cref="Predicate"/>s from a <see cref="Formula"/> that is a conjunction of them.
     /// Used by the <see cref="HashSetState(Formula)"/> constructor.
     /// </summary>
     private class ConstructionVisitor : RecursiveFormulaVisitor<HashSet<Predicate>>
     {
         private static readonly ConstructionVisitor Instance = new();
 
-        public static HashSet<Predicate> Visit(Formula sentence)
+        public static HashSet<Predicate> Visit(Formula formula)
         {
             var elements = new HashSet<Predicate>();
-            Instance.Visit(sentence, elements);
+            Instance.Visit(formula, elements);
             return elements;
         }
 
-        public override void Visit(Formula sentence, HashSet<Predicate> predicates)
+        public override void Visit(Formula formula, HashSet<Predicate> predicates)
         {
-            if (sentence is Conjunction conjunction)
+            if (formula is Conjunction conjunction)
             {
                 base.Visit(conjunction, predicates);
             }
-            else if (sentence is Predicate predicate)
+            else if (formula is Predicate predicate)
             {
                 predicates.Add(predicate);
             }
