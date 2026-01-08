@@ -13,7 +13,7 @@
 // limitations under the License.
 using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation.VariableManipulation;
+using SCFirstOrderLogic.FormulaManipulation.Substitution;
 
 namespace SCClassicalPlanning.Alternatives.Planning.Utilities;
 

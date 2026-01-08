@@ -1,5 +1,5 @@
 ﻿using SCFirstOrderLogic;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
+using static SCFirstOrderLogic.FormulaCreation.OperableFormulaFactory;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 
 namespace SCClassicalPlanning.ExampleDomains.AsCode;

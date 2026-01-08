@@ -63,7 +63,7 @@ public abstract class RecursiveGoalTransformation
         var predicate = ApplyTo(literal.Predicate);
         if (predicate != literal.Predicate)
         {
-            return new Literal(predicate, literal.IsNegated);
+            return new Literal(predicate, literal.IsNegative);
         }
 
         return literal;

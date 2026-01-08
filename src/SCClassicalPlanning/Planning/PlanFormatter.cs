@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCClassicalPlanning.Planning.Utilities;
-using SCFirstOrderLogic.SentenceManipulation;
-using SCFirstOrderLogic.SentenceManipulation.VariableManipulation;
+using SCFirstOrderLogic.FormulaManipulation;
+using SCFirstOrderLogic.FormulaManipulation.Substitution;
 using System.Text;
 
 namespace SCClassicalPlanning.Planning;

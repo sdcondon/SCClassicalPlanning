@@ -13,8 +13,8 @@
 // limitations under the License.
 using SCClassicalPlanning.InternalUtilities;
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
-using SCFirstOrderLogic.SentenceManipulation.VariableManipulation;
+using SCFirstOrderLogic.FormulaManipulation;
+using SCFirstOrderLogic.FormulaManipulation.Substitution;
 using System.Collections.Immutable;
 
 namespace SCClassicalPlanning;
@@ -48,7 +48,7 @@ public class Goal
     /// Initializes a new instance of the <see cref="Goal" /> class from a sentence of first order logic. The sentence must be a conjunction of literals, or an exception will be thrown.
     /// </summary>
     /// <param name="sentence">The sentence that expresses the goal.</param>
-    public Goal(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
+    public Goal(Formula sentence) : this(ConstructionVisitor.Visit(sentence)) { }
 
     // NB: uses argument directly, unlike public ctors. This is to avoid unnecessary GC pressure.
     // Also allows the public ctors apply validation, without forcing said validation to occur at every step of a planning process.
@@ -79,7 +79,7 @@ public class Goal
     /// <summary>
     /// Gets the negative elements of the goal - those whose predicates must NOT exist in a <see cref="IState"/> in order for this goal to be met.
     /// </summary>
-    public IEnumerable<Literal> NegativeElements => Elements.Where(l => l.IsNegated);
+    public IEnumerable<Literal> NegativeElements => Elements.Where(l => l.IsNegative);
 
     /// <summary>
     /// Gets the required predicates of the goal - those that must exist in a <see cref="IState"/> in order for this goal to be met.
@@ -162,14 +162,14 @@ public class Goal
     public override string ToString() => string.Join(" ∧ ", Elements.Select(a => a.ToString()));
 
     /// <summary>
-    /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.
-    /// Used by the <see cref="Goal(Sentence)"/> constructor.
+    /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Formula"/> that is a conjunction of them.
+    /// Used by the <see cref="Goal(Formula)"/> constructor.
     /// </summary>
-    private class ConstructionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
+    private class ConstructionVisitor : RecursiveFormulaVisitor<HashSet<Literal>>
     {
         private static readonly ConstructionVisitor Instance = new();
 
-        public static HashSet<Literal> Visit(Sentence sentence)
+        public static HashSet<Literal> Visit(Formula sentence)
         {
             var elements = new HashSet<Literal>();
             Instance.Visit(sentence, elements);
@@ -177,7 +177,7 @@ public class Goal
         }
 
         /// <inheritdoc/>
-        public override void Visit(Sentence sentence, HashSet<Literal> literals)
+        public override void Visit(Formula sentence, HashSet<Literal> literals)
         {
             if (sentence is Conjunction conjunction)
             {

@@ -1,6 +1,6 @@
 ﻿using SCFirstOrderLogic;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
+using static SCFirstOrderLogic.FormulaCreation.OperableFormulaFactory;
 
 namespace SCClassicalPlanning.ExampleDomains.AsCode;
 

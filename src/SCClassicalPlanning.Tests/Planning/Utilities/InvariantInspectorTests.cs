@@ -2,7 +2,7 @@
 using FlUnit;
 using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
+using static SCFirstOrderLogic.FormulaCreation.OperableFormulaFactory;
 using static SCClassicalPlanning.ProblemCreation.OperableProblemFactory;
 using SCFirstOrderLogic.Inference.Basic.Resolution;
 
@@ -13,7 +13,7 @@ public static class InvariantInspectorTests
     private static readonly Function blockA = new(nameof(blockA));
     private static readonly Function blockB = new(nameof(blockB));
 
-    private record TestCase(OperableGoal Goal, IEnumerable<Sentence> Knowledge, bool ExpectedResult);
+    private record TestCase(OperableGoal Goal, IEnumerable<Formula> Knowledge, bool ExpectedResult);
 
     public static Test IsGoalPrecludedByInvariantsBehaviour => TestThat
         .GivenEachOf(() => new TestCase[]
@@ -66,7 +66,7 @@ public static class InvariantInspectorTests
         .When(tc =>
         {
             var kb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
-                new HashSetClauseStore(tc.Knowledge.Select(s => (Sentence)s)),
+                new HashSetClauseStore(tc.Knowledge.Select(s => (Formula)s)),
                 ClauseResolutionFilters.None,
                 ClauseResolutionPriorityComparisons.UnitPreference));
 

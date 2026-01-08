@@ -3,7 +3,7 @@ using FlUnit;
 using SCFirstOrderLogic;
 using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargoDomain;
 using static SCClassicalPlanning.ExampleDomains.AsCode.ContainerDomain;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
+using static SCFirstOrderLogic.FormulaCreation.OperableFormulaFactory;
 
 namespace SCClassicalPlanning;
 

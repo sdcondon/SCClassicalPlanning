@@ -63,7 +63,7 @@ public abstract class RecursiveEffectTransformation
         var predicate = ApplyTo(literal.Predicate);
         if (predicate != literal.Predicate)
         {
-            return new Literal(predicate, literal.IsNegated);
+            return new Literal(predicate, literal.IsNegative);
         }
 
         return literal;

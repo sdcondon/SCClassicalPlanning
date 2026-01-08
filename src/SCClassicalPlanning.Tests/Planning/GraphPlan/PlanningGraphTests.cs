@@ -22,7 +22,7 @@ public static class PlanningGraphTests
         {
             new(
                 Problem: BlocksWorldDomain.ExampleProblem,
-                ExpectedLayer0Propositions: new Sentence[]
+                ExpectedLayer0Propositions: new Formula[]
                 {
                     Block(blockA),
                     Block(blockB),

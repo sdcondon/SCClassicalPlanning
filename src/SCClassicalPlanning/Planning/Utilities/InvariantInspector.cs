@@ -61,7 +61,7 @@ public class InvariantInspector
             // TODO-SCFIRSTORDERLOGIC-MAYBE: Annoying performance hit - goals are essentially already in CNF,
             // but our knowledge bases want to do the conversion themselves.. Meh, never mind.
             // TODO: Perhaps a ToSentence in Goal? (and others..)
-            var goalSentence = goal.Elements.Skip(1).Aggregate(goal.Elements.First().ToSentence(), (c, e) => new Conjunction(c, e.ToSentence()));
+            var goalSentence = goal.Elements.Skip(1).Aggregate(goal.Elements.First().ToFormula(), (c, e) => new Conjunction(c, e.ToFormula()));
 
             foreach (var variable in variables)
             {
@@ -151,7 +151,7 @@ public class InvariantInspector
     {
         if (!isTrivialElementResultCache.TryGetValue(literal, out bool isTrivialElement))
         {
-            var elementSentence = literal.ToSentence();
+            var elementSentence = literal.ToFormula();
 
             var variables = new HashSet<VariableDeclaration>();
             GoalVariableFinder.Instance.Visit(literal, variables);

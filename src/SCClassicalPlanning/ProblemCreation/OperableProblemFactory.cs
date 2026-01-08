@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
+using SCFirstOrderLogic.FormulaManipulation;
 using System.Collections.Immutable;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
+using static SCFirstOrderLogic.FormulaCreation.OperableFormulaFactory;
 
 namespace SCClassicalPlanning.ProblemCreation;
 
@@ -23,7 +23,7 @@ namespace SCClassicalPlanning.ProblemCreation;
 /// Utility logic for the declaration of <see cref="Problem"/> instances, prioritising succinct C# above all else.
 /// </para>
 /// <para>
-/// Allows for declaring actions that have preconditions and effects stated directly as <see cref="OperableSentence"/> instances.
+/// Allows for declaring actions that have preconditions and effects stated directly as <see cref="OperableFormula"/> instances.
 /// Which, err, really doesn't make much of a difference, to be honest - there's not nearly as much value in this as there is in the equivalent functionality in SCFirstOrderLogic.
 /// That's why it's not mentioned in the user guide.
 /// </para>
@@ -63,7 +63,7 @@ public static class OperableProblemFactory
     }
 
     /// <summary>
-    /// Surrogate type for <see cref="Goal"/> that is implictly convertible from an <see cref="OperableSentence"/>. Also implicitly convertible to and from <see cref="Goal"/>.
+    /// Surrogate type for <see cref="Goal"/> that is implictly convertible from an <see cref="OperableFormula"/>. Also implicitly convertible to and from <see cref="Goal"/>.
     /// </summary>
     public class OperableGoal
     {
@@ -84,10 +84,10 @@ public static class OperableProblemFactory
         public static implicit operator Goal(OperableGoal goal) => new(goal.Elements);
 
         /// <summary>
-        /// Defines the implicit conversion of an <see cref="OperableSentence"/> instance to an <see cref="OperableGoal"/>.
+        /// Defines the implicit conversion of an <see cref="OperableFormula"/> instance to an <see cref="OperableGoal"/>.
         /// </summary>
-        /// <param name="sentence">The <see cref="Sentence"/> to convert.</param>
-        public static implicit operator OperableGoal(OperableSentence sentence)
+        /// <param name="sentence">The <see cref="Formula"/> to convert.</param>
+        public static implicit operator OperableGoal(OperableFormula sentence)
         {
             var literals = new HashSet<Literal>();
             LiteralConjunctionVisitor.Instance.Visit(sentence, literals);
@@ -96,7 +96,7 @@ public static class OperableProblemFactory
     }
 
     /// <summary>
-    /// Surrogate type for <see cref="HashSetState"/> that is implictly convertible from an <see cref="OperableSentence"/>. Also implicitly convertible to and from <see cref="HashSetState"/>.
+    /// Surrogate type for <see cref="HashSetState"/> that is implictly convertible from an <see cref="OperableFormula"/>. Also implicitly convertible to and from <see cref="HashSetState"/>.
     /// </summary>
     public class OperableState
     {
@@ -117,10 +117,10 @@ public static class OperableProblemFactory
         public static implicit operator HashSetState(OperableState state) => new(state.Elements);
 
         /// <summary>
-        /// Defines the implicit conversion of an <see cref="OperableSentence"/> instance to an <see cref="OperableState"/>.
+        /// Defines the implicit conversion of an <see cref="OperableFormula"/> instance to an <see cref="OperableState"/>.
         /// </summary>
-        /// <param name="sentence">The <see cref="Sentence"/> to convert.</param>
-        public static implicit operator OperableState(OperableSentence sentence)
+        /// <param name="sentence">The <see cref="Formula"/> to convert.</param>
+        public static implicit operator OperableState(OperableFormula sentence)
         {
             var predicates = new HashSet<Predicate>();
             PredicateConjunctionVisitor.Instance.Visit(sentence, predicates);
@@ -129,7 +129,7 @@ public static class OperableProblemFactory
     }
 
     /// <summary>
-    /// Surrogate type for <see cref="Effect"/> that is implictly convertible from an <see cref="OperableSentence"/>. Also implicitly convertible to and from <see cref="Effect"/>.
+    /// Surrogate type for <see cref="Effect"/> that is implictly convertible from an <see cref="OperableFormula"/>. Also implicitly convertible to and from <see cref="Effect"/>.
     /// </summary>
     public class OperableEffect
     {
@@ -150,10 +150,10 @@ public static class OperableProblemFactory
         public static implicit operator Effect(OperableEffect effect) => new(effect.Elements);
 
         /// <summary>
-        /// Defines the implicit conversion of an <see cref="OperableSentence"/> instance to an <see cref="OperableEffect"/>.
+        /// Defines the implicit conversion of an <see cref="OperableFormula"/> instance to an <see cref="OperableEffect"/>.
         /// </summary>
-        /// <param name="sentence">The <see cref="Sentence"/> to convert.</param>
-        public static implicit operator OperableEffect(OperableSentence sentence)
+        /// <param name="sentence">The <see cref="Formula"/> to convert.</param>
+        public static implicit operator OperableEffect(OperableFormula sentence)
         {
             var literals = new HashSet<Literal>();
             LiteralConjunctionVisitor.Instance.Visit(sentence, literals);
@@ -162,9 +162,9 @@ public static class OperableProblemFactory
     }
 
     /// <summary>
-    /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.
+    /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Formula"/> that is a conjunction of them.
     /// </summary>
-    private class LiteralConjunctionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
+    private class LiteralConjunctionVisitor : RecursiveFormulaVisitor<HashSet<Literal>>
     {
         /// <summary>
         /// Gets a singleton instance of this class.
@@ -172,7 +172,7 @@ public static class OperableProblemFactory
         public static LiteralConjunctionVisitor Instance { get; } = new LiteralConjunctionVisitor();
 
         /// <inheritdoc/>
-        public override void Visit(Sentence sentence, HashSet<Literal> literals)
+        public override void Visit(Formula sentence, HashSet<Literal> literals)
         {
             if (sentence is Conjunction conjunction)
             {
@@ -190,9 +190,9 @@ public static class OperableProblemFactory
     }
 
     /// <summary>
-    /// Sentence visitor class that extracts <see cref="Predicate"/>s from a <see cref="Sentence"/> that is a conjunction of them.
+    /// Sentence visitor class that extracts <see cref="Predicate"/>s from a <see cref="Formula"/> that is a conjunction of them.
     /// </summary>
-    private class PredicateConjunctionVisitor : RecursiveSentenceVisitor<HashSet<Predicate>>
+    private class PredicateConjunctionVisitor : RecursiveFormulaVisitor<HashSet<Predicate>>
     {
         /// <summary>
         /// Gets a singleton instance of this class.
@@ -200,7 +200,7 @@ public static class OperableProblemFactory
         public static PredicateConjunctionVisitor Instance { get; } = new PredicateConjunctionVisitor();
 
         /// <inheritdoc/>
-        public override void Visit(Sentence sentence, HashSet<Predicate> predicates)
+        public override void Visit(Formula sentence, HashSet<Predicate> predicates)
         {
             if (sentence is Conjunction conjunction)
             {

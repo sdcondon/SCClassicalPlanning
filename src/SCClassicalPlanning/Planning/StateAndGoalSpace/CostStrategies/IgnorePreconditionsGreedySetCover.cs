@@ -13,7 +13,7 @@
 // limitations under the License.
 using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation.VariableManipulation;
+using SCFirstOrderLogic.FormulaManipulation.Substitution;
 using System.Diagnostics;
 
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
@@ -90,7 +90,7 @@ public class IgnorePreconditionsGreedySetCover : ICostStrategy
             {
                 uncovered.Remove(goalElement);
             }
-            else if (goalElement.IsNegated && !state.Elements.Contains(goalElement.Predicate))
+            else if (goalElement.IsNegative && !state.Elements.Contains(goalElement.Predicate))
             {
                 uncovered.Remove(goalElement);
             }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
+using SCFirstOrderLogic.FormulaManipulation;
 
 namespace SCClassicalPlanning.ProblemManipulation;
 
@@ -31,7 +31,7 @@ public static class IStateExtensions
     /// <summary>
     /// Utility class to find constants within the elements of a <see cref="IState"/>, and add them to a given <see cref="HashSet{T}"/>.
     /// </summary>
-    private class ConstantFinder : RecursiveSentenceVisitor<HashSet<Function>>
+    private class ConstantFinder : RecursiveFormulaVisitor<HashSet<Function>>
     {
         private static readonly ConstantFinder _instance = new();
 

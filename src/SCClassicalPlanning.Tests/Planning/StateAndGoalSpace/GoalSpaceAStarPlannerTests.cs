@@ -8,7 +8,7 @@ using SCFirstOrderLogic.Inference.Basic.KnowledgeBaseDecoration;
 using SCFirstOrderLogic.Inference.Basic.Resolution;
 using static SCClassicalPlanning.ExampleDomains.AsCode.AirCargoDomain;
 using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
+using static SCFirstOrderLogic.FormulaCreation.OperableFormulaFactory;
 
 namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
 
@@ -23,7 +23,7 @@ public static class GoalSpaceAStarPlannerTests
             new(
                 Problem: AirCargoDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(AirCargoDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
                 {
                     Cargo(new Function("cargo1")),
                     Cargo(new Function("cargo2")),
@@ -42,7 +42,7 @@ public static class GoalSpaceAStarPlannerTests
             new(
                 Problem: BlocksWorldDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
                 {
                     Block(new Function("blockA")),
                     Block(new Function("blockB")),
@@ -54,12 +54,12 @@ public static class GoalSpaceAStarPlannerTests
             new(
                 Problem: SpareTireDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(SpareTireDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(Array.Empty<Sentence>())),
+                InvariantsKB: await MakeResolutionKBAsync(Array.Empty<Formula>())),
 
             new(
                 Problem: BlocksWorldDomain.LargeExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
                 {
                     Block(new Function("blockA")),
                     Block(new Function("blockB")),
@@ -86,7 +86,7 @@ public static class GoalSpaceAStarPlannerTests
             new(
                 Problem: AirCargoDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(AirCargoDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
                 {
                     Cargo(new Function("cargo1")),
                     Cargo(new Function("cargo2")),
@@ -105,7 +105,7 @@ public static class GoalSpaceAStarPlannerTests
             new(
                 Problem: BlocksWorldDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
                 {
                     Block(new Function("blockA")),
                     Block(new Function("blockB")),
@@ -117,12 +117,12 @@ public static class GoalSpaceAStarPlannerTests
             new(
                 Problem: SpareTireDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(SpareTireDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(Array.Empty<Sentence>())),
+                InvariantsKB: await MakeResolutionKBAsync(Array.Empty<Formula>())),
 
             new(
                 Problem: BlocksWorldDomain.LargeExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Sentence[]
+                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
                 {
                     Block(new Function("blockA")),
                     Block(new Function("blockB")),
@@ -145,7 +145,7 @@ public static class GoalSpaceAStarPlannerTests
         .And((_, tc, _, pl) => pl.ApplyTo(tc.Problem.InitialState).Meets(tc.Problem.EndGoal).Should().BeTrue())
         .And((cxt, tc, _, pl) => cxt.WriteOutputLine(new PlanFormatter(tc.Problem).Format(pl)));
 
-    private static async Task<IKnowledgeBase> MakeResolutionKBAsync(IEnumerable<Sentence> invariants)
+    private static async Task<IKnowledgeBase> MakeResolutionKBAsync(IEnumerable<Formula> invariants)
     {
         var resolutionKb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
             new HashSetClauseStore(),

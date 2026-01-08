@@ -13,7 +13,7 @@
 // limitations under the License.
 using SCClassicalPlanning.InternalUtilities;
 using SCFirstOrderLogic;
-using SCFirstOrderLogic.SentenceManipulation;
+using SCFirstOrderLogic.FormulaManipulation;
 using System.Collections.Immutable;
 
 namespace SCClassicalPlanning;
@@ -45,7 +45,7 @@ public class Effect
     /// Initializes a new instance of the <see cref="Effect" /> class from a sentence of first order logic. The sentence must be a conjunction of literals, or an exception will be thrown.
     /// </summary>
     /// <param name="sentence">The sentence that expresses the effect.</param>
-    public Effect(Sentence sentence) : this(ConstructionVisitor.Visit(sentence)) { }
+    public Effect(Formula sentence) : this(ConstructionVisitor.Visit(sentence)) { }
 
     // NB: uses argument directly, unlike public ctors. This is to avoid unnecessary GC pressure.
     internal Effect(ImmutableHashSet<Literal> elements) => Elements = elements;
@@ -70,13 +70,13 @@ public class Effect
     /// Gets the "add list" of the effect - the non-negated predicates within the <see cref="Elements"/> set.
     /// These are added to a <see cref="IState"/> when this effect is applied.
     /// </summary>
-    public IEnumerable<Predicate> AddList => Elements.Where(a => !a.IsNegated).Select(l => l.Predicate);
+    public IEnumerable<Predicate> AddList => Elements.Where(a => !a.IsNegative).Select(l => l.Predicate);
 
     /// <summary>
     /// Gets the "delete list" of the effect - the negated predicates within the <see cref="Elements"/> set.
     /// These are removed from a <see cref="IState"/> when this effect is applied.
     /// </summary>
-    public IEnumerable<Predicate> DeleteList => Elements.Where(a => a.IsNegated).Select(l => l.Predicate);
+    public IEnumerable<Predicate> DeleteList => Elements.Where(a => a.IsNegative).Select(l => l.Predicate);
 
     /// <summary>
     /// <para>
@@ -132,14 +132,14 @@ public class Effect
     public override string ToString() => string.Join(" ∧ ", Elements.Select(a => a.ToString()));
 
     /// <summary>
-    /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Sentence"/> that is a conjunction of them.
-    /// Used by the <see cref="Effect(Sentence)"/> constructor.
+    /// Sentence visitor class that extracts <see cref="Literal"/>s from a <see cref="Formula"/> that is a conjunction of them.
+    /// Used by the <see cref="Effect(Formula)"/> constructor.
     /// </summary>
-    private class ConstructionVisitor : RecursiveSentenceVisitor<HashSet<Literal>>
+    private class ConstructionVisitor : RecursiveFormulaVisitor<HashSet<Literal>>
     {
         private static readonly ConstructionVisitor Instance = new();
 
-        public static HashSet<Literal> Visit(Sentence sentence)
+        public static HashSet<Literal> Visit(Formula sentence)
         {
             var elements = new HashSet<Literal>();
             Instance.Visit(sentence, elements);
@@ -147,7 +147,7 @@ public class Effect
         }
 
         /// <inheritdoc/>
-        public override void Visit(Sentence sentence, HashSet<Literal> literals)
+        public override void Visit(Formula sentence, HashSet<Literal> literals)
         {
             if (sentence is Conjunction conjunction)
             {

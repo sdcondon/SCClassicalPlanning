@@ -8,7 +8,7 @@ using SCFirstOrderLogic;
 using SCFirstOrderLogic.Inference;
 using SCFirstOrderLogic.Inference.Basic.Resolution;
 using static SCClassicalPlanning.ExampleDomains.AsCode.BlocksWorldDomain;
-using static SCFirstOrderLogic.SentenceCreation.OperableSentenceFactory;
+using static SCFirstOrderLogic.FormulaCreation.OperableFormulaFactory;
 
 namespace SCClassicalPlanning.Benchmarks.Planning;
 
@@ -27,13 +27,13 @@ public class PlannerBenchmarks
             Label: "Air Cargo",
             Problem: AirCargoDomain.ExampleProblem,
             CostStrategy: new IgnorePreconditionsGreedySetCover(AirCargoDomain.ActionSchemas),
-            InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
+            InvariantsKB: MakeInvariantsKB(Array.Empty<Formula>())),
 
         new(
             Label: "Blocks - Small",
             Problem: BlocksWorldDomain.ExampleProblem,
             CostStrategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
-            InvariantsKB: MakeInvariantsKB(new Sentence[]
+            InvariantsKB: MakeInvariantsKB(new Formula[]
             {
                 // TODO: slicker support for unique names assumption worth looking into at some point..
                 // Probably via invariants KB.
@@ -56,7 +56,7 @@ public class PlannerBenchmarks
             Label: "Spare Tire",
             Problem: SpareTireDomain.ExampleProblem,
             CostStrategy: new IgnorePreconditionsGreedySetCover(SpareTireDomain.ActionSchemas),
-            InvariantsKB: MakeInvariantsKB(Array.Empty<Sentence>())),
+            InvariantsKB: MakeInvariantsKB(Array.Empty<Formula>())),
 
         ////new(
         ////    Label: "Blocks - Large",
@@ -131,7 +131,7 @@ public class PlannerBenchmarks
         return new GoalSpaceAStarPlanner_PropositionalWithKB(CurrentTestCase!.CostStrategy, CurrentTestCase.InvariantsKB).CreatePlan(CurrentTestCase.Problem);
     }
 
-    private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Sentence> invariants)
+    private static IKnowledgeBase MakeInvariantsKB(IEnumerable<Formula> invariants)
     {
         var invariantKb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(
             new HashSetClauseStore(invariants),
