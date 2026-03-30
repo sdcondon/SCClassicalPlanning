@@ -36,11 +36,11 @@ public class PlanningGraphActionNode
     public Action Action { get; }
 
     // TODO-V1: make public but read-only (additions via internal methods)
-    internal Collection<PlanningGraphPropositionNode> Effects { get; } = new();
+    internal Collection<PlanningGraphPropositionNode> Effects { get; } = [];
 
-    internal Collection<PlanningGraphPropositionNode> Preconditions { get; } = new();
+    internal Collection<PlanningGraphPropositionNode> Preconditions { get; } = [];
 
-    internal Collection<PlanningGraphActionNode> Mutexes { get; } = new();
+    internal Collection<PlanningGraphActionNode> Mutexes { get; } = [];
 
     /// <summary>
     /// Returns a value indicating whether this node indicates mutual exclusion with any of an enumerable of others.

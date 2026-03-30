@@ -18,13 +18,13 @@ public static class GoalSpaceAStarPlannerTests
 
     public static Test CreatedPlanValidity => TestThat
         .GivenTestContext()
-        .AndEachOfAsync<TestCase>(async () => new TestCase[]
-        {
+        .AndEachOfAsync<TestCase>(async () =>
+        [
             new(
                 Problem: AirCargoDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(AirCargoDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
-                {
+                InvariantsKB: await MakeResolutionKBAsync(
+                [
                     Cargo(new Function("cargo1")),
                     Cargo(new Function("cargo2")),
                     Plane(new Function("plane1")),
@@ -37,30 +37,30 @@ public static class GoalSpaceAStarPlannerTests
                     ForAll(A, If(Plane(A), !Airport(A))),
                     ForAll(A, If(Airport(A), !Cargo(A))),
                     ForAll(A, If(Airport(A), !Plane(A))),
-                })),
+                ])),
 
             new(
                 Problem: BlocksWorldDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
-                {
+                InvariantsKB: await MakeResolutionKBAsync(
+                [
                     Block(new Function("blockA")),
                     Block(new Function("blockB")),
                     Block(new Function("blockC")),
                     !Block(Table),
                     ForAll(A, B, If(On(A, B), !Clear(B))),
-                })),
+                ])),
 
             new(
                 Problem: SpareTireDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(SpareTireDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(Array.Empty<Formula>())),
+                InvariantsKB: await MakeResolutionKBAsync([])),
 
             new(
                 Problem: BlocksWorldDomain.LargeExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
-                {
+                InvariantsKB: await MakeResolutionKBAsync(
+                [
                     Block(new Function("blockA")),
                     Block(new Function("blockB")),
                     Block(new Function("blockC")),
@@ -68,8 +68,8 @@ public static class GoalSpaceAStarPlannerTests
                     Block(new Function("blockE")),
                     !Block(Table),
                     ForAll(A, B, If(On(A, B), !Clear(B))),
-                })),
-        })
+                ])),
+        ])
         .WhenAsync(async (_, tc) =>
         {
             var planner = new GoalSpaceAStarPlanner(tc.Strategy);
@@ -81,13 +81,13 @@ public static class GoalSpaceAStarPlannerTests
 
     public static Test CreatedPlanValidity_AlternativeImplementations => TestThat
         .GivenTestContext()
-        .AndEachOfAsync<TestCase>(async () => new TestCase[]
-        {
+        .AndEachOfAsync<TestCase>(async () =>
+        [
             new(
                 Problem: AirCargoDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(AirCargoDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
-                {
+                InvariantsKB: await MakeResolutionKBAsync(
+                [
                     Cargo(new Function("cargo1")),
                     Cargo(new Function("cargo2")),
                     Plane(new Function("plane1")),
@@ -100,30 +100,30 @@ public static class GoalSpaceAStarPlannerTests
                     ForAll(A, If(Plane(A), !Airport(A))),
                     ForAll(A, If(Airport(A), !Cargo(A))),
                     ForAll(A, If(Airport(A), !Plane(A))),
-                })),
+                ])),
 
             new(
                 Problem: BlocksWorldDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
-                {
+                InvariantsKB: await MakeResolutionKBAsync(
+                [
                     Block(new Function("blockA")),
                     Block(new Function("blockB")),
                     Block(new Function("blockC")),
                     !Block(Table),
                     ForAll(A, B, If(On(A, B), !Clear(B))),
-                })),
+                ])),
 
             new(
                 Problem: SpareTireDomain.ExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(SpareTireDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(Array.Empty<Formula>())),
+                InvariantsKB: await MakeResolutionKBAsync([])),
 
             new(
                 Problem: BlocksWorldDomain.LargeExampleProblem,
                 Strategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
-                InvariantsKB: await MakeResolutionKBAsync(new Formula[]
-                {
+                InvariantsKB: await MakeResolutionKBAsync(
+                [
                     Block(new Function("blockA")),
                     Block(new Function("blockB")),
                     Block(new Function("blockC")),
@@ -131,8 +131,8 @@ public static class GoalSpaceAStarPlannerTests
                     Block(new Function("blockE")),
                     !Block(Table),
                     ForAll(A, B, If(On(A, B), !Clear(B))),
-                })),
-        })
+                ])),
+        ])
         .AndEachOf(() => new Func<TestCase, IPlanner>[]
         {
             tc => new GoalSpaceAStarPlanner_PropositionalWithoutKB(tc.Strategy),

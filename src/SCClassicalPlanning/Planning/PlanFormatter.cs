@@ -21,15 +21,10 @@ namespace SCClassicalPlanning.Planning;
 /// <summary>
 /// Formatting logic for plans (and actions).
 /// </summary>
-public class PlanFormatter
+/// <param name="problem">The problem of the plans that will be formatted by this instance. Used to establish succinct output for individual actions.</param>
+public class PlanFormatter(Problem problem)
 {
-    private readonly Problem problem;
-
-    /// <summary>
-    /// Initialises a new instance of the <see cref="PlanFormatter"/> class.
-    /// </summary>
-    /// <param name="problem">The problem of the plans that will be formatted by this instance. Used to establish succinct output for individual actions.</param>
-    public PlanFormatter(Problem problem) => this.problem = problem;
+    private readonly Problem problem = problem;
 
     /// <summary>
     /// Creates a human-readable string representation of a given plan.

@@ -15,7 +15,7 @@ using SCClassicalPlanning.ProblemManipulation;
 using SCFirstOrderLogic;
 using SCFirstOrderLogic.FormulaManipulation.Substitution;
 
-namespace SCClassicalPlanning.Alternatives.Planning.Utilities;
+namespace SCClassicalPlanning.Planning.Utilities;
 
 /// <summary>
 /// Just includes a version of ProblemInspector.GetRelevantSchemaSubstitutions that attempts to be more efficient,
@@ -62,7 +62,7 @@ public static class ProblemInspector_MergedUnmatchLogic
                     // We need to check for the existence of the negation of the literal formed by substituting EVERY combination of
                     // objects in the problem for the as yet unbound variables. This is obviously VERY expensive for large problems with lots of objects -
                     // though I guess clever indexing could help (support for indexing is TODO).
-                    IEnumerable<VariableSubstitution> allPossibleUnifiers = new List<VariableSubstitution>() { unifier };
+                    IEnumerable<VariableSubstitution> allPossibleUnifiers = [unifier];
                     var unboundVariables = firstEffectElement.Predicate.Arguments.OfType<VariableReference>().Except(unifier.Bindings.Keys);
                     foreach (var unboundVariable in unboundVariables)
                     {

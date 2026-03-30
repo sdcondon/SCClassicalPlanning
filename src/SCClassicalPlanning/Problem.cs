@@ -21,35 +21,25 @@ namespace SCClassicalPlanning;
 /// Problems consist of an initial <see cref="IState"/>, an end <see cref="Goal"/>, and a set of schemas for allowed <see cref="Action"/>s.
 /// </para>
 /// </summary>
-public class Problem
+/// <param name="initialState">The initial state of the problem.</param>
+/// <param name="endGoal">The end goal of the problem.</param>
+/// <param name="actionSchemas">The schemas of the actions that are available within the problem.</param>
+public class Problem(IState initialState, Goal endGoal, IQueryable<Action> actionSchemas)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Problem"/> class.
-    /// </summary>
-    /// <param name="initialState">The initial state of the problem.</param>
-    /// <param name="endGoal">The end goal of the problem.</param>
-    /// <param name="actionSchemas">The schemas of the actions that are available within the problem.</param>
-    public Problem(IState initialState, Goal endGoal, IQueryable<Action> actionSchemas)
-    {
-        InitialState = initialState;
-        EndGoal = endGoal;
-        ActionSchemas = actionSchemas;
-    }
-
     /// <summary>
     /// Gets the initial state of the problem.
     /// </summary>
-    public IState InitialState { get; }
+    public IState InitialState { get; } = initialState;
 
     /// <summary>
     /// Gets the end goal of the problem.
     /// </summary>
-    public Goal EndGoal { get; }
+    public Goal EndGoal { get; } = endGoal;
 
     /// <summary>
     /// Gets the schemas of the actions that are available within the problem.
     /// </summary>
-    public IQueryable<Action> ActionSchemas { get; }
+    public IQueryable<Action> ActionSchemas { get; } = actionSchemas;
 
     //// TODO-FEATURE: It is increasingly looking like adding the following would be useful.
     //// This could be used to represent both the :timeless and :axioms of PDDL, possibly 

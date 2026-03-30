@@ -26,15 +26,10 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 /// elements appear and are all not mutually-exclusive with one another.
 /// </para>
 /// </summary>
-public class PlanningGraphSetLevel : ICostStrategy
+/// <param name="actions">The available actions.</param>
+public class PlanningGraphSetLevel(IQueryable<Action> actions) : ICostStrategy
 {
-    private readonly IQueryable<Action> actions;
-
-    /// <summary>
-    /// Initialises a new instance of the <see cref="PlanningGraphMaxLevel"/> class.
-    /// </summary>
-    /// <param name="actions">The available actions.</param>
-    public PlanningGraphSetLevel(IQueryable<Action> actions) => this.actions = actions;
+    private readonly IQueryable<Action> actions = actions;
 
     /// <inheritdoc/>
     public float GetCost(Action action) => 1f;

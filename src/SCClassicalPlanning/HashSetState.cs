@@ -36,7 +36,7 @@ public class HashSetState : IState
             throw new ArgumentException("States cannot include non-ground terms", nameof(elements));
         }
 
-        Elements = elements.ToImmutableHashSet();
+        Elements = [.. elements];
     }
 
     /// <summary>
@@ -87,19 +87,12 @@ public class HashSetState : IState
     /// <inheritdoc />
     public IEnumerable<VariableSubstitution> GetSubstitutionsToMeet(Goal goal)
     {
-        bool UnifiesNegativeGoalElement(VariableSubstitution substitution)
+        foreach (var substitution in GetPositiveGoalElementUnifiers(goal.RequiredPredicates, new VariableSubstitution()).Distinct())
         {
-            List<Literal> constraintElements = new();
-
-            foreach (var goalElement in goal.ForbiddenPredicates)
+            if (!UnifiesNegativeGoalElement(substitution))
             {
-                if (Elements.Contains(substitution.ApplyTo(goalElement)))
-                {
-                    return true;
-                }
+                yield return substitution;
             }
-
-            return false;
         }
 
         IEnumerable<VariableSubstitution> GetPositiveGoalElementUnifiers(IEnumerable<Predicate> positiveGoalPredicates, VariableSubstitution substitution)
@@ -126,12 +119,19 @@ public class HashSetState : IState
             }
         }
 
-        foreach (var substitution in GetPositiveGoalElementUnifiers(goal.RequiredPredicates, new VariableSubstitution()).Distinct())
+        bool UnifiesNegativeGoalElement(VariableSubstitution substitution)
         {
-            if (!UnifiesNegativeGoalElement(substitution))
+            List<Literal> constraintElements = [];
+
+            foreach (var goalElement in goal.ForbiddenPredicates)
             {
-                yield return substitution;
+                if (Elements.Contains(substitution.ApplyTo(goalElement)))
+                {
+                    return true;
+                }
             }
+
+            return false;
         }
     }
 

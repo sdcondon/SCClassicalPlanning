@@ -17,15 +17,10 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
 /// <summary>
 /// An implementation of <see cref="IPlanner"/> that uses <see cref="StateSpaceAStarPlanningTask"/> instances.
 /// </summary>
-public class StateSpaceAStarPlanner : IPlanner
+/// <param name="costStrategy">The cost strategy to use.</param>
+public class StateSpaceAStarPlanner(ICostStrategy costStrategy) : IPlanner
 {
-    private readonly ICostStrategy costStrategy;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="StateSpaceAStarPlanner"/> class.
-    /// </summary>
-    /// <param name="costStrategy">The cost strategy to use.</param>
-    public StateSpaceAStarPlanner(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
+    private readonly ICostStrategy costStrategy = costStrategy;
 
     /// <summary>
     /// Creates a (specifically-typed) planning task to work on solving a given problem.

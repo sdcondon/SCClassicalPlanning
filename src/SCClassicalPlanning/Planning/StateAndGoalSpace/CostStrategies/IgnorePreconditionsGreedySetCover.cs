@@ -29,15 +29,10 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 /// that don't examine the available actions at all..
 /// </para>
 /// </summary>
-public class IgnorePreconditionsGreedySetCover : ICostStrategy
+/// <param name="actions">The available actions.</param>
+public class IgnorePreconditionsGreedySetCover(IQueryable<Action> actions) : ICostStrategy
 {
-    private readonly IQueryable<Action> actions;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="IgnorePreconditionsGreedySetCover"/> class.
-    /// </summary>
-    /// <param name="actions">The available actions.</param>
-    public IgnorePreconditionsGreedySetCover(IQueryable<Action> actions) => this.actions = actions;
+    private readonly IQueryable<Action> actions = actions;
 
     /// <inheritdoc/>
     public float GetCost(Action action) => 1f;
@@ -46,7 +41,7 @@ public class IgnorePreconditionsGreedySetCover : ICostStrategy
     public float EstimateCost(IState state, Goal goal)
     {
         var unmetGoalElements = GetUnmetGoalElements(state, goal);
-        if (!unmetGoalElements.Any())
+        if (unmetGoalElements.Count == 0)
         {
             return 0;
         }
@@ -167,11 +162,9 @@ public class IgnorePreconditionsGreedySetCover : ICostStrategy
     /// <summary>
     /// Utility class to transform <see cref="Effect"/> instances using a given <see cref="VariableSubstitution"/>.
     /// </summary>
-    private class VariableSubstitutionEffectTransformation : RecursiveEffectTransformation
+    private class VariableSubstitutionEffectTransformation(VariableSubstitution substitution) : RecursiveEffectTransformation
     {
-        private readonly VariableSubstitution substitution;
-
-        public VariableSubstitutionEffectTransformation(VariableSubstitution substitution) => this.substitution = substitution;
+        private readonly VariableSubstitution substitution = substitution;
 
         public override Literal ApplyTo(Literal literal) => substitution.ApplyTo(literal);
     }

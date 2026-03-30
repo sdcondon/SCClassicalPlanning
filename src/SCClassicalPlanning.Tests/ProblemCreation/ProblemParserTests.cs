@@ -18,13 +18,13 @@ public static class ProblemParserTests
                 ExampleDomains.AsPDDL.AirCargoDomain.DomainPDDL,
                 ExampleDomains.AsCode.AirCargoDomain.ExampleProblem),
         })
-        .When(tc => PddlParser.ParseProblem(tc.problemPddl, tc.domainPddl))
+        .When(tc => PddlParser.ParseProblem(tc.ProblemPddl, tc.DomainPddl))
         .ThenReturns()
         //.And((tc, rv) => rv.Domain.Predicates.Should().BeEquivalentTo(tc.expected.Domain.Predicates))
         //.And((tc, rv) => rv.Domain.Constants.Should().BeEquivalentTo(tc.expected.Domain.Constants))
-        .And((tc, rv) => rv.ActionSchemas.Should().BeEquivalentTo(tc.expected.ActionSchemas))
-        .And((tc, rv) => rv.InitialState.Should().Be(tc.expected.InitialState))
-        .And((tc, rv) => rv.EndGoal.Should().Be(tc.expected.EndGoal));
+        .And((tc, rv) => rv.ActionSchemas.Should().BeEquivalentTo(tc.Expected.ActionSchemas))
+        .And((tc, rv) => rv.InitialState.Should().Be(tc.Expected.InitialState))
+        .And((tc, rv) => rv.EndGoal.Should().Be(tc.Expected.EndGoal));
 
-    private record PositiveTestCase(string problemPddl, string domainPddl, Problem expected);
+    private record PositiveTestCase(string ProblemPddl, string DomainPddl, Problem Expected);
 }

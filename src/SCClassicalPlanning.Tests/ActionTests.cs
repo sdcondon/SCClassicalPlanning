@@ -13,8 +13,8 @@ public static class ActionTests
     private record IsApplicableToTestCase(HashSetState State, Action Action, bool ExpectedResult);
 
     public static Test IsApplicableToBehaviour => TestThat
-        .GivenEachOf<IsApplicableToTestCase>(() => (new IsApplicableToTestCase[]
-        {
+        .GivenEachOf<IsApplicableToTestCase>(() =>
+        [
             new( // Positive - positive precondition
                 State: new(IsPresent(element1)),
                 Action: Remove(element1),
@@ -34,7 +34,7 @@ public static class ActionTests
                 State: HashSetState.Empty,
                 Action: Remove(element1),
                 ExpectedResult: false),
-        }))
+        ])
         .When(tc => tc.Action.IsApplicableTo(tc.State))
         .ThenReturns()
         .And((tc, r) => r.Should().Be(tc.ExpectedResult));
@@ -42,8 +42,8 @@ public static class ActionTests
     private record ApplyToTestCase(HashSetState State, Action Action, HashSetState ExpectedState);
 
     public static Test ApplyToBehaviour => TestThat
-        .GivenEachOf<ApplyToTestCase>(() => (new ApplyToTestCase[]
-        {
+        .GivenEachOf<ApplyToTestCase>(() =>
+        [
             new( // Adds atom
                 State: HashSetState.Empty,
                 Action: Add(element1),
@@ -63,7 +63,7 @@ public static class ActionTests
                 State: HashSetState.Empty,
                 Action: Remove(element1),
                 ExpectedState: HashSetState.Empty),
-        }))
+        ])
         .When(tc => tc.Action.ApplyTo(tc.State))
         .ThenReturns()
         .And((tc, s) => s.Should().BeEquivalentTo(tc.ExpectedState));

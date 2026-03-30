@@ -21,31 +21,22 @@ namespace SCClassicalPlanning.Planning.GraphPlan;
 /// of "Automated Planning: Theory and Practice".
 /// </para>
 /// </summary>
+/// <param name="problem">The problem to solve.</param>
 // NB: Lots of comments here, perhaps too many - I'm leaving them in due to the
 // primary purpose of this lib - learning and experimentation.
-public class GraphPlanPlanningTask_FromAPTaP : TemplatePlanningTask
+public class GraphPlanPlanningTask_FromAPTaP(Problem problem) : TemplatePlanningTask
 {
-    private readonly Problem problem;
+    private readonly Problem problem = problem;
 
     // Is a dictionary because its described as a hashtable in the listing.
     // Seems like a List'd do the job just fine (and obv be faster; okay, index 0 unneeded, but..)?
-    private readonly Dictionary<int, HashSet<Goal>> noGoods = new();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GraphPlanPlanningTask"/> class.
-    /// </summary>
-    /// <param name="problem">The problem to solve.</param>
-    public GraphPlanPlanningTask_FromAPTaP(Problem problem)
-    {
-        this.problem = problem;
-        PlanningGraph = new(problem);
-    }
+    private readonly Dictionary<int, HashSet<Goal>> noGoods = [];
 
     /// <summary>
     /// Gets the planning graph used by this planning task.
     /// </summary>
-    public PlanningGraph PlanningGraph { get; }
-    
+    public PlanningGraph PlanningGraph { get; } = new(problem);
+
     // TODO: should probably expose NoGoods - just need to make it read-only.
 
     /// <inheritdoc/>
@@ -58,7 +49,7 @@ public class GraphPlanPlanningTask_FromAPTaP : TemplatePlanningTask
         while (!currentGraphLevel.ContainsNonMutex(problem.EndGoal.Elements) && !currentGraphLevel.IsLevelledOff)
         {
             currentGraphLevel = currentGraphLevel.NextLevel;
-            noGoods[currentGraphLevel.Index] = new();
+            noGoods[currentGraphLevel.Index] = [];
         }
 
         // If the graph levelled off before all elements were non-mutex,
@@ -80,7 +71,7 @@ public class GraphPlanPlanningTask_FromAPTaP : TemplatePlanningTask
         while (plan == null)
         {
             currentGraphLevel = currentGraphLevel.NextLevel;
-            noGoods[currentGraphLevel.Index] = new();
+            noGoods[currentGraphLevel.Index] = [];
 
             plan = Extract(problem.EndGoal, currentGraphLevel);
             if (plan == null && currentGraphLevel.IsLevelledOff)
@@ -129,7 +120,7 @@ public class GraphPlanPlanningTask_FromAPTaP : TemplatePlanningTask
         // Otherwise, try to find a plan:
         Plan? plan = GPSearch(
             remainingGoalElements: SortGoalElements(goal, level),
-            chosenActionNodes: Enumerable.Empty<PlanningGraphActionNode>(),
+            chosenActionNodes: [],
             level: level);
 
         if (plan == null)

@@ -18,38 +18,38 @@ public static class GoalInvariantCheckTests
     private record TestCase(IEnumerable<Formula> Invariants, IState State, OperableGoal Goal, float ExpectedCost);
 
     public static Test EstimateCostBehaviour => TestThat
-        .GivenEachOf(() => new TestCase[]
-        {
+        .GivenEachOf<TestCase>(() =>
+        [
             new TestCase(
-                Invariants: new Formula[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
+                Invariants: [Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B)))],
                 State: BlocksWorldDomain.ExampleProblem.InitialState,
                 Goal: Goal.Empty, // Fine
                 ExpectedCost: 0),
 
             new TestCase(
-                Invariants: new Formula[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
+                Invariants: [Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B)))],
                 State: BlocksWorldDomain.ExampleProblem.InitialState,
                 Goal: Block(Table), // Fine
                 ExpectedCost: 0),
 
             new TestCase(
-                Invariants: new Formula[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
+                Invariants: [Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B)))],
                 State: BlocksWorldDomain.ExampleProblem.InitialState,
                 Goal: !Block(blockA), // Violates Block(blockA)
                 ExpectedCost: float.PositiveInfinity),
 
             new TestCase(
-                Invariants: new Formula[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
+                Invariants: [Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B)))],
                 State: BlocksWorldDomain.ExampleProblem.InitialState,
                 Goal: On(blockA, blockB) & Clear(blockB), // Violates on/clear relationship
                 ExpectedCost: float.PositiveInfinity),
 
             new TestCase(
-                Invariants: new Formula[] { Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B))) },
+                Invariants: [Block(blockA), ForAll(A, B, If(On(A, B), !Clear(B)))],
                 State: BlocksWorldDomain.ExampleProblem.InitialState,
                 Goal: On(blockB, blockA) & Clear(blockB), // Fine
                 ExpectedCost: 0),
-        })
+        ])
         .When(tc =>
         {
             var kb = new ResolutionKnowledgeBase(new DelegateResolutionStrategy(

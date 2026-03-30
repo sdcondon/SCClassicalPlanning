@@ -25,15 +25,10 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 /// The cost estimate is the sum of the level costs of all of the goal's elements.
 /// </para>
 /// </summary>
-public class PlanningGraphLevelSum : ICostStrategy
+/// <param name="actions">The available actions.</param>
+public class PlanningGraphLevelSum(IQueryable<Action> actions) : ICostStrategy
 {
-    private readonly IQueryable<Action> actions;
-
-    /// <summary>
-    /// Initialises a new instance of the <see cref="PlanningGraphMaxLevel"/> class.
-    /// </summary>
-    /// <param name="actions">The available actions.</param>
-    public PlanningGraphLevelSum(IQueryable<Action> actions) => this.actions = actions;
+    private readonly IQueryable<Action> actions = actions;
 
     /// <inheritdoc/>
     public float GetCost(Action action) => 1f;

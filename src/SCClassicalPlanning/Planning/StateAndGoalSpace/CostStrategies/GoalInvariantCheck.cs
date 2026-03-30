@@ -46,21 +46,12 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace.CostStrategies;
 /// will always be true.
 /// </para>
 /// </summary>
-public class GoalInvariantCheck : ICostStrategy
+/// <param name="invariantsKB">A knowledge base containing all of the invariants of the problem.</param>
+/// <param name="innerStrategy">The inner strategy to invoke if no invariants are violated by the goal.</param>
+public class GoalInvariantCheck(IKnowledgeBase invariantsKB, ICostStrategy innerStrategy) : ICostStrategy
 {
-    private readonly InvariantInspector invariantInspector;
-    private readonly ICostStrategy innerStrategy;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GoalInvariantCheck"/>.
-    /// </summary>
-    /// <param name="invariantsKB">A knowledge base containing all of the invariants of the problem.</param>
-    /// <param name="innerStrategy">The inner strategy to invoke if no invariants are violated by the goal.</param>
-    public GoalInvariantCheck(IKnowledgeBase invariantsKB, ICostStrategy innerStrategy)
-    {
-        this.invariantInspector = new InvariantInspector(invariantsKB);
-        this.innerStrategy = innerStrategy;
-    }
+    private readonly InvariantInspector invariantInspector = new(invariantsKB);
+    private readonly ICostStrategy innerStrategy = innerStrategy;
 
     /// <inheritdoc/>
     public float GetCost(Action action) => innerStrategy.GetCost(action);

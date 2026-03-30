@@ -29,15 +29,10 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
 /// out to every possible value whenever they occur. This is obviously suboptimal from a performance perspective.
 /// </para>
 /// </summary>
-public class GoalSpaceAStarPlanner_PropositionalWithoutKB : IPlanner
+/// <param name="costStrategy">The cost strategy to use.</param>
+public class GoalSpaceAStarPlanner_PropositionalWithoutKB(ICostStrategy costStrategy) : IPlanner
 {
-    private readonly ICostStrategy costStrategy;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GoalSpaceAStarPlanner_PropositionalWithoutKB"/> class.
-    /// </summary>
-    /// <param name="costStrategy">The cost strategy to use.</param>
-    public GoalSpaceAStarPlanner_PropositionalWithoutKB(ICostStrategy costStrategy) => this.costStrategy = costStrategy;
+    private readonly ICostStrategy costStrategy = costStrategy;
 
     /// <summary>
     /// Creates a (concretely-typed) planning task to work on solving a given problem.
@@ -122,7 +117,7 @@ public class GoalSpaceAStarPlanner_PropositionalWithoutKB : IPlanner
             {
                 if (search.IsSucceeded)
                 {
-                    result = new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
+                    result = new Plan([.. search.PathToTarget().Reverse().Select(e => e.Action)]);
                 }
 
                 isComplete = true;
@@ -182,17 +177,10 @@ public class GoalSpaceAStarPlanner_PropositionalWithoutKB : IPlanner
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public readonly struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
+    public readonly struct GoalSpaceEdge(Problem problem, Goal fromGoal, Action action) : IEdge<GoalSpaceNode, GoalSpaceEdge>
     {
-        private readonly Problem problem;
-        private readonly Goal fromGoal;
-
-        public GoalSpaceEdge(Problem problem, Goal fromGoal, Action action)
-        {
-            this.problem = problem;
-            this.fromGoal = fromGoal;
-            this.Action = action;
-        }
+        private readonly Problem problem = problem;
+        private readonly Goal fromGoal = fromGoal;
 
         /// <inheritdoc />
         public GoalSpaceNode From => new(problem, fromGoal);
@@ -203,7 +191,7 @@ public class GoalSpaceAStarPlanner_PropositionalWithoutKB : IPlanner
         /// <summary>
         /// Gets the action that is regressed over to achieve this goal transition.
         /// </summary>
-        public Action Action { get; }
+        public Action Action { get; } = action;
 
         /// <inheritdoc />
         public override string ToString() => new PlanFormatter(problem).Format(Action);

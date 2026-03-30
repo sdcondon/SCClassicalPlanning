@@ -37,9 +37,9 @@ public class PlanningGraphPropositionNode
     public Literal Proposition { get; }
 
     // TODO-V1: make public but read-only (additions via internal methods)
-    internal Collection<PlanningGraphActionNode> Actions { get; } = new();
+    internal Collection<PlanningGraphActionNode> Actions { get; } = [];
 
-    internal Collection<PlanningGraphActionNode> Causes { get; } = new();
+    internal Collection<PlanningGraphActionNode> Causes { get; } = [];
 
-    internal Collection<PlanningGraphPropositionNode> Mutexes { get; } = new();
+    internal Collection<PlanningGraphPropositionNode> Mutexes { get; } = [];
 }

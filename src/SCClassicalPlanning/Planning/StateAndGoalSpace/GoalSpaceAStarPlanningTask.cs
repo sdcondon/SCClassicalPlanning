@@ -94,7 +94,7 @@ public class GoalSpaceAStarPlanningTask : SteppablePlanningTask<GoalSpaceEdge>
         {
             if (search.IsSucceeded)
             {
-                result = new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
+                result = new Plan([.. search.PathToTarget().Reverse().Select(e => e.Action)]);
             }
 
             isComplete = true;

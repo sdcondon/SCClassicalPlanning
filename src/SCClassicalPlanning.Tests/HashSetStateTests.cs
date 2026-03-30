@@ -88,23 +88,23 @@ public static class HashSetStateTests
             new( // met positive element - ground
                 State: new(IsPresent(element1)),
                 Goal: new(IsPresent(element1)),
-                ExpectedResult: new VariableSubstitution[]
-                {
+                ExpectedResult:
+                [
                     new()
-                }),
+                ]),
 
             new( // met positive element - variable
                 State: new(IsPresent(element1)),
                 Goal: new(IsPresent(E)),
-                ExpectedResult: new VariableSubstitution[]
-                {
+                ExpectedResult:
+                [
                     new(new Dictionary<VariableReference, Term>() { [E] = element1 })
-                }),
+                ]),
 
             new( // met positive element, unmet negative element
                 State: new(In(cargo1, plane1) & At(plane1, airport1)),
                 Goal: new(In(cargo1, P) & !At(P, airport1)),
-                ExpectedResult: Array.Empty<VariableSubstitution>()),
+                ExpectedResult: []),
         })
         .When(tc => tc.State.GetSubstitutionsToMeet(tc.Goal))
         .ThenReturns()

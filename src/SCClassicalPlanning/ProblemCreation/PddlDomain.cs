@@ -16,26 +16,17 @@ namespace SCClassicalPlanning.ProblemCreation;
 /// <summary>
 /// Represents a parsed PDDL domain.
 /// </summary>
-public class PddlDomain
+/// <param name="name"></param>
+/// <param name="actions"></param>
+public class PddlDomain(string name, IEnumerable<Action> actions)
 {
-    /// <summary>
-    /// Initialises a new instance of the <see cref="PddlDomain"/> class.
-    /// </summary>
-    /// <param name="name"></param>
-    /// <param name="actions"></param>
-    public PddlDomain(string name, IEnumerable<Action> actions)
-    {
-        Name = name;
-        ActionSchemas = actions.AsQueryable();
-    }
-
     /// <summary>
     /// Gets the name of the domain.
     /// </summary>
-    public string Name { get; }
+    public string Name { get; } = name;
 
     /// <summary>
     /// Gets the actions that are available in problems of this domain.
     /// </summary>
-    public IQueryable<Action> ActionSchemas { get; }
+    public IQueryable<Action> ActionSchemas { get; } = actions.AsQueryable();
 }

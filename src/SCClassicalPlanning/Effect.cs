@@ -33,7 +33,7 @@ public class Effect
     /// Initializes a new instance of the <see cref="Effect"/> class from an enumerable of the literals that comprise it.
     /// </summary>
     /// <param name="elements">The literals that comprise the effect.</param>
-    public Effect(IEnumerable<Literal> elements) => Elements = elements.ToImmutableHashSet();
+    public Effect(IEnumerable<Literal> elements) => Elements = [.. elements];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Effect"/> class from a (params) array of the literals that comprise it.

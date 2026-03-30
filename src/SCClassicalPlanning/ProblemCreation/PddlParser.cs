@@ -134,7 +134,7 @@ public static class PddlParser
             throw new NotSupportedException(":timeless is not yet supported");
         }
 
-        List<Action> actions = new();
+        List<Action> actions = [];
         foreach (var structure in context.structureDef())
         {
             switch (structure)

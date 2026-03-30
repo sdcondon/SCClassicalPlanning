@@ -18,30 +18,24 @@ namespace SCClassicalPlanning.Planning.GraphPlan;
 /// <summary>
 /// An implementation of <see cref="IPlanningTask"/> that uses the GraphPlan algorithm.
 /// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="GraphPlanPlanningTask"/> class.
+/// </remarks>
+/// <param name="problem">The problem to solve.</param>
 // NB: Lots of comments here, perhaps too many - I'm leaving them in due to the
 // primary purpose of this lib - learning and experimentation.
-internal class GraphPlanPlanningTask : TemplatePlanningTask
+internal class GraphPlanPlanningTask(Problem problem) : TemplatePlanningTask
 {
-    private readonly Problem problem;
+    private readonly Problem problem = problem;
 
     // Is a dictionary because its described as a hashtable in the listing.
     // Seems like a List'd do the job just fine (and obv be faster/require less mem; okay, index 0 is unneeded, but..)?
-    private readonly Dictionary<int, HashSet<Goal>> noGoods = new();
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GraphPlanPlanningTask"/> class.
-    /// </summary>
-    /// <param name="problem">The problem to solve.</param>
-    public GraphPlanPlanningTask(Problem problem)
-    {
-        this.problem = problem;
-        PlanningGraph = new(problem);
-    }
+    private readonly Dictionary<int, HashSet<Goal>> noGoods = [];
 
     /// <summary>
     /// Gets the planning graph used by this planning task.
     /// </summary>
-    public PlanningGraph PlanningGraph { get; }
+    public PlanningGraph PlanningGraph { get; } = new(problem);
 
     /// <inheritdoc/>
     protected override async Task<Plan> ExecuteAsyncCore(CancellationToken cancellationToken = default)
@@ -60,7 +54,7 @@ internal class GraphPlanPlanningTask : TemplatePlanningTask
             }
 
             currentGraphLevel = currentGraphLevel.NextLevel;
-            noGoods[currentGraphLevel.Index] = new();
+            noGoods[currentGraphLevel.Index] = [];
         }
 
         // Attempt to extract a plan until we succeed - stepping forward to the
@@ -87,7 +81,7 @@ internal class GraphPlanPlanningTask : TemplatePlanningTask
                 }
 
                 currentGraphLevel = currentGraphLevel.NextLevel;
-                noGoods[currentGraphLevel.Index] = new();
+                noGoods[currentGraphLevel.Index] = [];
                 await Task.Yield(); // just until such time as e.g. States can include async stuff..
             }
         }
@@ -124,7 +118,7 @@ internal class GraphPlanPlanningTask : TemplatePlanningTask
         // Otherwise, try to find a plan using the (recursive) GPSearch method:
         Plan? plan = GPSearch(
             remainingGoalElements: SortGoalElements(goal.Elements),
-            chosenActionNodes: Enumerable.Empty<PlanningGraphActionNode>(),
+            chosenActionNodes: [],
             level: level);
 
         if (plan == null)

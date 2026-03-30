@@ -94,7 +94,7 @@ public class StateSpaceAStarPlanningTask : SteppablePlanningTask<StateSpaceEdge>
         {
             if (search.IsSucceeded)
             {
-                result = new Plan(search.PathToTarget().Select(e => e.Action).ToList());
+                result = new Plan([.. search.PathToTarget().Select(e => e.Action)]);
             }
 
             isComplete = true;

@@ -32,8 +32,8 @@ namespace SCClassicalPlanning.Planning.GraphPlan;
 public class PlanningGraph
 {
     private readonly Problem problem;
-    private readonly List<Dictionary<Literal, PlanningGraphPropositionNode>> propositionLevels = new();
-    private readonly List<Dictionary<Action, PlanningGraphActionNode>> actionLevels = new();
+    private readonly List<Dictionary<Literal, PlanningGraphPropositionNode>> propositionLevels = [];
+    private readonly List<Dictionary<Action, PlanningGraphActionNode>> actionLevels = [];
 
     private int currentLevelPropositionMutexCount = 0;
     private int expandedToLevel = 0;

@@ -25,29 +25,20 @@ namespace SCClassicalPlanning.Planning.GraphPlan;
 /// An implementation of <see cref="IPlanningTask"/> that uses the GraphPlan algorithm.
 /// Influenced mostly by AIaMA - but doesn't work 'cos nogoods aren't implemented properly.
 /// </summary>
-internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
+/// <param name="problem">The problem to solve.</param>
+internal class GraphPlanPlanningTask_FromAIaMA(Problem problem) : TemplatePlanningTask
 {
-    private readonly Problem problem;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GraphPlanPlanningTask"/> class.
-    /// </summary>
-    /// <param name="problem">The problem to solve.</param>
-    public GraphPlanPlanningTask_FromAIaMA(Problem problem)
-    {
-        this.problem = problem;
-        PlanningGraph = new(problem);
-    }
+    private readonly Problem problem = problem;
 
     /// <summary>
     /// Gets the planning graph used by this planning task.
     /// </summary>
-    public PlanningGraph PlanningGraph { get; }
+    public PlanningGraph PlanningGraph { get; } = new(problem);
 
     /// <inheritdoc />
     protected override async Task<Plan> ExecuteAsyncCore(CancellationToken cancellationToken = default)
     {
-        HashSet<SearchState> noGoods = new();
+        HashSet<SearchState> noGoods = [];
         var goalElementsPresentAndNonMutex = false;
         var noGoodsLevelledOff = false;
 
@@ -127,17 +118,11 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
     // applicable to the previous level (no pair of which are mutually exclusive) that collectively
     // meet the goal.
     [DebuggerDisplay("{Goal} @ L{graphLevel.Index}")]
-    private readonly struct SearchNode : INode<SearchNode, SearchEdge>, IEquatable<SearchNode>
+    private readonly struct SearchNode(PlanningGraphPropositionLevel graphLevel, Goal goal) : INode<SearchNode, SearchEdge>, IEquatable<SearchNode>
     {
-        public SearchNode(PlanningGraphPropositionLevel graphLevel, Goal goal)
-        {
-            this.GraphLevel = graphLevel;
-            this.Goal = goal;
-        }
+        public readonly Goal Goal { get; } = goal;
 
-        public readonly Goal Goal { get; }
-
-        public readonly PlanningGraphPropositionLevel GraphLevel { get; }
+        public readonly PlanningGraphPropositionLevel GraphLevel { get; } = graphLevel;
 
         public IReadOnlyCollection<SearchEdge> Edges => new SearchNodeEdges(GraphLevel, Goal);
 
@@ -149,16 +134,10 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
         public override int GetHashCode() => HashCode.Combine(GraphLevel.Index, Goal);
     }
 
-    private readonly struct SearchNodeEdges : IReadOnlyCollection<SearchEdge>
+    private readonly struct SearchNodeEdges(PlanningGraphPropositionLevel graphLevel, Goal goal) : IReadOnlyCollection<SearchEdge>
     {
-        private readonly PlanningGraphPropositionLevel graphLevel;
-        private readonly Goal goal;
-
-        public SearchNodeEdges(PlanningGraphPropositionLevel graphLevel, Goal goal)
-        {
-            this.graphLevel = graphLevel;
-            this.goal = goal;
-        }
+        private readonly PlanningGraphPropositionLevel graphLevel = graphLevel;
+        private readonly Goal goal = goal;
 
         /// <inheritdoc />
         [SuppressMessage("CA", "CA1829", Justification = "False positive - this *is* the Count implementation")]
@@ -204,7 +183,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
             // Now (recursively) attempt to cover all elements of the goal, with no mutexes:
             // We go recursive to ensure that we ultimately find all combinations - but this is of course potentially expensive.
             // There's no way around this, unfortunately - the set cover problem is NP-complete, after all..
-            return FindCoveringActionSets(goalElements, relevantActionNodes.ToImmutableHashSet(), ImmutableHashSet<PlanningGraphActionNode>.Empty).GetEnumerator();
+            return FindCoveringActionSets(goalElements, [.. relevantActionNodes], []).GetEnumerator();
         }
 
         /// <inheritdoc />
@@ -244,19 +223,12 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
         }
     }
 
-    private readonly struct SearchEdge : IEdge<SearchNode, SearchEdge>
+    private readonly struct SearchEdge(PlanningGraphPropositionLevel graphLevel, Goal goal, IEnumerable<Action> actions) : IEdge<SearchNode, SearchEdge>
     {
-        private readonly PlanningGraphPropositionLevel graphLevel;
-        private readonly Goal goal;
+        private readonly PlanningGraphPropositionLevel graphLevel = graphLevel;
+        private readonly Goal goal = goal;
 
-        public SearchEdge(PlanningGraphPropositionLevel graphLevel, Goal goal, IEnumerable<Action> actions)
-        {
-            this.graphLevel = graphLevel;
-            this.goal = goal;
-            this.Actions = actions;
-        }
-
-        public IEnumerable<Action> Actions { get; }
+        public IEnumerable<Action> Actions { get; } = actions;
 
         /// <inheritdoc />
         public SearchNode From => new(graphLevel, goal);
@@ -277,7 +249,7 @@ internal class GraphPlanPlanningTask_FromAIaMA : TemplatePlanningTask
         private readonly SearchNode source;
         private readonly Problem problem;
         private readonly HashSet<SearchState> noGoods;
-        private readonly Dictionary<SearchNode, SearchEdge> visited = new();
+        private readonly Dictionary<SearchNode, SearchEdge> visited = [];
 
         public SolutionExtractionDFS(Problem problem, PlanningGraphPropositionLevel graphLevel, HashSet<SearchState> noGoods)
         {

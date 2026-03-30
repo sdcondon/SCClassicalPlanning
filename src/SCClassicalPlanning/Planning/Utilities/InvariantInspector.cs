@@ -20,23 +20,15 @@ namespace SCClassicalPlanning.Planning.Utilities;
 /// <summary>
 /// Utility logic for making use of invariants (that is, statements that hold true in all reachable states of a problem).
 /// </summary>
+/// <param name="knowledgeBase">A knowledge base that contains all of the invariants.</param>
 // TODO-EXTENSION?: Given that inference can take a while, might be interesting to play with non-trivial asynchronicity here at some point
 // (almost certainly as an extension rather than in this package). That is, create higher-level logic that queues up the methods here
 // and post-hoc prunes/updates search branches as appropriate when they finish.
-public class InvariantInspector
+public class InvariantInspector(IKnowledgeBase knowledgeBase)
 {
-    private readonly IKnowledgeBase invariantsKB;
+    private readonly IKnowledgeBase invariantsKB = knowledgeBase ?? throw new ArgumentNullException(nameof(knowledgeBase));
     private readonly Dictionary<Goal, bool> isPrecludedGoalResultCache = new() { [Goal.Empty] = false };
-    private readonly Dictionary<Literal, bool> isTrivialElementResultCache = new();
-
-    /// <summary>
-    /// Initialises a new instance of the <see cref="InvariantInspector"/> class.
-    /// </summary>
-    /// <param name="knowledgeBase">A knowledge base that contains all of the invariants.</param>
-    public InvariantInspector(IKnowledgeBase knowledgeBase)
-    {
-        invariantsKB = knowledgeBase ?? throw new ArgumentNullException(nameof(knowledgeBase));
-    }
+    private readonly Dictionary<Literal, bool> isTrivialElementResultCache = [];
 
     /// <summary>
     /// Gets a value indicating whether the invariants mean that a given goal is impossible to achieve.

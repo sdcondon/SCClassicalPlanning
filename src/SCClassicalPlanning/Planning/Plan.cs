@@ -18,23 +18,18 @@ namespace SCClassicalPlanning.Planning;
 /// <summary>
 /// Container for a (totally-ordered) plan of action - essentially just a list of steps.
 /// </summary>
-public class Plan
+/// <param name="steps">The actions that comprise the plan.</param>
+public class Plan(IEnumerable<Action> steps)
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="Plan"/> class.
-    /// </summary>
-    /// <param name="steps">The actions that comprise the plan.</param>
-    public Plan(IEnumerable<Action> steps) => Steps = steps.ToImmutableList();
-
     /// <summary>
     /// Gets a singleton instance of an empty plan;
     /// </summary>
-    public static Plan Empty { get; } = new Plan(Array.Empty<Action>());
+    public static Plan Empty { get; } = new Plan([]);
 
     /// <summary>
     /// Gets the steps of the plan.
     /// </summary>
-    public ImmutableList<Action> Steps { get; }
+    public ImmutableList<Action> Steps { get; } = [.. steps];
 
     /// <summary>
     /// <para>

@@ -19,8 +19,8 @@ public static class IgnorePreconditionsGreedySetCoverTests
     private record TestCase(IState State, OperableGoal Goal, IQueryable<Action> Actions, float ExpectedCost);
 
     public static Test EstimateCostBehaviour => TestThat
-        .GivenEachOf(() => new TestCase[]
-        {
+        .GivenEachOf<TestCase>(() =>
+        [
             // Unload (or indeed Fly - ignoring preconds means ignoring 'type'..) cargo1 to airport1,
             // = 1
             new TestCase(
@@ -72,7 +72,7 @@ public static class IgnorePreconditionsGreedySetCoverTests
                     & At(cargo1, airport2),
                 Actions: AirCargoDomain.ActionSchemas, // unload (or fly)
                 ExpectedCost: 2),
-        })
+        ])
         .When(tc => new IgnorePreconditionsGreedySetCover(tc.Actions).EstimateCost(tc.State, tc.Goal))
         .ThenReturns()
         .And((tc, rv) => rv.Should().Be(tc.ExpectedCost));

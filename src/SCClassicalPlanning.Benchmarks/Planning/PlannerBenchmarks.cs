@@ -21,20 +21,20 @@ public class PlannerBenchmarks
         public override string ToString() => Label;
     }
 
-    public static IEnumerable<TestCase> TestCases { get; } = new TestCase[]
-    {
+    public static IEnumerable<TestCase> TestCases { get; } =
+    [
         new(
             Label: "Air Cargo",
             Problem: AirCargoDomain.ExampleProblem,
             CostStrategy: new IgnorePreconditionsGreedySetCover(AirCargoDomain.ActionSchemas),
-            InvariantsKB: MakeInvariantsKB(Array.Empty<Formula>())),
+            InvariantsKB: MakeInvariantsKB([])),
 
         new(
             Label: "Blocks - Small",
             Problem: BlocksWorldDomain.ExampleProblem,
             CostStrategy: new IgnorePreconditionsGreedySetCover(BlocksWorldDomain.ActionSchemas),
-            InvariantsKB: MakeInvariantsKB(new Formula[]
-            {
+            InvariantsKB: MakeInvariantsKB(
+            [
                 // TODO: slicker support for unique names assumption worth looking into at some point..
                 // Probably via invariants KB.
                 Block(new Function("blockA")),
@@ -50,13 +50,13 @@ public class PlannerBenchmarks
                 !Equal(new Function("blockC"), new Function("blockB")),
                 Equal(new Function("blockC"), new Function("blockC")),
                 ForAll(A, B, If(On(A, B), !Clear(B))),
-            })),
+            ])),
 
         new(
             Label: "Spare Tire",
             Problem: SpareTireDomain.ExampleProblem,
             CostStrategy: new IgnorePreconditionsGreedySetCover(SpareTireDomain.ActionSchemas),
-            InvariantsKB: MakeInvariantsKB(Array.Empty<Formula>())),
+            InvariantsKB: MakeInvariantsKB([])),
 
         ////new(
         ////    Label: "Blocks - Large",
@@ -96,7 +96,7 @@ public class PlannerBenchmarks
         ////        Equal(new Constant("blockE"), new Constant("blockE")),
         ////        ForAll(A, B, If(On(A, B), !Clear(B))),
         ////    })),
-    };
+    ];
 
     [ParamsSource(nameof(TestCases))]
     public TestCase? CurrentTestCase { get; set; }

@@ -18,37 +18,27 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
 /// <summary>
 /// Represents an edge in the state space of a planning problem.
 /// </summary>
+/// <param name="problem">The problem whose state space this edge is a member of.</param>
+/// <param name="fromState">The state represented by the node that this edge connects from.</param>
+/// <param name="action">The action that this edge represents the application of.</param>
 // NB: three ref-valued fields puts this on the verge of being too large for a struct (24 bytes on a 64-bit system).
 // Probably worth comparing performance with a class-based graph at some point, but meh, it'll do for now.
-public readonly struct StateSpaceEdge : IEdge<StateSpaceNode, StateSpaceEdge>
+public readonly struct StateSpaceEdge(Problem problem, IState fromState, Action action) : IEdge<StateSpaceNode, StateSpaceEdge>
 {
     /// <summary>
     /// The problem whose state space this edge is a member of.
     /// </summary>
-    public readonly Problem Problem;
+    public readonly Problem Problem = problem;
 
     /// <summary>
     /// The state represented by the node that this edge connects from.
     /// </summary>
-    public readonly IState FromState;
+    public readonly IState FromState = fromState;
 
     /// <summary>
     /// The action that this edge represents the application of.
     /// </summary>
-    public readonly Action Action;
-
-    /// <summary>
-    /// Initialises a new instance of the <see cref="StateSpaceEdge"/> struct.
-    /// </summary>
-    /// <param name="problem">The problem whose state space this edge is a member of.</param>
-    /// <param name="fromState">The state represented by the node that this edge connects from.</param>
-    /// <param name="action">The action that this edge represents the application of.</param>
-    public StateSpaceEdge(Problem problem, IState fromState, Action action)
-    {
-        Problem = problem;
-        FromState = fromState;
-        Action = action;
-    }
+    public readonly Action Action = action;
 
     /// <inheritdoc />
     public StateSpaceNode From => new(Problem, FromState);

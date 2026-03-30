@@ -245,7 +245,7 @@ public static class ProblemInspector
         // Local method to find any constraints that apply to a given substitution for none of the goal's elements to be negated.
         bool TryGetConstraints(IEnumerable<Literal> effectElements, VariableSubstitution substitution, [MaybeNullWhen(false)] out Goal constraints)
         {
-            List<Literal> constraintElements = new();
+            List<Literal> constraintElements = [];
 
             foreach (var effectElement in effectElements)
             {
@@ -423,7 +423,7 @@ public static class ProblemInspector
     /// <returns>All possible subsitutions that populate each of the arguments of the given predicate with a constant.</returns>
     public static IEnumerable<VariableSubstitution> GetAllPossibleSubstitutions(Predicate predicate, IEnumerable<Function> constants, VariableSubstitution constraint)
     {
-        IEnumerable<VariableSubstitution> allPossibleSubstitutions = new List<VariableSubstitution>() { constraint };
+        IEnumerable<VariableSubstitution> allPossibleSubstitutions = [constraint];
         var unboundVariables = predicate.Arguments.OfType<VariableReference>().Except(constraint.Bindings.Keys);
 
         foreach (var unboundVariable in unboundVariables)
@@ -438,7 +438,7 @@ public static class ProblemInspector
 
     private class Standardisation : RecursiveActionTransformation
     {
-        private readonly Dictionary<VariableDeclaration, VariableDeclaration> mapping = new();
+        private readonly Dictionary<VariableDeclaration, VariableDeclaration> mapping = [];
 
         public override VariableDeclaration ApplyTo(VariableDeclaration variableDeclaration)
         {
@@ -456,25 +456,17 @@ public static class ProblemInspector
     // TODO-BUG-MAJOR: Probable issue - when identifying distinct goals in state space search,
     // some degree of recognition of variables being the same would be useful.
     // Might need to be logic in Goal, not here..
-    internal class StandardisedVariableSymbol
+    internal class StandardisedVariableSymbol(object originalSymbol)
     {
-        public StandardisedVariableSymbol(object originalSymbol) => OriginalSymbol = originalSymbol;
-
-        internal object OriginalSymbol { get; }
+        internal object OriginalSymbol { get; } = originalSymbol;
 
         public override string ToString() => $"<{OriginalSymbol}>";
     }
 
-    private class SchemaTransformation : RecursiveActionTransformation
+    private class SchemaTransformation(VariableSubstitution substitution, Goal constraints) : RecursiveActionTransformation
     {
-        private readonly VariableSubstitution substitution;
-        private readonly Goal constraints;
-
-        public SchemaTransformation(VariableSubstitution substitution, Goal constraints)
-        {
-            this.substitution = substitution;
-            this.constraints = constraints;
-        }
+        private readonly VariableSubstitution substitution = substitution;
+        private readonly Goal constraints = constraints;
 
         public override Action ApplyTo(Action action)
         {

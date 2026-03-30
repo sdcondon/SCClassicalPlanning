@@ -16,13 +16,26 @@ using SCFirstOrderLogic.FormulaManipulation;
 
 namespace SCClassicalPlanning.ProblemManipulation;
 
+/// <summary>
+/// Extension methods for 
+/// </summary>
 public static class IStateExtensions
 {
+    /// <summary>
+    /// Finds all of the constants in a given state.
+    /// </summary>
+    /// <param name="state">The state to examine.</param>
+    /// <returns>An enumerable of the constants in the given state.</returns>
     public static IEnumerable<Function> GetAllConstants(this IState state)
     {
         return state.Elements.SelectMany(p => ConstantFinder.GetAllConstants(p)).Distinct();
     }
 
+    /// <summary>
+    /// Finds all of the predicates in a given queryable of actions.
+    /// </summary>
+    /// <param name="actions">The actions to examine.</param>
+    /// <returns>An enumerable of the predicates in the queryable of actions.</returns>
     public static IEnumerable<Predicate> GetAllPredicates(this IQueryable<Action> actions)
     {
         return actions.SelectMany(a => PredicateFinder.GetAllPredicates(a)).Distinct();
@@ -39,7 +52,7 @@ public static class IStateExtensions
 
         public static IEnumerable<Function> GetAllConstants(Predicate predicate)
         {
-            HashSet<Function> result = new();
+            HashSet<Function> result = [];
             _instance.Visit(predicate, result);
             return result;
         }
@@ -62,7 +75,7 @@ public static class IStateExtensions
 
         public static IEnumerable<Predicate> GetAllPredicates(Action action)
         {
-            HashSet<Predicate> result = new();
+            HashSet<Predicate> result = [];
             _instance.Visit(action, result);
             return result;
         }

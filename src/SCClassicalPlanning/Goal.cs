@@ -36,7 +36,7 @@ public class Goal
     /// Initializes a new instance of the <see cref="Goal"/> class from an enumerable of the literals that comprise it.
     /// </summary>
     /// <param name="elements">The literals that comprise the goal.</param>
-    public Goal(IEnumerable<Literal> elements) => Elements = elements.ToImmutableHashSet();
+    public Goal(IEnumerable<Literal> elements) => Elements = [.. elements];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Goal"/> class from a (params) array of the literals that comprise it.

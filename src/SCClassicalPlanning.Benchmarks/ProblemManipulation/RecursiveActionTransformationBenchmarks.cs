@@ -14,8 +14,8 @@ public class RecursiveActionTransformationBenchmarks
         public override string ToString() => Label;
     }
 
-    public static IEnumerable<TestCase> TestCases { get; } = new TestCase[]
-    {
+    public static IEnumerable<TestCase> TestCases { get; } =
+    [
         new(
             Label: "BlocksWorld Move NO-OP",
             DoSomething: false,
@@ -25,7 +25,7 @@ public class RecursiveActionTransformationBenchmarks
             Label: "BlocksWorld Move ALL-LEAFS-OP",
             DoSomething: true,
             Action: BlocksWorldDomain.Move(new VariableDeclaration("b"), new VariableDeclaration("f"), new VariableDeclaration("t"))),
-    };
+    ];
 
     [ParamsSource(nameof(TestCases))]
     public TestCase? CurrentTestCase { get; set; }
@@ -39,11 +39,9 @@ public class RecursiveActionTransformationBenchmarks
     [Benchmark]
     public Action Linq() => new VarTransform_Linq(CurrentTestCase!.DoSomething).ApplyTo(CurrentTestCase!.Action);
 
-    private class VarTransform_Linq : RecursiveActionTransformation_Linq
+    private class VarTransform_Linq(bool doSomething) : RecursiveActionTransformation_Linq
     {
-        private readonly bool doSomething;
-
-        public VarTransform_Linq(bool doSomething) => this.doSomething = doSomething;
+        private readonly bool doSomething = doSomething;
 
         public override VariableDeclaration ApplyTo(VariableDeclaration variableDeclaration)
         {
@@ -51,11 +49,9 @@ public class RecursiveActionTransformationBenchmarks
         }
     }
 
-    private class VarTransform_ToIHS : RecursiveActionTransformation_ToIHS
+    private class VarTransform_ToIHS(bool doSomething) : RecursiveActionTransformation_ToIHS
     {
-        private readonly bool doSomething;
-
-        public VarTransform_ToIHS(bool doSomething) => this.doSomething = doSomething;
+        private readonly bool doSomething = doSomething;
 
         public override VariableDeclaration ApplyTo(VariableDeclaration variableDeclaration)
         {
@@ -63,11 +59,9 @@ public class RecursiveActionTransformationBenchmarks
         }
     }
 
-    private class VarTransform : RecursiveActionTransformation
+    private class VarTransform(bool doSomething) : RecursiveActionTransformation
     {
-        private readonly bool doSomething;
-
-        public VarTransform(bool doSomething) => this.doSomething = doSomething;
+        private readonly bool doSomething = doSomething;
 
         public override VariableDeclaration ApplyTo(VariableDeclaration variableDeclaration)
         {

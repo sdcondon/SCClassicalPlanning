@@ -23,20 +23,11 @@ namespace SCClassicalPlanning.Planning.StateAndGoalSpace;
 /// A simple implementation of <see cref="IPlanner"/> that carries out an A-star search of
 /// the goal space to create plans.
 /// </summary>
-public class GoalSpaceAStarPlanner_LiftedWithKB : IPlanner
+/// <param name="costStrategy">The cost strategy to use.</param>
+public class GoalSpaceAStarPlanner_LiftedWithKB(ICostStrategy costStrategy, IKnowledgeBase? invariantsKB = null) : IPlanner
 {
-    private readonly ICostStrategy costStrategy;
-    private readonly InvariantInspector? invariantInspector;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GoalSpaceAStarPlanner_LiftedWithKB"/> class.
-    /// </summary>
-    /// <param name="costStrategy">The cost strategy to use.</param>
-    public GoalSpaceAStarPlanner_LiftedWithKB(ICostStrategy costStrategy, IKnowledgeBase? invariantsKB = null)
-    {
-        this.costStrategy = costStrategy;
-        this.invariantInspector = invariantsKB != null ? new InvariantInspector(invariantsKB) : null;
-    }
+    private readonly ICostStrategy costStrategy = costStrategy;
+    private readonly InvariantInspector? invariantInspector = invariantsKB != null ? new InvariantInspector(invariantsKB) : null;
 
     /// <summary>
     /// Creates a (concretely-typed) planning task to work on solving a given problem.
@@ -129,7 +120,7 @@ public class GoalSpaceAStarPlanner_LiftedWithKB : IPlanner
             {
                 if (search.IsSucceeded)
                 {
-                    result = new Plan(search.PathToTarget().Reverse().Select(e => e.Action).ToList());
+                    result = new Plan([.. search.PathToTarget().Reverse().Select(e => e.Action)]);
                 }
 
                 isComplete = true;
@@ -210,17 +201,10 @@ public class GoalSpaceAStarPlanner_LiftedWithKB : IPlanner
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public readonly struct GoalSpaceEdge : IEdge<GoalSpaceNode, GoalSpaceEdge>
+    public readonly struct GoalSpaceEdge(GoalSpaceAStarPlanner_LiftedWithKB.PlanningTask planningTask, Goal fromGoal, Action action) : IEdge<GoalSpaceNode, GoalSpaceEdge>
     {
-        private readonly PlanningTask planningTask;
-        private readonly Goal fromGoal;
-
-        public GoalSpaceEdge(PlanningTask planningTask, Goal fromGoal, Action action)
-        {
-            this.planningTask = planningTask;
-            this.fromGoal = fromGoal;
-            this.Action = action;
-        }
+        private readonly PlanningTask planningTask = planningTask;
+        private readonly Goal fromGoal = fromGoal;
 
         /// <inheritdoc />
         public GoalSpaceNode From => new(planningTask, fromGoal);
@@ -231,7 +215,7 @@ public class GoalSpaceAStarPlanner_LiftedWithKB : IPlanner
         /// <summary>
         /// Gets the action that is regressed over to achieve this goal transition.
         /// </summary>
-        public Action Action { get; }
+        public Action Action { get; } = action;
 
         /// <inheritdoc />
         public override string ToString() => new PlanFormatter(planningTask.Problem).Format(Action);
